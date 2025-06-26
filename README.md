@@ -3,4 +3,4 @@ This will be expanded to serve as my base for a Foundry interactive Cyberpunk Ag
 Future plans:
 Create an interactive agent.
     User will log on, save their Foundry ID and be served a personalised Agent based on their Characters profile. 
-    I, as GM, will be able to send them texts, calls, a map
+    I, as GM, will be able to send them texts, calls, a map, shopping lists and other such things that are either in the book or in the CDPR module.
