@@ -1,0 +1,352 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.glow-cyan { text-shadow: 0 0 5px theme('colors.cyan.400'), 0 0 10px theme('colors.cyan.500'), 0 0 15px theme('colors.cyan.600'); }
+.glow-pink { text-shadow: 0 0 5px theme('colors.pink.400'), 0 0 10px theme('colors.pink.500'), 0 0 15px theme('colors.pink.600'); }
+.glow-lime { text-shadow: 0 0 5px theme('colors.lime.400'), 0 0 10px theme('colors.lime.500'), 0 0 15px theme('colors.lime.600'); }
+.glow-purple { text-shadow: 0 0 5px theme('colors.purple.400'), 0 0 10px theme('colors.purple.500'), 0 0 15px theme('colors.purple.600'); }
+.glow-red { text-shadow: 0 0 5px theme('colors.red.400'), 0 0 10px theme('colors.red.500'), 0 0 15px theme('colors.red.600'); }
+.glow-orange { text-shadow: 0 0 5px theme('colors.orange.400'), 0 0 10px theme('colors.orange.500'), 0 0 15px theme('colors.orange.600'); }
+.glow-teal { text-shadow: 0 0 5px theme('colors.teal.400'), 0 0 10px theme('colors.teal.500'), 0 0 15px theme('colors.teal.600'); }
+
+
+.cyber-button {
+    @apply text-white font-medium py-2.5 px-5 rounded-md shadow-md transition duration-150 ease-in-out tracking-wider border-2 text-sm;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+.cyber-button:hover { @apply shadow-lg transform scale-105; }
+.cyber-button:active { @apply transform scale-95; }
+
+.cyber-button.bg-cyan-600 { @apply focus:ring-cyan-400; }
+.cyber-button.bg-lime-600 { @apply focus:ring-lime-400; }
+.cyber-button.bg-yellow-500 { @apply focus:ring-yellow-300 text-gray-900; }
+.cyber-button.bg-yellow-500:hover { @apply text-gray-900; }
+.cyber-button.bg-red-600, .cyber-button.bg-red-500 { @apply focus:ring-red-400; } /* Consolidated red */
+.cyber-button.bg-purple-600 { @apply focus:ring-purple-400; }
+.cyber-button.bg-pink-600 { @apply focus:ring-pink-400; }
+.cyber-button.bg-orange-600 { @apply focus:ring-orange-400; }
+.cyber-button.bg-teal-600 { @apply focus:ring-teal-400; }
+
+
+.cyber-input-field, .cyber-textarea-field, .cyber-select-field {
+    @apply block w-full p-3 bg-gray-700 border border-gray-600 rounded-md shadow-sm text-gray-100 text-base;
+    @apply focus:ring-2 focus:ring-pink-500 focus:border-pink-500 placeholder-gray-400;
+}
+.cyber-textarea-field { @apply min-h-[70px] leading-relaxed; }
+.cyber-select-field {
+    @apply appearance-none bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+.cyber-select-option { @apply bg-gray-700 text-gray-100 p-2; }
+
+.input-grid { @apply grid gap-2 mb-2; } /* For multiple inputs in a row/column before a button */
+.input-grid > * { @apply mb-0; } /* Remove default bottom margin for items in the grid */
+
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: theme('colors.gray.800'); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: theme('colors.pink.600'); border-radius: 10px; border: 2px solid theme('colors.gray.800');}
+::-webkit-scrollbar-thumb:hover { background: theme('colors.pink.500'); }
+* { scrollbar-width: auto; scrollbar-color: theme('colors.pink.600') theme('colors.gray.800');}
+.modal-scroll-content::-webkit-scrollbar-thumb { background: theme('colors.lime.500');}
+.modal-scroll-content { scrollbar-color: theme('colors.lime.500') theme('colors.gray.800');}
+
+
+/* Sidebar specific styles */
+.cyber-sidebar { scrollbar-width: thin; scrollbar-color: theme('colors.cyan.500') theme('colors.gray.700'); }
+.cyber-sidebar::-webkit-scrollbar-thumb { background: theme('colors.cyan.500'); }
+.cyber-sidebar::-webkit-scrollbar-thumb:hover { background: theme('colors.cyan.400'); }
+.sidebar-text-lime { @apply text-lime-400; }
+.sidebar-text-yellow { @apply text-yellow-400; }
+.sidebar-text-red { @apply text-red-400; }
+.sidebar-text-purple { @apply text-purple-400; }
+.sidebar-text-cyan { @apply text-cyan-400; }
+.sidebar-text-orange { @apply text-orange-400; }
+.sidebar-text-teal { @apply text-teal-400; }
+
+.sidebar-section-active { @apply text-pink-400 font-semibold scale-105; }
+.sidebar-subsection-active { @apply text-pink-400 font-semibold; }
+
+/* Helper to mark sections for JS sidebar generation */
+.api-section {}
+
+.glow-cyan { text-shadow: 0 0 5px theme('colors.cyan.400'), 0 0 10px theme('colors.cyan.500'); }
+.glow-pink { text-shadow: 0 0 5px theme('colors.pink.400'), 0 0 10px theme('colors.pink.500'); }
+.glow-lime { text-shadow: 0 0 5px theme('colors.lime.400'), 0 0 10px theme('colors.lime.500'); }
+.glow-purple { text-shadow: 0 0 5px theme('colors.purple.400'), 0 0 10px theme('colors.purple.500'); }
+.glow-red { text-shadow: 0 0 5px theme('colors.red.400'), 0 0 10px theme('colors.red.500'); }
+
+.cyber-button {
+    @apply text-white font-medium py-2.5 px-5 rounded-md shadow-md transition duration-150 ease-in-out tracking-wider border-2;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+.cyber-button:hover {
+    @apply shadow-lg transform scale-105;
+}
+.cyber-button.bg-cyan-600 { @apply focus:ring-cyan-400; }
+.cyber-button.bg-lime-600 { @apply focus:ring-lime-400; }
+.cyber-button.bg-yellow-500 { @apply focus:ring-yellow-300 text-gray-900; } /* Yellow buttons might need darker text */
+.cyber-button.bg-yellow-500:hover { @apply text-gray-900; }
+.cyber-button.bg-red-600 { @apply focus:ring-red-400; }
+.cyber-button.bg-purple-600 { @apply focus:ring-purple-400; }
+.cyber-button.bg-pink-600 { @apply focus:ring-pink-400; }
+
+
+.cyber-input, .cyber-textarea {
+    @apply block w-full p-3 border-2 rounded-md shadow-sm text-gray-200
+    focus:ring-2 sm:text-sm placeholder-gray-500 transition-all duration-300 ease-in-out;
+    transform-origin: center;
+    position: relative;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+    background-color: theme('colors.gray.700');
+    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05));
+    display: block;
+}
+
+/* Grid layout for form inputs */
+.input-grid {
+    @apply grid gap-2;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* Style inputs based on their parent container's heading color using classes */
+.p-4 h4.text-lime-300 ~ .cyber-input,
+.p-4 h4.text-lime-300 ~ .mb-2 + .cyber-input {
+    @apply border-lime-700 focus:border-lime-500 focus:ring-lime-500;
+    box-shadow: 0 0 5px theme('colors.lime.900');
+    background-image: linear-gradient(to bottom,
+    rgba(132, 204, 22, 0.05), /* lime-500 with low opacity */
+    rgba(63, 98, 18, 0.1) /* lime-900 with low opacity */
+    );
+}
+
+.p-4 h4.text-yellow-400 ~ .cyber-input,
+.p-4 h4.text-yellow-400 ~ .cyber-textarea,
+.p-4 h4.text-yellow-400 ~ .mb-2 + .cyber-input {
+    @apply border-yellow-700 focus:border-yellow-500 focus:ring-yellow-500;
+    box-shadow: 0 0 5px theme('colors.yellow.900');
+    background-image: linear-gradient(to bottom,
+    rgba(250, 204, 21, 0.05), /* yellow-400 with low opacity */
+    rgba(113, 63, 18, 0.1) /* yellow-900 with low opacity */
+    );
+}
+
+.p-4 h4.text-red-500 ~ .cyber-input,
+.p-4 h4.text-red-500 ~ .mb-2 + .cyber-input {
+    @apply border-red-700 focus:border-red-500 focus:ring-red-500;
+    box-shadow: 0 0 5px theme('colors.red.900');
+    background-image: linear-gradient(to bottom,
+    rgba(239, 68, 68, 0.05), /* red-500 with low opacity */
+    rgba(127, 29, 29, 0.1) /* red-900 with low opacity */
+    );
+}
+
+.p-4 h4.text-purple-300 ~ .cyber-input,
+.p-4 h4.text-purple-300 ~ .cyber-textarea,
+.p-4 h4.text-purple-300 ~ .mb-2 + .cyber-input {
+    @apply border-purple-700 focus:border-purple-500 focus:ring-purple-500;
+    box-shadow: 0 0 5px theme('colors.purple.900');
+    background-image: linear-gradient(to bottom,
+    rgba(216, 180, 254, 0.05), /* purple-300 with low opacity */
+    rgba(88, 28, 135, 0.1) /* purple-900 with low opacity */
+    );
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* --- Global Scrollbar Styles (from your provided stylesheet) --- */
+/* These ensure consistent scrollbar appearance across the app */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: theme('colors.gray.800'); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: theme('colors.pink.600'); border-radius: 10px; border: 2px solid theme('colors.gray.800');}
+::-webkit-scrollbar-thumb:hover { background: theme('colors.pink.500'); }
+* { scrollbar-width: auto; scrollbar-color: theme('colors.pink.600') theme('colors.gray.800');}
+
+/* Specific scrollbar for the modal content, matching your theme */
+.modal-scroll-content::-webkit-scrollbar-thumb { background: theme('colors.lime.500');}
+.modal-scroll-content { scrollbar-color: theme('colors.lime.500') theme('colors.gray.800');}
+
+
+/* --- JSON Response Styling --- */
+/* Wrapper for the entire JSON response including header */
+.json-response-wrapper {
+    margin-bottom: 1rem;
+    border-radius: 0.375rem; /* rounded-md */
+    overflow: hidden; /* Ensure the header and content stay together visually */
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); /* Subtle outer glow */
+}
+
+/* Header styling for the JSON response */
+.json-response-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: theme('colors.cyan.900');
+    border-top: 2px solid theme('colors.cyan.600');
+    border-left: 2px solid theme('colors.cyan.700');
+    border-right: 2px solid theme('colors.cyan.700');
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+
+.json-response-title {
+    color: theme('colors.cyan.300');
+    font-weight: bold;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 5px theme('colors.cyan.500');
+}
+
+.json-response-info {
+    color: theme('colors.gray.400');
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+/* JSON Output Container Styling */
+/* This gives the main JSON block a 'digital panel' look */
+.json-output-container {
+    /* Base styling from Vue script: whitespace-pre-wrap, font-mono, text-sm, leading-relaxed, p-4, bg-gray-900, rounded-md, overflow-x-auto, text-gray-200 */
+    line-height: 1.6; /* Slightly increased line height for readability */
+    /* Cyberpunk additions: Border, subtle shadow, and gradient background for depth */
+    border: 2px solid theme('colors.cyan.700'); /* A strong, theme-appropriate border */
+    border-top: none; /* Remove top border as it connects with the header */
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), /* Cyan glow around the box */
+    0 0 8px rgba(0, 0, 0, 0.5); /* Inner shadow for depth */
+    background-image: linear-gradient(to bottom,
+    rgba(0, 255, 255, 0.03), /* Very subtle cyan glow from top */
+    rgba(0, 0, 0, 0.2) /* Darker bottom for depth */
+    );
+}
+
+/* --- JSON Syntax Highlighting (Cyberpunk Colors) --- */
+/* Using colors from your theme for syntax-like highlighting */
+.json-output-container .json-key {
+    color: theme('colors.cyan.400'); /* Bright Cyan for keys */
+    font-weight: bold;
+    text-shadow: 0 0 3px theme('colors.cyan.600'); /* Subtle cyan glow */
+}
+
+.json-output-container .json-string {
+    color: theme('colors.yellow.400'); /* Vibrant Yellow for strings */
+    text-shadow: 0 0 3px theme('colors.yellow.600'); /* Subtle yellow glow */
+}
+
+.json-output-container .json-number {
+    color: theme('colors.lime.400'); /* Electric Lime for numbers */
+    font-weight: bold;
+    text-shadow: 0 0 3px theme('colors.lime.600'); /* Subtle lime glow */
+}
+
+.json-output-container .json-boolean-null {
+    color: theme('colors.purple.400'); /* Deep Purple for booleans and null */
+    font-weight: bold;
+    text-shadow: 0 0 3px theme('colors.purple.600'); /* Subtle purple glow */
+}
+
+/* New styles for structural elements */
+.json-output-container .json-bracket {
+    color: theme('colors.pink.400'); /* Pink for brackets and braces */
+    font-weight: bold;
+    text-shadow: 0 0 3px theme('colors.pink.600'); /* Subtle pink glow */
+}
+
+.json-output-container .json-comma {
+    color: theme('colors.gray.400'); /* Subtle gray for commas */
+    opacity: 0.8;
+}
+
+.json-output-container .json-colon {
+    color: theme('colors.gray.300'); /* Light gray for colons */
+    opacity: 0.9;
+}
+
+/* Indentation guides for nested structures */
+.json-output-container .json-indent-guide {
+    display: inline-block;
+    width: 1px;
+    height: 1.2em;
+    background-color: theme('colors.gray.700');
+    position: relative;
+    top: 0.1em;
+    margin-right: 1px;
+    opacity: 0.5;
+    box-shadow: 0 0 2px theme('colors.cyan.900'); /* Very subtle glow */
+}
+
+/* --- Clickable ID Styling (Enhanced Cyberpunk Look) --- */
+.clickable-id {
+    position: relative; /* Needed for absolute positioning of 'Copied!' feedback */
+    /* Tailwind classes handled in JS: text-yellow-400, cursor-pointer, inline-flex, items-center, space-x-1, hover:text-yellow-300, transition-colors, duration-200 */
+    text-decoration: underline; /* Clearly indicates clickability */
+    text-underline-offset: 2px; /* Space between text and underline */
+    text-shadow: 0 0 5px theme('colors.yellow.600'); /* Stronger yellow glow for emphasis */
+}
+
+.clickable-id:hover {
+    text-shadow: 0 0 8px theme('colors.yellow.500'); /* More intense glow on hover */
+}
+
+/* Style for the copy icon within clickable IDs */
+.clickable-id .copy-icon {
+    /* Tailwind classes handled in JS: ml-1, w-4, h-4, text-gray-500, group-hover:text-yellow-400, transition-colors, duration-200 */
+    filter: drop-shadow(0 0 2px rgba(255, 255, 0, 0.5)); /* Subtle yellow glow on icon */
+}
+.clickable-id:hover .copy-icon {
+    color: theme('colors.yellow.300'); /* Ensure consistency on hover */
+    filter: drop-shadow(0 0 4px rgba(255, 255, 0, 0.8)); /* More intense glow on icon hover */
+}
+
+/* Visual feedback for copy action - themed to your lime color */
+.clickable-id[data-copied="true"]::after {
+    content: "Copied!";
+    position: absolute;
+    top: -25px; /* Position above the element */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: theme('colors.lime.600'); /* Lime green background for success */
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem; /* Smaller font size */
+    white-space: nowrap;
+    opacity: 0;
+    animation: fade-in-out 2s forwards; /* Animation for fade effect */
+    z-index: 10; /* Ensure it's above other content */
+    box-shadow: 0 0 10px theme('colors.lime.500'); /* Glow around the copied message */
+}
+
+@keyframes fade-in-out {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/* Ensure the modal content area has flex-grow and overflow-y-auto to allow scrolling */
+/* This should already be handled by your modal's HTML structure, but including for completeness */
+.modal-content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+}
