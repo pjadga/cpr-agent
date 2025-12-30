@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Roboto+Mono:wght@400;500;700&display=swap');
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -9,6 +10,41 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+:root {
+    --cpr-red: #ff2a2a;
+    --cpr-red-dark: #8a0e0e;
+    --cpr-black: #0a0a0a;
+    --cpr-panel: #141414;
+    --cpr-border: #2a2a2a;
+    --cpr-text-main: #e0e0e0;
+}
+
+body {
+    font-family: 'Rajdhani', sans-serif;
+    background-color: var(--cpr-black);
+    color: var(--cpr-text-main);
+}
+
+.font-mono { font-family: 'Roboto Mono', monospace; }
+
+.cpr-panel {
+    background-color: var(--cpr-panel);
+    border: 1px solid var(--cpr-border);
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 10px),
+        calc(100% - 10px) 100%,
+        0 100%
+    );
+}
+
+.cpr-stat-box { border-bottom: 2px solid var(--cpr-red); }
+.cpr-equipped-box { border-left: 3px solid var(--cpr-red); }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 
 .glow-cyan { text-shadow: 0 0 5px theme('colors.cyan.400'), 0 0 10px theme('colors.cyan.500'), 0 0 15px theme('colors.cyan.600'); }
 .glow-pink { text-shadow: 0 0 5px theme('colors.pink.400'), 0 0 10px theme('colors.pink.500'), 0 0 15px theme('colors.pink.600'); }

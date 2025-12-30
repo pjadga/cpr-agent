@@ -1,0 +1,200 @@
+/* Cyberpunk Prettify CSS - No frameworks, just pure CSS */
+
+/* Glow Text Effects */
+.glow-cyan { text-shadow: 0 0 5px #22d3ee, 0 0 10px #06b6d4, 0 0 15px #0891b2; }
+.glow-pink { text-shadow: 0 0 5px #f472b6, 0 0 10px #ec4899, 0 0 15px #db2777; }
+.glow-lime { text-shadow: 0 0 5px #a3e635, 0 0 10px #84cc16, 0 0 15px #65a30d; }
+.glow-purple { text-shadow: 0 0 5px #c084fc, 0 0 10px #a855f7, 0 0 15px #9333ea; }
+.glow-red { text-shadow: 0 0 5px #f87171, 0 0 10px #ef4444, 0 0 15px #dc2626; }
+.glow-orange { text-shadow: 0 0 5px #fb923c, 0 0 10px #f97316, 0 0 15px #ea580c; }
+.glow-teal { text-shadow: 0 0 5px #2dd4bf, 0 0 10px #14b8a6, 0 0 15px #0d9488; }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #1f2937; border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #db2777; border-radius: 10px; border: 2px solid #1f2937;}
+::-webkit-scrollbar-thumb:hover { background: #ec4899; }
+* { scrollbar-width: auto; scrollbar-color: #db2777 #1f2937;}
+
+/* Modal Scrollbar */
+.modal-scroll-content::-webkit-scrollbar-thumb { background: #84cc16;}
+.modal-scroll-content { scrollbar-color: #84cc16 #1f2937;}
+
+/* JSON Response Styling */
+.json-response-wrapper {
+    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.json-response-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #164e63;
+    border-top: 2px solid #0891b2;
+    border-left: 2px solid #0e7490;
+    border-right: 2px solid #0e7490;
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+}
+
+.json-response-title {
+    color: #67e8f9;
+    font-weight: bold;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 5px #06b6d4;
+}
+
+.json-response-info {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    font-family: monospace;
+}
+
+/* JSON Output Container Styling */
+.json-output-container {
+    line-height: 1.6;
+    border: 2px solid #0e7490;
+    border-top: none;
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 0 8px rgba(0, 0, 0, 0.5);
+    background-image: linear-gradient(to bottom,
+        rgba(0, 255, 255, 0.03),
+        rgba(0, 0, 0, 0.2)
+    );
+    padding: 1rem;
+    font-family: monospace;
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    color: #d1d5db;
+}
+
+/* JSON Syntax Highlighting */
+.json-output-container .json-key {
+    color: #22d3ee;
+    font-weight: bold;
+    text-shadow: 0 0 3px #0891b2;
+}
+
+.json-output-container .json-string {
+    color: #facc15;
+    text-shadow: 0 0 3px #ca8a04;
+}
+
+.json-output-container .json-number {
+    color: #a3e635;
+    font-weight: bold;
+    text-shadow: 0 0 3px #65a30d;
+}
+
+.json-output-container .json-boolean-null {
+    color: #c084fc;
+    font-weight: bold;
+    text-shadow: 0 0 3px #9333ea;
+}
+
+.json-output-container .json-bracket {
+    color: #f472b6;
+    font-weight: bold;
+    text-shadow: 0 0 3px #db2777;
+}
+
+.json-output-container .json-comma {
+    color: #9ca3af;
+    opacity: 0.8;
+}
+
+.json-output-container .json-colon {
+    color: #d1d5db;
+    opacity: 0.9;
+}
+
+/* Indentation guides for nested structures */
+.json-output-container .json-indent-guide {
+    display: inline-block;
+    width: 1px;
+    height: 1.2em;
+    background-color: #374151;
+    position: relative;
+    top: 0.1em;
+    margin-right: 1px;
+    opacity: 0.5;
+    box-shadow: 0 0 2px #164e63;
+}
+
+/* Clickable ID Styling */
+.clickable-id {
+    position: relative;
+    color: #facc15;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-shadow: 0 0 5px #ca8a04;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+.clickable-id:hover {
+    color: #fcd34d;
+    text-shadow: 0 0 8px #eab308;
+}
+
+.clickable-id .copy-icon {
+    margin-left: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    color: #6b7280;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 0, 0.5));
+    transition: color 0.2s, filter 0.2s;
+}
+
+.clickable-id:hover .copy-icon {
+    color: #fcd34d;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 0, 0.8));
+}
+
+/* Visual feedback for copy action */
+.clickable-id[data-copied="true"]::after {
+    content: "Copied!";
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #65a30d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    animation: fade-in-out 2s forwards;
+    z-index: 10;
+    box-shadow: 0 0 10px #84cc16;
+}
+
+@keyframes fade-in-out {
+    0% { opacity: 0; transform: translateX(-50%) translateY(0px); }
+    10% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    90% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Modal content area */
+.modal-content-area {
+    flex-grow: 1;
+    overflow-y: auto;
+}
