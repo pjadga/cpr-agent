@@ -254,14 +254,14 @@ const AdjustableStat = {
     emits: ['update:current'],
     template: `
         <div class="cpr-panel bg-[#151515] p-2 flex justify-between items-center">
-            <button @click="$emit('update:current', current - 1)"
+            <button @click="$emit('update:current', current > 0 ? current - 1 : current)"
                     class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm">-
             </button>
             <div class="flex flex-col items-center"><span
                 class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ label }}</span><span
                 class="text-xl font-mono font-black text-white">{{ current }} <span class="text-gray-600 text-sm">/
                 {{ max }}</span></span></div>
-            <button @click="$emit('update:current', current + 1)"
+            <button @click="$emit('update:current', (current < max ? current + 1 : current))"
                     class="w-8 h-8 bg-gray-800 hover:bg-green-900 text-white font-bold rounded-sm">+
             </button>
         </div>`
