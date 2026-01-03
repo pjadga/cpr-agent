@@ -15,6 +15,7 @@
     --cpr-red-dark: #8a0e0e;
     --cpr-black: #0a0a0a;
     --cpr-panel: #141414;
+    --cpr-panel-hover: rgba(255, 0, 0, 0.44);
     --cpr-border: #2a2a2a;
     --cpr-text-main: #e0e0e0;
 }
@@ -37,6 +38,14 @@ body {
         calc(100% - 10px) 100%,
         0 100%
     );
+    transition: color 0.2s;
+}
+.cpr-panel:hover{
+    background-color: var(--cpr-panel-hover);
+    transition: color 0.2s;
+    span {
+        color: var(--cpr-black);
+    }
 }
 
 .cpr-stat-box { border-bottom: 2px solid var(--cpr-red); }

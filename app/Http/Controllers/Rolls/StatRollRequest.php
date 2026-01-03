@@ -23,7 +23,7 @@ class StatRollRequest extends FormRequest
         $label = strtolower($validatedData['label']);
 
         $client = new FoundryClient("test-api-key", "https://foundry-api.surrealdisco.co.uk");
-        $return = $client->utilities->js("foundry-xECODN3n8rO4E5Cj",
+        $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
         "let statRoll = game.actors.getName('Jim');
         statRoll.sheet._onRoll(
         {'data-roll-type': 'stat',

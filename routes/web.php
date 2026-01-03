@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
 use Illuminate\Support\Facades\Route;
@@ -14,3 +15,4 @@ Route::get('/api', function () { // Route to display the Blade view
 
 Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
 Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
+Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);

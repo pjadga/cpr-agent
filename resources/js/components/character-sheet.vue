@@ -129,7 +129,7 @@
                     </div>
 
                     <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4">
-                        <div v-if="roleItem" class="bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner">
+                        <div v-if="roleItem" @click="sendRoleRequest(roleItem.name)" class="bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner cursor-pointer">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <h3 class="text-yellow-500 font-bold uppercase text-sm">{{ roleItem.name }}</h3>
@@ -246,7 +246,7 @@ const SimpleStat = {
     props: ['label', 'value'],
     emits: ['click'],
     template: `
-        <div @click="$emit('click')" class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer hover:bg-[#00e7ff451] transition-colors"><span
+        <div @click="$emit('click')" class="cpr-panel bg-[#151515] hover:bg-[#AA0A0A6B] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer transition-colors"><span
             class="text-xl font-bold text-white leading-none">{{ value }}</span><span
             class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1">{{ label }}</span></div>`
 };
@@ -302,7 +302,7 @@ export default {
         const activeTab = ref('stats');
         const loading = ref(false);
         const error = ref(null);
-
+//asd
         const charData = ref({
             "requestId": "entity_1766946329442",
             "clientId": "foundry-xECODN3n8rO4E5Cj",
@@ -436,6 +436,16 @@ export default {
             });
         };
 
+        const sendRoleRequest = (label) => {
+            window.axios.post('/rolerollrequest', {
+                label: label
+            }).then(response => {
+                console.log('Stat post successful', response);
+            }).catch(err => {
+                console.error('Error posting stat', err);
+            });
+        };
+
         onUpdated(() => {
             if (!loading.value && window.lucide) window.lucide.createIcons();
         });
@@ -444,7 +454,8 @@ export default {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
             groupedSkills, allCyberware, otherGear,
-            calculateBase, findItem, formatCategory, sendStatRequest, sendSkillRequest
+            calculateBase, findItem, formatCategory, sendStatRequest, sendSkillRequest,
+            sendRoleRequest
         };
     }
 };

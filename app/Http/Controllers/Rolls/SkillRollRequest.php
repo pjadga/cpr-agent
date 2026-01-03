@@ -22,7 +22,7 @@ class SkillRollRequest extends FormRequest
         $label = ucfirst($validatedData['label']);
 
         $client = new FoundryClient("test-api-key", "https://foundry-api.surrealdisco.co.uk");
-        $return = $client->utilities->js("foundry-xECODN3n8rO4E5Cj",
+        $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
 
         "let skillRoll = game.actors.getName('Jim');
         let id = skillRoll.items.getName('$label')._id;
@@ -32,8 +32,6 @@ class SkillRollRequest extends FormRequest
         'data-item-id': id,
         type: 'click',
         currentTarget: {'data-roll-type': 'skill', 'data-roll-title': '$label', 'data-item-id': id}})");
-        // Save the data (example)
-        // Message::create($validatedData);
 
         return response()->json([
             'success' => true,
