@@ -51,14 +51,14 @@
                         </div>
 
                         <div class="grid grid-cols-4 gap-2">
-                            <simple-stat label="INT" :value="stats.int?.value"></simple-stat>
-                            <simple-stat label="REF" :value="stats.ref?.value"></simple-stat>
-                            <simple-stat label="DEX" :value="stats.dex?.value"></simple-stat>
-                            <simple-stat label="TECH" :value="stats.tech?.value"></simple-stat>
-                            <simple-stat label="COOL" :value="stats.cool?.value"></simple-stat>
-                            <simple-stat label="WILL" :value="stats.will?.value"></simple-stat>
-                            <simple-stat label="MOVE" :value="stats.move?.value"></simple-stat>
-                            <simple-stat label="BODY" :value="stats.body?.value"></simple-stat>
+                            <simple-stat label="INT" :value="stats.int?.value" @click="sendStatRequest('INT', stats.int?.value)"></simple-stat>
+                            <simple-stat label="REF" :value="stats.ref?.value" @click="sendStatRequest('REF', stats.ref?.value)"></simple-stat>
+                            <simple-stat label="DEX" :value="stats.dex?.value" @click="sendStatRequest('DEX', stats.dex?.value)"></simple-stat>
+                            <simple-stat label="TECH" :value="stats.tech?.value" @click="sendStatRequest('TECH', stats.tech?.value)"></simple-stat>
+                            <simple-stat label="COOL" :value="stats.cool?.value" @click="sendStatRequest('COOL', stats.cool?.value)"></simple-stat>
+                            <simple-stat label="WILL" :value="stats.will?.value" @click="sendStatRequest('WILL', stats.will?.value)"></simple-stat>
+                            <simple-stat label="MOVE" :value="stats.move?.value" @click="sendStatRequest('MOVE', stats.move?.value)"></simple-stat>
+                            <simple-stat label="BODY" :value="stats.body?.value" @click="sendStatRequest('BODY', stats.body?.value)"></simple-stat>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
@@ -243,8 +243,9 @@ const NavBtn = {
 
 const SimpleStat = {
     props: ['label', 'value'],
+    emits: ['click'],
     template: `
-        <div class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box"><span
+        <div @click="$emit('click')" class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer hover:bg-[#222] transition-colors"><span
             class="text-xl font-bold text-white leading-none">{{ value }}</span><span
             class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1">{{ label }}</span></div>`
 };
@@ -413,6 +414,17 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
+        const sendStatRequest = (label, value) => {
+            window.axios.post('/statrollrequest', {
+                label: label,
+                value: value
+            }).then(response => {
+                console.log('Stat post successful', response);
+            }).catch(err => {
+                console.error('Error posting stat', err);
+            });
+        };
+
         onUpdated(() => {
             if (!loading.value && window.lucide) window.lucide.createIcons();
         });
@@ -421,7 +433,7 @@ export default {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
             groupedSkills, allCyberware, otherGear,
-            calculateBase, findItem, formatCategory
+            calculateBase, findItem, formatCategory, sendStatRequest
         };
     }
 };
