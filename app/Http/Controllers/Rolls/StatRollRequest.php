@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Rolls;
 
+use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use FoundryClient\FoundryClient;
 
 class StatRollRequest extends FormRequest
 {
@@ -18,9 +18,18 @@ class StatRollRequest extends FormRequest
             'value' => 'required|int|max:255'
         ]);
 
+        //Need to get the actors either ID or Name -
+        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
+        $label = strtolower($validatedData['label']);
+
         $client = new FoundryClient("test-api-key", "https://foundry-api.surrealdisco.co.uk");
         $return = $client->utilities->js("foundry-xECODN3n8rO4E5Cj",
-        "let Jim = game.actors.getName('Jim'); let id = Jim.items.getName('Accounting')._id; Jim.sheet._onRoll( { 'data-roll-type': 'skill', 'data-roll-title': 'accounting', 'data-item-id': id, type: 'click', currentTarget: {'data-roll-type': 'skill', 'data-roll-title': 'accounting', 'data-item-id': id} })");
+        "let statRoll = game.actors.getName('Jim');
+        statRoll.sheet._onRoll(
+        {'data-roll-type': 'stat',
+        'data-roll-title': '$label',
+        type: 'click',
+        currentTarget: {'data-roll-type': 'stat', 'data-roll-title': '$label'}})");
         // Save the data (example)
         // Message::create($validatedData);
 

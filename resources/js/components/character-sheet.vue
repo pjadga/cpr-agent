@@ -146,8 +146,9 @@
                                         formatCategory(categoryKey)
                                     }}</span>
                             </div>
-                            <div class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800">
+                            <div class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800 cursor-pointer">
                                 <div v-for="skill in group" :key="skill.name"
+                                     @click="sendSkillRequest(skill.name)"
                                      class="flex justify-between items-center bg-[#0a0a0a] p-2 hover:bg-[#111]">
                                     <div class="flex flex-col">
                                         <div class="flex items-baseline gap-2">
@@ -245,7 +246,7 @@ const SimpleStat = {
     props: ['label', 'value'],
     emits: ['click'],
     template: `
-        <div @click="$emit('click')" class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer hover:bg-[#222] transition-colors"><span
+        <div @click="$emit('click')" class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer hover:bg-[#00e7ff45] transition-colors"><span
             class="text-xl font-bold text-white leading-none">{{ value }}</span><span
             class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1">{{ label }}</span></div>`
 };
@@ -425,6 +426,16 @@ export default {
             });
         };
 
+        const sendSkillRequest = (label) => {
+            window.axios.post('/skillrollrequest', {
+                label: label
+            }).then(response => {
+                console.log('Stat post successful', response);
+            }).catch(err => {
+                console.error('Error posting stat', err);
+            });
+        };
+
         onUpdated(() => {
             if (!loading.value && window.lucide) window.lucide.createIcons();
         });
@@ -433,7 +444,7 @@ export default {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
             groupedSkills, allCyberware, otherGear,
-            calculateBase, findItem, formatCategory, sendStatRequest
+            calculateBase, findItem, formatCategory, sendStatRequest, sendSkillRequest
         };
     }
 };
