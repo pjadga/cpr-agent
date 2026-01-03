@@ -246,7 +246,7 @@ const SimpleStat = {
     props: ['label', 'value'],
     emits: ['click'],
     template: `
-        <div @click="$emit('click')" class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer hover:bg-[#00e7ff45] transition-colors"><span
+        <div @click="$emit('click')" class="cpr-panel bg-[#151515] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer hover:bg-[#00e7ff451] transition-colors"><span
             class="text-xl font-bold text-white leading-none">{{ value }}</span><span
             class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1">{{ label }}</span></div>`
 };
