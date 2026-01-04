@@ -64,11 +64,13 @@
                         <div class="grid grid-cols-2 gap-3">
                             <adjustable-stat label="LUCK"
                                              v-model:current="luck.value"
-                                             :max="luck.max">
+                                             :max="luck.max"
+                                             @updateStat="updateStat">
                             </adjustable-stat>
                             <adjustable-stat label="EMP"
                                              v-model:current="emp.value"
-                                             :max="emp.max">
+                                             :max="emp.max"
+                                             @updateStat="updateStat">
                             </adjustable-stat>
                         </div>
 
@@ -251,19 +253,21 @@ const SimpleStat = {
             class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1">{{ label }}</span></div>`
 };
 
+//asdasd
+
 const AdjustableStat = {
     props: ['label', 'current', 'max'],
-    emits: ['update:current'],
+    emits: ['update:current', 'updateStat'],
     template: `
         <div class="cpr-panel bg-[#151515] p-2 flex justify-between items-center">
-            <button @click="$emit('update:current', current > 0 ? current - 1 : current)"
+            <button @click="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current)"
                     class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm">-
             </button>
             <div class="flex flex-col items-center"><span
                 class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ label }}</span><span
                 class="text-xl font-mono font-black text-white">{{ current }} <span class="text-gray-600 text-sm">/
                 {{ max }}</span></span></div>
-            <button @click="$emit('update:current', (current < max ? current + 1 : current))"
+            <button @click="$emit('update:current', (current < max ? current + 1 : current)); $emit('updateStat', label, current < max ? current + 1 : current)"
                     class="w-8 h-8 bg-gray-800 hover:bg-green-900 text-white font-bold rounded-sm">+
             </button>
         </div>`
@@ -415,35 +419,40 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
-        const sendStatRequest = (label, value) => {
-            window.axios.post('/statrollrequest', {
-                label: label,
+        const sendRequest = (data, url) => {
+            window.axios.post(url, data
+            ).then(response => {
+                console.log('Stat post successful', response);
+            }).catch(err => {
+                console.error('Error posting stat', err);
+            });
+        }
+
+        //Deal with returns if needed for any kind of update or hook.
+        const sendStatRequest = (stat, value) => {
+            sendRequest({
+                label: stat,
                 value: value
-            }).then(response => {
-                console.log('Stat post successful', response);
-            }).catch(err => {
-                console.error('Error posting stat', err);
-            });
+            }, "/statrollrequest")
         };
 
-        const sendSkillRequest = (label) => {
-            window.axios.post('/skillrollrequest', {
-                label: label
-            }).then(response => {
-                console.log('Stat post successful', response);
-            }).catch(err => {
-                console.error('Error posting stat', err);
-            });
+        const updateStat = (stat, value) => {
+            sendRequest({
+                label: stat,
+                value: value
+            }, "/updatestat")
+        }
+
+        const sendSkillRequest = (skill) => {
+            sendRequest({
+                label: skill
+            }, "/skillrollrequest")
         };
 
-        const sendRoleRequest = (label) => {
-            window.axios.post('/rolerollrequest', {
-                label: label
-            }).then(response => {
-                console.log('Stat post successful', response);
-            }).catch(err => {
-                console.error('Error posting stat', err);
-            });
+        const sendRoleRequest = (role) => {
+            sendRequest({
+                label: role
+            }, "/rolerollrequest")
         };
 
         onUpdated(() => {
@@ -455,8 +464,9 @@ export default {
             stats, luck, emp, roleItem,
             groupedSkills, allCyberware, otherGear,
             calculateBase, findItem, formatCategory, sendStatRequest, sendSkillRequest,
-            sendRoleRequest
+            sendRoleRequest, updateStat
         };
     }
 };
+//https://www.camya.com/ddev-vite-hot-reloading-fix-2025/
 </script>
