@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
@@ -18,3 +19,4 @@ Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
 Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
 Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
 Route::post("/updatestat", [UpdateStat::class, "updateStat"]);
+Route::post("/actorsheet", [ActorSheet::class, "getCleanData"]);

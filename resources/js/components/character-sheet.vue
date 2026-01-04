@@ -234,7 +234,7 @@
 </template>
 
 <script>
-import { ref, computed, onUpdated } from "vue";
+import {computed, onMounted, onUpdated, ref} from "vue";
 
 const NavBtn = {
     props: ['icon', 'label', 'active'],
@@ -304,61 +304,80 @@ export default {
     components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, EquippedCard },
     setup() {
         const activeTab = ref('stats');
-        const loading = ref(false);
+        const charData = ref(null);
+        const loading = ref(true);
         const error = ref(null);
-//asd
-        const charData = ref({
-            "requestId": "entity_1766946329442",
-            "clientId": "foundry-xECODN3n8rO4E5Cj",
-            "type": "entity-result",
-            "uuid": "Actor.UGkNHSnOykhJEjPm",
-            "data": {
-                "name": "Jim",
-                "system": {
-                    "stats": {
-                        "int": { "value": 6 }, "ref": { "value": 8 }, "dex": { "value": 7 },
-                        "tech": { "value": 4 }, "cool": { "value": 6 }, "will": { "value": 5 },
-                        "luck": { "value": 6, "max": 6 }, "move": { "value": 6 },
-                        "body": { "value": 7 }, "emp": { "value": 4, "max": 6 }
-                    },
-                    "derivedStats": {
-                        "hp": { "value": 35, "max": 40 },
-                        "humanity": { "value": 42, "max": 60 },
-                        "deathSave": { "value": 0 }
-                    },
-                    "reputation": { "value": 2 },
-                    "wealth": { "value": 1500 },
-                    "improvementPoints": { "value": 80 },
-                    "roleInfo": { "activeRole": "Rockerboy", "activeNetRole": "lFspsxudEli10fYh" },
-                    "externalData": {
-                        "currentWeapon": { "id": "wep123", "value": 0 },
-                        "currentArmorBody": { "id": "arm123", "value": 0 },
-                        "currentArmorHead": { "id": "", "value": 0 },
-                        "currentArmorShield": { "id": "", "value": 0 }
-                    }
-                },
-                "items": [
-                    { "_id": "lFspsxudEli10fYh", "name": "Rockerboy", "type": "role", "system": { "rank": 4, "mainRoleAbility": "Charismatic Impact" } },
-                    { "_id": "wep123", "name": "Heavy Pistol", "type": "weapon", "system": { "damage": "3d6", "weaponSkill": "Handgun", "rof": 2, "weaponType": "heavyPistol" } },
-                    { "_id": "arm123", "name": "Light Armorjack", "type": "armor", "system": { "sp": 11 } },
-                    { "name": "External (7 Option Slots)", "type": "cyberwareExternal", "system": { "installLocation": "hospital", "installedItems": { "slots": 7 } } },
-                    { "name": "Internal (7 Option Slots)", "type": "cyberwareInternal", "system": { "installLocation": "hospital", "installedItems": { "slots": 7 } } },
-                    { "name": "Fashionware (7 Option Slots)", "type": "fashionware", "system": { "installLocation": "mall", "installedItems": { "slots": 7 } } },
-                    { "name": "Cyberaudio Suite", "type": "cyberware", "system": { "installLocation": "head" } },
-                    { "name": "Wolvers", "type": "cyberware", "system": { "installLocation": "arm" } },
-                    { "name": "Athletics", "type": "skill", "system": { "level": 4, "stat": "dex", "category": "bodySkills" } },
-                    { "name": "Brawling", "type": "skill", "system": { "level": 6, "stat": "dex", "category": "fightingSkills" } },
-                    { "name": "Handgun", "type": "skill", "system": { "level": 6, "stat": "ref", "category": "rangedweaponSkills" } },
-                    { "name": "Perception", "type": "skill", "system": { "level": 2, "stat": "int", "category": "awarenessSkills" } },
-                    { "name": "Stealth", "type": "skill", "system": { "level": 2, "stat": "dex", "category": "bodySkills" } },
-                    { "name": "Basic Tech", "type": "skill", "system": { "level": 0, "stat": "tech", "category": "techniqueSkills" } },
-                    { "name": "Persuasion", "type": "skill", "system": { "level": 5, "stat": "cool", "category": "socialSkills" } },
-                    { "name": "Education", "type": "skill", "system": { "level": 2, "stat": "int", "category": "educationSkills" } },
-                    { "name": "Drive Land Vehicle", "type": "skill", "system": { "level": 0, "stat": "ref", "category": "controlSkills" } },
-                    { "name": "Play Instrument", "type": "skill", "system": { "level": 6, "stat": "tech", "category": "performanceSkills" } },
-                ]
+
+        // --- FETCH DATA ---
+        onMounted(async () => {
+            try {
+                // Point this to your new "Glue" PHP file
+                const response = await window.axios.post("/actorsheet", {"actorUuid" : "Actor.uVaAxOQd61fdJ9KU"});
+console.log(response);
+                charData.value = await response.data;
+                loading.value = false;
+
+                // Wait for DOM update then render icons
+                setTimeout(() => window.lucide.createIcons(), 50);
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                error.value = "Failed to load character data.";
+                loading.value = false;
             }
         });
+
+        // const charData = ref({
+        //     "requestId": "entity_1766946329442",
+        //     "clientId": "foundry-xECODN3n8rO4E5Cj",
+        //     "type": "entity-result",
+        //     "uuid": "Actor.UGkNHSnOykhJEjPm",
+        //     "data": {
+        //         "name": "Jim",
+        //         "system": {
+        //             "stats": {
+        //                 "int": { "value": 6 }, "ref": { "value": 8 }, "dex": { "value": 7 },
+        //                 "tech": { "value": 4 }, "cool": { "value": 6 }, "will": { "value": 5 },
+        //                 "luck": { "value": 6, "max": 6 }, "move": { "value": 6 },
+        //                 "body": { "value": 7 }, "emp": { "value": 4, "max": 6 }
+        //             },
+        //             "derivedStats": {
+        //                 "hp": { "value": 35, "max": 40 },
+        //                 "humanity": { "value": 42, "max": 60 },
+        //                 "deathSave": { "value": 0 }
+        //             },
+        //             "reputation": { "value": 2 },
+        //             "wealth": { "value": 1500 },
+        //             "improvementPoints": { "value": 80 },
+        //             "roleInfo": { "activeRole": "Rockerboy", "activeNetRole": "lFspsxudEli10fYh" },
+        //             "externalData": {
+        //                 "currentWeapon": { "id": "wep123", "value": 0 },
+        //                 "currentArmorBody": { "id": "arm123", "value": 0 },
+        //                 "currentArmorHead": { "id": "", "value": 0 },
+        //                 "currentArmorShield": { "id": "", "value": 0 }
+        //             }
+        //         },
+        //         "items": [
+        //             { "_id": "lFspsxudEli10fYh", "name": "Rockerboy", "type": "role", "system": { "rank": 4, "mainRoleAbility": "Charismatic Impact" } },
+        //             { "_id": "wep123", "name": "Heavy Pistol", "type": "weapon", "system": { "damage": "3d6", "weaponSkill": "Handgun", "rof": 2, "weaponType": "heavyPistol" } },
+        //             { "_id": "arm123", "name": "Light Armorjack", "type": "armor", "system": { "sp": 11 } },
+        //             { "name": "External (7 Option Slots)", "type": "cyberwareExternal", "system": { "installLocation": "hospital", "installedItems": { "slots": 7 } } },
+        //             { "name": "Internal (7 Option Slots)", "type": "cyberwareInternal", "system": { "installLocation": "hospital", "installedItems": { "slots": 7 } } },
+        //             { "name": "Fashionware (7 Option Slots)", "type": "fashionware", "system": { "installLocation": "mall", "installedItems": { "slots": 7 } } },
+        //             { "name": "Cyberaudio Suite", "type": "cyberware", "system": { "installLocation": "head" } },
+        //             { "name": "Wolvers", "type": "cyberware", "system": { "installLocation": "arm" } },
+        //             { "name": "Athletics", "type": "skill", "system": { "level": 4, "stat": "dex", "category": "bodySkills" } },
+        //             { "name": "Brawling", "type": "skill", "system": { "level": 6, "stat": "dex", "category": "fightingSkills" } },
+        //             { "name": "Handgun", "type": "skill", "system": { "level": 6, "stat": "ref", "category": "rangedweaponSkills" } },
+        //             { "name": "Perception", "type": "skill", "system": { "level": 2, "stat": "int", "category": "awarenessSkills" } },
+        //             { "name": "Stealth", "type": "skill", "system": { "level": 2, "stat": "dex", "category": "bodySkills" } },
+        //             { "name": "Basic Tech", "type": "skill", "system": { "level": 0, "stat": "tech", "category": "techniqueSkills" } },
+        //             { "name": "Persuasion", "type": "skill", "system": { "level": 5, "stat": "cool", "category": "socialSkills" } },
+        //             { "name": "Education", "type": "skill", "system": { "level": 2, "stat": "int", "category": "educationSkills" } },
+        //             { "name": "Drive Land Vehicle", "type": "skill", "system": { "level": 0, "stat": "ref", "category": "controlSkills" } },
+        //             { "name": "Play Instrument", "type": "skill", "system": { "level": 6, "stat": "tech", "category": "performanceSkills" } },
+        //         ]
+        //     }
+        // });
 
         const stats = computed(() => {
             if (!charData.value) return {};

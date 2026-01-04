@@ -27,12 +27,12 @@ class RoleRollRequest extends FormRequest
         "let skillRoll = game.actors.getName('Jim');
         let id = skillRoll.items.getName('$label')._id;
         skillRoll.sheet._onRoll(
-        {'data-roll-type': 'roleability',
+        {'data-roll-type': 'roleAbility',
         'data-roll-title': '$label',
         'data-item-id': id,
         'data-item-subtype': '$label',
         type: 'click',
-        currentTarget: {'data-roll-type': 'roleability', 'data-roll-title': '$label', 'data-item-id': id, 'data-item-subtype': '$label' }})");
+        currentTarget: {'data-roll-type': 'roleAbility', 'data-roll-title': '$label', 'data-item-id': id, 'data-item-subtype': '$label' }})");
 
         return response()->json([
             'success' => true,
