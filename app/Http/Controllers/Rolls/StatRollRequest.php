@@ -16,8 +16,7 @@ class StatRollRequest extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'label' => 'required|string|max:255',
-            'value' => 'required|int|max:255'
+            'label' => 'required|string|max:255'
         ]);
 
         //Need to get the actors either ID or Name -

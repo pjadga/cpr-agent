@@ -76,26 +76,28 @@
                         </div>
 
                         <div class="grid grid-cols-4 gap-2">
-                            <simple-stat label="INT" :value="stats.int?.value" @click="sendStatRequest('INT', stats.int?.value)"></simple-stat>
-                            <simple-stat label="REF" :value="stats.ref?.value" @click="sendStatRequest('REF', stats.ref?.value)"></simple-stat>
-                            <simple-stat label="DEX" :value="stats.dex?.value" @click="sendStatRequest('DEX', stats.dex?.value)"></simple-stat>
-                            <simple-stat label="TECH" :value="stats.tech?.value" @click="sendStatRequest('TECH', stats.tech?.value)"></simple-stat>
-                            <simple-stat label="COOL" :value="stats.cool?.value" @click="sendStatRequest('COOL', stats.cool?.value)"></simple-stat>
-                            <simple-stat label="WILL" :value="stats.will?.value" @click="sendStatRequest('WILL', stats.will?.value)"></simple-stat>
-                            <simple-stat label="MOVE" :value="stats.move?.value" @click="sendStatRequest('MOVE', stats.move?.value)"></simple-stat>
-                            <simple-stat label="BODY" :value="stats.body?.value" @click="sendStatRequest('BODY', stats.body?.value)"></simple-stat>
+                            <simple-stat label="INT" :value="stats.int?.value" @click="sendStatRequest('INT')"></simple-stat>
+                            <simple-stat label="REF" :value="stats.ref?.value" @click="sendStatRequest('REF')"></simple-stat>
+                            <simple-stat label="DEX" :value="stats.dex?.value" @click="sendStatRequest('DEX')"></simple-stat>
+                            <simple-stat label="TECH" :value="stats.tech?.value" @click="sendStatRequest('TECH')"></simple-stat>
+                            <simple-stat label="COOL" :value="stats.cool?.value" @click="sendStatRequest('COOL')"></simple-stat>
+                            <simple-stat label="WILL" :value="stats.will?.value" @click="sendStatRequest('WILL')"></simple-stat>
+                            <simple-stat label="MOVE" :value="stats.move?.value" @click="sendStatRequest('MOVE')"></simple-stat>
+                            <simple-stat label="BODY" :value="stats.body?.value" @click="sendStatRequest('BODY')"></simple-stat>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <adjustable-stat label="LUCK"
                                              v-model:current="luck.value"
                                              :max="luck.max"
-                                             @updateStat="updateStat">
+                                             @updateStat="updateStat"
+                                             @sendStatRequest="sendStatRequest">
                             </adjustable-stat>
                             <adjustable-stat label="EMP"
                                              v-model:current="emp.value"
                                              :max="emp.max"
-                                             @updateStat="updateStat">
+                                             @updateStat="updateStat"
+                                             @sendStatRequest="sendStatRequest">
                             </adjustable-stat>
                         </div>
 
@@ -134,21 +136,9 @@
                             </h3>
 
                             <div class="space-y-2">
-                                <equipped-card label="Weapon" icon="sword"
-                                               :item="findItem(charData.data.system.externalData.currentWeapon.id)">
-                                </equipped-card>
-
-                                <equipped-card label="Body Armor" icon="shield"
-                                               :item="findItem(charData.data.system.externalData.currentArmorBody.id)">
-                                </equipped-card>
-
-                                <equipped-card label="Head Armor" icon="hard-hat"
-                                               :item="findItem(charData.data.system.externalData.currentArmorHead.id)">
-                                </equipped-card>
-
-                                <div v-if="charData.data.system.externalData.currentArmorShield.id">
-                                    <equipped-card label="Shield" icon="shield-alert"
-                                                   :item="findItem(charData.data.system.externalData.currentArmorShield.id)">
+                                <div v-for="item in equippedItems" :key="item._id">
+                                    <equipped-card :label="formatCategory(item.type)" :icon="getItemIcon(item.type)"
+                                                   :item="item">
                                     </equipped-card>
                                 </div>
                             </div>
@@ -282,10 +272,10 @@ const SimpleStat = {
 
 const AdjustableStat = {
     props: ['label', 'current', 'max'],
-    emits: ['update:current', 'updateStat'],
+    emits: ['update:current', 'updateStat', 'sendStatRequest'],
     template: `
-        <div class="cpr-panel bg-[#151515] p-2 flex justify-between items-center">
-            <button @click="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current)"
+        <div class="cpr-panel bg-[#151515] cursor-pointer p-2 flex justify-between items-center" @click="$emit('sendStatRequest', label)">
+            <button @click="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current);"
                     class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm">-
             </button>
             <div class="flex flex-col items-center"><span
@@ -383,7 +373,7 @@ export default {
         const otherGear = computed(() => {
             if (!charData.value) return [];
             return charData.value.data.items.filter(i =>
-                ['weapon', 'armor', 'gear', 'ammo'].includes(i.type)
+                ['weapon', 'armor', 'gear', 'ammo'].includes(i.type) && i.system.usage !== 'equipped'
             );
         });
 
@@ -398,6 +388,11 @@ export default {
                 groups[cat].push(skill);
             });
             return groups;
+        });
+
+        const equippedItems = computed(() => {
+            if (!charData.value) return [];
+            return charData.value.data.items.filter(i => i.system.usage === 'equipped');
         });
 
         const calculateBase = (skill) => {
@@ -417,6 +412,18 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
+        const getItemIcon = (type) => {
+            const icons = {
+                weapon: 'sword',
+                armor: 'shield',
+                gear: 'package',
+                ammo: 'database',
+                cyberware: 'zap',
+                skill: 'book'
+            };
+            return icons[type] || 'circle-help';
+        };
+
         const sendRequest = (data, url) => {
             window.axios.post(url, data
             ).then(response => {
@@ -430,10 +437,9 @@ export default {
         }
 
         //Deal with returns if needed for any kind of update or hook.
-        const sendStatRequest = (stat, value) => {
+        const sendStatRequest = (stat) => {
             sendRequest({
-                label: stat,
-                value: value
+                label: stat
             }, "/statrollrequest")
         };
 
@@ -463,8 +469,8 @@ export default {
         return {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
-            groupedSkills, allCyberware, otherGear,
-            calculateBase, findItem, formatCategory, sendStatRequest, sendSkillRequest,
+            groupedSkills, allCyberware, otherGear, equippedItems,
+            calculateBase, findItem, formatCategory, getItemIcon, sendStatRequest, sendSkillRequest,
             sendRoleRequest, updateStat, showPopup, popupMessage
         };
     }

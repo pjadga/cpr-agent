@@ -118,6 +118,8 @@ class ActorSheet extends FormRequest
                 // Role Specifics
                 'rank'            => $sys['rank'] ?? 0,
                 'mainRoleAbility' => $sys['mainRoleAbility'] ?? '',
+
+                'usage'           => $sys['usage'] ?? '',
             ]
         ];
     }
