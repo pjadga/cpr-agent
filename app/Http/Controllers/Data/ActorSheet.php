@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Data;
 
+use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 
 class ActorSheet extends FormRequest
 {
+    use HasConfiguration;
 
     /**
      * Main entry point to get the simplified Vue-ready JSON
@@ -20,13 +22,17 @@ class ActorSheet extends FormRequest
             'actorUuid' => 'required|string|max:255'
         ]);
 
-        $client = new FoundryClient("test-api-key", "https://foundry-api.surrealdisco.co.uk");
+        $client = $this->getFoundryClient();
         $data = $client->entity->getActorSheetAsJson("foundry-xECODN3n8rO4E5Cj", $validatedData["actorUuid"]);
 
         $characterData = $data['data'] ?? [];
 
         if (empty($characterData)) {
-            return ["error" => "Invalid Character Data Structure"];
+            return response()->json([
+                'success' => false,
+                'message' => 'Data successfully submitted!',
+                'error' => "Can't Find Actor",
+            ], 400);
         }
 
         return [

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Values;
 
+use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 
 class UpdateStat extends FormRequest
 {
+    use HasConfiguration;
 
     public function updateStat(Request $request): JsonResponse
     {
@@ -22,10 +24,10 @@ class UpdateStat extends FormRequest
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $label = strtolower($validatedData['label']);
         $value = $validatedData['value'];
-        $client = new FoundryClient("test-api-key", "https://foundry-api.surrealdisco.co.uk");
+        $client = $this->getFoundryClient();
         $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
             "let updateStat = game.actors.getName('Jim');
-            updateStat.update({'system.stats.$label.value': $value, 'system.stats.$label.max': 6 })");
+            updateStat.update({'system.stats.$label.value': $value})");
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',

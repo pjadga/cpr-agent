@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 
 class RoleRollRequest extends FormRequest
 {
+    use HasConfiguration;
 
     public function rollRole(Request $request): JsonResponse
     {
@@ -21,7 +23,7 @@ class RoleRollRequest extends FormRequest
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $label = ucfirst($validatedData['label']);
 
-        $client = new FoundryClient("test-api-key", "https://foundry-api.surrealdisco.co.uk");
+        $client = $this->getFoundryClient();
         $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
 
         "let skillRoll = game.actors.getName('Jim');

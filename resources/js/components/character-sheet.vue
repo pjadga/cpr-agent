@@ -11,7 +11,32 @@
             </div>
         </div>
 
-        <div v-else>
+        <div v-if="showPopup" class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60">
+            <div class="cpr-panel w-full max-w-xs bg-black border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-in fade-in zoom-in duration-200">
+                <div class="bg-red-600 p-2 flex justify-between items-center">
+                    <span class="text-xs font-black text-black tracking-tighter uppercase italic">SYSTEM ALERT</span>
+                    <button @click="showPopup = false" class="text-black hover:text-white transition-colors">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex gap-3">
+                        <div class="shrink-0 w-10 h-10 border border-red-500 flex items-center justify-center text-red-500 bg-red-900/10">
+                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-red-500 font-bold text-sm uppercase">Connection Error</h4>
+                            <p class="text-gray-300 text-xs font-mono leading-relaxed">{{ popupMessage }}</p>
+                        </div>
+                    </div>
+                    <button @click="showPopup = false" class="w-full py-2 bg-red-600/10 border border-red-600 text-red-500 text-xs font-bold uppercase hover:bg-red-600 hover:text-white transition-all">
+                        Acknowledge
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-else-if="!loading && charData">
             <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
                 <div class="flex items-center gap-3">
                     <div class="relative w-12 h-12 shrink-0">
@@ -307,13 +332,17 @@ export default {
         const charData = ref(null);
         const loading = ref(true);
         const error = ref(null);
+        const showPopup = ref(false);
+        const popupMessage = ref('');
 
         // --- FETCH DATA ---
         onMounted(async () => {
             try {
-                // Point this to your new "Glue" PHP file
-                const response = await window.axios.post("/actorsheet", {"actorUuid" : "Actor.uVaAxOQd61fdJ9KU"});
-console.log(response);
+
+                const getActors = await window.axios.post("/getactors");
+                const actorId = await getActors.data.uuid;
+
+                const response = await window.axios.post("/actorsheet", {"actorUuid" : actorId});
                 charData.value = await response.data;
                 loading.value = false;
 
@@ -321,63 +350,13 @@ console.log(response);
                 setTimeout(() => window.lucide.createIcons(), 50);
             } catch (err) {
                 console.error("Fetch Error:", err);
-                error.value = "Failed to load character data.";
+                error.value = err.response.data.error
+                popupMessage.value = err.response.data.error;
+                showPopup.value = true;
                 loading.value = false;
+                setTimeout(() => window.lucide.createIcons(), 50);
             }
         });
-
-        // const charData = ref({
-        //     "requestId": "entity_1766946329442",
-        //     "clientId": "foundry-xECODN3n8rO4E5Cj",
-        //     "type": "entity-result",
-        //     "uuid": "Actor.UGkNHSnOykhJEjPm",
-        //     "data": {
-        //         "name": "Jim",
-        //         "system": {
-        //             "stats": {
-        //                 "int": { "value": 6 }, "ref": { "value": 8 }, "dex": { "value": 7 },
-        //                 "tech": { "value": 4 }, "cool": { "value": 6 }, "will": { "value": 5 },
-        //                 "luck": { "value": 6, "max": 6 }, "move": { "value": 6 },
-        //                 "body": { "value": 7 }, "emp": { "value": 4, "max": 6 }
-        //             },
-        //             "derivedStats": {
-        //                 "hp": { "value": 35, "max": 40 },
-        //                 "humanity": { "value": 42, "max": 60 },
-        //                 "deathSave": { "value": 0 }
-        //             },
-        //             "reputation": { "value": 2 },
-        //             "wealth": { "value": 1500 },
-        //             "improvementPoints": { "value": 80 },
-        //             "roleInfo": { "activeRole": "Rockerboy", "activeNetRole": "lFspsxudEli10fYh" },
-        //             "externalData": {
-        //                 "currentWeapon": { "id": "wep123", "value": 0 },
-        //                 "currentArmorBody": { "id": "arm123", "value": 0 },
-        //                 "currentArmorHead": { "id": "", "value": 0 },
-        //                 "currentArmorShield": { "id": "", "value": 0 }
-        //             }
-        //         },
-        //         "items": [
-        //             { "_id": "lFspsxudEli10fYh", "name": "Rockerboy", "type": "role", "system": { "rank": 4, "mainRoleAbility": "Charismatic Impact" } },
-        //             { "_id": "wep123", "name": "Heavy Pistol", "type": "weapon", "system": { "damage": "3d6", "weaponSkill": "Handgun", "rof": 2, "weaponType": "heavyPistol" } },
-        //             { "_id": "arm123", "name": "Light Armorjack", "type": "armor", "system": { "sp": 11 } },
-        //             { "name": "External (7 Option Slots)", "type": "cyberwareExternal", "system": { "installLocation": "hospital", "installedItems": { "slots": 7 } } },
-        //             { "name": "Internal (7 Option Slots)", "type": "cyberwareInternal", "system": { "installLocation": "hospital", "installedItems": { "slots": 7 } } },
-        //             { "name": "Fashionware (7 Option Slots)", "type": "fashionware", "system": { "installLocation": "mall", "installedItems": { "slots": 7 } } },
-        //             { "name": "Cyberaudio Suite", "type": "cyberware", "system": { "installLocation": "head" } },
-        //             { "name": "Wolvers", "type": "cyberware", "system": { "installLocation": "arm" } },
-        //             { "name": "Athletics", "type": "skill", "system": { "level": 4, "stat": "dex", "category": "bodySkills" } },
-        //             { "name": "Brawling", "type": "skill", "system": { "level": 6, "stat": "dex", "category": "fightingSkills" } },
-        //             { "name": "Handgun", "type": "skill", "system": { "level": 6, "stat": "ref", "category": "rangedweaponSkills" } },
-        //             { "name": "Perception", "type": "skill", "system": { "level": 2, "stat": "int", "category": "awarenessSkills" } },
-        //             { "name": "Stealth", "type": "skill", "system": { "level": 2, "stat": "dex", "category": "bodySkills" } },
-        //             { "name": "Basic Tech", "type": "skill", "system": { "level": 0, "stat": "tech", "category": "techniqueSkills" } },
-        //             { "name": "Persuasion", "type": "skill", "system": { "level": 5, "stat": "cool", "category": "socialSkills" } },
-        //             { "name": "Education", "type": "skill", "system": { "level": 2, "stat": "int", "category": "educationSkills" } },
-        //             { "name": "Drive Land Vehicle", "type": "skill", "system": { "level": 0, "stat": "ref", "category": "controlSkills" } },
-        //             { "name": "Play Instrument", "type": "skill", "system": { "level": 6, "stat": "tech", "category": "performanceSkills" } },
-        //         ]
-        //     }
-        // });
 
         const stats = computed(() => {
             if (!charData.value) return {};
@@ -444,6 +423,9 @@ console.log(response);
                 console.log('Stat post successful', response);
             }).catch(err => {
                 console.error('Error posting stat', err);
+                popupMessage.value = "Neural uplink failed: Data packet lost.";
+                showPopup.value = true;
+                setTimeout(() => window.lucide.createIcons(), 50);
             });
         }
 
@@ -483,7 +465,7 @@ console.log(response);
             stats, luck, emp, roleItem,
             groupedSkills, allCyberware, otherGear,
             calculateBase, findItem, formatCategory, sendStatRequest, sendSkillRequest,
-            sendRoleRequest, updateStat
+            sendRoleRequest, updateStat, showPopup, popupMessage
         };
     }
 };
