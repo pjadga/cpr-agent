@@ -95,6 +95,9 @@ class ActorSheet extends FormRequest
                 'price' => [
                     'market' => $sys['price']['market'] ?? 0
                 ],
+                'amount' => $sys['amount'] ?? 0,
+                'source' => $sys['source'] ?? 0,
+                'concealable' => $sys['concealable'] ?? false,
 
                 // Skill Specifics
                 'level'     => $sys['level'] ?? 0,
@@ -107,10 +110,12 @@ class ActorSheet extends FormRequest
                 'weaponSkill' => $sys['weaponSkill'] ?? '',
                 'weaponType'  => $sys['weaponType'] ?? '',
                 'rof'         => $sys['rof'] ?? 0,
+                'magazine'         => $sys['magazine'] ?? 0,
 
                 // Cyberware Specifics
                 'installLocation' => $sys['installLocation'] ?? '',
                 'installedItems'  => $sys['installedItems'] ?? [], // Keeps slot data
+                'cyberwareType' => $sys['type'] ?? '',
 
                 // Armor Specifics
                 'sp' => $sys['sp'] ?? 0,

@@ -1,16 +1,19 @@
 <template>
-    <div class="min-h-screen pb-28">
+    <div class="min-h-screen pb-28 text-sans">
 
-        <div v-if="loading" class="flex h-screen items-center justify-center">
+        <!-- LOADING STATE -->
+        <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
             <div class="text-red-500 font-mono animate-pulse text-xl">CONNECTING TO NET...</div>
         </div>
 
-        <div v-else-if="error" class="flex h-screen items-center justify-center p-4">
+        <!-- ERROR STATE -->
+        <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-black">
             <div class="text-red-500 font-bold border border-red-500 p-4 bg-red-900/20">
                 ERROR: {{ error }}
             </div>
         </div>
 
+        <!-- SYSTEM ALERT POPUP -->
         <div v-if="showPopup" class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60">
             <div class="cpr-panel w-full max-w-xs bg-black border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-in fade-in zoom-in duration-200">
                 <div class="bg-red-600 p-2 flex justify-between items-center">
@@ -36,13 +39,33 @@
             </div>
         </div>
 
-        <div v-else-if="!loading && charData">
+        <!-- CHARACTER IMAGE POPUP -->
+        <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
+            <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200" @click.stop>
+                <div class="absolute top-0 right-0 m-4">
+                    <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
+                <div class="mt-4 text-center">
+                    <h2 class="text-white font-bold uppercase tracking-widest text-lg">{{ charData.data.name }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN INTERFACE -->
+        <div v-if="!loading && charData && !error">
             <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
                 <div class="flex items-center gap-3">
-                    <div class="relative w-12 h-12 shrink-0">
+                    <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
-                            class="absolute inset-0 border border-[var(--cpr-red)] bg-gray-900 flex items-center justify-center">
-                            <span class="text-xl font-bold text-red-500">{{ charData.data.name[0] }}</span>
+                            class="absolute inset-0 border border-[var(--cpr-red)] bg-gray-900 flex items-center justify-center overflow-hidden">
+                            <img v-if="charData.data.img" :src="getImageUrl(charData.data.img)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" :alt="charData.data.name">
+                            <span v-else class="text-xl font-bold text-red-500">{{ charData.data.name[0] }}</span>
+                        </div>
+                        <div class="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/20 transition-colors duration-300 flex items-center justify-center">
+                            <i data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
@@ -58,8 +81,9 @@
 
             <main class="p-3 max-w-md mx-auto space-y-4">
 
-                <transition name="fade" mode="out-in">
+                <transition name="fade" mode="out-in" @after-enter="refreshIcons">
 
+                    <!-- STATS TAB -->
                     <div v-if="activeTab === 'stats'" key="stats" class="space-y-5">
 
                         <div class="grid grid-cols-2 gap-3">
@@ -130,24 +154,45 @@
                             </div>
                         </div>
 
+                        <!-- Currently Equipped Section -->
                         <div>
-                            <h3 class="text-sm font-bold text-white uppercase mb-2 border-b border-red-900 pb-1 flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-white uppercase mb-4 border-b border-red-900 pb-1 flex items-center gap-2">
                                 <i data-lucide="crosshair" class="w-4 h-4 text-red-500"></i> Currently Equipped
                             </h3>
 
-                            <div class="space-y-2">
-                                <div v-for="item in equippedItems" :key="item._id">
-                                    <equipped-card :label="formatCategory(item.type)" :icon="getItemIcon(item.type)"
-                                                   :item="item">
-                                    </equipped-card>
+                            <!-- Loop through categorized equipped items -->
+                            <div v-for="(items, category) in groupedEquipped" :key="category">
+                                <div v-if="items.length > 0" class="mb-4">
+                                    <h4 class="text-[9px] font-bold text-gray-500 uppercase mb-2 tracking-widest pl-1">{{ category }}</h4>
+                                    <div class="space-y-2">
+                                        <div v-for="item in items" :key="item._id">
+                                            <item-row
+                                                :item="item"
+                                                :category="category"
+                                                :all-items="charData.data.items"
+                                                @click="$emit('click', item)">
+                                            </item-row>
+                                            <!-- Nested Children for Equipped (ammo, attachments) -->
+                                            <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
+                                                 class="ml-6 mt-1 space-y-1 border-l border-red-900/50 pl-2">
+                                                <div v-for="childId in item.system.installedItems.list" :key="childId">
+                                                    <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" @click="$emit('click', charData.data.items.find(i => i._id === childId))"></item-row>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                            <div v-if="Object.values(groupedEquipped).flat().length === 0" class="text-gray-600 text-xs italic p-2 text-center">
+                                No items equipped.
                             </div>
                         </div>
                     </div>
 
+                    <!-- SKILLS TAB -->
                     <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4">
-                        <div v-if="roleItem" @click="sendRoleRequest(roleItem.name)" class="bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner cursor-pointer">
-                            <div class="flex justify-between items-center">
+                        <div v-if="roleItem" @click="sendRoleRequest(roleItem.name)" class="relative bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner cursor-pointer group">
+                            <div class="flex justify-between items-center pr-2">
                                 <div>
                                     <h3 class="text-yellow-500 font-bold uppercase text-sm">{{ roleItem.name }}</h3>
                                     <p class="text-[10px] text-gray-400">{{ roleItem.system.mainRoleAbility }}</p>
@@ -158,24 +203,29 @@
 
                         <div v-for="(group, categoryKey) in groupedSkills" :key="categoryKey">
                             <div
-                                class="flex items-center gap-2 mb-2 mt-4 bg-gray-900 py-1 px-2 border-l-2 border-red-500">
-                                <span class="text-white font-bold text-xs uppercase">{{
+                                @click="toggleCategory(categoryKey)"
+                                class="flex items-center justify-between mb-2 mt-4 bg-gray-900 py-1 px-2 border-l-2 border-red-500 cursor-pointer hover:bg-cyan-950/40 transition-colors group">
+                                <span class="text-white font-bold text-xs uppercase group-hover:text-cyan-400 transition-colors">{{
                                         formatCategory(categoryKey)
                                     }}</span>
+                                <i data-lucide="chevron-down"
+                                   class="w-4 h-4 text-red-500 transition-transform duration-200 group-hover:text-cyan-500"
+                                   :class="{ 'rotate-180': collapsedCategories[categoryKey] }"></i>
                             </div>
-                            <div class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800 cursor-pointer">
-                                <div v-for="skill in group" :key="skill.name"
+                            <div v-show="!collapsedCategories[categoryKey]" class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800">
+                                <div v-for="(skill, index) in group" :key="skill.name"
                                      @click="sendSkillRequest(skill.name)"
-                                     class="flex justify-between items-center bg-[#0a0a0a] p-2 hover:bg-[#111]">
+                                     class="flex justify-between items-center bg-[#0a0a0a] p-2 hover:bg-cyan-950/20 cursor-pointer group transition-colors">
                                     <div class="flex flex-col">
                                         <div class="flex items-baseline gap-2">
-                                            <span class="text-sm font-medium text-gray-300">{{ skill.name }}</span>
+                                            <span class="text-sm font-medium text-gray-300 group-hover:text-cyan-400 transition-colors">{{ skill.name }}</span>
                                             <span class="text-[9px] text-red-500 font-bold uppercase tracking-wider">({{
                                                     skill.system.stat
                                                 }})</span>
                                         </div>
                                     </div>
                                     <div class="flex items-center gap-3">
+
                                         <span class="text-[9px] text-gray-600 uppercase font-mono">Lvl {{
                                                 skill.system.level
                                             }}</span>
@@ -189,45 +239,89 @@
                         </div>
                     </div>
 
+                    <!-- GEAR TAB -->
                     <div v-else-if="activeTab === 'gear'" key="gear" class="space-y-6">
+
+                        <!-- Cyberware Section -->
                         <div>
-                            <h3 class="text-sm font-bold text-white uppercase mb-2 flex items-center gap-2">
-                                <i data-lucide="zap" class="w-4 h-4 text-blue-500"></i> Cyberware
+                            <h3 @click="toggleCategory('cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cyan-950/20 p-1 transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="zap" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400"></i> <span class="group-hover:text-cyan-400 transition-colors">Cyberware</span>
+                                </div>
+                                <i data-lucide="chevron-down"
+                                   class="w-4 h-4 text-blue-500 transition-transform duration-200 group-hover:text-cyan-500"
+                                   :class="{ 'rotate-180': collapsedCategories['cyberware'] }"></i>
                             </h3>
-                            <div class="space-y-2">
-                                <div v-for="cw in allCyberware" :key="cw._id"
-                                     class="cpr-panel p-3 bg-[#111] flex flex-col">
-                                    <div class="flex justify-between items-start">
-                                        <span class="text-sm font-bold text-blue-100">{{ cw.name }}</span>
-                                        <span v-if="cw.system.installedItems"
-                                              class="text-[9px] bg-blue-900/30 text-blue-400 px-1 border border-blue-900">
-                                        SLOTS: {{ cw.system.installedItems.slots }}
-                                    </span>
-                                    </div>
-                                    <div class="mt-1 text-[10px] text-gray-500 uppercase flex justify-between">
-                                        <span>{{ formatCategory(cw.type) }}</span>
-                                        <span v-if="cw.system.installLocation">{{ cw.system.installLocation }}</span>
+                            <transition name="fade-from-black">
+                                <div v-show="!collapsedCategories['cyberware']" class="space-y-2">
+                                    <div v-for="(group, type) in groupedCyberware" :key="type">
+                                        <h4 class="text-[10px] font-bold text-blue-400 uppercase mb-2 mt-4 tracking-widest border-b border-blue-900/30 pb-1">
+                                            {{ type }}
+                                        </h4>
+                                        <div class="space-y-2">
+                                            <!-- Cyberware Item Row -->
+                                            <div v-for="cw in group" :key="cw._id">
+                                                <item-row
+                                                    :item="cw"
+                                                    category="cyberware"
+                                                    :all-items="charData.data.items"
+                                                    @click="$emit('click', cw)">
+                                                </item-row>
+                                                <!-- Nested Children -->
+                                                <div v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
+                                                     class="ml-6 mt-1 space-y-1 border-l border-blue-900/50 pl-2">
+                                                    <div v-for="childId in cw.system.installedItems.list" :key="childId">
+                                                        <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" category="cyberware" :all-items="charData.data.items" @click="$emit('click', charData.data.items.find(i => i._id === childId))"></item-row>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                            </transition>
+                        </div>
+
+                        <!-- Gear, Weapons, Armor, Ammo Section -->
+                        <div v-for="(items, category) in groupedGear" :key="category">
+                            <!-- Only show category if items exist -->
+                            <div v-if="items.length > 0">
+                                <h3 @click="toggleCategory(category)" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group mt-6 hover:bg-cyan-950/20 p-1 transition-colors">
+                                    <div class="flex items-center gap-2">
+                                        <!-- Dynamic Icons based on category -->
+                                        <i v-if="category === 'weapon'" data-lucide="sword" class="w-4 h-4 text-red-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-else-if="category === 'armor'" data-lucide="shield" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-else-if="category === 'ammo'" data-lucide="database" class="w-4 h-4 text-yellow-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-else data-lucide="package" class="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition-colors"></i>
+
+                                        <span class="group-hover:text-cyan-400 transition-colors">{{ category }}</span>
+                                    </div>
+                                    <i data-lucide="chevron-down"
+                                       class="w-4 h-4 text-gray-500 transition-transform duration-200 group-hover:text-cyan-500"
+                                       :class="{ 'rotate-180': collapsedCategories[category] }"></i>
+                                </h3>
+
+                                <transition name="fade-from-black">
+                                    <div v-show="!collapsedCategories[category]" class="space-y-2">
+                                        <div v-for="item in items" :key="item._id">
+                                            <item-row
+                                                :item="item"
+                                                :category="category"
+                                                :all-items="charData.data.items"
+                                                @click="$emit('click', item)">
+                                            </item-row>
+                                            <!-- Nested Children for Gear (e.g. attachments on weapons) -->
+                                            <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
+                                                 class="ml-6 mt-1 space-y-1 border-l border-gray-700/50 pl-2">
+                                                <div v-for="childId in item.system.installedItems.list" :key="childId">
+                                                    <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" @click="$emit('click', charData.data.items.find(i => i._id === childId))"></item-row>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </transition>
                             </div>
                         </div>
 
-                        <div>
-                            <h3 class="text-sm font-bold text-white uppercase mb-2 flex items-center gap-2">
-                                <i data-lucide="package" class="w-4 h-4 text-gray-500"></i> Gear & Weapons
-                            </h3>
-                            <div class="space-y-2">
-                                <div v-for="item in otherGear" :key="item._id"
-                                     class="border-l-2 border-gray-700 pl-3 py-1">
-                                    <div class="flex justify-between">
-                                        <span class="text-sm text-gray-300">{{ item.name }}</span>
-                                        <span v-if="item.system.price" class="text-[10px] font-mono text-yellow-600">{{
-                                                item.system.price.market
-                                            }}eb</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                 </transition>
@@ -249,12 +343,14 @@
 </template>
 
 <script>
-import {computed, onMounted, onUpdated, ref} from "vue";
+import {computed, onMounted, onUpdated, ref, nextTick, watch} from "vue";
+
+// --- SUB COMPONENTS ---
 
 const NavBtn = {
     props: ['icon', 'label', 'active'],
     template: `
-        <button class="flex flex-col items-center gap-1 w-16 transition-colors"
+        <button class="flex flex-col items-center gap-1 w-16 transition-colors cursor-pointer"
                 :class="active ? 'text-red-500' : 'text-gray-600'"><i :data-lucide="icon" class="w-6 h-6"></i><span
             class="text-[9px] font-bold uppercase tracking-wider">{{ label }}</span></button>`
 };
@@ -263,12 +359,11 @@ const SimpleStat = {
     props: ['label', 'value'],
     emits: ['click'],
     template: `
-        <div @click="$emit('click')" class="cpr-panel bg-[#151515] hover:bg-[#AA0A0A6B] p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer transition-colors"><span
-            class="text-xl font-bold text-white leading-none">{{ value }}</span><span
-            class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1">{{ label }}</span></div>`
+        <div @click="$emit('click')" class="cpr-panel bg-[#151515] hover:bg-cyan-900/40 hover:border-cyan-500/50 p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer transition-all group">
+            <span class="text-xl font-bold text-white leading-none group-hover:text-cyan-400 transition-colors">{{ value }}</span>
+            <span class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1 group-hover:text-cyan-500 transition-colors">{{ label }}</span>
+        </div>`
 };
-
-//asdasd
 
 const AdjustableStat = {
     props: ['label', 'current', 'max'],
@@ -276,14 +371,14 @@ const AdjustableStat = {
     template: `
         <div class="cpr-panel bg-[#151515] cursor-pointer p-2 flex justify-between items-center" @click="$emit('sendStatRequest', label)">
             <button @click="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current);"
-                    class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm">-
+                    class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm cursor-pointer">-
             </button>
             <div class="flex flex-col items-center"><span
                 class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ label }}</span><span
                 class="text-xl font-mono font-black text-white">{{ current }} <span class="text-gray-600 text-sm">/
                 {{ max }}</span></span></div>
             <button @click="$emit('update:current', (current < max ? current + 1 : current)); $emit('updateStat', label, current < max ? current + 1 : current)"
-                    class="w-8 h-8 bg-gray-800 hover:bg-green-900 text-white font-bold rounded-sm">+
+                    class="w-8 h-8 bg-gray-800 hover:bg-green-900 text-white font-bold rounded-sm cursor-pointer">+
             </button>
         </div>`
 };
@@ -299,33 +394,174 @@ const ResourceCounter = {
         </div>`
 };
 
-const EquippedCard = {
-    props: ['label', 'item', 'icon'],
+// New Item Row Component with Expansion Logic
+const ItemRow = {
+    props: ['item', 'category', 'all-items'],
+    setup(props) {
+        const expanded = ref(false);
+        const toggle = () => {
+            expanded.value = !expanded.value;
+            if (expanded.value) {
+                // Ensure icons inside dropdown render
+                setTimeout(() => { if(window.lucide) window.lucide.createIcons(); }, 10);
+            }
+        };
+        const formatType = (type) => {
+            if (!type) return 'Other';
+            const result = type.replace(/([A-Z])/g, ' $1').trim();
+            return result.charAt(0).toUpperCase() + result.slice(1);
+        };
+
+        const findItem = (id) => {
+            if (!id || !props.allItems) return null;
+            return props.allItems.find(i => i._id === id);
+        };
+
+        const ammoName = computed(() => {
+            if (props.category !== 'weapon' || !props.item.system.installedItems || !props.item.system.installedItems.list) return null;
+            const ammoId = props.item.system.installedItems.list[0]; // Assuming first item in list is ammo for weapons
+            if (!ammoId) return null;
+            const ammoItem = findItem(ammoId);
+            return ammoItem ? ammoItem.name : null;
+        });
+
+        return { expanded, toggle, formatType, findItem, ammoName };
+    },
     template: `
-        <div class="cpr-panel cpr-equipped-box bg-[#111] p-2 flex items-center gap-3">
-            <div class="w-8 h-8 bg-gray-900 flex items-center justify-center border border-gray-800 text-gray-500"><i
-                :data-lucide="icon" class="w-4 h-4"></i></div>
-            <div class="flex-1">
-                <div class="text-[9px] text-gray-500 uppercase font-bold">{{ label }}</div>
-                <div class="text-sm font-medium text-white truncate" :class="!item ? 'text-gray-600 italic' : ''">
-                    {{ item ? item.name : 'Empty Slot' }}
+        <div class="cpr-panel bg-[#111] flex flex-col transition-colors border-l-2 relative group"
+             :class="{
+            'border-red-600': category === 'weapon',
+            'border-blue-600': category === 'armor',
+            'border-yellow-600': category === 'ammo',
+            'border-gray-600': category === 'gear',
+            'border-blue-400': category === 'cyberware'
+         }">
+
+            <div class="flex items-stretch min-h-[3.5rem]">
+                <!-- Main Content -->
+                <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
+                    <div class="flex justify-between items-start pr-2">
+                        <div class="flex flex-col">
+                        <span class="text-sm font-bold text-gray-200 group-hover:text-cyan-400 transition-colors">
+                            {{ item.name }}
+                        </span>
+
+                            <!-- Subtitles / Stats -->
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                <!-- Category label if strictly needed, but icon usually suffices. Adding Subtype for Cyberware/Gear context -->
+                                <!--                                <span v-if="category === 'cyberware'" class="text-[9px] text-gray-500 uppercase">{{ formatType(item.type) }}</span>-->
+
+                                <!-- Magazine -->
+                                <div v-if="item.system.magazine && category !== 'cyberware'" class="flex items-center gap-1">
+                                    <i data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
+                                    <span class="text-[10px] font-mono text-gray-400">
+                                    {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ item.system.magazine.max }}
+                                    <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
+                                    <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
+                                    <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
+                                </span>
+                                </div>
+
+                                <!-- Amount -->
+                                <div v-else-if="item.system.amount || item.system.count" class="flex items-center gap-1">
+                                    <i data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
+                                    <span class="text-[10px] font-mono text-gray-400">
+                                    x{{ item.system.amount || item.system.count }}
+                                    <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
+                                    <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
+                                </span>
+                                </div>
+
+                                <!-- Install Slots (Cyberware/Attachments) -->
+                                <div v-if="category === 'cyberware'" class="flex items-center gap-1">
+                                    <i data-lucide="cpu" class="w-3 h-3 text-blue-500"></i>
+                                    <span class="text-[10px] font-mono text-blue-400">
+                                    {{ item.system.installedItems.usedSlots }} / {{ item.system.installedItems.slots }}
+                                </span>
+                                </div>
+
+                        <span v-if="item.system.installLocation" class="text-[9px] text-gray-500 uppercase">
+                                [{{ item.system.installLocation }}]
+                            </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Chevron Trigger -->
+                <button
+                    @click.stop="toggle"
+                    class="w-12 shrink-0 flex items-center justify-center bg-gray-900/30 border-l border-white/5 active:bg-cyan-900/20 transition-colors hover:bg-cyan-900/40 cursor-pointer">
+                    <i data-lucide="chevron-down"
+                       class="w-5 h-5 text-gray-500 transition-transform duration-200 group-hover:text-cyan-500"
+                       :class="{ 'rotate-180': expanded }">
+                    </i>
+                </button>
             </div>
-        </div>`
+
+            <!-- Dropdown Content -->
+            <transition name="expand">
+                <div v-if="expanded" class="border-t border-white/5 bg-black/40 p-3 shadow-inner">
+                    <!-- Description -->
+                    <div v-if="item.system.description && item.system.description.value"
+                         class="text-gray-300 text-xs leading-relaxed font-sans cpr-description mb-3"
+                         v-html="item.system.description.value">
+                    </div>
+                    <div v-else class="text-gray-600 text-xs italic mb-3">No description available.</div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[10px] uppercase font-bold text-gray-500">
+                        <div v-if="item.system.price" class="bg-gray-900/50 p-1 px-2 border-l-2 border-yellow-600 flex justify-between items-center">
+                            <span>Cost</span>
+                            <span class="text-yellow-600 font-mono">
+                                {{ item.system.price.market }}eb
+                            </span>
+                        </div>
+                        <div v-if="item.system.concealable" class="bg-gray-900/50 p-1 px-2 border-l-2 flex justify-between items-center"
+                             :class="item.system.concealable.concealable ? 'border-green-600' : 'border-red-600'">
+                            <span>Concealable</span>
+                            <span :class="item.system.concealable.concealable ? 'text-green-500' : 'text-red-500'">
+                                {{ (item.system.concealable.concealable ? "Yes" : "No" ) }}
+                            </span>
+                        </div>
+                        <div v-if="item.system.source" class="bg-gray-900/50 p-1 px-2 border-l-2 border-gray-600 flex justify-between items-center">
+                            <span>Source</span>
+                            <span class="text-gray-300 normal-case truncate max-w-[100px] text-right">
+                            {{ typeof item.system.source === 'object' ? item.system.source.book + ' p.' + item.system.source.page : item.system.source }}
+                        </span>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </div>
+    `
 };
 
 export default {
     name: 'CharacterSheet',
-    components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, EquippedCard },
+    components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, ItemRow },
     setup() {
         const activeTab = ref('stats');
         const charData = ref(null);
         const loading = ref(true);
         const error = ref(null);
         const showPopup = ref(false);
+        const showImagePopup = ref(false);
         const popupMessage = ref('');
 
-        // --- FETCH DATA ---
+        // Helper to refresh icons safely
+        const refreshIcons = () => {
+            if (window.lucide) {
+                nextTick(() => window.lucide.createIcons());
+            }
+        };
+
+        const getImageUrl = (path) => {
+            if (!path) return '';
+            if (path.startsWith('http')) return path;
+            return 'https://foundry.surrealdisco.co.uk/' + path;
+        };
+
+        // --- FETCH DATA --
         onMounted(async () => {
             try {
 
@@ -333,18 +569,21 @@ export default {
                 const actorId = await getActors.data.uuid;
 
                 const response = await window.axios.post("/actorsheet", {"actorUuid" : actorId});
+                console.log(response.data);
                 charData.value = await response.data;
                 loading.value = false;
 
                 // Wait for DOM update then render icons
-                setTimeout(() => window.lucide.createIcons(), 50);
+                setTimeout(refreshIcons, 50);
             } catch (err) {
                 console.error("Fetch Error:", err);
-                error.value = err.response.data.error
-                popupMessage.value = err.response.data.error;
-                showPopup.value = true;
+                if(err.response) {
+                    error.value = err.response.data.error
+                    popupMessage.value = err.response.data.error;
+                    showPopup.value = true;
+                }
                 loading.value = false;
-                setTimeout(() => window.lucide.createIcons(), 50);
+                setTimeout(refreshIcons, 50);
             }
         });
 
@@ -363,18 +602,83 @@ export default {
             return charData.value.data.items.find(i => i._id === id);
         });
 
-        const allCyberware = computed(() => {
-            if (!charData.value) return [];
-            return charData.value.data.items.filter(i =>
-                ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(i.type)
+        const groupedCyberware = computed(() => {
+            if (!charData.value) return {};
+
+            // Get all items that could be installed in others
+            const allItems = charData.value.data.items;
+            const installedIds = new Set();
+            allItems.forEach(item => {
+                if (item.system.installedItems && item.system.installedItems.list) {
+                    item.system.installedItems.list.forEach(id => installedIds.add(id));
+                }
+            });
+
+            const cyberware = allItems.filter(i =>
+                ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(i.type) &&
+                !installedIds.has(i._id) // Only top-level items
             );
+
+            const groups = {};
+            cyberware.forEach(cw => {
+                const type = cw.system.cyberwareType || 'Other';
+                if (!groups[type]) groups[type] = [];
+                groups[type].push(cw);
+            });
+            return groups;
         });
 
-        const otherGear = computed(() => {
-            if (!charData.value) return [];
-            return charData.value.data.items.filter(i =>
-                ['weapon', 'armor', 'gear', 'ammo'].includes(i.type) && i.system.usage !== 'equipped'
+        const groupedGear = computed(() => {
+            if (!charData.value) return {};
+
+            // Get all items that could be installed in others
+            const allItems = charData.value.data.items;
+            const installedIds = new Set();
+            allItems.forEach(item => {
+                if (item.system.installedItems && item.system.installedItems.list) {
+                    item.system.installedItems.list.forEach(id => installedIds.add(id));
+                }
+            });
+
+            const groups = { weapon: [], armor: [], ammo: [], gear: [] };
+            const items = allItems.filter(i =>
+                ['weapon', 'armor', 'gear', 'ammo'].includes(i.type) &&
+                !installedIds.has(i._id)
             );
+
+            items.forEach(item => {
+                if (groups[item.type]) groups[item.type].push(item);
+                else groups.gear.push(item);
+            });
+
+            return groups;
+        });
+
+        const groupedEquipped = computed(() => {
+            if (!charData.value) return {};
+
+            // Get all items that could be installed in others
+            const allItems = charData.value.data.items;
+            const installedIds = new Set();
+            allItems.forEach(item => {
+                if (item.system.installedItems && item.system.installedItems.list) {
+                    item.system.installedItems.list.forEach(id => installedIds.add(id));
+                }
+            });
+
+            const groups = { weapon: [], armor: [], ammo: [], gear: [] };
+            // Filter strictly for equipped items AND NOT installed in others
+            const items = allItems.filter(i => i.system.usage === 'equipped' && !installedIds.has(i._id));
+
+            items.forEach(item => {
+                if (groups[item.type]) groups[item.type].push(item);
+                else if (['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(item.type)) {
+                    // Handled in Cyberware tab usually, but if user equips them they show in Gear tab under "Gear" or "Other"
+                }
+                else groups.gear.push(item);
+            });
+
+            return groups;
         });
 
         const groupedSkills = computed(() => {
@@ -388,11 +692,6 @@ export default {
                 groups[cat].push(skill);
             });
             return groups;
-        });
-
-        const equippedItems = computed(() => {
-            if (!charData.value) return [];
-            return charData.value.data.items.filter(i => i.system.usage === 'equipped');
         });
 
         const calculateBase = (skill) => {
@@ -432,11 +731,10 @@ export default {
                 console.error('Error posting stat', err);
                 popupMessage.value = "Neural uplink failed: Data packet lost.";
                 showPopup.value = true;
-                setTimeout(() => window.lucide.createIcons(), 50);
+                setTimeout(refreshIcons, 50);
             });
         }
 
-        //Deal with returns if needed for any kind of update or hook.
         const sendStatRequest = (stat) => {
             sendRequest({
                 label: stat
@@ -463,17 +761,78 @@ export default {
         };
 
         onUpdated(() => {
-            if (!loading.value && window.lucide) window.lucide.createIcons();
+            if (!loading.value) refreshIcons();
         });
+
+        const collapsedCategories = ref({});
+
+        const toggleCategory = (category) => {
+            collapsedCategories.value[category] = !collapsedCategories.value[category];
+            setTimeout(refreshIcons, 50);
+        };
 
         return {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
-            groupedSkills, allCyberware, otherGear, equippedItems,
-            calculateBase, findItem, formatCategory, getItemIcon, sendStatRequest, sendSkillRequest,
-            sendRoleRequest, updateStat, showPopup, popupMessage
+            groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
+            calculateBase, findItem, formatCategory, getItemIcon, getImageUrl, sendStatRequest, sendSkillRequest,
+            sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
+            collapsedCategories, toggleCategory,
+            refreshIcons
         };
     }
 };
-//https://www.camya.com/ddev-vite-hot-reloading-fix-2025/
 </script>
+<style scoped>
+/* Added basic fade transition styles if they were missing */
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-from-black-enter-active,
+.fade-from-black-leave-active {
+    transition: all 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
+    overflow: hidden;
+}
+
+.fade-from-black-enter-from,
+.fade-from-black-leave-to {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(20px) skewY(2deg);
+    filter: brightness(3) hue-rotate(90deg);
+}
+
+.fade-from-black-enter-to,
+.fade-from-black-leave-from {
+    max-height: 1000px;
+}
+
+/* Expansion Animation */
+.expand-enter-active,
+.expand-leave-active {
+    transition: all 0.2s ease-out;
+    max-height: 500px;
+    opacity: 1;
+}
+.expand-enter-from,
+.expand-leave-to {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* Specific styles for the description HTML injection */
+.cpr-description p {
+    margin-bottom: 0.5rem;
+}
+.cpr-description strong {
+    color: #ef4444; /* red-500 */
+}
+</style>

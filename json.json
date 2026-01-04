@@ -1,0 +1,4283 @@
+{
+    "requestId": "entity_695af0e50ad03",
+    "type": "character",
+    "uuid": "",
+    "data": {
+        "name": "Desert Storm, AKA Jackie Reed (Nomad)",
+        "img": "modules/night-city-gang-and-corp-mook-pack/packs/NCGangsnCorpsMooks/Edgerunners/Desert%20Storm.webp",
+        "system": {
+            "stats": {
+                "int": {
+                    "value": 7
+                },
+                "ref": {
+                    "value": 8
+                },
+                "dex": {
+                    "value": 7
+                },
+                "tech": {
+                    "value": 8
+                },
+                "cool": {
+                    "value": 5
+                },
+                "will": {
+                    "value": 8
+                },
+                "luck": {
+                    "value": 2,
+                    "max": 2
+                },
+                "move": {
+                    "value": 6
+                },
+                "body": {
+                    "value": 5
+                },
+                "emp": {
+                    "value": 6,
+                    "max": 7
+                }
+            },
+            "derivedStats": {
+                "hp": {
+                    "value": 45,
+                    "max": 45,
+                    "transactions": []
+                },
+                "walk": {
+                    "value": 0
+                },
+                "run": {
+                    "value": 0
+                },
+                "currentWoundState": "notWounded",
+                "seriouslyWounded": 20,
+                "deathSave": {
+                    "value": 0,
+                    "penalty": 0,
+                    "basePenalty": 0
+                },
+                "humanity": {
+                    "value": 66,
+                    "max": 66,
+                    "transactions": []
+                }
+            },
+            "reputation": {
+                "value": 0,
+                "transactions": []
+            },
+            "wealth": {
+                "value": 30,
+                "transactions": [
+                    [
+                        "Set to 2550",
+                        "Starting Funds - GM Dan"
+                    ],
+                    [
+                        "wealth decreased by 100 to 1390",
+                        "Armor - GM Dan"
+                    ],
+                    [
+                        "wealth decreased by 460 to 930",
+                        "Gear - GM Dan"
+                    ],
+                    [
+                        "wealth decreased by 960 to 1030",
+                        "Weapons & Ammo - GM Dan"
+                    ],
+                    [
+                        "wealth decreased by 1000 to 30",
+                        "Cyberware - GM Dan"
+                    ]
+                ]
+            },
+            "improvementPoints": {
+                "value": 0,
+                "transactions": []
+            },
+            "roleInfo": {
+                "activeNetRole": "nZa5IvxOafLw1q3R",
+                "activeRole": "Nomad"
+            },
+            "externalData": {
+                "currentArmorBody": {
+                    "id": "",
+                    "value": 0,
+                    "max": 0
+                },
+                "currentArmorHead": {
+                    "id": "",
+                    "value": 0,
+                    "max": 0
+                },
+                "currentArmorShield": {
+                    "id": "",
+                    "value": 0,
+                    "max": 0
+                },
+                "currentWeapon": {
+                    "id": "",
+                    "value": 0,
+                    "max": 0
+                }
+            }
+        },
+        "items": [
+            {
+                "_id": "6NdaJ2plsvmUmaXb",
+                "name": "Basic Tech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 140
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "iPLkWDbDEz76zDKV",
+                "name": "Melee Weapon",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "dex",
+                    "category": "fightingSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "0EGiIAW3du4jcjXl",
+                "name": "Athletics",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "dex",
+                    "category": "bodySkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "y4gkKnkMX2ordn7M",
+                "name": "Trading",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "hlUWMW4TNJg3lbDG",
+                "name": "Electronics/Security Tech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "PNHghWJcb8fHxjAh",
+                "name": "Animal Handling",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 133
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "d197E1HCNVZiIq8Z",
+                "name": "Resist Torture/Drugs",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 3,
+                    "stat": "will",
+                    "category": "bodySkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "6rm94MJfrJoV9QuS",
+                "name": "Martial Arts",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "dex",
+                    "category": "fightingSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "eo8OShaGVpKNelmE",
+                "name": "First Aid",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 3,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "8oJXVhwVcbNFOKa6",
+                "name": "Paint/Draw/Sculpt",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "Wc6WraEPmEHCW5Oi",
+                "name": "Bureaucracy",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 133
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "56cEk354qhAQfyXU",
+                "name": "Riding",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 133
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "ref",
+                    "category": "controlSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "W0KVWmwN8Er2DOQE",
+                "name": "Gamble",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 135
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "GnV5PVRFwzAIo0Qj",
+                "name": "Evasion",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 3,
+                    "stat": "dex",
+                    "category": "fightingSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "xr2exabPN4v9rQ5r",
+                "name": "Conversation",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 138
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "emp",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "YoDSYeyJUb2bWQv4",
+                "name": "Local Expert",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 135
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "9jN9iALCE39Bny12",
+                "name": "Land Vehicle Tech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "Bf2BtkpnvXKPTMvZ",
+                "name": "Streetwise",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "Qgh4kURRyQWRLw19",
+                "name": "Contortionist",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "dex",
+                    "category": "bodySkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "hLW5ctCXBWLXY1fE",
+                "name": "Human Perception",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "emp",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "rVhYEoCI3e9WFM03",
+                "name": "Criminology",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 134
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "azzxDT6FLhXiuI9L",
+                "name": "Composition",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 134
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "diXYxdFeW2DWMyI0",
+                "name": "Cybertech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 140
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "DC70HPXscoVIRa3R",
+                "name": "Language (Streetslang)",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 135
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "S5lun1bC0fXZADft",
+                "name": "Photography/Film",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "sCJ7P1Bahp84bHnm",
+                "name": "Accounting",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 133
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "EQWkJ0ql3QLSZrI4",
+                "name": "Sea Vehicle Tech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 142
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "mQRIPIbIohBb7Wp4",
+                "name": "Wardrobe & Style",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "UgFck4BeC7wx6UQx",
+                "name": "Cryptography",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 134
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "LdQDayRwKy0F8L8U",
+                "name": "Deduction",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 134
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "zJceVSoBJQIjYGcv",
+                "name": "Pilot Sea Vehicle",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "ref",
+                    "category": "controlSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "x8z5bJOE1HJ2AdpZ",
+                "name": "Heavy Weapons",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "ref",
+                    "category": "rangedweaponSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "tsV2TksHaLWi9Ftb",
+                "name": "Drive Land Vehicle",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "ref",
+                    "category": "controlSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "7i9qrd0BeILFEB49",
+                "name": "Shoulder Arms",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 138
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "ref",
+                    "category": "rangedweaponSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "9aBfVV85jfSbzUlV",
+                "name": "Autofire",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 138
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "ref",
+                    "category": "rangedweaponSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "SjXEoUhjVqt6mQ68",
+                "name": "Weaponstech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 142
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "3JPCt1vMPCstME82",
+                "name": "Interrogation",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "eoiMrlyUD8dk81TI",
+                "name": "Tracking",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "int",
+                    "category": "awarenessSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "3wzLlOdJfPjjR9Uu",
+                "name": "Library Search",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 135
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "5xbbEBf6NTGxZaB6",
+                "name": "Pick Pocket",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 142
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "SF4dPI0V8dNoHoma",
+                "name": "Persuasion",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "EhCekPbool96l6YN",
+                "name": "Archery",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "ref",
+                    "category": "rangedweaponSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "P6sbEeRMZZWAwIDU",
+                "name": "Endurance",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "will",
+                    "category": "bodySkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "9ek3rn9VitXwpSkX",
+                "name": "Concentration",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "will",
+                    "category": "awarenessSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "50N22xBrrpdgPSdJ",
+                "name": "Personal Grooming",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 139
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "43OQu0WPGisjiqqe",
+                "name": "Brawling",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 136
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "dex",
+                    "category": "fightingSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "3v672J4wS5gWKt94",
+                "name": "Demolitions",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 140
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "Ud8S0s7HqL0jjDiu",
+                "name": "Business",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 134
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "AhUrUJsOSVt9R38V",
+                "name": "Wilderness Survival",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 136
+                    },
+                    "concealable": false,
+                    "level": 5,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "kfD1jN714MLxkyRY",
+                "name": "Handgun",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 3,
+                    "stat": "ref",
+                    "category": "rangedweaponSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "F1ZemGlBDW2Z0N0A",
+                "name": "Education",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 135
+                    },
+                    "concealable": false,
+                    "level": 3,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "3nDuPUKT3tnv71LT",
+                "name": "Perception",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "int",
+                    "category": "awarenessSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "uh77xw3uTbkqg17I",
+                "name": "Lip Reading",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "awarenessSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "MBpTG2Wj5ps1BHpW",
+                "name": "Bribery",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 138
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "socialSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "5FeyCbYBtPKeoXKF",
+                "name": "Science",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 135
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "W0JNUVMCtOjsitdc",
+                "name": "Pick Lock",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 142
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "BGwfJ9LjoJFdQKgP",
+                "name": "Conceal/Reveal Object",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 131
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "int",
+                    "category": "awarenessSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "kmCsOUM6NxNdhj3n",
+                "name": "Acting",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "cool",
+                    "category": "performanceSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "H8cl4YoxKz4CHRfZ",
+                "name": "Air Vehicle Tech",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 140
+                    },
+                    "concealable": false,
+                    "level": 5,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "UHzIiqpdbaXeW0ig",
+                "name": "Pilot Air Vehicle",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "ref",
+                    "category": "controlSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "RqikVXWUok7mQY3f",
+                "name": "Play Instrument",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 137
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "performanceSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "zeJRirzdC2jN9HgT",
+                "name": "Forgery",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "XzfuP4OD8FxsB0wc",
+                "name": "Tactics",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 136
+                    },
+                    "concealable": false,
+                    "level": 2,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "WucjkItfLSc9EUSk",
+                "name": "Stealth",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 5,
+                    "stat": "dex",
+                    "category": "bodySkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "WtFVeKXml27dmH3k",
+                "name": "Paramedic",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 141
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "tech",
+                    "category": "techniqueSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "ZkGwUH7hcFURpwbP",
+                "name": "Dance",
+                "type": "skill",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 132
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "dex",
+                    "category": "bodySkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "ntSWbHVdDEfzvzky",
+                "name": "External (7 Option Slots)",
+                "type": "cyberware",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 364
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "hospital",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade",
+                            "cyberware"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 7
+                    },
+                    "cyberwareType": "cyberwareExternal",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "c39c4PRyQxrfXXOd",
+                "name": "Fashionware (7 Option Slots)",
+                "type": "cyberware",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 358
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "mall",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade",
+                            "cyberware"
+                        ],
+                        "allowed": true,
+                        "list": [
+                            "GeiaFxsZB1WCoJQd"
+                        ],
+                        "usedSlots": 2,
+                        "slots": 7
+                    },
+                    "cyberwareType": "fashionware",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "qwkFcUUVqGKGIkoy",
+                "name": "Internal (7 Option Slots)",
+                "type": "cyberware",
+                "img": "icons/svg/item-bag.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 362
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "hospital",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade",
+                            "cyberware"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 7
+                    },
+                    "cyberwareType": "cyberwareInternal",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "nZa5IvxOafLw1q3R",
+                "name": "Nomad",
+                "type": "role",
+                "img": "systems/cyberpunk-red-core/icons/compendium/default/Default_Role.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Car people, truckers, transportation afficionados, air-pirates, they are the sole carriers of product across the world, maintaining the transport and supply chains in the time of the Red.</p>"
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 161
+                    },
+                    "concealable": false,
+                    "level": 0,
+                    "stat": "--",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 4,
+                    "mainRoleAbility": "Moto",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "KLk6K7ZCxzBRq4sR",
+                "name": "Storm's Throat-Puncher (Nomad Rocker)",
+                "type": "weapon",
+                "img": "systems/cyberpunk-red-core/icons/compendium/weapons/veryHeavyPistol_poor.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>The Nomad Rocker is a Poor Quality Exotic Very Heavy Pistol that fires rocks. Ammo is free for this weapon. Full rules can be found in Black Chrome on Page 115.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "BC",
+                        "page": 115
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "4d6",
+                    "weaponSkill": "Handgun",
+                    "weaponType": "vHeavyPistol",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 3,
+                        "max": 8,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "ammo",
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [
+                            "JRp7ziVxUQew1pFQ"
+                        ],
+                        "usedSlots": 0,
+                        "slots": 0
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "JIwAzyh7uVlCiiUz",
+                "name": "Storm's Thunder (Flare Gun)",
+                "type": "weapon",
+                "img": "systems/cyberpunk-red-core/icons/compendium/weapons/GrenadeLauncher.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>As well as normal Grenade Ammunition, this weapon can fire road flares*. They don't deal any damage, but if fired into the air can be seen from 3 miles. You cannot install this weapon in Pop-up Cyberware.</p>\n<p><em>*Currently not supported so will need to manually delete a road flare from actors inventory after firing</em></p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "WG",
+                        "page": 3
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "6d6",
+                    "weaponSkill": "Heavy Weapons",
+                    "weaponType": "grenadeLauncher",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 1,
+                        "max": 1,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "ammo"
+                        ],
+                        "allowed": true,
+                        "list": [
+                            "tnzfRsVwXUIEtPbz"
+                        ],
+                        "usedSlots": 0,
+                        "slots": 0
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "1gwKHjGJgOMMib98",
+                "name": "Storm's Fury (Nomad Pneumatic Bolt Gun)",
+                "type": "weapon",
+                "img": "systems/cyberpunk-red-core/icons/compendium/weapons/SniperRifle.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Capable of firing all Non-Basic ammunition, this weapon is still as versatile as when it was invented over two decades ago.</p>"
+                    },
+                    "price": {
+                        "market": 500
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "12DoG",
+                        "page": 5
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "4d6",
+                    "weaponSkill": "Shoulder Arms",
+                    "weaponType": "sniperRifle",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 7,
+                        "max": 8,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "ammo"
+                        ],
+                        "allowed": true,
+                        "list": [
+                            "bmKhwybVQEkI3IqW"
+                        ],
+                        "usedSlots": 0,
+                        "slots": 0
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "eXDSAxJIy9qruLjm",
+                "name": "Jackie's Desert Threads (LAJ Body)",
+                "type": "armor",
+                "img": "systems/cyberpunk-red-core/icons/compendium/armor/light-armorjack_body.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Light version of an Armorjack. No armor penalty.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 350
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "tnzfRsVwXUIEtPbz",
+                "name": "Grenade (Armor-Piercing)",
+                "type": "ammo",
+                "img": "systems/cyberpunk-red-core/icons/compendium/ammo/grenade_armorpiercing.png",
+                "system": {
+                    "description": {
+                        "value": "<p>Double ablation to armor. </p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 345
+                    },
+                    "concealable": {
+                        "concealable": true,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "mall",
+                    "installedItems": [],
+                    "cyberwareType": "armorPiercing",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "ZHApEB6UEU6DQaBq",
+                "name": "Road Flare",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/roadflare.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Range: 100m/yd. Duration: 1h.</p>"
+                    },
+                    "price": {
+                        "market": 10
+                    },
+                    "amount": 3,
+                    "source": {
+                        "book": "Core",
+                        "page": 354
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "JRp7ziVxUQew1pFQ",
+                "name": "Rocks",
+                "type": "ammo",
+                "img": "systems/cyberpunk-red-core/icons/compendium/black-chrome/rocks.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Ammunition for the Nomad Rocker.</p>"
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 12,
+                    "source": {
+                        "book": "BC",
+                        "page": 115
+                    },
+                    "concealable": {
+                        "concealable": true,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "mall",
+                    "installedItems": [],
+                    "cyberwareType": "basic",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "bmKhwybVQEkI3IqW",
+                "name": "Arrow (Basic)",
+                "type": "ammo",
+                "img": "systems/cyberpunk-red-core/icons/compendium/ammo/bow_basic.png",
+                "system": {
+                    "description": {
+                        "value": "<p>Basic ammo, nothing special.</p>"
+                    },
+                    "price": {
+                        "market": 10
+                    },
+                    "amount": 32,
+                    "source": {
+                        "book": "Core",
+                        "page": 345
+                    },
+                    "concealable": {
+                        "concealable": true,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "mall",
+                    "installedItems": [],
+                    "cyberwareType": "basic",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "VrSSBufKH4kvUSE0",
+                "name": "Jackie's Desert Resperator (Anti-Smog Breathing Mask)",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/antismog_breathing_mask.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Airborne toxin filter.</p>"
+                    },
+                    "price": {
+                        "market": 20
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 352
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "LogLO9Tp08Dn01x8",
+                "name": "Agent",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/agent.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>AI Smartphone. +2 Library Search, +2 Wardrobe &amp; Style depending on circumstance.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 352
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "carried"
+                }
+            },
+            {
+                "_id": "VHipCG4kEoyRvfF5",
+                "name": "Flashlight",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/flashlight.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>10h of light on a single charge. 100m/yd range.</p>"
+                    },
+                    "price": {
+                        "market": 20
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 353
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "zyNItssc86UGdmAh",
+                "name": "Grapple Gun",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/grapple_gun.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Range: 30m/yds. Not usable as weapon.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 353
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "0AonQ1VivjeDKUmp",
+                "name": "Inflatable Bed & Sleep-bag",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/inflatable_bed_and_sleepingbag.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Portable sleeping set.</p>"
+                    },
+                    "price": {
+                        "market": 20
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 354
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "QJblxqmTe3yPFKsD",
+                "name": "Radio Communicator",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/radio_communicator.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Range: 1 mile. In-ear.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 354
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "95scLb7Uvceo1Dd3",
+                "name": "Tent and Camping Equipment",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/tent_and_camping_equipment.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>For one person.</p>"
+                    },
+                    "price": {
+                        "market": 50
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 355
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "vm8HgbJkIe6LpSpp",
+                "name": "Carryall",
+                "type": "gear",
+                "img": "systems/cyberpunk-red-core/icons/compendium/gear/carryall.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Bag.</p>"
+                    },
+                    "price": {
+                        "market": 20
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 352
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "JSr5cQqnzglIlzOv",
+                "name": "Storm's Gyrocopter (Nomad)",
+                "type": "vehicle",
+                "img": "systems/cyberpunk-red-core/icons/compendium/vehicles/helicopter.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>It's made of rust, held together by duct tape, and tends to tilt to the left, but it's gotten Jackie halfway across America and back, and it isn't about to let her down now.</p><p>A small two-seater rotorcraft.</p>"
+                    },
+                    "price": {
+                        "market": 20000
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 191
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "hVVPwicr5CAgvhF9",
+                "name": "NOS",
+                "type": "itemUpgrade",
+                "img": "systems/cyberpunk-red-core/icons/compendium/upgrades/nos.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Can be applied to all vehicles. Adds a tank of nitrous oxide to the vehicle. Allows you to use your Action to use an additional Move Action while driving. </p>\n<p>You may install this upgrade multiple times, each upgrade adds an additional tank and each tank may be used once per day.</p>"
+                    },
+                    "price": {
+                        "market": 1000
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 163
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "mall",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "vehicle",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "4FA72P7kjAOiDF9w",
+                "name": "Bulletproof Glass",
+                "type": "itemUpgrade",
+                "img": "systems/cyberpunk-red-core/icons/compendium/upgrades/bulletproof_glass.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Can be applied to all vehicles. All glass on the vehicle is now considered cover with 15 HP. Can be taken a second time to upgrade to 30HP. All windows take damage individually.</p>"
+                    },
+                    "price": {
+                        "market": 1000
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 163
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "mall",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "vehicle",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "4ivT2w8uI8rqHEQQ",
+                "name": "Seating Upgrade",
+                "type": "itemUpgrade",
+                "img": "systems/cyberpunk-red-core/icons/compendium/upgrades/seating_upgrade.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Can be applied to all vehicles. Adds two seats to the vehicle. These can be installed as an external sidecar, they may also be installed as ejector seats with removable parachutes.</p>\n<p>Can be taken multiple times with the exception of Bikes, Jetskis and Gyrocopters.</p>"
+                    },
+                    "price": {
+                        "market": 1000
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 163
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "mall",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "vehicle",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "GeiaFxsZB1WCoJQd",
+                "name": "Biomonitor",
+                "type": "cyberware",
+                "img": "systems/cyberpunk-red-core/icons/compendium/cyberware/biomonitor.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Provides an LED showing vitals readouts. Can be linked to your agent. </p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 358
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "Archery",
+                    "weaponType": "assaultRifle",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "mall",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": false,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "fashionware",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "GcrbbwbK46knPALT",
+                "name": "Jodes Nomad Jacket",
+                "type": "clothing",
+                "img": "systems/cyberpunk-red-core/icons/compendium/clothing/generic_jacket.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>If you want to look like a chromed-up cowboy, this is perfect for you.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 356
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "jacket",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "Y8Lu9gdCSZDrD1JU",
+                "name": "Jackie's Combat Boots",
+                "type": "clothing",
+                "img": "systems/cyberpunk-red-core/icons/compendium/clothing/generic_footwear.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>If you want to look like a chromed-up cowboy, this is perfect for you.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 356
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "footwear",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "OkN1sTCmbZLnOhZA",
+                "name": "Jackie's Chaps",
+                "type": "clothing",
+                "img": "systems/cyberpunk-red-core/icons/compendium/clothing/generic_bottoms.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>If you want to look like a chromed-up cowboy, this is perfect for you.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 356
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "bottoms",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "BBFbo5eBAFWPoV9p",
+                "name": "Jackie's Aviators",
+                "type": "clothing",
+                "img": "systems/cyberpunk-red-core/icons/compendium/clothing/generic_mirrorshades.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>If you want to look like a chromed-up cowboy, this is perfect for you.</p>"
+                    },
+                    "price": {
+                        "market": 50
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 356
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "mirrorshades",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "hg6zAw2jyCUWVECi",
+                "name": "Storm's Worn-Out Top",
+                "type": "clothing",
+                "img": "systems/cyberpunk-red-core/icons/compendium/clothing/generic_top.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Follow the latest dumpster diver fashion trends! Torn and worn out clothes, perfect if you want that homeless look.</p>"
+                    },
+                    "price": {
+                        "market": 10
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 356
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": true,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "top",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "j38L0huAEkRafhUH",
+                "name": "Language (English)",
+                "type": "skill",
+                "img": "systems/cyberpunk-red-core/icons/compendium/default/Default_Skill.svg",
+                "system": {
+                    "description": {
+                        "value": ""
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 45
+                    },
+                    "concealable": false,
+                    "level": 4,
+                    "stat": "int",
+                    "category": "educationSkills",
+                    "skillType": "generic",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "CysbaBLDg7bFZQMX",
+                "name": "Grenade (Incendiary - G&C ver)",
+                "type": "ammo",
+                "img": "systems/cyberpunk-red-core/icons/compendium/ammo/grenade_incendiary.png",
+                "system": {
+                    "description": {
+                        "value": "<p>AOE lingers 1 minute. Targets caught in the explosion are set Deadly On Fire (-6 HP at the end of each of their turns) until they use action to extinguish flames; targets moving through flames set Mild On Fire. Does not stack. See Journal 1 for more details on Fire.</p>"
+                    },
+                    "price": {
+                        "market": 100
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 346
+                    },
+                    "concealable": {
+                        "concealable": true,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "mall",
+                    "installedItems": [],
+                    "cyberwareType": "incendiary",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": ""
+                }
+            },
+            {
+                "_id": "6C3HehHXpDM69LNM",
+                "name": "Neural Link",
+                "type": "cyberware",
+                "img": "systems/cyberpunk-red-core/icons/compendium/cyberware/neural_link.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Access to nervous system. </p>"
+                    },
+                    "price": {
+                        "market": 500
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 359
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "Archery",
+                    "weaponType": "assaultRifle",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "clinic",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade",
+                            "cyberware"
+                        ],
+                        "allowed": true,
+                        "list": [
+                            "dxinWYi0jw0Ux2PH"
+                        ],
+                        "usedSlots": 2,
+                        "slots": 5
+                    },
+                    "cyberwareType": "neuralWare",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "dxinWYi0jw0Ux2PH",
+                "name": "Interface Plugs",
+                "type": "cyberware",
+                "img": "systems/cyberpunk-red-core/icons/compendium/cyberware/interface_plugs.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Plugs in the wrist or head to allow you to connect to machines/systems hands-free. </p>"
+                    },
+                    "price": {
+                        "market": 500
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 359
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "Archery",
+                    "weaponType": "assaultRifle",
+                    "rof": 1,
+                    "magazine": {
+                        "value": 0,
+                        "max": 0,
+                        "ammoData": {
+                            "uuid": ""
+                        }
+                    },
+                    "installLocation": "clinic",
+                    "installedItems": {
+                        "allowedTypes": [
+                            "itemUpgrade"
+                        ],
+                        "allowed": false,
+                        "list": [],
+                        "usedSlots": 0,
+                        "slots": 3
+                    },
+                    "cyberwareType": "neuralWare",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "ZNVPhAor8v97xoT0",
+                "name": "Speedheal",
+                "type": "drug",
+                "img": "systems/cyberpunk-red-core/icons/compendium/drugs/speedheal.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>\n  Injecting a target with Speedheal immediately causes them to heal HP equal to\n  their BODY plus their WILL. This effect does not work on Mortally Wounded\n  targets, and can only be used on a target once per day.\n</p>"
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 1,
+                    "source": {
+                        "book": "Core",
+                        "page": 150
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "",
+                    "weaponSkill": "",
+                    "weaponType": "",
+                    "rof": 0,
+                    "magazine": 0,
+                    "installLocation": "",
+                    "installedItems": [],
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "toggled"
+                }
+            },
+            {
+                "_id": "wtlo5XZFpqBoq2IE",
+                "name": "Unarmed",
+                "type": "weapon",
+                "img": "systems/cyberpunk-red-core/icons/compendium/weapons/unarmed.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>Throwing hands, does not ignore half armor.</p>"
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 176
+                    },
+                    "concealable": {
+                        "concealable": false,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "1d6",
+                    "weaponSkill": "Brawling",
+                    "weaponType": "unarmed",
+                    "rof": 2,
+                    "magazine": {
+                        "ammoData": null,
+                        "max": 0,
+                        "value": 0
+                    },
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowed": true,
+                        "allowedTypes": [
+                            "itemUpgrade",
+                            "ammo"
+                        ],
+                        "list": [],
+                        "slots": 3,
+                        "usedSlots": 0
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            },
+            {
+                "_id": "CjX1fgyxm9sIv99d",
+                "name": "Thrown Weapon",
+                "type": "weapon",
+                "img": "systems/cyberpunk-red-core/icons/compendium/weapons/thrown_weapon.svg",
+                "system": {
+                    "description": {
+                        "value": "<p>\n  A basic lob or pitch of an object. Use an Action to make a Ranged Attack at up\n  to 25m/yds. Targets can choose to Dodge your throw if they can Dodge bullets.\n  Melee weapons deal their base damage, but don't penetrate half SP.\n</p>"
+                    },
+                    "price": {
+                        "market": 0
+                    },
+                    "amount": 0,
+                    "source": {
+                        "book": "Core",
+                        "page": 177
+                    },
+                    "concealable": {
+                        "concealable": true,
+                        "isConcealed": false
+                    },
+                    "level": 0,
+                    "stat": "",
+                    "category": "",
+                    "skillType": "",
+                    "damage": "6d6",
+                    "weaponSkill": "Athletics",
+                    "weaponType": "thrownWeapon",
+                    "rof": 1,
+                    "magazine": {
+                        "ammoData": null,
+                        "max": 1,
+                        "value": 0
+                    },
+                    "installLocation": "",
+                    "installedItems": {
+                        "allowed": true,
+                        "allowedTypes": [
+                            "itemUpgrade",
+                            "ammo"
+                        ],
+                        "list": [
+                            "CysbaBLDg7bFZQMX"
+                        ],
+                        "slots": 3,
+                        "usedSlots": 0
+                    },
+                    "cyberwareType": "",
+                    "sp": 0,
+                    "rank": 0,
+                    "mainRoleAbility": "",
+                    "usage": "equipped"
+                }
+            }
+        ]
+    }
+}

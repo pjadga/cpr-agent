@@ -40,13 +40,6 @@ body {
     );
     transition: color 0.2s;
 }
-.cpr-panel:hover{
-    background-color: var(--cpr-panel-hover);
-    transition: color 0.2s;
-    span {
-        color: var(--cpr-black);
-    }
-}
 
 .cpr-stat-box { border-bottom: 2px solid var(--cpr-red); }
 .cpr-equipped-box { border-left: 3px solid var(--cpr-red); }
