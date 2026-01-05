@@ -15,20 +15,15 @@ class GetActors extends FormRequest
     public function getActors(Request $request)
     {
         $client = $this->getFoundryClient();
-//        $search = $client->searchFor->searchEntities("foundry-xECODN3n8rO4E5Cj", "", "documentType:Actor");
-//        $characterIds = [];
-//        foreach ($search['results'] as $character) {
-//            $characterIds[] = $character['uuid'];
-//        }
-        //foreach($characterIds as $characterId) {
-            $character = $client->entity->getEntity("foundry-xECODN3n8rO4E5Cj", $client->entity::UUID, "Actor.BehNGodGRTaG7ClI");
-            if (isset($character["data"]["ownership"]['yMtjHtgJj3VENELV'])){ //NOTE THE ID HAS CHANGED TO A USER
-                $data = $character;
-            } else {
-                $data = false;
-            }
-        //}
+        $user = auth()->user();
 
-        return response()->json($data, 200);
+        // Use user's client_id if available, otherwise fallback to a default or dummy for testing
+        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
+        $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
+
+        $character = $client->entity->getEntity($clientId, $client->entity::UUID, $actorId);
+
+        // Simplified for now, just returning the character data
+        return response()->json($character, 200);
     }
 }

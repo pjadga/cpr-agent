@@ -451,6 +451,8 @@
                 <!-- NEW CONTROL BTN -->
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
+                <nav-btn icon="user" label="Profile" :active="activeTab === 'profile'"
+                         @click="goToProfile"></nav-btn>
             </nav>
 
         </div>
@@ -892,6 +894,10 @@ export default {
             window.axios.post("/movetoken", { direction });
         };
 
+        const goToProfile = () => {
+            window.location.href = '/profile-setup';
+        };
+
         const rollHit = () => {
             console.log("Rolling Hit", controlState.value);
             // TODO: Implement API call
@@ -922,7 +928,7 @@ export default {
             collapsedCategories, toggleCategory,
             refreshIcons,
             // New Control Exports
-            mockEnemies, controlState, moveToken, rollHit, rollDamage
+            mockEnemies, controlState, moveToken, rollHit, rollDamage, goToProfile
         };
     }
 };

@@ -22,10 +22,13 @@ class StatRollRequest extends FormRequest
         //Need to get the actors either ID or Name -
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $label = strtolower($validatedData['label']);
-
         $client = $this->getFoundryClient();
-        $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
-        "let statRoll = game.actors.getName('Jim');
+        $user = auth()->user();
+        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
+        $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
+
+        $return = $client->utilities->executeJs($clientId,
+        "let statRoll = game.actors.get('$actorId');
         statRoll.sheet._onRoll(
         {'data-roll-type': 'stat',
         'data-roll-title': '$label',

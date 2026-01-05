@@ -22,17 +22,19 @@ class MoveToken extends FormRequest
         //Need to get the actors either ID or Name -
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $direction = $validatedData['direction'];
-
         $client = $this->getFoundryClient();
-            $return = "fuck";
+        $user = auth()->user();
+        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
+
+        $return = "fuck";
         if ($direction == "up") {
-            $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj","const token = canvas.tokens.controlled[0]; const direction = token.document.y - canvas.grid.size; await token.document.update({ y: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.y - canvas.grid.size; await token.document.update({ y: direction });");
         } elseif ($direction == "down") {
-            $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj","const token = canvas.tokens.controlled[0]; const direction = token.document.y + canvas.grid.size; await token.document.update({ y: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.y + canvas.grid.size; await token.document.update({ y: direction });");
         } elseif ($direction == "left") {
-            $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj","const token = canvas.tokens.controlled[0]; const direction = token.document.x - canvas.grid.size; await token.document.update({ x: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.x - canvas.grid.size; await token.document.update({ x: direction });");
         } elseif ($direction == "right") {
-            $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj","const token = canvas.tokens.controlled[0]; const direction = token.document.x + canvas.grid.size; await token.document.update({ x: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.x + canvas.grid.size; await token.document.update({ x: direction });");
         }
         return response()->json([
             'success' => true,

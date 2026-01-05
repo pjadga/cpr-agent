@@ -24,9 +24,13 @@ class SkillRollRequest extends FormRequest
         $label = ucfirst($validatedData['label']);
 
         $client = $this->getFoundryClient();
-        $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
+        $user = auth()->user();
+        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
+        $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
 
-        "let skillRoll = game.actors.getName('Jim');
+        $return = $client->utilities->executeJs($clientId,
+
+        "let skillRoll = game.actors.get('$actorId');
         let id = skillRoll.items.getName('$label')._id;
         skillRoll.sheet._onRoll(
         {'data-roll-type': 'skill',
