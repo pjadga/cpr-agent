@@ -324,6 +324,119 @@
 
                     </div>
 
+                    <!-- CONTROL TAB (NEW) -->
+                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20">
+
+                        <!-- D-Pad Section -->
+                        <div class="flex justify-center my-6">
+                            <div class="grid grid-cols-3 gap-2 p-4 bg-gray-900/50 rounded-full border border-gray-800 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+                                <!-- Empty Top Left -->
+                                <div></div>
+                                <!-- Up Button -->
+                                <button @touchstart.prevent="moveToken('up')" @click="moveToken('up')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
+                                    <i data-lucide="chevron-up" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                </button>
+                                <!-- Empty Top Right -->
+                                <div></div>
+
+                                <!-- Left Button -->
+                                <button @touchstart.prevent="moveToken('left')" @click="moveToken('left')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
+                                    <i data-lucide="chevron-left" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                </button>
+                                <!-- Center (Action/Stop/Center) -->
+                                <div class="w-16 h-16 flex items-center justify-center">
+                                    <div class="w-4 h-4 bg-red-900/50 rounded-full animate-pulse"></div>
+                                </div>
+                                <!-- Right Button -->
+                                <button @touchstart.prevent="moveToken('right')" @click="moveToken('right')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
+                                    <i data-lucide="chevron-right" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                </button>
+
+                                <!-- Empty Bottom Left -->
+                                <div></div>
+                                <!-- Down Button -->
+                                <button @touchstart.prevent="moveToken('down')" @click="moveToken('down')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
+                                    <i data-lucide="chevron-down" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                </button>
+                                <!-- Empty Bottom Right -->
+                                <div></div>
+                            </div>
+                        </div>
+
+                        <!-- Targeting Section -->
+                        <div class="cpr-panel p-4 bg-[#111]">
+                            <h3 class="text-xs font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <i data-lucide="target" class="w-4 h-4"></i> Select Target
+                            </h3>
+                            <div class="relative">
+                                <select v-model="controlState.selectedTarget" class="w-full bg-black border border-gray-700 text-white p-3 text-sm appearance-none focus:border-red-500 focus:outline-none">
+                                    <option :value="null">-- NO TARGET --</option>
+                                    <option v-for="enemy in mockEnemies" :key="enemy.id" :value="enemy">
+                                        {{ enemy.name }} [{{ enemy.x }}, {{ enemy.y }}]
+                                    </option>
+                                </select>
+                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-red-500">
+                                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            <div v-if="controlState.selectedTarget" class="mt-2 text-[10px] text-gray-500 font-mono text-right">
+                                COORDS: X:{{ controlState.selectedTarget.x }} Y:{{ controlState.selectedTarget.y }}
+                            </div>
+                        </div>
+
+                        <!-- Weapon Selection Section -->
+                        <div>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Select Weapon</h3>
+                            <div class="space-y-2">
+                                <div v-if="groupedEquipped.weapon.length === 0" class="text-gray-600 text-xs italic p-2 border border-dashed border-gray-800 text-center">
+                                    No weapons equipped.
+                                </div>
+                                <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
+                                     @click="controlState.selectedWeapon = weapon"
+                                     class="cursor-pointer transition-all duration-200">
+                                    <!-- Only show simple button until selected, then show item row -->
+                                    <div v-if="controlState.selectedWeapon?._id !== weapon._id"
+                                         class="p-3 bg-[#111] border border-gray-800 text-gray-400 text-sm font-bold uppercase hover:border-red-500 hover:text-white flex justify-between items-center">
+                                        <span>{{ weapon.name }}</span>
+                                        <i data-lucide="circle" class="w-3 h-3"></i>
+                                    </div>
+                                    <!-- Selected State -->
+                                    <div v-else class="border-2 border-red-600 relative">
+                                        <item-row :item="weapon" category="weapon" :all-items="charData.data.items"></item-row>
+                                        <div class="absolute -top-2 -right-2 bg-red-600 text-black text-[9px] font-black px-1 uppercase">Active</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Firing Modes -->
+                        <div class="cpr-panel p-4 bg-[#111]">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button v-for="mode in ['Aim', 'Auto', 'Suppress']" :key="mode"
+                                        @click="controlState.fireMode = mode"
+                                        class="py-3 text-xs font-bold uppercase border transition-colors flex flex-col items-center gap-1"
+                                        :class="controlState.fireMode === mode ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
+                                    <i v-if="mode === 'Aim'" data-lucide="crosshair" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Auto'" data-lucide="zap" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Suppress'" data-lucide="shield-alert" class="w-4 h-4"></i>
+                                    {{ mode }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-2 gap-3 pt-4 sticky bottom-20 z-40 bg-gradient-to-t from-black via-black to-transparent p-3 -mx-3">
+                            <button @click="rollHit" class="cpr-panel bg-red-900/20 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <i data-lucide="crosshair" class="w-5 h-5"></i> Roll Hit
+                            </button>
+                            <button @click="rollDamage" class="cpr-panel bg-yellow-900/20 border-2 border-yellow-600 text-yellow-500 hover:bg-yellow-500 hover:text-black py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <i data-lucide="skull" class="w-5 h-5"></i> Roll Dmg
+                            </button>
+                        </div>
+
+                    </div>
+
                 </transition>
             </main>
 
@@ -335,6 +448,9 @@
                          @click="activeTab = 'skills'"></nav-btn>
                 <nav-btn icon="shield" label="Gear" :active="activeTab === 'gear'"
                          @click="activeTab = 'gear'"></nav-btn>
+                <!-- NEW CONTROL BTN -->
+                <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
+                         @click="activeTab = 'control'"></nav-btn>
             </nav>
 
         </div>
@@ -370,14 +486,14 @@ const AdjustableStat = {
     emits: ['update:current', 'updateStat', 'sendStatRequest'],
     template: `
         <div class="cpr-panel bg-[#151515] cursor-pointer p-2 flex justify-between items-center" @click="$emit('sendStatRequest', label)">
-            <button @click="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current);"
+            <button @click.stop="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current);"
                     class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm cursor-pointer">-
             </button>
             <div class="flex flex-col items-center"><span
                 class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ label }}</span><span
                 class="text-xl font-mono font-black text-white">{{ current }} <span class="text-gray-600 text-sm">/
                 {{ max }}</span></span></div>
-            <button @click="$emit('update:current', (current < max ? current + 1 : current)); $emit('updateStat', label, current < max ? current + 1 : current)"
+            <button @click.stop="$emit('update:current', (current < max ? current + 1 : current)); $emit('updateStat', label, current < max ? current + 1 : current)"
                     class="w-8 h-8 bg-gray-800 hover:bg-green-900 text-white font-bold rounded-sm cursor-pointer">+
             </button>
         </div>`
@@ -448,15 +564,12 @@ const ItemRow = {
 
                             <!-- Subtitles / Stats -->
                             <div class="flex flex-wrap gap-2 mt-1">
-                                <!-- Category label if strictly needed, but icon usually suffices. Adding Subtype for Cyberware/Gear context -->
-                                <!--                                <span v-if="category === 'cyberware'" class="text-[9px] text-gray-500 uppercase">{{ formatType(item.type) }}</span>-->
-
                                 <!-- Magazine -->
                                 <div v-if="item.system.magazine && category !== 'cyberware'" class="flex items-center gap-1">
                                     <i data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
                                     <span class="text-[10px] font-mono text-gray-400">
                                     {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ item.system.magazine.max }}
-                                    <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
+                                        <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
                                     <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
                                     <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
                                 </span>
@@ -467,7 +580,7 @@ const ItemRow = {
                                     <i data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
                                     <span class="text-[10px] font-mono text-gray-400">
                                     x{{ item.system.amount || item.system.count }}
-                                    <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
+                                        <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
                                     <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
                                 </span>
                                 </div>
@@ -480,7 +593,7 @@ const ItemRow = {
                                 </span>
                                 </div>
 
-                        <span v-if="item.system.installLocation" class="text-[9px] text-gray-500 uppercase">
+                                <span v-if="item.system.installLocation" class="text-[9px] text-gray-500 uppercase">
                                 [{{ item.system.installLocation }}]
                             </span>
                             </div>
@@ -547,6 +660,20 @@ export default {
         const showPopup = ref(false);
         const showImagePopup = ref(false);
         const popupMessage = ref('');
+
+        // --- MOCK DATA FOR CONTROL TAB ---
+        const mockEnemies = ref([
+            { id: 'e1', name: 'Arasaka Guard Alpha', x: 12, y: 15 },
+            { id: 'e2', name: 'Bozo Ganger', x: 24, y: 8 },
+            { id: 'e3', name: 'Militech Drone', x: 5, y: 30 },
+            { id: 'e4', name: 'Cyberpsycho', x: 18, y: 18 }
+        ]);
+
+        const controlState = ref({
+            selectedTarget: null,
+            selectedWeapon: null,
+            fireMode: 'Aim'
+        });
 
         // Helper to refresh icons safely
         const refreshIcons = () => {
@@ -735,7 +862,7 @@ export default {
             });
         }
 
-        const sendStatRequest = (stat) => {
+        const sendStatRequest = (stat) => {direction
             sendRequest({
                 label: stat
             }, "/statrollrequest")
@@ -760,6 +887,21 @@ export default {
             }, "/rolerollrequest")
         };
 
+        // --- CONTROL TAB ACTIONS ---
+        const moveToken = (direction) => {
+            window.axios.post("/movetoken", { direction });
+        };
+
+        const rollHit = () => {
+            console.log("Rolling Hit", controlState.value);
+            // TODO: Implement API call
+        };
+
+        const rollDamage = () => {
+            console.log("Rolling Damage", controlState.value);
+            // TODO: Implement API call
+        };
+
         onUpdated(() => {
             if (!loading.value) refreshIcons();
         });
@@ -778,7 +920,9 @@ export default {
             calculateBase, findItem, formatCategory, getItemIcon, getImageUrl, sendStatRequest, sendSkillRequest,
             sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
             collapsedCategories, toggleCategory,
-            refreshIcons
+            refreshIcons,
+            // New Control Exports
+            mockEnemies, controlState, moveToken, rollHit, rollDamage
         };
     }
 };
