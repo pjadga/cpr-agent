@@ -1,31 +1,33 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
-    </div>
+    <div class="max-w-md mx-auto">
+        <h2 class="text-2xl font-bold mb-4 glow-lime text-lime-500 uppercase tracking-tighter">ID Verification Pending</h2>
 
-    @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+        <div class="mb-6 text-sm text-gray-400 leading-relaxed italic">
+            {{ __('Welcome to the Net. Before you can interface with Night City systems, we need to verify your neural ID. Check your terminal for the verification link we transmitted. If it didn\'t arrive, we can re-transmit.') }}
         </div>
-    @endif
 
-    <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
+        @if (session('status') == 'verification-link-sent')
+            <div class="mb-6 font-medium text-sm text-lime-400 uppercase tracking-widest glow-lime">
+                {{ __('New transmission sent. Check your neural inbox.') }}
             </div>
-        </form>
+        @endif
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <form method="POST" action="{{ route('verification.send') }}" class="w-full sm:w-auto">
+                @csrf
 
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Log Out') }}
-            </button>
-        </form>
+                <x-primary-button class="w-full">
+                    {{ __('Re-transmit Link') }}
+                </x-primary-button>
+            </form>
+
+            <form method="POST" action="{{ route('logout') }}" class="w-full sm:w-auto">
+                @csrf
+
+                <button type="submit" class="w-full text-xs text-gray-500 hover:text-red-500 uppercase transition-colors tracking-widest">
+                    {{ __('Terminate Session') }}
+                </button>
+            </form>
+        </div>
     </div>
 </x-guest-layout>

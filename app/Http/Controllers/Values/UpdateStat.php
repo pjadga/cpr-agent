@@ -25,8 +25,14 @@ class UpdateStat extends FormRequest
         $label = strtolower($validatedData['label']);
         $value = $validatedData['value'];
         $client = $this->getFoundryClient();
-        $return = $client->utilities->executeJs("foundry-xECODN3n8rO4E5Cj",
-            "let updateStat = game.actors.getName('Jim');
+
+        $user = auth()->user();
+        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
+        $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
+        $actorId = str_replace("Actor.", "", $actorId);
+
+        $return = $client->utilities->executeJs($clientId,
+            "let updateStat = game.actors.get('$actorId');
             updateStat.update({'system.stats.$label.value': $value})");
         return response()->json([
             'success' => true,

@@ -18,7 +18,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('api');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'profile.setup'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -29,7 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'profile.setup'])->group(function () {
     Route::get('/config', [ConfigController::class, 'index'])->name('config.index');
     Route::post('/config', [ConfigController::class, 'store'])->name('config.store');
 

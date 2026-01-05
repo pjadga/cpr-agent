@@ -2,26 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\HasConfiguration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileSetupController extends Controller
 {
+    use HasConfiguration;
+
     public function show()
     {
         // Generate some dummy Client IDs as requested
         $dummyClientIds = [
-            'foundry-xECODN3n8rO4E5Cj' => 'Night City Main',
-            'foundry-aB1C2D3E4F5G6H7' => 'Afterlife Hub',
-            'foundry-zY9X8W7V6U5T4S3' => 'Badlands Outpost',
+            'foundry-xECODN3n8rO4E5Cj' => 'No Client Available'
         ];
+
+        $clientId = $this->getFoundryClient()->api->getClientId();
+
+        if ($clientId !== null) {
+            $dummyClientIds = [
+                $clientId => "Client Online"
+            ];
+        }
 
         // In a real scenario, we would fetch actors based on the client_id
         // For now, let's provide some dummy actors or a text input
         $dummyActors = [
-            'Actor.BehNGodGRTaG7ClI' => 'Johnny Silverhand',
-            'Actor.vMtjHtgJj3VENELV' => 'V',
-            'Actor.xXxShadowxXx' => 'Jackie Welles',
+            'Actor.UGkNHSnOykhJEjPm' => 'Johnny Silverhand',
+            'Actor.BehNGodGRTaG7ClI' => 'V',
+            'Actor.88CUpTpxicp5Lz2Z' => 'Jackie Welles',
         ];
 
         return view('profile-setup', [
@@ -41,6 +50,6 @@ class ProfileSetupController extends Controller
         $user = Auth::user();
         $user->update($validated);
 
-        return redirect()->route('dashboard')->with('status', 'Profile updated successfully!');
+        return redirect()->route('dashboard')->with('status', 'Profile synchronized successfully!');
     }
 }

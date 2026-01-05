@@ -119,7 +119,11 @@ class ActorSheet extends FormRequest
                 'cyberwareType' => $sys['type'] ?? '',
 
                 // Armor Specifics
-                'sp' => $sys['sp'] ?? 0,
+                'armor-head' => $sys['headLocation'] ?? [],
+                'armor-body' => $sys['bodyLocation'] ?? [],
+                'isShield'=> $sys['isShield'] ?? false,
+                'shieldHitPoints'=> $sys['shieldHitPoints'] ?? [],
+
 
                 // Role Specifics
                 'rank'            => $sys['rank'] ?? 0,

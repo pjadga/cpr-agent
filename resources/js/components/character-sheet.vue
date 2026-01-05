@@ -412,12 +412,13 @@
                         <!-- Firing Modes -->
                         <div class="cpr-panel p-4 bg-[#111]">
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button v-for="mode in ['Aim', 'Auto', 'Suppress']" :key="mode"
+                            <div class="grid grid-cols-4 gap-2">
+                                <button v-for="mode in ['Single', 'Aim', 'Auto', 'Suppress']" :key="mode"
                                         @click="controlState.fireMode = mode"
                                         class="py-3 text-xs font-bold uppercase border transition-colors flex flex-col items-center gap-1"
                                         :class="controlState.fireMode === mode ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
-                                    <i v-if="mode === 'Aim'" data-lucide="crosshair" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Single'" data-lucide="locate" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Aim'" data-lucide="locate-fixed" class="w-4 h-4"></i>
                                     <i v-if="mode === 'Auto'" data-lucide="zap" class="w-4 h-4"></i>
                                     <i v-if="mode === 'Suppress'" data-lucide="shield-alert" class="w-4 h-4"></i>
                                     {{ mode }}
@@ -451,7 +452,7 @@
                 <!-- NEW CONTROL BTN -->
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
-                <nav-btn icon="user" label="Profile" :active="activeTab === 'profile'"
+                <nav-btn icon="user-cog" label="Profile" :active="activeTab === 'profile'"
                          @click="goToProfile"></nav-btn>
             </nav>
 
@@ -461,7 +462,7 @@
 </template>
 
 <script>
-import {computed, onMounted, onUpdated, ref, nextTick, watch} from "vue";
+import {computed, onMounted, onUpdated, ref, nextTick, watch, onUnmounted} from "vue";
 
 // --- SUB COMPONENTS ---
 
@@ -543,10 +544,90 @@ const ItemRow = {
             return ammoItem ? ammoItem.name : null;
         });
 
-        return { expanded, toggle, formatType, findItem, ammoName };
+        const armorDisplay = computed(() => {
+            if (props.category !== 'armor') return null;
+            const sys = props.item.system;
+            const results = [];
+
+            if (sys.isShield && sys.shieldHitPoints) {
+                results.push({
+                    label: 'Shield HP',
+                    value: `${sys.shieldHitPoints.value} / ${sys.shieldHitPoints.max}`,
+                    icon: 'shield'
+                });
+            }
+
+            if (sys['armor-head'] && sys['armor-head'].sp > 0) {
+                const head = sys['armor-head'];
+                results.push({
+                    label: 'Head',
+                    value: `${head.sp - head.ablation} / ${head.sp}`,
+                    icon: 'user'
+                });
+            }
+
+            if (sys['armor-body'] && sys['armor-body'].sp > 0) {
+                const body = sys['armor-body'];
+                results.push({
+                    label: 'Body',
+                    value: `${body.sp - body.ablation} / ${body.sp}`,
+                    icon: 'user'
+                });
+            }
+
+            return results.length > 0 ? results : null;
+        });
+
+        const statusLine = computed(() => {
+            let percent = null;
+            const sys = props.item.system;
+
+            if (props.category === 'weapon' && sys.magazine && sys.magazine.max > 0) {
+                percent = (sys.magazine.value / sys.magazine.max) * 100;
+            } else if (props.category === 'armor') {
+                if (sys.isShield && sys.shieldHitPoints && sys.shieldHitPoints.max > 0) {
+                    percent = (sys.shieldHitPoints.value / sys.shieldHitPoints.max) * 100;
+                } else {
+                    let totalSp = 0;
+                    let currentSp = 0;
+                    let count = 0;
+
+                    if (sys['armor-head'] && sys['armor-head'].sp > 0) {
+                        totalSp += sys['armor-head'].sp;
+                        currentSp += (sys['armor-head'].sp - sys['armor-head'].ablation);
+                        count++;
+                    }
+                    if (sys['armor-body'] && sys['armor-body'].sp > 0) {
+                        totalSp += sys['armor-body'].sp;
+                        currentSp += (sys['armor-body'].sp - sys['armor-body'].ablation);
+                        count++;
+                    }
+
+                    if (totalSp > 0) {
+                        percent = (currentSp / totalSp) * 100;
+                    }
+                }
+            }
+
+            if (percent === null) return null;
+
+            // Ensure percent is between 0 and 100
+            percent = Math.min(100, Math.max(0, percent));
+
+            let color = 'bg-green-500';
+            if (percent < 25) color = 'bg-red-500';
+            else if (percent < 60) color = 'bg-amber-500';
+
+            return {
+                width: `${percent}%`,
+                color: color
+            };
+        });
+
+        return { expanded, toggle, formatType, findItem, ammoName, armorDisplay, statusLine };
     },
     template: `
-        <div class="cpr-panel bg-[#111] flex flex-col transition-colors border-l-2 relative group"
+        <div class="cpr-panel bg-[#111] flex flex-col transition-colors border-l-2 relative group overflow-hidden"
              :class="{
             'border-red-600': category === 'weapon',
             'border-blue-600': category === 'armor',
@@ -554,6 +635,12 @@ const ItemRow = {
             'border-gray-600': category === 'gear',
             'border-blue-400': category === 'cyberware'
          }">
+
+            <!-- Status Bar Line -->
+            <div v-if="statusLine" class="absolute top-0 left-0 h-[3px] transition-all duration-500 z-10"
+                 :class="statusLine.color"
+                 :style="{ width: statusLine.width }">
+            </div>
 
             <div class="flex items-stretch min-h-[3.5rem]">
                 <!-- Main Content -->
@@ -566,8 +653,19 @@ const ItemRow = {
 
                             <!-- Subtitles / Stats -->
                             <div class="flex flex-wrap gap-2 mt-1">
-                                <!-- Magazine -->
-                                <div v-if="item.system.magazine && category !== 'cyberware'" class="flex items-center gap-1">
+                                <!-- Armor Display -->
+                                <template v-if="category === 'armor' && armorDisplay">
+                                    <div v-for="stat in armorDisplay" :key="stat.label" class="flex items-center gap-1 mr-2">
+                                        <i :data-lucide="stat.icon" class="w-3 h-3 text-blue-500"></i>
+                                        <span class="text-[10px] font-mono text-gray-400">
+                                            <span class="text-[8px] uppercase text-gray-600 mr-0.5">{{ stat.label }}:</span>
+                                            {{ stat.value }}
+                                        </span>
+                                    </div>
+                                </template>
+
+                                <!-- Magazine / Weapons -->
+                                <div v-if="item.system.magazine && category === 'weapon'" class="flex items-center gap-1">
                                     <i data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
                                     <span class="text-[10px] font-mono text-gray-400">
                                     {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ item.system.magazine.max }}
@@ -578,7 +676,7 @@ const ItemRow = {
                                 </div>
 
                                 <!-- Amount -->
-                                <div v-else-if="item.system.amount || item.system.count" class="flex items-center gap-1">
+                                <div v-else-if="(item.system.amount || item.system.count) && category !== 'armor'" class="flex items-center gap-1">
                                     <i data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
                                     <span class="text-[10px] font-mono text-gray-400">
                                     x{{ item.system.amount || item.system.count }}
@@ -690,29 +788,57 @@ export default {
             return 'https://foundry.surrealdisco.co.uk/' + path;
         };
 
-        // --- FETCH DATA --
-        onMounted(async () => {
+        let refreshInterval = null;
+        let actorUuid = null;
+
+        const fetchCharacterData = async (isInitial = false) => {
             try {
+                if (isInitial) {
+                    const getActors = await window.axios.post("/getactors");
+                    actorUuid = getActors.data.uuid;
+                }
 
-                const getActors = await window.axios.post("/getactors");
-                const actorId = await getActors.data.uuid;
+                if (!actorUuid) return;
 
-                const response = await window.axios.post("/actorsheet", {"actorUuid" : actorId});
-                console.log(response.data);
-                charData.value = await response.data;
-                loading.value = false;
+                const response = await window.axios.post("/actorsheet", {"actorUuid" : actorUuid});
 
-                // Wait for DOM update then render icons
-                setTimeout(refreshIcons, 50);
+                // Simple check to see if data changed to avoid unnecessary re-renders
+                // though usually Vue's reactivity handles this well, we can compare requestId if it exists
+                if (!charData.value || charData.value.requestId !== response.data.requestId) {
+                    charData.value = response.data;
+                    if (isInitial) {
+                        loading.value = false;
+                    }
+                    // Wait for DOM update then render icons
+                    setTimeout(refreshIcons, 50);
+                }
             } catch (err) {
                 console.error("Fetch Error:", err);
-                if(err.response) {
-                    error.value = err.response.data.error
-                    popupMessage.value = err.response.data.error;
-                    showPopup.value = true;
+                if (isInitial) {
+                    if (err.response) {
+                        error.value = err.response.data.error;
+                        popupMessage.value = err.response.data.error;
+                        showPopup.value = true;
+                    }
+                    loading.value = false;
+                    setTimeout(refreshIcons, 50);
                 }
-                loading.value = false;
-                setTimeout(refreshIcons, 50);
+            }
+        };
+
+        // --- FETCH DATA --
+        onMounted(async () => {
+            await fetchCharacterData(true);
+
+            // Set up polling every 5 seconds
+            refreshInterval = setInterval(() => {
+                fetchCharacterData();
+            }, 5000);
+        });
+
+        onUnmounted(() => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
             }
         });
 
@@ -864,7 +990,7 @@ export default {
             });
         }
 
-        const sendStatRequest = (stat) => {direction
+        const sendStatRequest = (stat) => {
             sendRequest({
                 label: stat
             }, "/statrollrequest")
