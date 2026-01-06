@@ -762,12 +762,7 @@ export default {
         const popupMessage = ref('');
 
         // --- MOCK DATA FOR CONTROL TAB ---
-        const mockEnemies = ref([
-            { id: 'e1', name: 'Arasaka Guard Alpha', x: 12, y: 15 },
-            { id: 'e2', name: 'Bozo Ganger', x: 24, y: 8 },
-            { id: 'e3', name: 'Militech Drone', x: 5, y: 30 },
-            { id: 'e4', name: 'Cyberpsycho', x: 18, y: 18 }
-        ]);
+        const mockEnemies = ref([]);
 
         const controlState = ref({
             selectedTarget: null,
@@ -830,15 +825,15 @@ export default {
             await fetchCharacterData(true);
 
             // Set up polling every 5 seconds
-            refreshInterval = setInterval(() => {
-                fetchCharacterData();
-            }, 5000);
+            // refreshInterval = setInterval(() => {
+            //     fetchCharacterData();
+            // }, 5000);
         });
 
         onUnmounted(() => {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
+            // if (refreshInterval) {
+            //     clearInterval(refreshInterval);
+            // }
         });
 
         const stats = computed(() => {
@@ -981,13 +976,31 @@ export default {
             window.axios.post(url, data
             ).then(response => {
                 console.log('Stat post successful', response);
+                return response;
             }).catch(err => {
                 console.error('Error posting stat', err);
                 popupMessage.value = "Neural uplink failed: Data packet lost.";
                 showPopup.value = true;
                 setTimeout(refreshIcons, 50);
+                return err;
             });
         }
+
+        const getVisibleTokens = () => {
+            window.axios.post("/getvisibletokens").then(response => {
+                if (response.data.success && response.data.data.result) {
+                    mockEnemies.value = response.data.data.result;
+                }
+            }).catch(err => {
+                console.error('Error fetching visible tokens', err);
+            });
+        };
+
+        watch(activeTab, (newTab) => {
+            if (newTab === 'control') {
+                getVisibleTokens();
+            }
+        });
 
         const sendStatRequest = (stat) => {
             sendRequest({

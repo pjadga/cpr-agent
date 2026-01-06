@@ -24,7 +24,7 @@ class MoveToken extends FormRequest
         $direction = $validatedData['direction'];
         $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
+        $clientId = $user->getClientId();
 
         $return = "fuck";
         if ($direction == "up") {

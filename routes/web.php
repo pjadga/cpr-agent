@@ -5,6 +5,7 @@ use App\Http\Controllers\Data\GetActors;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
+use App\Http\Controllers\Token\GetVisibleTokens;
 use App\Http\Controllers\Token\MoveToken;
 use App\Http\Controllers\Values\UpdateStat;
 use App\Http\Controllers\Views\ConfigController;
@@ -25,10 +26,10 @@ use Illuminate\Support\Facades\Route;
  * Flow
  * Signup
  * Save deets
- * Choose default client - CALL getclient
- * choose defualt actor - CALL getPlayerTokens (tokens owned by players)
+ * Choose default client - CALL getclient DONE
+ * choose defualt actor - CALL getPlayerTokens (tokens owned by players) DONE
  *
- * let tokens = canvas.tokens.placeables
+ * let tokens = canvas.tokens.placeables DONE
   .filter(t => t.actor && t.actor.hasPlayerOwner)
   .map(t => ({
     name: t.name,
@@ -44,6 +45,17 @@ use Illuminate\Support\Facades\Route;
  *
  * Control -
  * Find all tokens that are not hidden on board - list with coords - triggers aim on that token when selected
+ * const characterTokens = canvas.tokens.placeables
+  .filter(t => !t.document.hidden && t.actor && (t.actor.type === 'character' || t.actor.type === 'mook'))
+  .map(t => ({
+    name: t.name,
+    id: t.id,
+    actorId: t.actor.id,
+    type: t.actor.type,
+    x: Math.round(t.x),
+    y: Math.round(t.y)
+  }));return characterTokens;
+
  * Work out DV value
  * Equip weapon
  * Choose mode
@@ -90,6 +102,7 @@ Route::middleware(['auth', 'profile.setup'])->group(function () {
     Route::post("/actorsheet", [ActorSheet::class, "getCleanData"]);
     Route::post("/getactors", [GetActors::class, "getActors"]);
     Route::post("/movetoken", [MoveToken::class, "moveToken"]);
+    Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);
 });
 
 require __DIR__.'/auth.php';
