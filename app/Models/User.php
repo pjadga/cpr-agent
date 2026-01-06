@@ -23,6 +23,7 @@ class User extends Authenticatable
         'password',
         'client_id',
         'default_actor_id',
+        'default_token_id',
     ];
 
     /**
@@ -46,5 +47,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function getClientId(): string
+    {
+        return $this->client_id;
+    }
+
+    public function getActorId(): string
+    {
+        return $this->default_actor_id;
+    }
+
+    public function getTokenId(): string
+    {
+        return $this->default_token_id;
     }
 }

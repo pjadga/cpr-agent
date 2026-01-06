@@ -797,7 +797,6 @@ export default {
                     const getActors = await window.axios.post("/getactors");
                     actorUuid = getActors.data.uuid;
                 }
-
                 if (!actorUuid) return;
 
                 const response = await window.axios.post("/actorsheet", {"actorUuid" : actorUuid});

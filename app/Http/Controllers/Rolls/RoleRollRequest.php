@@ -38,12 +38,13 @@ class RoleRollRequest extends FormRequest
         'data-item-id': id,
         'data-item-subtype': '$label',
         type: 'click',
-        currentTarget: {'data-roll-type': 'roleAbility', 'data-roll-title': '$label', 'data-item-id': id, 'data-item-subtype': '$label' }})");
+        currentTarget: {'data-roll-type': 'roleAbility', 'data-roll-title': '$label', 'data-item-id': id, 'data-item-subtype': '$label' }});return skillRoll");
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
             'data' => $return,
+            'jsReturn' => $return["result"]
         ], 201);
     }
 }

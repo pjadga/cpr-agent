@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('client_id')->nullable();
             $table->string('default_actor_id')->nullable();
+            $table->string('default_token_id')->nullable();
         });
     }
 
@@ -23,7 +24,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['client_id', 'default_actor_id']);
+            $table->dropColumn(['client_id', 'default_actor_id', 'default_token_id']);
         });
     }
 };

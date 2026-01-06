@@ -13,29 +13,36 @@ class ProfileSetupController extends Controller
     public function show()
     {
         // Generate some dummy Client IDs as requested
-        $dummyClientIds = [
+        $clientIds = [
             'foundry-xECODN3n8rO4E5Cj' => 'No Client Available'
         ];
 
         $clientId = $this->getFoundryClient()->api->getClientId();
 
         if ($clientId !== null) {
-            $dummyClientIds = [
-                $clientId => "Client Online"
+            $clientIds = [
+                $clientId => "Foundry Client Available"
             ];
         }
 
         // In a real scenario, we would fetch actors based on the client_id
         // For now, let's provide some dummy actors or a text input
-        $dummyActors = [
-            'Actor.UGkNHSnOykhJEjPm' => 'Johnny Silverhand',
-            'Actor.BehNGodGRTaG7ClI' => 'V',
-            'Actor.88CUpTpxicp5Lz2Z' => 'Jackie Welles',
-        ];
+
+        $getActors = $this->getFoundryClient()->utilities->executeJs($clientId, "let tokens=canvas.tokens.placeables.filter(t=>t.actor&&t.actor.hasPlayerOwner).map(t=>({name:t.name,actorID:t.actor.id,tokenID:t.id}));return tokens");
+
+        $actors = [];
+        foreach ($getActors["result"] as $actor) {
+            $actors[] = [
+                "name" => $actor["name"],
+                "actorId" => $actor["actorID"],
+                "tokenId" => $actor["tokenID"]
+            ];
+
+        }
 
         return view('profile-setup', [
-            'clientIds' => $dummyClientIds,
-            'actors' => $dummyActors,
+            'clientIds' => $clientIds,
+            'actors' => $actors,
             'user' => Auth::user(),
         ]);
     }
@@ -45,6 +52,7 @@ class ProfileSetupController extends Controller
         $validated = $request->validate([
             'client_id' => 'required|string',
             'default_actor_id' => 'required|string',
+            'default_token_id' => 'required|string',
         ]);
 
         $user = Auth::user();
