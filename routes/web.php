@@ -64,7 +64,7 @@ use Illuminate\Support\Facades\Route;
  *
  *
  * Todo
- * Weapon rolls - roll weapon + aim mode.
+ * Weapon rolls - roll weapon + aim mode. - WEAPON ROLLS ARE FROM THE ITEM, NEED ACTOR TO FUNCITON
  * Find Enemies
  * Get Player owned tokens
  * Get tokens on canvas - pass player controll - enemy (not hidden)
