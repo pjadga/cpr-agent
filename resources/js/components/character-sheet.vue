@@ -1050,15 +1050,15 @@ export default {
             window.location.href = '/profile-setup';
         };
 
-        watch(() => controlState.value.selectedTarget, (newTarget) => {
-            if (newTarget) {
-                targetToken(newTarget.id);
-            }
-        });
-
-        const targetToken = (tokenId) => {
-            window.axios.post("/targettokens", { token: tokenId });
-        }
+        // watch(() => controlState.value.selectedTarget, (newTarget) => {
+        //     if (newTarget) {
+        //         targetToken(newTarget.id);
+        //     }
+        // });
+        //
+        // const targetToken = (tokenId) => {
+        //     window.axios.post("/targettokens", { token: tokenId });
+        // }
 
         const rollHit = () => {
             console.log("Rolling Hit", controlState.value);

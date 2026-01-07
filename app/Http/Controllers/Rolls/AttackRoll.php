@@ -32,16 +32,61 @@ class AttackRoll extends FormRequest
 
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
-        $return = $client->utilities->executeJs($clientId,
 
-        "let attackRoll = game.actors.get('$actorId');
+        //This JS may cause issues with targeting if there are many people trying to target.
+        //The targeting from the dropdown is now removed.
+
+        $js = "const enemyTokenId = '$targetId';
+                const targetToken = canvas.tokens.get(enemyTokenId);
+                const actor = game.actors.get('$actorId');
+                const weaponId = actor.items.get('$weaponId')._id
+
+                if (targetToken && actor) {
+                    // 1. Set the target
+                    targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
+                    console.log('Successfully targeted: ' + targetToken.name);
+
+                    // This waits for the CPR system to broadcast that an attack roll is finished
+                    Hooks.once('cyberpunk-red-core.isAttack', (rollData) => {
+                        console.log('Attack roll detected. Total:', rollData.resultTotal);
+
+                        // 3. Only untarget if the roll actually happened (total > 0)
+                        if (rollData.resultTotal && rollData.resultTotal > 0) {
+                            targetToken.setTarget(false);
+                            console.log('Roll complete: Target cleared.');
+                        }
+                    });
+
+                    actor.sheet._onRoll(
+        {'data-roll-type': 'attack',
+        'data-roll-title': 'Attack Roll',
+        'data-item-id': weaponId,
+        type: 'click',
+        currentTarget: {'data-roll-type': 'attack', 'data-roll-title': 'Attack Roll', 'data-item-id': weaponId}})
+                }";
+
+        $oldJs = "
+        const enemyTokenId = '$targetId'; // This comes from your enemy list
+        const targetToken = canvas.tokens.get(enemyTokenId);
+        if (targetToken) {
+            targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
+            console.log('Successfully targeted: ' + targetToken.name);
+        }
+
+        let attackRoll = game.actors.get('$actorId');
         let id = attackRoll.items.get('$weaponId')._id;
         attackRoll.sheet._onRoll(
         {'data-roll-type': 'attackl',
         'data-roll-title': 'Attack Roll',
         'data-item-id': id,
         type: 'click',
-        currentTarget: {'data-roll-type': 'attack', 'data-roll-title': 'Attack Roll', 'data-item-id': id}})");
+        currentTarget: {'data-roll-type': 'attack', 'data-roll-title': 'Attack Roll', 'data-item-id': id}})
+
+        targetToken.setTarget(false, { releaseOthers: true, groupSelection: true });
+        ";
+
+
+        $return = $client->utilities->executeJs($clientId, $js);
 
         return response()->json([
             'success' => true,
