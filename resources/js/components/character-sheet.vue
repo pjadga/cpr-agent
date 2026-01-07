@@ -774,9 +774,16 @@ export default {
         const controlState = ref({
             selectedTarget: null,
             selectedWeapon: null,
-            fireMode: 'Aim',
+            fireMode: 'Single',
             reloadRequired: false
         });
+
+        watch(controlState, (newControlState) => {
+            if (newControlState) {
+                console.log(newControlState);
+            }
+        }, { deep: true });
+
 
         // Helper to refresh icons safely
         const refreshIcons = () => {
@@ -831,17 +838,16 @@ export default {
         // --- FETCH DATA --
         onMounted(async () => {
             await fetchCharacterData(true);
-
             // Set up polling every 5 seconds
-            // refreshInterval = setInterval(() => {
-            //     fetchCharacterData();
-            // }, 5000);
+            refreshInterval = setInterval(() => {
+                fetchCharacterData();
+            }, 5000);
         });
 
         onUnmounted(() => {
-            // if (refreshInterval) {
-            //     clearInterval(refreshInterval);
-            // }
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
         });
 
         const stats = computed(() => {
@@ -1044,9 +1050,31 @@ export default {
             window.location.href = '/profile-setup';
         };
 
+        watch(() => controlState.value.selectedTarget, (newTarget) => {
+            if (newTarget) {
+                targetToken(newTarget.id);
+            }
+        });
+
+        const targetToken = (tokenId) => {
+            window.axios.post("/targettokens", { token: tokenId });
+        }
+
         const rollHit = () => {
             console.log("Rolling Hit", controlState.value);
-            // TODO: Implement API call
+            if (!controlState.value.selectedTarget) {
+                throwError("No Target Selected")
+                return;
+            }
+            if (!controlState.value.selectedWeapon) {
+                throwError("No Weapon Selected")
+                return;
+            }
+            if (controlState.value.reloadRequired) {
+                throwError("Out of Ammo!")
+                return;
+            }
+            window.axios.post("/attackroll", controlState.value);
         };
 
         const rollDamage = () => {
@@ -1095,6 +1123,11 @@ export default {
         onUpdated(() => {
             if (!loading.value) refreshIcons();
         });
+
+        const throwError = (message) => {
+            popupMessage.value = message;
+            showPopup.value = true;
+        }
 
         const collapsedCategories = ref({});
 

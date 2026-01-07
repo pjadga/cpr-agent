@@ -7,6 +7,7 @@ use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
 use App\Http\Controllers\Token\GetVisibleTokens;
 use App\Http\Controllers\Token\MoveToken;
+use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
 use App\Http\Controllers\Views\ConfigController;
 use App\Http\Controllers\ProfileController;
@@ -43,31 +44,18 @@ use Illuminate\Support\Facades\Route;
  * Rolls are done via JS for now.
  * Direction - JS for now
  *
- * Control -
- * Find all tokens that are not hidden on board - list with coords - triggers aim on that token when selected
- * const characterTokens = canvas.tokens.placeables
-  .filter(t => !t.document.hidden && t.actor && (t.actor.type === 'character' || t.actor.type === 'mook'))
-  .map(t => ({
-    name: t.name,
-    id: t.id,
-    actorId: t.actor.id,
-    type: t.actor.type,
-    x: Math.round(t.x),
-    y: Math.round(t.y)
-  }));return characterTokens;
-
  * Work out DV value
  * Equip weapon
  * Choose mode
  * Roll to hit
  * Roll damage
  *
- *
  * Todo
  * Weapon rolls - roll weapon + aim mode. - WEAPON ROLLS ARE FROM THE ITEM, NEED ACTOR TO FUNCITON
- * Find Enemies
- * Get Player owned tokens
- * Get tokens on canvas - pass player controll - enemy (not hidden)
+ * - In foundry if an enemy is targeted then it will roll against that enemy.
+
+
+
  * Facedown? Death Saves
  * Reload?
  * Ping on Change - TH Module needs to ping relay if anything happens so it can update sheets
@@ -103,6 +91,8 @@ Route::middleware(['auth', 'profile.setup'])->group(function () {
     Route::post("/getactors", [GetActors::class, "getActors"]);
     Route::post("/movetoken", [MoveToken::class, "moveToken"]);
     Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);
+    Route::post("/targettokens", [TargetTokens::class, "targetTokens"]);
+    Route::post("/attackroll", [\App\Http\Controllers\Rolls\AttackRoll::class, "attackRoll"]);
 });
 
 require __DIR__.'/auth.php';

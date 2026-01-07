@@ -25,16 +25,17 @@ class MoveToken extends FormRequest
         $client = $this->getFoundryClient();
         $user = auth()->user();
         $clientId = $user->getClientId();
+        $tokenId = $user->getTokenId();
 
         $return = "fuck";
         if ($direction == "up") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.y - canvas.grid.size; await token.document.update({ y: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.y - canvas.grid.size; await token.document.update({ y: direction });");
         } elseif ($direction == "down") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.y + canvas.grid.size; await token.document.update({ y: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.y + canvas.grid.size; await token.document.update({ y: direction });");
         } elseif ($direction == "left") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.x - canvas.grid.size; await token.document.update({ x: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.x - canvas.grid.size; await token.document.update({ x: direction });");
         } elseif ($direction == "right") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.controlled[0]; const direction = token.document.x + canvas.grid.size; await token.document.update({ x: direction });");
+            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.x + canvas.grid.size; await token.document.update({ x: direction });");
         }
         return response()->json([
             'success' => true,
