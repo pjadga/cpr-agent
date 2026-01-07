@@ -208,9 +208,10 @@
                                 <span class="text-white font-bold text-xs uppercase group-hover:text-cyan-400 transition-colors">{{
                                         formatCategory(categoryKey)
                                     }}</span>
-                                <i data-lucide="chevron-down"
-                                   class="w-4 h-4 text-red-500 transition-transform duration-200 group-hover:text-cyan-500"
-                                   :class="{ 'rotate-180': collapsedCategories[categoryKey] }"></i>
+                                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[categoryKey] }">
+                                    <i data-lucide="chevron-down"
+                                       class="w-4 h-4 text-red-500 group-hover:text-cyan-500"></i>
+                                </div>
                             </div>
                             <div v-show="!collapsedCategories[categoryKey]" class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800">
                                 <div v-for="(skill, index) in group" :key="skill.name"
@@ -248,9 +249,10 @@
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="zap" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400"></i> <span class="group-hover:text-cyan-400 transition-colors">Cyberware</span>
                                 </div>
-                                <i data-lucide="chevron-down"
-                                   class="w-4 h-4 text-blue-500 transition-transform duration-200 group-hover:text-cyan-500"
-                                   :class="{ 'rotate-180': collapsedCategories['cyberware'] }"></i>
+                                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
+                                    <i data-lucide="chevron-down"
+                                       class="w-4 h-4 text-blue-500 group-hover:text-cyan-500"></i>
+                                </div>
                             </h3>
                             <transition name="fade-from-black">
                                 <div v-show="!collapsedCategories['cyberware']" class="space-y-2">
@@ -295,9 +297,10 @@
 
                                         <span class="group-hover:text-cyan-400 transition-colors">{{ category }}</span>
                                     </div>
-                                    <i data-lucide="chevron-down"
-                                       class="w-4 h-4 text-gray-500 transition-transform duration-200 group-hover:text-cyan-500"
-                                       :class="{ 'rotate-180': collapsedCategories[category] }"></i>
+                                    <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[category] }">
+                                        <i data-lucide="chevron-down"
+                                           class="w-4 h-4 text-gray-500 group-hover:text-cyan-500"></i>
+                                    </div>
                                 </h3>
 
                                 <transition name="fade-from-black">
@@ -372,7 +375,7 @@
                                 <select v-model="controlState.selectedTarget" class="w-full bg-black border border-gray-700 text-white p-3 text-sm appearance-none focus:border-red-500 focus:outline-none">
                                     <option :value="null">-- NO TARGET --</option>
                                     <option v-for="enemy in mockEnemies" :key="enemy.id" :value="enemy">
-                                        {{ enemy.name }} [{{ enemy.x }}, {{ enemy.y }}]
+                                        {{ enemy.name }} {{ enemy.distanceM }}m
                                     </option>
                                 </select>
                                 <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-red-500">
@@ -380,7 +383,7 @@
                                 </div>
                             </div>
                             <div v-if="controlState.selectedTarget" class="mt-2 text-[10px] text-gray-500 font-mono text-right">
-                                COORDS: X:{{ controlState.selectedTarget.x }} Y:{{ controlState.selectedTarget.y }}
+                                Distance {{controlState.selectedTarget.distanceM}}m
                             </div>
                         </div>
 
@@ -394,19 +397,21 @@
                                 <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
                                      @click="controlState.selectedWeapon = weapon"
                                      class="cursor-pointer transition-all duration-200">
-                                    <!-- Only show simple button until selected, then show item row -->
-                                    <div v-if="controlState.selectedWeapon?._id !== weapon._id"
-                                         class="p-3 bg-[#111] border border-gray-800 text-gray-400 text-sm font-bold uppercase hover:border-red-500 hover:text-white flex justify-between items-center">
-                                        <span>{{ weapon.name }}</span>
-                                        <i data-lucide="circle" class="w-3 h-3"></i>
-                                    </div>
-                                    <!-- Selected State -->
-                                    <div v-else class="border-2 border-red-600 relative">
+                                    <div class="relative" :class="{'border-2 border-red-600': controlState.selectedWeapon?._id === weapon._id}">
                                         <item-row :item="weapon" category="weapon" :all-items="charData.data.items"></item-row>
-                                        <div class="absolute -top-2 -right-2 bg-red-600 text-black text-[9px] font-black px-1 uppercase">Active</div>
+                                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="absolute -top-2 -right-2 bg-red-600 text-black text-[9px] font-black px-1 uppercase z-20">Active</div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Reload Button -->
+                        <div class="mb-4">
+                            <button @click="reloadWeapon"
+                                    class="w-full py-4 bg-blue-900/20 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
+                                    :class="{'animate-pulse-purple': controlState.reloadRequired}">
+                                <i data-lucide="refresh-cw" class="w-5 h-5"></i> Reload Equipped Weapon
+                            </button>
                         </div>
 
                         <!-- Firing Modes -->
@@ -705,10 +710,12 @@ const ItemRow = {
                 <button
                     @click.stop="toggle"
                     class="w-12 shrink-0 flex items-center justify-center bg-gray-900/30 border-l border-white/5 active:bg-cyan-900/20 transition-colors hover:bg-cyan-900/40 cursor-pointer">
-                    <i data-lucide="chevron-down"
-                       class="w-5 h-5 text-gray-500 transition-transform duration-200 group-hover:text-cyan-500"
-                       :class="{ 'rotate-180': expanded }">
-                    </i>
+                    <div class="transition-transform duration-300 flex items-center justify-center"
+                         :class="{ 'rotate-180': expanded }">
+                        <i data-lucide="chevron-down"
+                           class="w-5 h-5 text-gray-500 group-hover:text-cyan-500">
+                        </i>
+                    </div>
                 </button>
             </div>
 
@@ -767,7 +774,8 @@ export default {
         const controlState = ref({
             selectedTarget: null,
             selectedWeapon: null,
-            fireMode: 'Aim'
+            fireMode: 'Aim',
+            reloadRequired: false
         });
 
         // Helper to refresh icons safely
@@ -1046,6 +1054,44 @@ export default {
             // TODO: Implement API call
         };
 
+        const checkReloadRequired = () => {
+            if (controlState.value.selectedWeapon) {
+                const weapon = controlState.value.selectedWeapon;
+                if (weapon.system.magazine && weapon.system.magazine.max > 0) {
+                    controlState.value.reloadRequired = weapon.system.magazine.value === 0;
+                } else {
+                    controlState.value.reloadRequired = false;
+                }
+            } else {
+                controlState.value.reloadRequired = false;
+            }
+        };
+
+        watch(() => controlState.value.selectedWeapon, (newWeapon) => {
+            checkReloadRequired();
+        }, { deep: true });
+
+        watch(() => charData.value, (newData) => {
+            if (newData && controlState.value.selectedWeapon) {
+                // Update selected weapon reference from the fresh charData if it exists
+                const updatedWeapon = newData.data.items.find(i => i._id === controlState.value.selectedWeapon._id);
+                if (updatedWeapon) {
+                    controlState.value.selectedWeapon = updatedWeapon;
+                    checkReloadRequired();
+                }
+            }
+        }, { deep: true });
+
+        const reloadWeapon = () => {
+            console.log("Reloading Weapon", controlState.value.selectedWeapon);
+            if (controlState.value.selectedWeapon) {
+                sendRequest({
+                    itemUuid: controlState.value.selectedWeapon.uuid,
+                    actorUuid: actorUuid
+                }, "/reloadweapon");
+            }
+        };
+
         onUpdated(() => {
             if (!loading.value) refreshIcons();
         });
@@ -1066,7 +1112,7 @@ export default {
             collapsedCategories, toggleCategory,
             refreshIcons,
             // New Control Exports
-            mockEnemies, controlState, moveToken, rollHit, rollDamage, goToProfile
+            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile
         };
     }
 };
@@ -1100,6 +1146,27 @@ export default {
 .fade-from-black-enter-to,
 .fade-from-black-leave-from {
     max-height: 1000px;
+}
+
+@keyframes pulse-purple {
+    0% {
+        background-color: rgba(88, 28, 135, 0.2); /* bg-purple-900/20 */
+        box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
+    }
+    50% {
+        background-color: rgba(88, 28, 135, 0.6); /* darker purple */
+        box-shadow: 0 0 15px 5px rgba(88, 28, 135, 0.4);
+    }
+    100% {
+        background-color: rgba(88, 28, 135, 0.2);
+        box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
+    }
+}
+
+.animate-pulse-purple {
+    animation: pulse-purple 3s infinite ease-in-out;
+    border-color: #7e22ce !important; /* purple-700 */
+    color: #e9d5ff !important; /* purple-200 for readability */
 }
 
 /* Expansion Animation */
