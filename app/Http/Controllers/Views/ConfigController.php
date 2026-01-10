@@ -26,4 +26,9 @@ class ConfigController
 
         return redirect()->back()->with('success', 'Configuration updated successfully.');
     }
+
+    public function getBaseUrl(Request $request)
+    {
+        return Config::first()->base_url ?? null;
+    }
 }

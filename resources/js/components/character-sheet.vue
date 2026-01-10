@@ -795,7 +795,8 @@ export default {
         const getImageUrl = (path) => {
             if (!path) return '';
             if (path.startsWith('http')) return path;
-            return 'https://foundry.surrealdisco.co.uk/' + path;
+            let baseUrl = window.axios.get("/getbaseurl")
+            return baseUrl + path;
         };
 
         let refreshInterval = null;

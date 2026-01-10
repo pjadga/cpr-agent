@@ -1054,16 +1054,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v12.45.0",
+            "version": "v12.46.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "9dfd2afc48f2519bfdbe6862dfb9849491c673ad"
+                "reference": "9dcff48d25a632c1fadb713024c952fec489c4ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/9dfd2afc48f2519bfdbe6862dfb9849491c673ad",
-                "reference": "9dfd2afc48f2519bfdbe6862dfb9849491c673ad",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/9dcff48d25a632c1fadb713024c952fec489c4ae",
+                "reference": "9dcff48d25a632c1fadb713024c952fec489c4ae",
                 "shasum": ""
             },
             "require": {
@@ -1272,7 +1272,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2026-01-06T15:24:52+00:00"
+            "time": "2026-01-07T23:26:53+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -3296,15 +3296,16 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/surrealtech/threehats-api-php-wrapper.git",
-                "reference": "e0007a27a193f4cba24cc93acf1749e2abd1e4c5"
+                "reference": "3ec9c053814d1d1f380487da2757dc561df44bb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/surrealtech%2Fthreehats-api-php-wrapper/repository/archive.zip?sha=e0007a27a193f4cba24cc93acf1749e2abd1e4c5",
-                "reference": "e0007a27a193f4cba24cc93acf1749e2abd1e4c5",
+                "url": "https://gitlab.com/api/v4/projects/surrealtech%2Fthreehats-api-php-wrapper/repository/archive.zip?sha=3ec9c053814d1d1f380487da2757dc561df44bb4",
+                "reference": "3ec9c053814d1d1f380487da2757dc561df44bb4",
                 "shasum": ""
             },
             "require": {
+                "ext-openssl": "*",
                 "guzzlehttp/guzzle": "^7.0",
                 "php": "^8.3"
             },
@@ -3335,7 +3336,7 @@
                 "issues": "https://gitlab.com/surrealtech/threehats-api-php-wrapper/-/issues",
                 "source": "https://gitlab.com/surrealtech/threehats-api-php-wrapper/-/tree/main"
             },
-            "time": "2026-01-03T19:10:19+00:00"
+            "time": "2026-01-10T00:56:41+00:00"
         },
         {
             "name": "symfony/clock",

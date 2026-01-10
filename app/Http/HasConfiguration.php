@@ -10,13 +10,13 @@ trait HasConfiguration
     public function getApiKey(): string
     {
         $config = Config::first();
-        return $config->api_key ?? "test-api-key";
+        return $config->api_key;
     }
 
     public function getBaseUrl(): string
     {
         $config = Config::first();
-        return $config->base_url ?? "https://foundry-api.surrealdisco.co.uk";
+        return $config->base_url;
     }
 
     /**

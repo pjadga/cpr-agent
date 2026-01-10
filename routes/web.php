@@ -82,7 +82,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'profile.setup'])->group(function () {
     Route::get('/config', [ConfigController::class, 'index'])->name('config.index');
     Route::post('/config', [ConfigController::class, 'store'])->name('config.store');
-
+    Route::get('/getbaseurl', [ConfigController::class, 'getBaseUrl'])->name('config.getBaseUrl');
     Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
