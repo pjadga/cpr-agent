@@ -3296,12 +3296,12 @@
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/surrealtech/threehats-api-php-wrapper.git",
-                "reference": "3ec9c053814d1d1f380487da2757dc561df44bb4"
+                "reference": "ed0c32113aad0e6d1e7d32aee3b606453fc93070"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/surrealtech%2Fthreehats-api-php-wrapper/repository/archive.zip?sha=3ec9c053814d1d1f380487da2757dc561df44bb4",
-                "reference": "3ec9c053814d1d1f380487da2757dc561df44bb4",
+                "url": "https://gitlab.com/api/v4/projects/surrealtech%2Fthreehats-api-php-wrapper/repository/archive.zip?sha=ed0c32113aad0e6d1e7d32aee3b606453fc93070",
+                "reference": "ed0c32113aad0e6d1e7d32aee3b606453fc93070",
                 "shasum": ""
             },
             "require": {
@@ -3336,7 +3336,7 @@
                 "issues": "https://gitlab.com/surrealtech/threehats-api-php-wrapper/-/issues",
                 "source": "https://gitlab.com/surrealtech/threehats-api-php-wrapper/-/tree/main"
             },
-            "time": "2026-01-10T00:56:41+00:00"
+            "time": "2026-01-10T01:53:12+00:00"
         },
         {
             "name": "symfony/clock",

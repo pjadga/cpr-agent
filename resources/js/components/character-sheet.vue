@@ -767,6 +767,7 @@ export default {
         const showPopup = ref(false);
         const showImagePopup = ref(false);
         const popupMessage = ref('');
+        const baseUrl = ref('');
 
         // --- MOCK DATA FOR CONTROL TAB ---
         const mockEnemies = ref([]);
@@ -795,8 +796,11 @@ export default {
         const getImageUrl = (path) => {
             if (!path) return '';
             if (path.startsWith('http')) return path;
-            let baseUrl = window.axios.get("/getbaseurl")
-            return baseUrl + path;
+            if (baseUrl.value) return baseUrl.value;
+            window.axios.get("/getbaseurl").then(response => {
+                baseUrl.value = response.data;
+                return baseUrl.value;
+            })
         };
 
         let refreshInterval = null;
