@@ -24,6 +24,10 @@ class ConfigController
         $config->fill($validated);
         $config->save();
 
+        if ($request->filled('api_key') && $request->filled('base_url')) {
+            return redirect()->route('dashboard')->with('success', 'Configuration updated successfully.');
+        }
+
         return redirect()->back()->with('success', 'Configuration updated successfully.');
     }
 

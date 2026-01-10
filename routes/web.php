@@ -68,20 +68,25 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     return view('api');
-})->middleware(['auth', 'verified', 'profile.setup'])->name('dashboard');
+})->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
+
+Route::middleware(['auth', 'app.configured'])->group(function () {
+    Route::get('/profile-setup', [ProfileSetupController::class, 'show'])->name('profile-setup.show');
+    Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::get('/profile-setup', [ProfileSetupController::class, 'show'])->name('profile-setup.show');
-    Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');
 });
 
-Route::middleware(['auth', 'profile.setup'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/config', [ConfigController::class, 'index'])->name('config.index');
     Route::post('/config', [ConfigController::class, 'store'])->name('config.store');
+});
+
+Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
     Route::get('/getbaseurl', [ConfigController::class, 'getBaseUrl'])->name('config.getBaseUrl');
     Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
