@@ -935,10 +935,11 @@ export default {
         const getImageUrl = (path) => {
             if (!path) return '';
             if (path.startsWith('http')) return path;
-            if (baseUrl.value) return baseUrl.value;
+            if (baseUrl.value) return baseUrl.value + "/" + path;
             window.axios.get("/getbaseurl").then(response => {
                 baseUrl.value = response.data;
-                return baseUrl.value;
+                console.log(baseUrl.value)
+                return baseUrl.value + "/" + path;
             })
         };
 

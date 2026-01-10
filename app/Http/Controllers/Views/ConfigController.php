@@ -18,6 +18,7 @@ class ConfigController
         $validated = $request->validate([
             'api_key' => 'nullable|string',
             'base_url' => 'nullable|string',
+            'foundry_url' => 'nullable|string',
         ]);
 
         $config = Config::first() ?: new Config();
@@ -34,5 +35,10 @@ class ConfigController
     public function getBaseUrl(Request $request)
     {
         return Config::first()->base_url ?? null;
+    }
+
+    public function getFoundryUrl(Request $request)
+    {
+        return Config::first()->foundry_url ?? null;
     }
 }

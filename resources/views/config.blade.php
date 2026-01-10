@@ -24,6 +24,10 @@
                 <label for="base_url" class="form-label">Base URL</label>
                 <input type="text" name="base_url" class="form-label w-100" id="base_url" value="{{ old('base_url', $config->base_url) }}">
             </div>
+            <div class="mb-3">
+                <label for="foundry_url" class="form-label">Foundry URL</label>
+                <input type="text" name="foundry_url" class="form-label w-100" id="foundry_url" value="{{ old('foundry_url', $config->foundry_url) }}">
+            </div>
             <button type="submit" class="btn btn-primary">Save Configuration</button>
         </form>
     </div>

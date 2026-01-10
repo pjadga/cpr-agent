@@ -44,7 +44,9 @@ class GetVisibleTokens extends FormRequest
               'Sniper Rifle':     [30, 25, 25, 20, 15, 16, 17, 20],
               'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
               'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
-              'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30]
+              'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
+              'Martial Arts': ['Ka Pow'],
+              'Unarmed': ['unarmed']
             };
             const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
 
@@ -63,9 +65,13 @@ class GetVisibleTokens extends FormRequest
                     'assaultRifle': 'Assault Rifle',
                     'smg': 'SMG',
                     'shotgun': 'Shotgun (Slug)',
-                    'sniperRifle': 'Sniper Rifle'
+                    'sniperRifle': 'Sniper Rifle',
+                    'unarmed' : 'Unarmed',
+                    'martialArts' : 'Martial Arts',
+                    'grenade' : 'Grenade Launcher',
+                    'thrownWeapon': 'Grenade Launcher',
                 };
-                const category = typeMap[weaponData.system.weaponType] || 'Pistol';
+                const category = (typeMap[weaponData.system.weaponType] || typeMap[weaponData.system.variety]) || 'Pistol';
 
                 // Find DV
                 const bracketIndex = DISTANCE_BRACKETS.findIndex(limit => distanceM <= limit);

@@ -29,36 +29,9 @@ use Illuminate\Support\Facades\Route;
  * After setting up their ClientId, they will be able to see what Actors are owned by then using the script below.
  * They can then save the Actor ID to their profile, allowing it to be loaded when ever.
  *
- * Flow
- * Signup
- * Save deets
- * Choose default client - CALL getclient DONE
- * choose defualt actor - CALL getPlayerTokens (tokens owned by players) DONE
- *
- * let tokens = canvas.tokens.placeables DONE
-  .filter(t => t.actor && t.actor.hasPlayerOwner)
-  .map(t => ({
-    name: t.name,
-    actorID: t.actor.id,
-    tokenID: t.id
-  }));return tokens;
-
-
- *
- * Load sheet
- * Rolls are done via JS for now.
- * Direction - JS for now
- *
- * Work out DV value
- * Equip weapon
- * Choose mode
- * Roll to hit
- * Roll damage
- *
  * Todo
  * Facedown?
  * Death Saves
- * Show modifiers to rolls (wounds etc)
 
  * Ping on Change - TH Module needs to ping relay if anything happens so it can update sheets
  *
@@ -89,7 +62,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
-    Route::get('/getbaseurl', [ConfigController::class, 'getBaseUrl']);
+    Route::get('/getbaseurl', [ConfigController::class, 'getFoundryUrl']);
     Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
