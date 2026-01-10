@@ -2,11 +2,14 @@
 
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Rolls\AttackRoll;
+use App\Http\Controllers\Rolls\DamageRoll;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
 use App\Http\Controllers\Token\GetVisibleTokens;
 use App\Http\Controllers\Token\MoveToken;
+use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
 use App\Http\Controllers\Views\ConfigController;
@@ -97,7 +100,9 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/movetoken", [MoveToken::class, "moveToken"]);
     Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);
     Route::post("/targettokens", [TargetTokens::class, "targetTokens"]);
-    Route::post("/attackroll", [\App\Http\Controllers\Rolls\AttackRoll::class, "attackRoll"]);
+    Route::post("/attackroll", [AttackRoll::class, "attackRoll"]);
+    Route::post("/damageroll", [DamageRoll::class, "damageRoll"]);
+    Route::post("/reloadweapon", [ReloadWeapon::class, "reloadWeapon"]);
 });
 
 require __DIR__.'/auth.php';

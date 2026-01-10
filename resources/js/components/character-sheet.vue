@@ -1055,6 +1055,8 @@ export default {
             window.location.href = '/profile-setup';
         };
 
+        //This is the 'targeting' hook that allows the dropdown to target anything
+        //Replaced with targeting adhoc as it might get a bit weird with multiple peeps
         // watch(() => controlState.value.selectedTarget, (newTarget) => {
         //     if (newTarget) {
         //         targetToken(newTarget.id);
@@ -1084,7 +1086,7 @@ export default {
 
         const rollDamage = () => {
             console.log("Rolling Damage", controlState.value);
-            // TODO: Implement API call
+            window.axios.post("/damageroll", controlState.value);
         };
 
         const checkReloadRequired = () => {
@@ -1118,10 +1120,7 @@ export default {
         const reloadWeapon = () => {
             console.log("Reloading Weapon", controlState.value.selectedWeapon);
             if (controlState.value.selectedWeapon) {
-                sendRequest({
-                    itemUuid: controlState.value.selectedWeapon.uuid,
-                    actorUuid: actorUuid
-                }, "/reloadweapon");
+                sendRequest(controlState.value, "/reloadweapon");
             }
         };
 
