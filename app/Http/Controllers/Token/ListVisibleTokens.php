@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Token;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cache;
 
 class ListVisibleTokens extends FormRequest
 {
@@ -56,7 +57,12 @@ class ListVisibleTokens extends FormRequest
         }
         ";
 
-        $result = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        // Short cache to reduce repeated polling when opening/refreshing UI
+        $cacheKey = sprintf('visibletokens:%s:%s', $clientId, $tokenId);
+        $ttl = now()->addSeconds(2);
+        $result = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
+            return $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        });
 
         return response()->json([
             'success' => true,

@@ -614,6 +614,70 @@
 <script>
 import {computed, onMounted, onUpdated, ref, nextTick, watch, onUnmounted} from "vue";
 
+// --- REQUEST CACHING & COALESCING HELPERS ---
+const _inFlight = new Map(); // key -> Promise
+const _responseCache = new Map(); // key -> { expiresAt, data }
+
+const _makeKey = (url, data) => `${url}::${JSON.stringify(data||{})}`;
+
+function cachedPost(url, data, ttlMs = 1500) {
+    const key = _makeKey(url, data);
+    const now = Date.now();
+    const cached = _responseCache.get(key);
+    if (cached && cached.expiresAt > now) {
+        return Promise.resolve(cached.data);
+    }
+    if (_inFlight.has(key)) {
+        return _inFlight.get(key);
+    }
+    const p = window.axios.post(url, data).then(resp => {
+        _responseCache.set(key, { expiresAt: now + ttlMs, data: resp });
+        _inFlight.delete(key);
+        return resp;
+    }).catch(err => {
+        _inFlight.delete(key);
+        throw err;
+    });
+    _inFlight.set(key, p);
+    return p;
+}
+
+function debounce(fn, wait = 250) {
+    let t = null;
+    return (...args) => {
+        if (t) clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+    };
+}
+
+function shallowEqual(a, b) {
+    if (a === b) return true;
+    if (typeof a !== 'object' || typeof b !== 'object' || !a || !b) return false;
+    const ak = Object.keys(a);
+    const bk = Object.keys(b);
+    if (ak.length !== bk.length) return false;
+    for (const k of ak) {
+        if (a[k] !== b[k]) return false;
+    }
+    return true;
+}
+
+function arraysEqualShallow(a, b) {
+    if (a === b) return true;
+    if (!Array.isArray(a) || !Array.isArray(b)) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; i++) {
+        const ai = a[i];
+        const bi = b[i];
+        if (typeof ai === 'object' || typeof bi === 'object') {
+            if (!shallowEqual(ai || {}, bi || {})) return false;
+        } else if (ai !== bi) {
+            return false;
+        }
+    }
+    return true;
+}
+
 // --- SUB COMPONENTS ---
 
 const NavBtn = {
@@ -960,12 +1024,14 @@ export default {
             if (!controlState.value.selectedWeapon) return;
             try {
                 dvLoading.value = true;
-                const response = await window.axios.post('/getvisibletokens', {
+                const response = await cachedPost('/getvisibletokens', {
                     selectedWeapon: controlState.value.selectedWeapon
-                });
+                }, 1000);
                 const payload = response?.data?.data?.result;
                 // Some endpoints may nest under result; safeguard
-                dvInfo.value = payload;
+                if (!shallowEqual(dvInfo.value || {}, payload || {})) {
+                    dvInfo.value = payload;
+                }
             } catch (e) {
                 console.error('Error fetching DV', e.error);
                 dvError.value = 'Unable to fetch DV.';
@@ -973,6 +1039,8 @@ export default {
                 dvLoading.value = false;
             }
         };
+
+        const debouncedFetchDV = debounce(fetchDVForSelectedWeapon, 250);
 
         const fetchRollModifiers = async () => {
             rollModsError.value = null;
@@ -983,14 +1051,18 @@ export default {
                     rollModsError.value = 'No weapon selected. Choose a weapon in Control > Select Weapon.';
                     return;
                 }
-                const response = await window.axios.post('/getrollmodifiers', {
+                const response = await cachedPost('/getrollmodifiers', {
                     selectedWeapon: controlState.value.selectedWeapon
-                });
+                }, 2500);
                 const data = response?.data?.data;
                 if (data?.result) {
-                    rollModsData.value = data.result; // Some endpoints wrap under result
+                    if (!shallowEqual(rollModsData.value || {}, data.result || {})) {
+                        rollModsData.value = data.result; // Some endpoints wrap under result
+                    }
                 } else {
-                    rollModsData.value = data;
+                    if (!shallowEqual(rollModsData.value || {}, data || {})) {
+                        rollModsData.value = data;
+                    }
                 }
                 if (rollModsData.value?.error) {
                     rollModsError.value = rollModsData.value.error;
@@ -1004,6 +1076,8 @@ export default {
                 setTimeout(refreshIcons, 50);
             }
         };
+
+        const debouncedFetchRollModifiers = debounce(fetchRollModifiers, 250);
 
         // --- RESOURCE EDIT MODAL STATE/LOGIC (HP / HUMANITY) ---
         const showResourceModal = ref(false);
@@ -1278,22 +1352,43 @@ export default {
         }
 
         const getVisibleTokens = () => {
-            window.axios.post("/listvisibletokens").then(response => {
-                const d = response?.data.data;
-                const payload = d.result
-                if (Array.isArray(payload)) {
-                    mockEnemies.value = payload;
-                } else {
-                    mockEnemies.value = [];
+            cachedPost("/listvisibletokens", {}, 1500).then(response => {
+                const d = response?.data?.data;
+                const payload = d?.result;
+                const list = Array.isArray(payload) ? payload : [];
+                if (!arraysEqualShallow(mockEnemies.value || [], list)) {
+                    // Preserve currently selected target if it still exists in the refreshed list
+                    const prevSelectedId = controlState.value.selectedTarget?.id || null;
+                    mockEnemies.value = list;
+                    if (prevSelectedId) {
+                        const preserved = list.find(t => t.id === prevSelectedId);
+                        if (preserved && controlState.value.selectedTarget?.id !== preserved.id) {
+                            controlState.value.selectedTarget = preserved;
+                        }
+                    }
+                }
+                // After refreshing visible tokens, refresh DV/distance if we still have a selection and weapon
+                if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
+                    debouncedFetchDV();
                 }
             }).catch(err => {
                 console.error('Error fetching visible tokens', err);
             });
         };
+        const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
         watch(activeTab, (newTab) => {
             if (newTab === 'control') {
-                getVisibleTokens();
+                // When returning to Control tab, rebind selectedTarget to the instance
+                // inside current mockEnemies (same id) so the dropdown keeps showing it
+                const prevSelectedId = controlState.value.selectedTarget?.id || null;
+                if (prevSelectedId) {
+                    const match = mockEnemies.value.find(t => t.id === prevSelectedId);
+                    if (match && controlState.value.selectedTarget !== match) {
+                        controlState.value.selectedTarget = match;
+                    }
+                }
+                debouncedGetVisibleTokens();
             }
         });
 
@@ -1323,8 +1418,17 @@ export default {
         };
 
         // --- CONTROL TAB ACTIONS ---
+        let moveRefreshTimer = null;
         const moveToken = (direction) => {
             window.axios.post("/movetoken", { direction });
+            // Schedule refresh 4s after the LAST movement; subsequent moves reset the timer
+            if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
+            moveRefreshTimer = setTimeout(() => {
+                getVisibleTokens();
+                if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
+                    debouncedFetchDV();
+                }
+            }, 4000);
         };
 
         const goToProfile = () => {
@@ -1381,7 +1485,8 @@ export default {
         watch(() => controlState.value.selectedWeapon, async (newWeapon) => {
             checkReloadRequired();
             if (newWeapon) {
-                await fetchDVForSelectedWeapon();
+                debouncedFetchDV();
+                debouncedFetchRollModifiers();
             } else {
                 dvInfo.value = null;
             }
@@ -1407,6 +1512,10 @@ export default {
 
         onUpdated(() => {
             if (!loading.value) refreshIcons();
+        });
+
+        onUnmounted(() => {
+            if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
         });
 
         const throwError = (message) => {

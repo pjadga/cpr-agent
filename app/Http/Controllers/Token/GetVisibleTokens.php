@@ -8,6 +8,7 @@ use JShrink\Minifier;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class GetVisibleTokens extends FormRequest
 {
@@ -90,9 +91,12 @@ class GetVisibleTokens extends FormRequest
             return { error: 'No valid token/target' };
         ";
 
-        $return = $client->utilities->executeJs($clientId,
-            \JShrink\Minifier::minify($js)
-        );
+        // Cache very briefly because distance/target may change rapidly; still reduces spam on quick UI flips
+        $cacheKey = sprintf('dvinfo:%s:%s:%s', $clientId, $tokenId, $weaponId);
+        $ttl = now()->addSeconds(1);
+        $return = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
+            return $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        });
 
         return response()->json([
             'success' => true,

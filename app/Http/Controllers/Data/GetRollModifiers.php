@@ -7,6 +7,7 @@ use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class GetRollModifiers extends FormRequest
 {
@@ -102,7 +103,13 @@ class GetRollModifiers extends FormRequest
 
         return result;
         ";
-        $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+
+        // Cache for a very short time (character states can change frequently)
+        $cacheKey = sprintf('rollmods:%s:%s:%s', $clientId, $actorId, $weaponId);
+        $ttl = now()->addSeconds(3);
+        $return = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
+            return $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        });
 
         return response()->json([
             'success' => true,
