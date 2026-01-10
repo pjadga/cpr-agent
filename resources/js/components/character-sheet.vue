@@ -54,10 +54,55 @@
             </div>
         </div>
 
+        <!-- RESOURCE EDIT MODAL (HP / HUMANITY) -->
+        <div v-if="showResourceModal" class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/70" @click="closeResourceModal">
+            <div class="w-full max-w-xs bg-[#0b0b0b] border border-gray-800 shadow-2xl" @click.stop>
+                <div class="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-black/40">
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Adjust {{ resourceLabel }}</span>
+                    <button class="text-gray-400 hover:text-white" @click="closeResourceModal"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div class="p-4 space-y-4">
+                    <div class="flex items-center justify-center gap-3">
+                        <button class="w-10 h-10 bg-gray-900 border border-gray-700 text-white font-bold hover:bg-red-900/40" @click="stepResource(-1)">-</button>
+                        <div class="text-center">
+                            <div class="text-xs text-gray-500 uppercase font-bold tracking-widest">Current</div>
+                            <div class="text-4xl font-black font-mono" :class="resourceColor">{{ resourceValue }}</div>
+                            <div class="text-xs text-gray-600 font-mono">/ {{ resourceMax }}</div>
+                        </div>
+                        <button class="w-10 h-10 bg-gray-900 border border-gray-700 text-white font-bold hover:bg-green-900/40" @click="stepResource(1)">+</button>
+                    </div>
+
+                    <div class="space-y-2">
+                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Bulk adjust</div>
+                        <div class="flex items-center gap-2 w-full">
+                            <div class="flex shrink-0">
+                                <button class="px-4 py-3 text-base border border-gray-700 rounded-sm"
+                                        :class="bulkSign === '+' ? 'bg-green-900/40 text-green-300' : 'bg-gray-900 text-gray-300'"
+                                        @click="bulkSign = '+'">+</button>
+                                <button class="px-4 py-3 text-base border border-gray-700 -ml-px rounded-sm"
+                                        :class="bulkSign === '-' ? 'bg-red-900/40 text-red-300' : 'bg-gray-900 text-gray-300'"
+                                        @click="bulkSign = '-'">-</button>
+                            </div>
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" min="0"
+                                   class="flex-1 min-w-0 bg-black border border-gray-800 px-3 py-2 text-white placeholder-gray-600"
+                                   v-model.number="bulkAmount" placeholder="Amount"/>
+                            <button class="shrink-0 px-4 py-3 bg-gray-900 border border-gray-700 text-white text-base hover:bg-gray-800"
+                                    @click="applyBulkChange">Apply</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2 pt-2">
+                        <button class="flex-1 py-2 bg-red-600/10 border border-red-600 text-red-500 text-xs font-bold uppercase hover:bg-red-600 hover:text-black transition-colors" @click="closeResourceModal">Cancel</button>
+                        <button class="flex-1 py-2 bg-green-600/10 border border-green-600 text-green-500 text-xs font-bold uppercase hover:bg-green-600 hover:text-black transition-colors" @click="commitResourceValue">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- MAIN INTERFACE -->
         <div v-if="!loading && charData && !error">
             <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
                             class="absolute inset-0 border border-[var(--cpr-red)] bg-gray-900 flex items-center justify-center overflow-hidden">
@@ -76,6 +121,11 @@
                                 charData.data.system.roleInfo.activeRole
                             }}</span>
                     </div>
+                    <div class="shrink-0">
+                        <button @click="openRollPanel" class="p-2 border border-red-600 text-red-500 hover:bg-red-600 hover:text-black transition-colors" title="Show Roll Modifiers">
+                            <i data-lucide="dice-6" class="w-5 h-5"></i>
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -90,12 +140,14 @@
                             <resource-counter label="HIT POINTS"
                                               :current="charData.data.system.derivedStats.hp.value"
                                               :max="charData.data.system.derivedStats.hp.max"
-                                              color="text-green-500">
+                                              color="text-green-500"
+                                              @edit="openResourceModal('HIT POINTS', charData.data.system.derivedStats.hp.value, charData.data.system.derivedStats.hp.max, 'text-green-500')">
                             </resource-counter>
                             <resource-counter label="HUMANITY"
                                               :current="charData.data.system.derivedStats.humanity.value"
                                               :max="charData.data.system.derivedStats.humanity.max"
-                                              color="text-blue-500">
+                                              color="text-blue-500"
+                                              @edit="openResourceModal('HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-blue-500')">
                             </resource-counter>
                         </div>
 
@@ -431,6 +483,16 @@
                             </div>
                         </div>
 
+                        <!-- DV Display -->
+                        <div v-if="dvInfo && controlState.selectedWeapon" class="text-center py-3">
+                            <div class="text-4xl font-black tracking-widest" :class="dvInfo.dv === 'Out of Range' ? 'text-red-500' : 'text-white'">
+                                DV: <span>{{ dvInfo.dv }}</span>
+                            </div>
+                            <div class="text-[15px] text-gray-500 uppercase font-bold mt-1" v-if="dvInfo.distanceMeters && dvInfo.weaponCategory">
+                                {{ dvInfo.weaponCategory }} • {{ dvInfo.distanceMeters }}m
+                            </div>
+                        </div>
+
                         <!-- Action Buttons -->
                         <div class="grid grid-cols-2 gap-3 pt-4 sticky bottom-20 z-40 bg-gradient-to-t from-black via-black to-transparent p-3 -mx-3">
                             <button @click="rollHit" class="cpr-panel bg-red-900/20 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -460,6 +522,89 @@
                 <nav-btn icon="user-cog" label="Profile" :active="activeTab === 'profile'"
                          @click="goToProfile"></nav-btn>
             </nav>
+
+            <!-- ROLL MODIFIERS SLIDE-OUT PANEL -->
+            <transition name="slide-right" @after-enter="refreshIcons">
+                <aside v-if="showRollPanel" class="fixed top-0 right-0 h-full w-[20rem] max-w-[85vw] z-[60] bg-black/95 border-l border-red-900 shadow-[0_0_30px_rgba(220,38,38,0.35)]">
+                    <div class="flex items-center justify-between p-3 border-b border-red-900 bg-black/70 sticky top-0">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="dice-6" class="w-4 h-4 text-red-500"></i>
+                            <span class="text-xs font-black uppercase tracking-widest text-red-500">Roll Modifiers</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button @click="fetchRollModifiers" class="p-1 text-gray-300 hover:text-white">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                            <button @click="closeRollPanel" class="p-1 text-gray-300 hover:text-white">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-3 space-y-3 overflow-y-auto h-full pb-24">
+                        <div v-if="rollModsLoading" class="text-center py-8 text-gray-400 text-xs">Loading modifiers...</div>
+
+                        <div v-else-if="rollModsError" class="border border-red-700 bg-red-900/20 text-red-400 text-xs p-3">
+                            {{ rollModsError }}
+                            <div v-if="!controlState.selectedWeapon" class="mt-2">
+                                <button @click="activeTab='control'; closeRollPanel()" class="text-[10px] uppercase font-bold border border-red-600 text-red-500 px-2 py-1 hover:bg-red-600 hover:text-black transition-colors">Go to Control</button>
+                            </div>
+                        </div>
+
+                        <div v-else-if="rollModsData" class="space-y-4">
+                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                                <div class="text-[10px] text-gray-500 uppercase font-bold">Actor</div>
+                                <div class="text-white font-bold">{{ rollModsData.actorName }}</div>
+                            </div>
+
+                            <!-- Base Bonus with breakdown -->
+                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[10px] text-gray-500 uppercase font-bold">Base Bonus</div>
+                                    <div class="text-green-400 font-mono font-bold">+{{ rollModsData.baseBonus }}</div>
+                                </div>
+                                <div v-if="rollModsData.breakdown" class="mt-2 text-[11px] text-gray-300 font-mono space-y-1">
+                                    <div class="flex justify-between"><span>{{ (rollModsData.breakdown.statName || 'STAT').toUpperCase() }}</span><span>+{{ rollModsData.breakdown.statValue }}</span></div>
+                                    <div class="flex justify-between"><span>{{ rollModsData.breakdown.skillName }}</span><span>+{{ rollModsData.breakdown.skillLevel }}</span></div>
+                                    <div class="flex justify-between"><span>Weapon Acc</span><span>+{{ rollModsData.breakdown.weaponAcc }}</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Total Penalty -->
+                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[10px] text-gray-500 uppercase font-bold">Total Penalty</div>
+                                    <div :class="{'text-red-400': rollModsData.totalPenalty < 0, 'text-gray-300': rollModsData.totalPenalty === 0, 'text-green-400': rollModsData.totalPenalty > 0}" class="font-mono font-bold">{{ rollModsData.totalPenalty }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Final Modifier -->
+                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[10px] text-gray-500 uppercase font-bold">Final Roll Modifier</div>
+                                    <div :class="{'text-green-400': rollModsData.finalModifier >= 0, 'text-red-400': rollModsData.finalModifier < 0}" class="font-mono font-bold">{{ rollModsData.finalModifier }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Injuries -->
+                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-2">Injuries & Effects</div>
+                                <div v-if="!rollModsData.injuries || rollModsData.injuries.length === 0" class="text-xs text-gray-500 italic">No injuries affecting rolls.</div>
+                                <div v-else class="space-y-2">
+                                    <div v-for="(inj, idx) in rollModsData.injuries" :key="idx" class="border border-gray-800 p-2 bg-black/40">
+                                        <div class="flex items-center justify-between">
+                                            <div class="text-xs font-bold text-white">{{ inj.title }}</div>
+                                            <div :class="{'text-red-400': inj.penalty < 0, 'text-gray-300': inj.penalty === 0, 'text-green-400': inj.penalty > 0}" class="text-[11px] font-mono">{{ inj.penalty }}</div>
+                                        </div>
+                                        <div v-if="inj.description" class="text-[11px] text-gray-400 mt-1">{{ inj.description }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-else class="text-xs text-gray-400">No data available.</div>
+                    </div>
+                </aside>
+            </transition>
 
         </div>
     </div>
@@ -509,8 +654,9 @@ const AdjustableStat = {
 
 const ResourceCounter = {
     props: ['label', 'current', 'max', 'color'],
+    emits: ['edit'],
     template: `
-        <div class="cpr-panel p-2 bg-[#111] flex flex-col items-center"><span
+        <div class="cpr-panel p-2 bg-[#111] flex flex-col items-center cursor-pointer" @click="$emit('edit')"><span
             class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">{{ label }}</span>
             <div class="flex items-baseline gap-1"><span class="text-2xl font-black font-mono"
                                                          :class="color">{{ current }}</span><span
@@ -779,13 +925,6 @@ export default {
             reloadRequired: false
         });
 
-        watch(controlState, (newControlState) => {
-            if (newControlState) {
-                console.log(newControlState);
-            }
-        }, { deep: true });
-
-
         // Helper to refresh icons safely
         const refreshIcons = () => {
             if (window.lucide) {
@@ -801,6 +940,137 @@ export default {
                 baseUrl.value = response.data;
                 return baseUrl.value;
             })
+        };
+
+        // --- ROLL MODIFIERS PANEL STATE ---
+        const showRollPanel = ref(false);
+        const rollModsLoading = ref(false);
+        const rollModsError = ref(null);
+        const rollModsData = ref(null);
+
+        // --- DV INFO STATE ---
+        const dvInfo = ref(null);
+        const dvLoading = ref(false);
+        const dvError = ref(null);
+
+        const fetchDVForSelectedWeapon = async () => {
+            dvError.value = null;
+            dvInfo.value = null;
+            if (!controlState.value.selectedWeapon) return;
+            try {
+                dvLoading.value = true;
+                const response = await window.axios.post('/getvisibletokens', {
+                    selectedWeapon: controlState.value.selectedWeapon
+                });
+                const payload = response?.data?.data?.result;
+                // Some endpoints may nest under result; safeguard
+                dvInfo.value = payload;
+            } catch (e) {
+                console.error('Error fetching DV', e.error);
+                dvError.value = 'Unable to fetch DV.';
+            } finally {
+                dvLoading.value = false;
+            }
+        };
+
+        const fetchRollModifiers = async () => {
+            rollModsError.value = null;
+            rollModsLoading.value = true;
+            rollModsData.value = null;
+            try {
+                if (!controlState.value.selectedWeapon) {
+                    rollModsError.value = 'No weapon selected. Choose a weapon in Control > Select Weapon.';
+                    return;
+                }
+                const response = await window.axios.post('/getrollmodifiers', {
+                    selectedWeapon: controlState.value.selectedWeapon
+                });
+                const data = response?.data?.data;
+                if (data?.result) {
+                    rollModsData.value = data.result; // Some endpoints wrap under result
+                } else {
+                    rollModsData.value = data;
+                }
+                if (rollModsData.value?.error) {
+                    rollModsError.value = rollModsData.value.error;
+                    rollModsData.value = null;
+                }
+            } catch (e) {
+                console.error('Error fetching roll modifiers', e);
+                rollModsError.value = 'Unable to fetch roll modifiers.';
+            } finally {
+                rollModsLoading.value = false;
+                setTimeout(refreshIcons, 50);
+            }
+        };
+
+        // --- RESOURCE EDIT MODAL STATE/LOGIC (HP / HUMANITY) ---
+        const showResourceModal = ref(false);
+        const resourceLabel = ref('');
+        const resourceValue = ref(0);
+        const resourceMax = ref(0);
+        const resourceColor = ref('text-white');
+        const bulkSign = ref('+');
+        const bulkAmount = ref(0);
+
+        const clampResource = (val) => {
+            const max = Number(resourceMax.value) || 0;
+            if (max <= 0) return Math.max(0, Math.floor(val));
+            return Math.max(0, Math.min(max, Math.floor(val)));
+        };
+
+        const openResourceModal = (label, current, max, color) => {
+            resourceLabel.value = label;
+            resourceValue.value = clampResource(Number(current) || 0);
+            resourceMax.value = Number(max) || 0;
+            resourceColor.value = color || 'text-white';
+            bulkSign.value = '+';
+            bulkAmount.value = 0;
+            showResourceModal.value = true;
+            setTimeout(refreshIcons, 50);
+        };
+
+        const closeResourceModal = () => {
+            showResourceModal.value = false;
+        };
+
+        const stepResource = (delta) => {
+            resourceValue.value = clampResource(resourceValue.value + (delta || 0));
+        };
+
+        const applyBulkChange = () => {
+            const amt = Math.abs(Number(bulkAmount.value) || 0);
+            if (!amt) return;
+            const sign = bulkSign.value === '-' ? -1 : 1;
+            resourceValue.value = clampResource(resourceValue.value + sign * amt);
+        };
+
+        const commitResourceValue = () => {
+            // Update local state optimistically
+            if (charData.value) {
+                if (resourceLabel.value === 'HIT POINTS') {
+                    const hp = charData.value.data.system.derivedStats.hp;
+                    if (hp) hp.value = resourceValue.value;
+                } else if (resourceLabel.value === 'HUMANITY') {
+                    const hum = charData.value.data.system.derivedStats.humanity;
+                    if (hum) hum.value = resourceValue.value;
+                }
+            }
+            updateStat(resourceLabel.value, resourceValue.value);
+            showResourceModal.value = false;
+            setTimeout(refreshIcons, 50);
+        };
+
+        const openRollPanel = async () => {
+            showRollPanel.value = true;
+            await fetchRollModifiers();
+            // Optionally refresh DV when opening panel
+            if (controlState.value.selectedWeapon) {
+                fetchDVForSelectedWeapon();
+            }
+        };
+        const closeRollPanel = () => {
+            showRollPanel.value = false;
         };
 
         let refreshInterval = null;
@@ -840,13 +1110,14 @@ export default {
             }
         };
 
+
         // --- FETCH DATA --
         onMounted(async () => {
             await fetchCharacterData(true);
             // Set up polling every 5 seconds
             refreshInterval = setInterval(() => {
                 fetchCharacterData();
-            }, 5000);
+            }, 30000);
         });
 
         onUnmounted(() => {
@@ -1006,9 +1277,13 @@ export default {
         }
 
         const getVisibleTokens = () => {
-            window.axios.post("/getvisibletokens").then(response => {
-                if (response.data.success && response.data.data.result) {
-                    mockEnemies.value = response.data.data.result;
+            window.axios.post("/listvisibletokens").then(response => {
+                const d = response?.data.data;
+                const payload = d.result
+                if (Array.isArray(payload)) {
+                    mockEnemies.value = payload;
+                } else {
+                    mockEnemies.value = [];
                 }
             }).catch(err => {
                 console.error('Error fetching visible tokens', err);
@@ -1057,15 +1332,15 @@ export default {
 
         //This is the 'targeting' hook that allows the dropdown to target anything
         //Replaced with targeting adhoc as it might get a bit weird with multiple peeps
-        // watch(() => controlState.value.selectedTarget, (newTarget) => {
-        //     if (newTarget) {
-        //         targetToken(newTarget.id);
-        //     }
-        // });
-        //
-        // const targetToken = (tokenId) => {
-        //     window.axios.post("/targettokens", { token: tokenId });
-        // }
+        watch(() => controlState.value.selectedTarget, (newTarget) => {
+            if (newTarget) {
+                targetToken(newTarget.id);
+            }
+        });
+
+        const targetToken = (tokenId) => {
+            window.axios.post("/targettokens", { token: tokenId });
+        }
 
         const rollHit = () => {
             console.log("Rolling Hit", controlState.value);
@@ -1102,8 +1377,13 @@ export default {
             }
         };
 
-        watch(() => controlState.value.selectedWeapon, (newWeapon) => {
+        watch(() => controlState.value.selectedWeapon, async (newWeapon) => {
             checkReloadRequired();
+            if (newWeapon) {
+                await fetchDVForSelectedWeapon();
+            } else {
+                dvInfo.value = null;
+            }
         }, { deep: true });
 
         watch(() => charData.value, (newData) => {
@@ -1149,7 +1429,14 @@ export default {
             collapsedCategories, toggleCategory,
             refreshIcons,
             // New Control Exports
-            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile
+            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile,
+            // Roll Modifiers Panel
+            showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
+            // DV Exports
+            dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
+            // Resource Modal Exports
+            showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
+            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue
         };
     }
 };
@@ -1218,6 +1505,17 @@ export default {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
+}
+
+/* Slide-in from right */
+.slide-right-enter-active,
+.slide-right-leave-active {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.slide-right-enter-from,
+.slide-right-leave-to {
+    transform: translateX(100%);
+    opacity: 0.5;
 }
 
 /* Specific styles for the description HTML injection */

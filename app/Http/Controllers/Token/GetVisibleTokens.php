@@ -15,46 +15,73 @@ class GetVisibleTokens extends FormRequest
 
     public function getVisibleTokens(Request $request): JsonResponse
     {
+
+        // Validate incoming request
+        $validatedData = $request->validate([
+            'selectedWeapon' => 'required|array|max:255'
+        ]);
+
         $client = $this->getFoundryClient();
         $user = auth()->user();
         $clientId = $user->getClientId();
         $tokenId = $user->getTokenId();
-        $js = "
-        const PIXELS_PER_METER = canvas.grid.size;
-        const tokenId = '$tokenId';//Saved Token ID
-        const jim = canvas.tokens.placeables.find(t => t.id === tokenId); //RIP Jim
-
-        if (!jim) {
-            console.error(`Could not find a token on scene.`);
-            return 'Nope!!!'
-        } else {
-            const d = canvas.dimensions;
-            const jimX = jim.center.x;
-            const jimY = jim.center.y;
-
-            const nearbyTokens = canvas.tokens.placeables
-                .filter(t => {
-                    const isVisible = !t.document.hidden;
-                    const isActorType = t.actor && (t.actor.type === 'character' || t.actor.type === 'mook');
-                    const isOnMap = t.x >= d.sceneX && t.x <= (d.sceneX + d.sceneWidth) &&
-                        t.y >= d.sceneY && t.y <= (d.sceneY + d.sceneHeight);
-                    return isVisible && isActorType && isOnMap && t.id !== jim.id;
-                })
-                .map(t => {
-                    const distX = t.center.x - jimX;
-                    const distY = t.center.y - jimY;
-                    const distancePx = Math.sqrt(distX**2 + distY**2);
-                    const distanceMeters = (distancePx / PIXELS_PER_METER).toFixed(2);
-                    return {
-                        name: t.name,
-                        id: t.id,
-                        distanceM: parseFloat(distanceMeters),
-                        type: t.actor.type
-                    };
-                })
-                .sort((a, b) => a.distanceM - b.distanceM);
-                return nearbyTokens;
+        // Expect full weapon object and extract the ID for Foundry lookup
+        $weaponId = $validatedData['selectedWeapon']["_id"] ?? null;
+        if (!$weaponId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Weapon ID not provided',
+                'data' => null,
+            ], 422);
         }
+        //language=JS
+        $js = "
+            const RANGE_DV_TABLE = {
+              'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
+              'SMG':              [15, 13, 15, 20, 25, 25, 30, 99],
+              'Shotgun (Slug)':   [13, 15, 20, 25, 30, 35, 99, 99],
+              'Assault Rifle':    [17, 16, 15, 13, 15, 20, 25, 30],
+              'Sniper Rifle':     [30, 25, 25, 20, 15, 16, 17, 20],
+              'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
+              'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
+              'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30]
+            };
+            const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
+
+            const jim = canvas.tokens.placeables.find(t => t.id === '$tokenId')
+            const target = Array.from(game.user.targets)[0];
+
+            if (jim && target) {
+                // Distance Calculation (128px = 1m)
+                const distancePx = Math.sqrt(Math.pow(target.center.x - jim.center.x, 2) + Math.pow(target.center.y - jim.center.y, 2));
+                const distanceM = Math.ceil(distancePx / 128);
+
+                // Weapon Mapping
+                const weaponData = jim.actor.items.get('$weaponId');
+                const typeMap = {
+                    'heavyPistol': 'Pistol',
+                    'assaultRifle': 'Assault Rifle',
+                    'smg': 'SMG',
+                    'shotgun': 'Shotgun (Slug)',
+                    'sniperRifle': 'Sniper Rifle'
+                };
+                const category = typeMap[weaponData.system.weaponType] || 'Pistol';
+
+                // Find DV
+                const bracketIndex = DISTANCE_BRACKETS.findIndex(limit => distanceM <= limit);
+                const targetDV = bracketIndex !== -1 ? RANGE_DV_TABLE[category][bracketIndex] : 99;
+
+                const result = {
+                    targetName: target.name,
+                    distanceMeters: distanceM,
+                    weaponCategory: category,
+                    dv: targetDV === 99 ? 'Out of Range' : targetDV
+                };
+
+                console.log('TARGET_DV_PACKET:', JSON.stringify(result));
+                return result;
+            }
+            return { error: 'No valid token/target' };
         ";
 
         $return = $client->utilities->executeJs($clientId,

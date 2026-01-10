@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Rolls\AttackRoll;
 use App\Http\Controllers\Rolls\DamageRoll;
 use App\Http\Controllers\Rolls\RoleRollRequest;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
 use App\Http\Controllers\Token\GetVisibleTokens;
 use App\Http\Controllers\Token\MoveToken;
+use App\Http\Controllers\Token\ListVisibleTokens;
 use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
@@ -54,13 +56,10 @@ use Illuminate\Support\Facades\Route;
  * Roll damage
  *
  * Todo
- * Weapon rolls - roll weapon + aim mode. - WEAPON ROLLS ARE FROM THE ITEM, NEED ACTOR TO FUNCITON
- * - In foundry if an enemy is targeted then it will roll against that enemy.
+ * Facedown?
+ * Death Saves
+ * Show modifiers to rolls (wounds etc)
 
-
-
- * Facedown? Death Saves
- * Reload?
  * Ping on Change - TH Module needs to ping relay if anything happens so it can update sheets
  *
  *  */
@@ -99,10 +98,12 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/getactors", [GetActors::class, "getActors"]);
     Route::post("/movetoken", [MoveToken::class, "moveToken"]);
     Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);
+    Route::post("/listvisibletokens", [ListVisibleTokens::class, "listVisibleTokens"]);
     Route::post("/targettokens", [TargetTokens::class, "targetTokens"]);
     Route::post("/attackroll", [AttackRoll::class, "attackRoll"]);
     Route::post("/damageroll", [DamageRoll::class, "damageRoll"]);
     Route::post("/reloadweapon", [ReloadWeapon::class, "reloadWeapon"]);
+    Route::post("/getrollmodifiers", [GetRollModifiers::class, "getRollModifiers"]);
 });
 
 require __DIR__.'/auth.php';

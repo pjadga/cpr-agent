@@ -41,13 +41,14 @@ class AttackRoll extends FormRequest
                 const actor = game.actors.get('$actorId');
                 const actorId = actor.id;
                 const weaponId = actor.items.get('$weaponId')._id
+                let attackRoll;
 
                 if (targetToken && actor) {
                     // 1. Set the target
                     targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
                     console.log('Successfully targeted: ' + targetToken.name);
 
-                    await actor.sheet._onRoll(
+                    attackRoll = actor.sheet._onRoll(
                     {'data-roll-type': 'attack',
                     'data-roll-title': 'Attack Roll',
                     'data-item-id': weaponId,
@@ -55,16 +56,23 @@ class AttackRoll extends FormRequest
                     currentTarget: {'data-roll-type': 'attack', 'data-roll-title': 'Attack Roll', 'data-item-id': weaponId}}
                     )
 
-                    targetToken.setTarget(false);
-
+                    setTimeout(function(){
+                        targetToken.setTarget(false)
+                        return attackRoll
+                    }, 1500)
                 }";
 
         $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
 
+        if (isset($return["success"]) && $return["success"]) {
+            //Attack has rolled, get the dice number
+            $diceTotal = $client->roll->getLastRoll($clientId);
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => $diceTotal
         ], 201);
     }
 }
