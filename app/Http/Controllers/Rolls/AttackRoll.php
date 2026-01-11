@@ -57,9 +57,8 @@ class AttackRoll extends FormRequest
                     )
 
                     setTimeout(function(){
-                        targetToken.setTarget(false)
                         return attackRoll
-                    }, 1500)
+                    }, 3000)
                 }";
 
         $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));

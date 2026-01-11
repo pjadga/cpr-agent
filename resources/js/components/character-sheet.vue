@@ -1022,6 +1022,7 @@ export default {
             dvError.value = null;
             dvInfo.value = null;
             if (!controlState.value.selectedWeapon) return;
+            if (!controlState.value.selectedTarget) return;
             try {
                 dvLoading.value = true;
                 const response = await cachedPost('/getvisibletokens', {
@@ -1275,16 +1276,24 @@ export default {
             const allItems = charData.value.data.items;
             const installedIds = new Set();
             allItems.forEach(item => {
-                if (item.system.installedItems && item.system.installedItems.list) {
+                if ((item.system.installedItems && item.system.installedItems.list) && item.system.isWeapon === true) {
                     item.system.installedItems.list.forEach(id => installedIds.add(id));
                 }
             });
 
             const groups = { weapon: [], armor: [], ammo: [], gear: [] };
             // Filter strictly for equipped items AND NOT installed in others
-            const items = allItems.filter(i => i.system.usage === 'equipped' && !installedIds.has(i._id));
+            const items = allItems.filter(i => {
+                const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'owned';
+                const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
+                return (isEquipped || isToggledWeapon) && !installedIds.has(i._id);
+            });
 
             items.forEach(item => {
+                if (item.system.isWeapon) {
+                    groups['weapon'].push(item);
+                    return;
+                }
                 if (groups[item.type]) groups[item.type].push(item);
                 else if (['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(item.type)) {
                     // Handled in Cyberware tab usually, but if user equips them they show in Gear tab under "Gear" or "Other"
@@ -1440,6 +1449,7 @@ export default {
         watch(() => controlState.value.selectedTarget, (newTarget) => {
             if (newTarget) {
                 targetToken(newTarget.id);
+                debouncedFetchDV();
             }
         });
 

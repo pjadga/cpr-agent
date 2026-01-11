@@ -47,8 +47,9 @@ class GetVisibleTokens extends FormRequest
               'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
               'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
               'Martial Arts': ['Ka Pow'],
-              'Unarmed': ['unarmed']
-            };
+              'Unarmed': ['unarmed'],
+              'Heavy Melee Weapon' : ['heavyMelee']
+};
             const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
 
             const jim = canvas.tokens.placeables.find(t => t.id === '$tokenId')
@@ -67,10 +68,11 @@ class GetVisibleTokens extends FormRequest
                     'smg': 'SMG',
                     'shotgun': 'Shotgun (Slug)',
                     'sniperRifle': 'Sniper Rifle',
-                    'unarmed' : 'Unarmed',
+                    'unarmed' : 'Put \'em Up',
                     'martialArts' : 'Martial Arts',
                     'grenade' : 'Grenade Launcher',
                     'thrownWeapon': 'Grenade Launcher',
+                    'heavyMelee' : 'Heavy Melee Weapon'
                 };
                 const category = (typeMap[weaponData.system.weaponType] || typeMap[weaponData.system.variety]) || 'Pistol';
 

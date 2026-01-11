@@ -26,6 +26,12 @@ class UpdateStat extends FormRequest
         $value = $validatedData['value'];
         $client = $this->getFoundryClient();
 
+        if ($label === "hit points" || $label === "humanity") {
+            $label = "derivedStats" . ($label === "hit points" ? ".hp" : ".humanity") . ".value";
+        } else {
+            $label = "stats." . $label . ".value";
+        }
+
         $user = auth()->user();
         $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
         $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
@@ -33,7 +39,7 @@ class UpdateStat extends FormRequest
 
         $return = $client->utilities->executeJs($clientId,
             "let updateStat = game.actors.get('$actorId');
-            updateStat.update({'system.stats.$label.value': $value})");
+            updateStat.update({'system.$label': $value})");
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
