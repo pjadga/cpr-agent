@@ -1,31 +1,28 @@
 <template>
     <div class="min-h-screen pb-28 text-sans">
 
-        <!-- LOADING STATE -->
         <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
             <div class="text-red-500 font-mono animate-pulse text-xl">CONNECTING TO NET...</div>
         </div>
 
-        <!-- ERROR STATE -->
         <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-black">
             <div class="text-red-500 font-bold border border-red-500 p-4 bg-red-900/20">
                 ERROR: {{ error }}
             </div>
         </div>
 
-        <!-- SYSTEM ALERT POPUP -->
         <div v-if="showPopup" class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60">
             <div class="cpr-panel w-full max-w-xs bg-black border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-in fade-in zoom-in duration-200">
                 <div class="bg-red-600 p-2 flex justify-between items-center">
                     <span class="text-xs font-black text-black tracking-tighter uppercase italic">SYSTEM ALERT</span>
                     <button @click="showPopup = false" class="text-black hover:text-white transition-colors">
-                        <i data-lucide="x" class="w-4 h-4"></i>
+                        <i v-icon data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
                 <div class="p-4 space-y-4">
                     <div class="flex gap-3">
                         <div class="shrink-0 w-10 h-10 border border-red-500 flex items-center justify-center text-red-500 bg-red-900/10">
-                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                            <i v-icon data-lucide="alert-triangle" class="w-6 h-6"></i>
                         </div>
                         <div class="space-y-1">
                             <h4 class="text-red-500 font-bold text-sm uppercase">Connection Error</h4>
@@ -39,12 +36,11 @@
             </div>
         </div>
 
-        <!-- CHARACTER IMAGE POPUP -->
         <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
             <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200" @click.stop>
                 <div class="absolute top-0 right-0 m-4">
                     <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
-                        <i data-lucide="x" class="w-6 h-6"></i>
+                        <i v-icon data-lucide="x" class="w-6 h-6"></i>
                     </button>
                 </div>
                 <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
@@ -54,12 +50,11 @@
             </div>
         </div>
 
-        <!-- RESOURCE EDIT MODAL (HP / HUMANITY) -->
         <div v-if="showResourceModal" class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/70" @click="closeResourceModal">
             <div class="w-full max-w-xs bg-[#0b0b0b] border border-gray-800 shadow-2xl" @click.stop>
                 <div class="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-black/40">
                     <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Adjust {{ resourceLabel }}</span>
-                    <button class="text-gray-400 hover:text-white" @click="closeResourceModal"><i data-lucide="x" class="w-4 h-4"></i></button>
+                    <button class="text-gray-400 hover:text-white" @click="closeResourceModal"><i v-icon data-lucide="x" class="w-4 h-4"></i></button>
                 </div>
                 <div class="p-4 space-y-4">
                     <div class="flex items-center justify-center gap-3">
@@ -99,7 +94,6 @@
             </div>
         </div>
 
-        <!-- MAIN INTERFACE -->
         <div v-if="!loading && charData && !error">
             <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
                 <div class="flex items-center gap-3 justify-between">
@@ -110,7 +104,7 @@
                             <span v-else class="text-xl font-bold text-red-500">{{ charData.data.name[0] }}</span>
                         </div>
                         <div class="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/20 transition-colors duration-300 flex items-center justify-center">
-                            <i data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            <i v-icon data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
@@ -123,18 +117,17 @@
                     </div>
                     <div class="shrink-0">
                         <button @click="openRollPanel" class="p-2 border border-red-600 text-red-500 hover:bg-red-600 hover:text-black transition-colors" title="Show Roll Modifiers">
-                            <i data-lucide="dice-6" class="w-5 h-5"></i>
+                            <i v-icon data-lucide="dice-6" class="w-5 h-5"></i>
                         </button>
                     </div>
                 </div>
             </header>
 
-            <main class="p-3 max-w-md mx-auto space-y-4">
+            <main class="p-3 max-w-md mx-auto space-y-4 relative min-h-[60vh]">
 
-                <transition name="fade" mode="out-in" @after-enter="refreshIcons">
+                <transition name="fade">
 
-                    <!-- STATS TAB -->
-                    <div v-if="activeTab === 'stats'" key="stats" class="space-y-5">
+                    <div v-if="activeTab === 'stats'" key="stats" class="space-y-5 absolute w-full top-0 left-0 p-3">
 
                         <div class="grid grid-cols-2 gap-3">
                             <resource-counter label="HIT POINTS"
@@ -206,13 +199,11 @@
                             </div>
                         </div>
 
-                        <!-- Currently Equipped Section -->
                         <div>
                             <h3 class="text-sm font-bold text-white uppercase mb-4 border-b border-red-900 pb-1 flex items-center gap-2">
-                                <i data-lucide="crosshair" class="w-4 h-4 text-red-500"></i> Currently Equipped
+                                <i v-icon data-lucide="crosshair" class="w-4 h-4 text-red-500"></i> Currently Equipped
                             </h3>
 
-                            <!-- Loop through categorized equipped items -->
                             <div v-for="(items, category) in groupedEquipped" :key="category">
                                 <div v-if="items.length > 0" class="mb-4">
                                     <h4 class="text-[9px] font-bold text-gray-500 uppercase mb-2 tracking-widest pl-1">{{ category }}</h4>
@@ -224,7 +215,6 @@
                                                 :all-items="charData.data.items"
                                                 @click="$emit('click', item)">
                                             </item-row>
-                                            <!-- Nested Children for Equipped (ammo, attachments) -->
                                             <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
                                                  class="ml-6 mt-1 space-y-1 border-l border-red-900/50 pl-2">
                                                 <div v-for="childId in item.system.installedItems.list" :key="childId">
@@ -241,8 +231,7 @@
                         </div>
                     </div>
 
-                    <!-- SKILLS TAB -->
-                    <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4">
+                    <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3">
                         <div v-if="roleItem" @click="sendRoleRequest(roleItem.name)" class="relative bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner cursor-pointer group">
                             <div class="flex justify-between items-center pr-2">
                                 <div>
@@ -261,7 +250,7 @@
                                         formatCategory(categoryKey)
                                     }}</span>
                                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[categoryKey] }">
-                                    <i data-lucide="chevron-down"
+                                    <i v-icon data-lucide="chevron-down"
                                        class="w-4 h-4 text-red-500 group-hover:text-cyan-500"></i>
                                 </div>
                             </div>
@@ -292,17 +281,15 @@
                         </div>
                     </div>
 
-                    <!-- GEAR TAB -->
-                    <div v-else-if="activeTab === 'gear'" key="gear" class="space-y-6">
+                    <div v-else-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3">
 
-                        <!-- Cyberware Section -->
                         <div>
                             <h3 @click="toggleCategory('cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cyan-950/20 p-1 transition-colors">
                                 <div class="flex items-center gap-2">
-                                    <i data-lucide="zap" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400"></i> <span class="group-hover:text-cyan-400 transition-colors">Cyberware</span>
+                                    <i v-icon data-lucide="zap" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400"></i> <span class="group-hover:text-cyan-400 transition-colors">Cyberware</span>
                                 </div>
                                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
-                                    <i data-lucide="chevron-down"
+                                    <i v-icon data-lucide="chevron-down"
                                        class="w-4 h-4 text-blue-500 group-hover:text-cyan-500"></i>
                                 </div>
                             </h3>
@@ -313,7 +300,6 @@
                                             {{ type }}
                                         </h4>
                                         <div class="space-y-2">
-                                            <!-- Cyberware Item Row -->
                                             <div v-for="cw in group" :key="cw._id">
                                                 <item-row
                                                     :item="cw"
@@ -321,7 +307,6 @@
                                                     :all-items="charData.data.items"
                                                     @click="$emit('click', cw)">
                                                 </item-row>
-                                                <!-- Nested Children -->
                                                 <div v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
                                                      class="ml-6 mt-1 space-y-1 border-l border-blue-900/50 pl-2">
                                                     <div v-for="childId in cw.system.installedItems.list" :key="childId">
@@ -335,22 +320,19 @@
                             </transition>
                         </div>
 
-                        <!-- Gear, Weapons, Armor, Ammo Section -->
                         <div v-for="(items, category) in groupedGear" :key="category">
-                            <!-- Only show category if items exist -->
                             <div v-if="items.length > 0">
                                 <h3 @click="toggleCategory(category)" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group mt-6 hover:bg-cyan-950/20 p-1 transition-colors">
                                     <div class="flex items-center gap-2">
-                                        <!-- Dynamic Icons based on category -->
-                                        <i v-if="category === 'weapon'" data-lucide="sword" class="w-4 h-4 text-red-500 group-hover:text-cyan-400 transition-colors"></i>
-                                        <i v-else-if="category === 'armor'" data-lucide="shield" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400 transition-colors"></i>
-                                        <i v-else-if="category === 'ammo'" data-lucide="database" class="w-4 h-4 text-yellow-500 group-hover:text-cyan-400 transition-colors"></i>
-                                        <i v-else data-lucide="package" class="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-if="category === 'weapon'" v-icon data-lucide="sword" class="w-4 h-4 text-red-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-else-if="category === 'armor'" v-icon data-lucide="shield" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-else-if="category === 'ammo'" v-icon data-lucide="database" class="w-4 h-4 text-yellow-500 group-hover:text-cyan-400 transition-colors"></i>
+                                        <i v-else v-icon data-lucide="package" class="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition-colors"></i>
 
                                         <span class="group-hover:text-cyan-400 transition-colors">{{ category }}</span>
                                     </div>
                                     <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[category] }">
-                                        <i data-lucide="chevron-down"
+                                        <i v-icon data-lucide="chevron-down"
                                            class="w-4 h-4 text-gray-500 group-hover:text-cyan-500"></i>
                                     </div>
                                 </h3>
@@ -364,7 +346,6 @@
                                                 :all-items="charData.data.items"
                                                 @click="$emit('click', item)">
                                             </item-row>
-                                            <!-- Nested Children for Gear (e.g. attachments on weapons) -->
                                             <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
                                                  class="ml-6 mt-1 space-y-1 border-l border-gray-700/50 pl-2">
                                                 <div v-for="childId in item.system.installedItems.list" :key="childId">
@@ -379,49 +360,37 @@
 
                     </div>
 
-                    <!-- CONTROL TAB (NEW) -->
-                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20">
+                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20 absolute w-full top-0 left-0 p-3">
 
-                        <!-- D-Pad Section -->
                         <div class="flex justify-center my-6">
                             <div class="grid grid-cols-3 gap-2 p-4 bg-gray-900/50 rounded-full border border-gray-800 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-                                <!-- Empty Top Left -->
                                 <div></div>
-                                <!-- Up Button -->
                                 <button @touchstart.prevent="moveToken('up')" @click="moveToken('up')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i data-lucide="chevron-up" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                    <i v-icon data-lucide="chevron-up" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
                                 </button>
-                                <!-- Empty Top Right -->
                                 <div></div>
 
-                                <!-- Left Button -->
                                 <button @touchstart.prevent="moveToken('left')" @click="moveToken('left')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i data-lucide="chevron-left" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                    <i v-icon data-lucide="chevron-left" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
                                 </button>
-                                <!-- Center (Action/Stop/Center) -->
                                 <div class="w-16 h-16 flex items-center justify-center">
                                     <div class="w-4 h-4 bg-red-900/50 rounded-full animate-pulse"></div>
                                 </div>
-                                <!-- Right Button -->
                                 <button @touchstart.prevent="moveToken('right')" @click="moveToken('right')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i data-lucide="chevron-right" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                    <i v-icon data-lucide="chevron-right" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
                                 </button>
 
-                                <!-- Empty Bottom Left -->
                                 <div></div>
-                                <!-- Down Button -->
                                 <button @touchstart.prevent="moveToken('down')" @click="moveToken('down')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i data-lucide="chevron-down" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
+                                    <i v-icon data-lucide="chevron-down" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
                                 </button>
-                                <!-- Empty Bottom Right -->
                                 <div></div>
                             </div>
                         </div>
 
-                        <!-- Targeting Section -->
                         <div class="cpr-panel p-4 bg-[#111]">
                             <h3 class="text-xs font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <i data-lucide="target" class="w-4 h-4"></i> Select Target
+                                <i v-icon data-lucide="target" class="w-4 h-4"></i> Select Target
                             </h3>
                             <div class="relative">
                                 <select v-model="controlState.selectedTarget" class="w-full bg-black border border-gray-700 text-white p-3 text-sm appearance-none focus:border-red-500 focus:outline-none">
@@ -431,7 +400,7 @@
                                     </option>
                                 </select>
                                 <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-red-500">
-                                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                    <i v-icon data-lucide="chevron-down" class="w-4 h-4"></i>
                                 </div>
                             </div>
                             <div v-if="controlState.selectedTarget" class="mt-2 text-[10px] text-gray-500 font-mono text-right">
@@ -439,7 +408,6 @@
                             </div>
                         </div>
 
-                        <!-- Weapon Selection Section -->
                         <div>
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Select Weapon</h3>
                             <div class="space-y-2">
@@ -457,16 +425,14 @@
                             </div>
                         </div>
 
-                        <!-- Reload Button -->
                         <div class="mb-4">
                             <button @click="reloadWeapon"
                                     class="w-full py-4 bg-blue-900/20 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
                                     :class="{'animate-pulse-purple': controlState.reloadRequired}">
-                                <i data-lucide="refresh-cw" class="w-5 h-5"></i> Reload Equipped Weapon
+                                <i v-icon data-lucide="refresh-cw" class="w-5 h-5"></i> Reload Equipped Weapon
                             </button>
                         </div>
 
-                        <!-- Firing Modes -->
                         <div class="cpr-panel p-4 bg-[#111]">
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
                             <div class="grid grid-cols-4 gap-2">
@@ -474,16 +440,15 @@
                                         @click="controlState.fireMode = mode"
                                         class="py-3 text-xs font-bold uppercase border transition-colors flex flex-col items-center gap-1"
                                         :class="controlState.fireMode === mode ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
-                                    <i v-if="mode === 'Single'" data-lucide="locate" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Aim'" data-lucide="locate-fixed" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Auto'" data-lucide="zap" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Suppress'" data-lucide="shield-alert" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Single'" v-icon data-lucide="locate" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Aim'" v-icon data-lucide="locate-fixed" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Auto'" v-icon data-lucide="zap" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Suppress'" v-icon data-lucide="shield-alert" class="w-4 h-4"></i>
                                     {{ mode }}
                                 </button>
                             </div>
                         </div>
 
-                        <!-- DV Display -->
                         <div v-if="dvInfo && controlState.selectedWeapon" class="text-center py-3">
                             <div class="text-4xl font-black tracking-widest" :class="dvInfo.dv === 'Out of Range' ? 'text-red-500' : 'text-white'">
                                 DV: <span>{{ dvInfo.dv }}</span>
@@ -493,13 +458,12 @@
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="grid grid-cols-2 gap-3 pt-4 sticky bottom-20 z-40 bg-gradient-to-t from-black via-black to-transparent p-3 -mx-3">
                             <button @click="rollHit" class="cpr-panel bg-red-900/20 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i data-lucide="crosshair" class="w-5 h-5"></i> Roll Hit
+                                <i v-icon data-lucide="crosshair" class="w-5 h-5"></i> Roll Hit
                             </button>
                             <button @click="rollDamage" class="cpr-panel bg-yellow-900/20 border-2 border-yellow-600 text-yellow-500 hover:bg-yellow-500 hover:text-black py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i data-lucide="skull" class="w-5 h-5"></i> Roll Dmg
+                                <i v-icon data-lucide="skull" class="w-5 h-5"></i> Roll Dmg
                             </button>
                         </div>
 
@@ -516,27 +480,25 @@
                          @click="activeTab = 'skills'"></nav-btn>
                 <nav-btn icon="shield" label="Gear" :active="activeTab === 'gear'"
                          @click="activeTab = 'gear'"></nav-btn>
-                <!-- NEW CONTROL BTN -->
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
                 <nav-btn icon="user-cog" label="Profile" :active="activeTab === 'profile'"
                          @click="goToProfile"></nav-btn>
             </nav>
 
-            <!-- ROLL MODIFIERS SLIDE-OUT PANEL -->
-            <transition name="slide-right" @after-enter="refreshIcons">
+            <transition name="slide-right">
                 <aside v-if="showRollPanel" class="fixed top-0 right-0 h-full w-[20rem] max-w-[85vw] z-[60] bg-black/95 border-l border-red-900 shadow-[0_0_30px_rgba(220,38,38,0.35)]">
                     <div class="flex items-center justify-between p-3 border-b border-red-900 bg-black/70 sticky top-0">
                         <div class="flex items-center gap-2">
-                            <i data-lucide="dice-6" class="w-4 h-4 text-red-500"></i>
+                            <i v-icon data-lucide="dice-6" class="w-4 h-4 text-red-500"></i>
                             <span class="text-xs font-black uppercase tracking-widest text-red-500">Roll Modifiers</span>
                         </div>
                         <div class="flex items-center gap-2">
                             <button @click="fetchRollModifiers" class="p-1 text-gray-300 hover:text-white">
-                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                                <i v-icon data-lucide="refresh-cw" class="w-4 h-4"></i>
                             </button>
                             <button @click="closeRollPanel" class="p-1 text-gray-300 hover:text-white">
-                                <i data-lucide="x" class="w-4 h-4"></i>
+                                <i v-icon data-lucide="x" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </div>
@@ -556,7 +518,6 @@
                                 <div class="text-white font-bold">{{ rollModsData.actorName }}</div>
                             </div>
 
-                            <!-- Base Bonus with breakdown -->
                             <div class="bg-[#0b0b0b] border border-gray-800 p-3">
                                 <div class="flex items-center justify-between">
                                     <div class="text-[10px] text-gray-500 uppercase font-bold">Base Bonus</div>
@@ -569,7 +530,6 @@
                                 </div>
                             </div>
 
-                            <!-- Total Penalty -->
                             <div class="bg-[#0b0b0b] border border-gray-800 p-3">
                                 <div class="flex items-center justify-between">
                                     <div class="text-[10px] text-gray-500 uppercase font-bold">Total Penalty</div>
@@ -577,7 +537,6 @@
                                 </div>
                             </div>
 
-                            <!-- Final Modifier -->
                             <div class="bg-[#0b0b0b] border border-gray-800 p-3">
                                 <div class="flex items-center justify-between">
                                     <div class="text-[10px] text-gray-500 uppercase font-bold">Final Roll Modifier</div>
@@ -585,7 +544,6 @@
                                 </div>
                             </div>
 
-                            <!-- Injuries -->
                             <div class="bg-[#0b0b0b] border border-gray-800 p-3">
                                 <div class="text-[10px] text-gray-500 uppercase font-bold mb-2">Injuries & Effects</div>
                                 <div v-if="!rollModsData.injuries || rollModsData.injuries.length === 0" class="text-xs text-gray-500 italic">No injuries affecting rolls.</div>
@@ -612,12 +570,45 @@
 </template>
 
 <script>
-import {computed, onMounted, onUpdated, ref, nextTick, watch, onUnmounted} from "vue";
+import {computed, onMounted, onUpdated, ref, shallowRef, triggerRef, nextTick, watch, onUnmounted} from "vue";
 
-// --- REQUEST CACHING & COALESCING HELPERS ---
-const _inFlight = new Map(); // key -> Promise
-const _responseCache = new Map(); // key -> { expiresAt, data }
+// --- PERFORMANCE HELPERS ---
 
+// Custom icon directive to render icons efficiently per element
+const vIcon = {
+    mounted(el) {
+        // Wait for DOM insertion
+        nextTick(() => {
+            if (window.lucide && el.parentElement) {
+                window.lucide.createIcons({ root: el.parentElement });
+            }
+        });
+    },
+    updated(el) {
+        // Wait for DOM updates
+        nextTick(() => {
+            if (window.lucide && el.parentElement) {
+                window.lucide.createIcons({ root: el.parentElement });
+            }
+        });
+    }
+};
+
+// Deep equality check to prevent unnecessary reactivity updates
+function isDeepEqual(obj1, obj2) {
+    if (obj1 === obj2) return true;
+    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) return false;
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+    if (keys1.length !== keys2.length) return false;
+    for (let key of keys1) {
+        if (!keys2.includes(key) || !isDeepEqual(obj1[key], obj2[key])) return false;
+    }
+    return true;
+}
+
+const _inFlight = new Map();
+const _responseCache = new Map();
 const _makeKey = (url, data) => `${url}::${JSON.stringify(data||{})}`;
 
 function cachedPost(url, data, ttlMs = 1500) {
@@ -650,41 +641,24 @@ function debounce(fn, wait = 250) {
     };
 }
 
-function shallowEqual(a, b) {
-    if (a === b) return true;
-    if (typeof a !== 'object' || typeof b !== 'object' || !a || !b) return false;
-    const ak = Object.keys(a);
-    const bk = Object.keys(b);
-    if (ak.length !== bk.length) return false;
-    for (const k of ak) {
-        if (a[k] !== b[k]) return false;
-    }
-    return true;
-}
-
 function arraysEqualShallow(a, b) {
     if (a === b) return true;
     if (!Array.isArray(a) || !Array.isArray(b)) return false;
     if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-        const ai = a[i];
-        const bi = b[i];
-        if (typeof ai === 'object' || typeof bi === 'object') {
-            if (!shallowEqual(ai || {}, bi || {})) return false;
-        } else if (ai !== bi) {
-            return false;
-        }
-    }
-    return true;
+    // Compare items by ID hash if available, else simple equality
+    const aIds = a.map(i => i.id || JSON.stringify(i)).join(',');
+    const bIds = b.map(i => i.id || JSON.stringify(i)).join(',');
+    return aIds === bIds;
 }
 
-// --- SUB COMPONENTS ---
+// --- SUB COMPONENTS (Directives added) ---
 
 const NavBtn = {
     props: ['icon', 'label', 'active'],
+    directives: { icon: vIcon },
     template: `
         <button class="flex flex-col items-center gap-1 w-16 transition-colors cursor-pointer"
-                :class="active ? 'text-red-500' : 'text-gray-600'"><i :data-lucide="icon" class="w-6 h-6"></i><span
+                :class="active ? 'text-red-500' : 'text-gray-600'"><i v-icon :data-lucide="icon" class="w-6 h-6"></i><span
             class="text-[9px] font-bold uppercase tracking-wider">{{ label }}</span></button>`
 };
 
@@ -728,17 +702,13 @@ const ResourceCounter = {
         </div>`
 };
 
-// New Item Row Component with Expansion Logic
 const ItemRow = {
     props: ['item', 'category', 'all-items'],
+    directives: { icon: vIcon },
     setup(props) {
         const expanded = ref(false);
         const toggle = () => {
             expanded.value = !expanded.value;
-            if (expanded.value) {
-                // Ensure icons inside dropdown render
-                setTimeout(() => { if(window.lucide) window.lucide.createIcons(); }, 10);
-            }
         };
         const formatType = (type) => {
             if (!type) return 'Other';
@@ -753,7 +723,7 @@ const ItemRow = {
 
         const ammoName = computed(() => {
             if (props.category !== 'weapon' || !props.item.system.installedItems || !props.item.system.installedItems.list) return null;
-            const ammoId = props.item.system.installedItems.list[0]; // Assuming first item in list is ammo for weapons
+            const ammoId = props.item.system.installedItems.list[0];
             if (!ammoId) return null;
             const ammoItem = findItem(ammoId);
             return ammoItem ? ammoItem.name : null;
@@ -825,8 +795,6 @@ const ItemRow = {
             }
 
             if (percent === null) return null;
-
-            // Ensure percent is between 0 and 100
             percent = Math.min(100, Math.max(0, percent));
 
             let color = 'bg-green-500';
@@ -851,14 +819,12 @@ const ItemRow = {
             'border-blue-400': category === 'cyberware'
          }">
 
-            <!-- Status Bar Line -->
             <div v-if="statusLine" class="absolute top-0 left-0 h-[3px] transition-all duration-500 z-10"
                  :class="statusLine.color"
                  :style="{ width: statusLine.width }">
             </div>
 
             <div class="flex items-stretch min-h-[3.5rem]">
-                <!-- Main Content -->
                 <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
                     <div class="flex justify-between items-start pr-2">
                         <div class="flex flex-col">
@@ -866,12 +832,10 @@ const ItemRow = {
                             {{ item.name }}
                         </span>
 
-                            <!-- Subtitles / Stats -->
                             <div class="flex flex-wrap gap-2 mt-1">
-                                <!-- Armor Display -->
                                 <template v-if="category === 'armor' && armorDisplay">
                                     <div v-for="stat in armorDisplay" :key="stat.label" class="flex items-center gap-1 mr-2">
-                                        <i :data-lucide="stat.icon" class="w-3 h-3 text-blue-500"></i>
+                                        <i v-icon :data-lucide="stat.icon" class="w-3 h-3 text-blue-500"></i>
                                         <span class="text-[10px] font-mono text-gray-400">
                                             <span class="text-[8px] uppercase text-gray-600 mr-0.5">{{ stat.label }}:</span>
                                             {{ stat.value }}
@@ -879,9 +843,8 @@ const ItemRow = {
                                     </div>
                                 </template>
 
-                                <!-- Magazine / Weapons -->
                                 <div v-if="item.system.magazine && category === 'weapon'" class="flex items-center gap-1">
-                                    <i data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
+                                    <i v-icon data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
                                     <span class="text-[10px] font-mono text-gray-400">
                                     {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ item.system.magazine.max }}
                                         <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
@@ -890,9 +853,8 @@ const ItemRow = {
                                 </span>
                                 </div>
 
-                                <!-- Amount -->
                                 <div v-else-if="(item.system.amount || item.system.count) && category !== 'armor'" class="flex items-center gap-1">
-                                    <i data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
+                                    <i v-icon data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
                                     <span class="text-[10px] font-mono text-gray-400">
                                     x{{ item.system.amount || item.system.count }}
                                         <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
@@ -900,9 +862,8 @@ const ItemRow = {
                                 </span>
                                 </div>
 
-                                <!-- Install Slots (Cyberware/Attachments) -->
                                 <div v-if="category === 'cyberware'" class="flex items-center gap-1">
-                                    <i data-lucide="cpu" class="w-3 h-3 text-blue-500"></i>
+                                    <i v-icon data-lucide="cpu" class="w-3 h-3 text-blue-500"></i>
                                     <span class="text-[10px] font-mono text-blue-400">
                                     {{ item.system.installedItems.usedSlots }} / {{ item.system.installedItems.slots }}
                                 </span>
@@ -916,23 +877,20 @@ const ItemRow = {
                     </div>
                 </div>
 
-                <!-- Chevron Trigger -->
                 <button
                     @click.stop="toggle"
                     class="w-12 shrink-0 flex items-center justify-center bg-gray-900/30 border-l border-white/5 active:bg-cyan-900/20 transition-colors hover:bg-cyan-900/40 cursor-pointer">
                     <div class="transition-transform duration-300 flex items-center justify-center"
                          :class="{ 'rotate-180': expanded }">
-                        <i data-lucide="chevron-down"
+                        <i v-icon data-lucide="chevron-down"
                            class="w-5 h-5 text-gray-500 group-hover:text-cyan-500">
                         </i>
                     </div>
                 </button>
             </div>
 
-            <!-- Dropdown Content -->
             <transition name="expand">
                 <div v-if="expanded" class="border-t border-white/5 bg-black/40 p-3 shadow-inner">
-                    <!-- Description -->
                     <div v-if="item.system.description && item.system.description.value"
                          class="text-gray-300 text-xs leading-relaxed font-sans cpr-description mb-3"
                          v-html="item.system.description.value">
@@ -969,9 +927,11 @@ const ItemRow = {
 export default {
     name: 'CharacterSheet',
     components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, ItemRow },
+    directives: { icon: vIcon },
     setup() {
         const activeTab = ref('stats');
-        const charData = ref(null);
+        // Changed to shallowRef for performance optimization on large objects
+        const charData = shallowRef(null);
         const loading = ref(true);
         const error = ref(null);
         const showPopup = ref(false);
@@ -979,7 +939,6 @@ export default {
         const popupMessage = ref('');
         const baseUrl = ref('');
 
-        // --- MOCK DATA FOR CONTROL TAB ---
         const mockEnemies = ref([]);
 
         const controlState = ref({
@@ -989,7 +948,7 @@ export default {
             reloadRequired: false
         });
 
-        // Helper to refresh icons safely
+        // Helper to refresh icons safely (now mostly used via directives, but kept for popups)
         const refreshIcons = () => {
             if (window.lucide) {
                 nextTick(() => window.lucide.createIcons());
@@ -1029,8 +988,7 @@ export default {
                     selectedWeapon: controlState.value.selectedWeapon
                 }, 1000);
                 const payload = response?.data?.data?.result;
-                // Some endpoints may nest under result; safeguard
-                if (!shallowEqual(dvInfo.value || {}, payload || {})) {
+                if (!isDeepEqual(dvInfo.value || {}, payload || {})) {
                     dvInfo.value = payload;
                 }
             } catch (e) {
@@ -1056,15 +1014,12 @@ export default {
                     selectedWeapon: controlState.value.selectedWeapon
                 }, 2500);
                 const data = response?.data?.data;
-                if (data?.result) {
-                    if (!shallowEqual(rollModsData.value || {}, data.result || {})) {
-                        rollModsData.value = data.result; // Some endpoints wrap under result
-                    }
-                } else {
-                    if (!shallowEqual(rollModsData.value || {}, data || {})) {
-                        rollModsData.value = data;
-                    }
+                const payload = data?.result ? data.result : data;
+
+                if (!isDeepEqual(rollModsData.value || {}, payload || {})) {
+                    rollModsData.value = payload;
                 }
+
                 if (rollModsData.value?.error) {
                     rollModsError.value = rollModsData.value.error;
                     rollModsData.value = null;
@@ -1074,13 +1029,11 @@ export default {
                 rollModsError.value = 'Unable to fetch roll modifiers.';
             } finally {
                 rollModsLoading.value = false;
-                setTimeout(refreshIcons, 50);
             }
         };
 
         const debouncedFetchRollModifiers = debounce(fetchRollModifiers, 250);
 
-        // --- RESOURCE EDIT MODAL STATE/LOGIC (HP / HUMANITY) ---
         const showResourceModal = ref(false);
         const resourceLabel = ref('');
         const resourceValue = ref(0);
@@ -1103,7 +1056,6 @@ export default {
             bulkSign.value = '+';
             bulkAmount.value = 0;
             showResourceModal.value = true;
-            setTimeout(refreshIcons, 50);
         };
 
         const closeResourceModal = () => {
@@ -1122,7 +1074,6 @@ export default {
         };
 
         const commitResourceValue = () => {
-            // Update local state optimistically
             if (charData.value) {
                 if (resourceLabel.value === 'HIT POINTS') {
                     const hp = charData.value.data.system.derivedStats.hp;
@@ -1131,16 +1082,16 @@ export default {
                     const hum = charData.value.data.system.derivedStats.humanity;
                     if (hum) hum.value = resourceValue.value;
                 }
+                // Important: Trigger ref update since we mutated a nested prop of a shallowRef
+                triggerRef(charData);
             }
             updateStat(resourceLabel.value, resourceValue.value);
             showResourceModal.value = false;
-            setTimeout(refreshIcons, 50);
         };
 
         const openRollPanel = async () => {
             showRollPanel.value = true;
             await fetchRollModifiers();
-            // Optionally refresh DV when opening panel
             if (controlState.value.selectedWeapon) {
                 fetchDVForSelectedWeapon();
             }
@@ -1162,16 +1113,21 @@ export default {
 
                 const response = await window.axios.post("/actorsheet", {"actorUuid" : actorUuid});
 
-                // Simple check to see if data changed to avoid unnecessary re-renders
-                // though usually Vue's reactivity handles this well, we can compare requestId if it exists
-                if (!charData.value || charData.value.requestId !== response.data.requestId) {
-                    charData.value = response.data;
-                    if (isInitial) {
-                        loading.value = false;
+                // Optimization: Deep Equality Check prevents re-render if data hasn't changed
+                if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
+                    // Update only metadata/requestId if needed, but skip heavy re-assignment
+                    if (charData.value.requestId !== response.data.requestId) {
+                        charData.value.requestId = response.data.requestId;
                     }
-                    // Wait for DOM update then render icons
-                    setTimeout(refreshIcons, 50);
+                    return;
                 }
+
+                charData.value = response.data;
+                if (isInitial) {
+                    loading.value = false;
+                }
+                // Refresh icons only when structure actually changes
+                setTimeout(refreshIcons, 50);
             } catch (err) {
                 console.error("Fetch Error:", err);
                 if (isInitial) {
@@ -1181,16 +1137,12 @@ export default {
                         showPopup.value = true;
                     }
                     loading.value = false;
-                    setTimeout(refreshIcons, 50);
                 }
             }
         };
 
-
-        // --- FETCH DATA --
         onMounted(async () => {
             await fetchCharacterData(true);
-            // Set up polling every 5 seconds
             refreshInterval = setInterval(() => {
                 fetchCharacterData();
             }, 30000);
@@ -1219,8 +1171,6 @@ export default {
 
         const groupedCyberware = computed(() => {
             if (!charData.value) return {};
-
-            // Get all items that could be installed in others
             const allItems = charData.value.data.items;
             const installedIds = new Set();
             allItems.forEach(item => {
@@ -1228,12 +1178,10 @@ export default {
                     item.system.installedItems.list.forEach(id => installedIds.add(id));
                 }
             });
-
             const cyberware = allItems.filter(i =>
                 ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(i.type) &&
-                !installedIds.has(i._id) // Only top-level items
+                !installedIds.has(i._id)
             );
-
             const groups = {};
             cyberware.forEach(cw => {
                 const type = cw.system.cyberwareType || 'Other';
@@ -1245,8 +1193,6 @@ export default {
 
         const groupedGear = computed(() => {
             if (!charData.value) return {};
-
-            // Get all items that could be installed in others
             const allItems = charData.value.data.items;
             const installedIds = new Set();
             allItems.forEach(item => {
@@ -1254,25 +1200,20 @@ export default {
                     item.system.installedItems.list.forEach(id => installedIds.add(id));
                 }
             });
-
             const groups = { weapon: [], armor: [], ammo: [], gear: [] };
             const items = allItems.filter(i =>
                 ['weapon', 'armor', 'gear', 'ammo'].includes(i.type) &&
                 !installedIds.has(i._id)
             );
-
             items.forEach(item => {
                 if (groups[item.type]) groups[item.type].push(item);
                 else groups.gear.push(item);
             });
-
             return groups;
         });
 
         const groupedEquipped = computed(() => {
             if (!charData.value) return {};
-
-            // Get all items that could be installed in others
             const allItems = charData.value.data.items;
             const installedIds = new Set();
             allItems.forEach(item => {
@@ -1280,15 +1221,12 @@ export default {
                     item.system.installedItems.list.forEach(id => installedIds.add(id));
                 }
             });
-
             const groups = { weapon: [], armor: [], ammo: [], gear: [] };
-            // Filter strictly for equipped items AND NOT installed in others
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'owned';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
                 return (isEquipped || isToggledWeapon) && !installedIds.has(i._id);
             });
-
             items.forEach(item => {
                 if (item.system.isWeapon) {
                     groups['weapon'].push(item);
@@ -1296,11 +1234,9 @@ export default {
                 }
                 if (groups[item.type]) groups[item.type].push(item);
                 else if (['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(item.type)) {
-                    // Handled in Cyberware tab usually, but if user equips them they show in Gear tab under "Gear" or "Other"
                 }
                 else groups.gear.push(item);
             });
-
             return groups;
         });
 
@@ -1334,28 +1270,14 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
-        const getItemIcon = (type) => {
-            const icons = {
-                weapon: 'sword',
-                armor: 'shield',
-                gear: 'package',
-                ammo: 'database',
-                cyberware: 'zap',
-                skill: 'book'
-            };
-            return icons[type] || 'circle-help';
-        };
-
         const sendRequest = (data, url) => {
-            window.axios.post(url, data
-            ).then(response => {
+            window.axios.post(url, data).then(response => {
                 console.log('Stat post successful', response);
                 return response;
             }).catch(err => {
                 console.error('Error posting stat', err);
                 popupMessage.value = "Neural uplink failed: Data packet lost.";
                 showPopup.value = true;
-                setTimeout(refreshIcons, 50);
                 return err;
             });
         }
@@ -1365,18 +1287,34 @@ export default {
                 const d = response?.data?.data;
                 const payload = d?.result;
                 const list = Array.isArray(payload) ? payload : [];
-                if (!arraysEqualShallow(mockEnemies.value || [], list)) {
-                    // Preserve currently selected target if it still exists in the refreshed list
+
+                // Optimization: Patch existing array to prevent v-for destroy/re-create
+                const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
+                const newIds = list.map(e => e.id).sort().join(',');
+
+                if (currentIds !== newIds) {
+                    // Structure changed (new enemy appeared/died), replace whole list
                     const prevSelectedId = controlState.value.selectedTarget?.id || null;
                     mockEnemies.value = list;
+                    // Try to preserve selection
                     if (prevSelectedId) {
                         const preserved = list.find(t => t.id === prevSelectedId);
                         if (preserved && controlState.value.selectedTarget?.id !== preserved.id) {
                             controlState.value.selectedTarget = preserved;
                         }
                     }
+                } else {
+                    // Same enemies, just update properties (like distance) in place
+                    list.forEach(newItem => {
+                        const existing = mockEnemies.value.find(e => e.id === newItem.id);
+                        if (existing) {
+                            // Vue will reactively update only the text that changed
+                            if(existing.distanceM !== newItem.distanceM) existing.distanceM = newItem.distanceM;
+                            if(existing.name !== newItem.name) existing.name = newItem.name;
+                        }
+                    });
                 }
-                // After refreshing visible tokens, refresh DV/distance if we still have a selection and weapon
+
                 if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
                     debouncedFetchDV();
                 }
@@ -1388,8 +1326,6 @@ export default {
 
         watch(activeTab, (newTab) => {
             if (newTab === 'control') {
-                // When returning to Control tab, rebind selectedTarget to the instance
-                // inside current mockEnemies (same id) so the dropdown keeps showing it
                 const prevSelectedId = controlState.value.selectedTarget?.id || null;
                 if (prevSelectedId) {
                     const match = mockEnemies.value.find(t => t.id === prevSelectedId);
@@ -1402,35 +1338,32 @@ export default {
         });
 
         const sendStatRequest = (stat) => {
-            sendRequest({
-                label: stat
-            }, "/statrollrequest")
+            sendRequest({ label: stat }, "/statrollrequest")
         };
 
         const updateStat = (stat, value) => {
-            sendRequest({
-                label: stat,
-                value: value
-            }, "/updatestat")
+            // FIX: Manual local update because charData is shallowRef
+            if (charData.value) {
+                const key = stat.toLowerCase(); // LUCK -> luck
+                if (charData.value.data.system.stats[key]) {
+                    charData.value.data.system.stats[key].value = value;
+                    triggerRef(charData); // Force UI update
+                }
+            }
+            sendRequest({ label: stat, value: value }, "/updatestat")
         }
 
         const sendSkillRequest = (skill) => {
-            sendRequest({
-                label: skill
-            }, "/skillrollrequest")
+            sendRequest({ label: skill }, "/skillrollrequest")
         };
 
         const sendRoleRequest = (role) => {
-            sendRequest({
-                label: role
-            }, "/rolerollrequest")
+            sendRequest({ label: role }, "/rolerollrequest")
         };
 
-        // --- CONTROL TAB ACTIONS ---
         let moveRefreshTimer = null;
         const moveToken = (direction) => {
             window.axios.post("/movetoken", { direction });
-            // Schedule refresh 4s after the LAST movement; subsequent moves reset the timer
             if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
             moveRefreshTimer = setTimeout(() => {
                 getVisibleTokens();
@@ -1444,8 +1377,6 @@ export default {
             window.location.href = '/profile-setup';
         };
 
-        //This is the 'targeting' hook that allows the dropdown to target anything
-        //Replaced with targeting adhoc as it might get a bit weird with multiple peeps
         watch(() => controlState.value.selectedTarget, (newTarget) => {
             if (newTarget) {
                 targetToken(newTarget.id);
@@ -1504,7 +1435,6 @@ export default {
 
         watch(() => charData.value, (newData) => {
             if (newData && controlState.value.selectedWeapon) {
-                // Update selected weapon reference from the fresh charData if it exists
                 const updatedWeapon = newData.data.items.find(i => i._id === controlState.value.selectedWeapon._id);
                 if (updatedWeapon) {
                     controlState.value.selectedWeapon = updatedWeapon;
@@ -1520,9 +1450,8 @@ export default {
             }
         };
 
-        onUpdated(() => {
-            if (!loading.value) refreshIcons();
-        });
+        // Removed the global onUpdated hook to prevent excessive icon refresh
+        // onUpdated(() => { if (!loading.value) refreshIcons(); });
 
         onUnmounted(() => {
             if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
@@ -1537,6 +1466,7 @@ export default {
 
         const toggleCategory = (category) => {
             collapsedCategories.value[category] = !collapsedCategories.value[category];
+            // refreshIcons is still useful here for the expanded section
             setTimeout(refreshIcons, 50);
         };
 
@@ -1544,17 +1474,13 @@ export default {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
             groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
-            calculateBase, findItem, formatCategory, getItemIcon, getImageUrl, sendStatRequest, sendSkillRequest,
+            calculateBase, findItem, formatCategory, getImageUrl, sendStatRequest, sendSkillRequest,
             sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
             collapsedCategories, toggleCategory,
             refreshIcons,
-            // New Control Exports
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile,
-            // Roll Modifiers Panel
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
-            // DV Exports
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
-            // Resource Modal Exports
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
             openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue
         };
