@@ -36,30 +36,80 @@ class AttackRoll extends FormRequest
         //This JS may cause issues with targeting if there are many people trying to target.
         //The targeting from the dropdown is now removed.
 
-        $js = "const enemyTokenId = '$targetId';
-                const targetToken = canvas.tokens.get(enemyTokenId);
-                const actor = game.actors.get('$actorId');
-                const actorId = actor.id;
-                const weaponId = actor.items.get('$weaponId')._id
-                let attackRoll;
+        $js = "
+            // --- CONFIGURATION ---
+            const actorId = '$actorId';
+            const weaponId = '$weaponId';
+            const fireMode = '$fireMode'; // 'Single', 'Aim', 'Auto', 'Suppress'
+                        const enemyTokenId = '$targetId';
+                        const targetToken = canvas.tokens.get(enemyTokenId);
 
-                if (targetToken && actor) {
-                    // 1. Set the target
-                    targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
-                    console.log('Successfully targeted: ' + targetToken.name);
+            // --- LOGIC ---
+            const actor = game.actors.get(actorId);
 
-                    attackRoll = actor.sheet._onRoll(
-                    {'data-roll-type': 'attack',
-                    'data-roll-title': 'Attack Roll',
-                    'data-item-id': weaponId,
-                    type: 'click',
-                    currentTarget: {'data-roll-type': 'attack', 'data-roll-title': 'Attack Roll', 'data-item-id': weaponId}}
-                    )
+            if (actor) {
+                (async () => {
+                    // 1. Construct the specific flag key for this weapon
+                    const flagKey = 'firetype-' + weaponId;
+                    const scope = 'cyberpunk-red-core';
 
-                    setTimeout(function(){
-                        return attackRoll
-                    }, 3000)
-                }";
+                    let flagValue = ''; // Default is empty (Single shot)
+
+                    // 2. Map your app's mode to the System's flag values
+                    switch (fireMode) {
+                        case 'Auto':
+                            flagValue = 'autofire';
+                            break;
+                        case 'Suppress':
+                            flagValue = 'suppressive';
+                            break;
+                        case 'Aimed':
+                            flagValue = 'aimed';
+                            // If aiming, we also ensure the location is set to head (default called shot)
+                            await actor.setFlag(scope, 'aimedLocation', 'head');
+                            break;
+                        case 'Single':
+                        default:
+                            flagValue = ''; // Clear the flag for normal shooting
+                            break;
+                    }
+
+                    targetToken.setTarget(true, {
+                        releaseOthers: true,
+                        groupSelection: true
+                    });
+
+                    // 3. Update the Actor's Flag
+                    if (flagValue === '') {
+                        // If Single, we unset the flag to clean up
+                        await actor.unsetFlag(scope, flagKey);
+                    } else {
+                        // Otherwise set the mode
+                        await actor.setFlag(scope, flagKey, flagValue);
+                    }
+
+                    console.log('Set ' + flagKey + ' to: ' + (flagValue || 'Single'));
+
+                    // 4. Create the Fake Button for the System Logic
+                    const dummyBtn = document.createElement('a');
+                    dummyBtn.dataset.rollType = 'attack';
+                    dummyBtn.dataset.itemId = weaponId;
+                    dummyBtn.dataset.rollTitle = fireMode + ' Attack';
+
+                    // 5. Execute the Roll
+                    await actor.sheet._onRoll({
+                        preventDefault: () => {},
+                        currentTarget: dummyBtn,
+                        type: 'click'
+                    }, {
+                        showDialog: false
+                    });
+
+                })();
+            }
+        ";
+
+
 
         $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
 
