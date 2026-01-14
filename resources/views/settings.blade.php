@@ -72,7 +72,7 @@
                     <!-- Default Actor ID -->
                     <div>
                         <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-lime-400" />
-                        <select id="actor_selection" class="cyber-select-field mt-1" onchange="updateActorTokens(this)">
+                        <select id="actor_selection" class="cyber-select-field mt-1">
                             <option value="" disabled {{ !$user->default_actor_id ? 'selected' : '' }}>Select Biometric Data</option>
                             @foreach($actors as $actor)
                                 <option value="{{ $actor['actorId'] }}|{{ $actor['tokenId'] }}" {{ $user->default_actor_id == $actor["actorId"] && $user->default_token_id == $actor["tokenId"] ? 'selected' : '' }} class="cyber-select-option">
@@ -95,11 +95,14 @@
     </div>
 </div>
 
-<script>
-    function updateActorTokens(select) {
-        const [actorId, tokenId] = select.value.split('|');
-        document.getElementById('default_actor_id').value = actorId;
-        document.getElementById('default_token_id').value = tokenId;
+<script @cspNonce>
+    const actorSelection = document.getElementById('actor_selection');
+    if (actorSelection) {
+        actorSelection.addEventListener('change', function() {
+            const [actorId, tokenId] = this.value.split('|');
+            document.getElementById('default_actor_id').value = actorId;
+            document.getElementById('default_token_id').value = tokenId;
+        });
     }
 </script>
 @endsection

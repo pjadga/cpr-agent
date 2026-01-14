@@ -7,7 +7,7 @@
                 Your journey into the neon abyss starts here.
             </p>
             <div class="rounded shadow-2xl border-2 border-red-900 overflow-hidden group">
-                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070&auto=format&fit=crop"
+                <img src="{{ asset('images/external/register-bg.jpg') }}"
                      alt="Cyberpunk Technology"
                      class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500">
             </div>

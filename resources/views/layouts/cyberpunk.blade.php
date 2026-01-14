@@ -14,12 +14,12 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="https://unpkg.com/lucide@latest"></script>
+        <script src="https://unpkg.com/lucide@latest" @cspNonce></script>
     </head>
     <body class="bg-black text-gray-100 font-sans antialiased">
         @yield('content')
 
-        <script>
+        <script @cspNonce>
             // Initialize Lucide icons if they are used in Blade templates
             lucide.createIcons();
         </script>

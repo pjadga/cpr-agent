@@ -1,7 +1,7 @@
 @extends('layouts.cyberpunk')
 
 @section('content')
-<div class="min-h-screen flex flex-col items-center justify-center p-6 bg-[url('https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-black/80">
+<div class="min-h-screen flex flex-col items-center justify-center p-6 bg-[url('{{ asset('images/external/login-bg.jpg') }}')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-black/80">
     <div class="cpr-panel p-12 max-w-2xl w-full border-t-4 border-t-red-600 shadow-2xl backdrop-blur-sm">
         <div class="text-center">
             <h1 class="text-6xl font-black mb-6 glow-red text-red-600 uppercase tracking-tighter">Cyberpunk Interface</h1>

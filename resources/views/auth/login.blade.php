@@ -7,7 +7,7 @@
                 The streets of 2077 don't wait for anyone.
             </p>
             <div class="rounded shadow-2xl border-2 border-red-900 overflow-hidden group">
-                <img src="https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=2070&auto=format&fit=crop"
+                <img src="{{ asset('images/external/login-bg.jpg') }}"
                      alt="Cyberpunk Cityscape"
                      class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500">
             </div>
