@@ -1,27 +1,51 @@
-# STATE
-Currently unfinished, functioning but being actively worked on by myself in my spare time.
-I will create a write up on how to get it running once I'm happy with the services provided by it.
+# Cyberpunk Red Companion App
 
-For the time being, if you can host a Laravel site, you can get this running.
+A hostable companion app for Cyberpunk Red, designed to bridge the gap between players at a physical table and a Foundry VTT session. This app displays character stats, handles rolls, and allows for token interaction directly from a mobile device or desktop application.
 
-# Introduction
-This started as a proof of concept idea, when around a single screen (say, a table or a tv) h
-how would the players interact?
-A companion app was the obvious choice - something that displayed stats and rolls, and coming from my background in backend web developemnt,
-I wanted the app to be a hostable service. And thanks to [ThreeHats Foundry API](https://github.com/ThreeHats/foundryvtt-rest-api) and a 
-hastily written [PHP wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper) I have a hostable app that can fire and return data to 
-a session of Foundry via the THF api.
+## State
+Currently functioning but actively being worked on. If you can host a Laravel site, you can get this running.
 
-# Cyberpunk Red companion app 
-* Displays relevant character stats, skills and roles, all rollable from the app.
-* Displays equipped gear, ammo count, costs, damage, amounts and descriptions of most gear.
-* All gear & cyberware displayed in an easy to read format.
-* Directional control of tokens via an on-screen D-pad.
-* Listed tokens on map, their position relative to your token & calculated DV values per weapon.
-* Weapon select, reloading & firing modes.
-* Hit rolls, Damage rolls based on target & selected weapon
+## Features
+* **Character Management**: Displays relevant character stats, skills, and roles, all rollable from the app.
+* **Gear & Cyberware**: Displays equipped gear, ammo count, costs, damage, and descriptions in an easy-to-read format.
+* **Token Control**: Directional control of tokens via an on-screen D-pad.
+* **Combat Support**: 
+    * Listed tokens on map with relative positions.
+    * Calculated DV values per weapon.
+    * Weapon selection, reloading, and multiple firing modes.
+    * Hit and Damage rolls based on target and selected weapon.
 
-# App configuration
-The app requires a live foundry session to link to, and the ThreeHats module installed. 
-Each app user has a login, to which they save their character & Foundry session.
-The site 'admin' can save the base URLS for the API and Foundry session, along with the Client ID (usually found when setting up the ThreeHats API).
+## Setup & Installation
+
+### Availability
+The app is available through several methods:
+* **Self-Hosting**: Using DDEV (recommended for local/shared development).
+* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available.
+* **Mobile**: iOS and Android App Store versions are coming later.
+
+### Self-Hosting with DDEV
+For the best experience while self-hosting and sharing with your players:
+1. Ensure you have [DDEV](https://ddev.readthedocs.io/) installed.
+2. Clone the repository and run `ddev config` if not already configured.
+3. Start the project: `ddev start`.
+4. Install dependencies: `ddev composer install` and `ddev npm install`.
+5. To share the app with players over the internet:
+   * Use `ddev share`. 
+   * This utilizes **ngrok** to provide a public URL that your players can use to access the companion app.
+
+## Relay Setup
+The app requires a live Foundry VTT session to link to, with the [ThreeHats Foundry API](https://github.com/ThreeHats/foundryvtt-rest-api) module installed.
+
+### Best Practices for Relay
+To ensure a stable connection between the app and your Foundry session, setting up a relay is highly recommended. 
+
+For a comprehensive guide on setting up a relay (using DuckDNS as an example), please refer to:
+**[Foundry VTT REST API Relay - DuckDNS Example](https://foundryvtt-rest-api-relay.fly.dev/docs/relay-app-duckdns-example)**
+
+### Configuration
+1. Each app user logs in and saves their character and Foundry session details.
+2. The site 'admin' can save base URLs for the API and Foundry session.
+3. You will need a **Client ID**, which is generated when setting up the ThreeHats API in Foundry.
+
+## Technical Foundation
+This app is built with Laravel and [NativePHP](https://nativephp.com/). It uses a [PHP wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper) for the ThreeHats API to communicate with Foundry VTT.
