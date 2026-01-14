@@ -458,12 +458,12 @@
                         <div class="cpr-panel p-4 bg-[#111]">
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
                             <div class="grid grid-cols-4 gap-2">
-                                <button v-for="mode in ['Single', 'Aim', 'Auto', 'Suppress']" :key="mode"
+                                <button v-for="mode in ['Single', 'Aimed', 'Auto', 'Suppress']" :key="mode"
                                         @click="controlState.fireMode = mode"
                                         class="py-3 text-xs font-bold uppercase border transition-colors flex flex-col items-center gap-1"
                                         :class="controlState.fireMode === mode ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
                                     <i v-if="mode === 'Single'" v-icon data-lucide="locate" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Aim'" v-icon data-lucide="locate-fixed" class="w-4 h-4"></i>
+                                    <i v-if="mode === 'Aimed'" v-icon data-lucide="locate-fixed" class="w-4 h-4"></i>
                                     <i v-if="mode === 'Auto'" v-icon data-lucide="zap" class="w-4 h-4"></i>
                                     <i v-if="mode === 'Suppress'" v-icon data-lucide="shield-alert" class="w-4 h-4"></i>
                                     {{ mode }}
@@ -592,377 +592,45 @@
 </template>
 
 <script>
-import {computed, onMounted, onUpdated, ref, shallowRef, triggerRef, nextTick, watch, onUnmounted} from "vue";
+/**
+ * CharacterSheet.vue
+ * Main entry point for the cyberpunk character sheet.
+ * Handles character data fetching, stat updates, skills, gear, and combat controls.
+ */
 
-// --- PERFORMANCE HELPERS ---
+import { computed, onMounted, ref, shallowRef, triggerRef, nextTick, watch, onUnmounted } from "vue";
 
-// Custom icon directive to render icons efficiently per element
-const vIcon = {
-    mounted(el) {
-        // Wait for DOM insertion
-        nextTick(() => {
-            if (window.lucide && el.parentElement) {
-                window.lucide.createIcons({ root: el.parentElement });
-            }
-        });
-    },
-    updated(el) {
-        // Wait for DOM updates
-        nextTick(() => {
-            if (window.lucide && el.parentElement) {
-                window.lucide.createIcons({ root: el.parentElement });
-            }
-        });
-    }
-};
+// --- COMPONENTS ---
+import NavBtn from './character-sheet/NavBtn.vue';
+import SimpleStat from './character-sheet/SimpleStat.vue';
+import AdjustableStat from './character-sheet/AdjustableStat.vue';
+import ResourceCounter from './character-sheet/ResourceCounter.vue';
+import ItemRow from './character-sheet/ItemRow.vue';
 
-// Deep equality check to prevent unnecessary reactivity updates
-function isDeepEqual(obj1, obj2) {
-    if (obj1 === obj2) return true;
-    if (typeof obj1 !== 'object' || obj1 === null || typeof obj2 !== 'object' || obj2 === null) return false;
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-    if (keys1.length !== keys2.length) return false;
-    for (let key of keys1) {
-        if (!keys2.includes(key) || !isDeepEqual(obj1[key], obj2[key])) return false;
-    }
-    return true;
-}
-
-const _inFlight = new Map();
-const _responseCache = new Map();
-const _makeKey = (url, data) => `${url}::${JSON.stringify(data||{})}`;
-
-function cachedPost(url, data, ttlMs = 1500) {
-    const key = _makeKey(url, data);
-    const now = Date.now();
-    const cached = _responseCache.get(key);
-    if (cached && cached.expiresAt > now) {
-        return Promise.resolve(cached.data);
-    }
-    if (_inFlight.has(key)) {
-        return _inFlight.get(key);
-    }
-    const p = window.axios.post(url, data).then(resp => {
-        _responseCache.set(key, { expiresAt: now + ttlMs, data: resp });
-        _inFlight.delete(key);
-        return resp;
-    }).catch(err => {
-        _inFlight.delete(key);
-        throw err;
-    });
-    _inFlight.set(key, p);
-    return p;
-}
-
-function debounce(fn, wait = 250) {
-    let t = null;
-    return (...args) => {
-        if (t) clearTimeout(t);
-        t = setTimeout(() => fn(...args), wait);
-    };
-}
-
-function arraysEqualShallow(a, b) {
-    if (a === b) return true;
-    if (!Array.isArray(a) || !Array.isArray(b)) return false;
-    if (a.length !== b.length) return false;
-    // Compare items by ID hash if available, else simple equality
-    const aIds = a.map(i => i.id || JSON.stringify(i)).join(',');
-    const bIds = b.map(i => i.id || JSON.stringify(i)).join(',');
-    return aIds === bIds;
-}
-
-// --- SUB COMPONENTS (Directives added) ---
-
-const NavBtn = {
-    props: ['icon', 'label', 'active'],
-    directives: { icon: vIcon },
-    template: `
-        <button class="flex flex-col items-center gap-1 w-16 transition-colors cursor-pointer"
-                :class="active ? 'text-red-500' : 'text-gray-600'"><i v-icon :data-lucide="icon" class="w-6 h-6"></i><span
-            class="text-[9px] font-bold uppercase tracking-wider">{{ label }}</span></button>`
-};
-
-const SimpleStat = {
-    props: ['label', 'value'],
-    emits: ['click'],
-    template: `
-        <div @click="$emit('click')" class="cpr-panel bg-[#151515] hover:bg-cyan-900/40 hover:border-cyan-500/50 p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer transition-all group">
-            <span class="text-xl font-bold text-white leading-none group-hover:text-cyan-400 transition-colors">{{ value }}</span>
-            <span class="text-[10px] text-[var(--cpr-red)] font-bold uppercase mt-1 group-hover:text-cyan-500 transition-colors">{{ label }}</span>
-        </div>`
-};
-
-const AdjustableStat = {
-    props: ['label', 'current', 'max'],
-    emits: ['update:current', 'updateStat', 'sendStatRequest'],
-    template: `
-        <div class="cpr-panel bg-[#151515] cursor-pointer p-2 flex justify-between items-center" @click="$emit('sendStatRequest', label)">
-            <button @click.stop="$emit('update:current', current > 0 ? current - 1 : current); $emit('updateStat', label, current > 0 ? current - 1 : current);"
-                    class="w-8 h-8 bg-gray-800 hover:bg-red-900 text-white font-bold rounded-sm cursor-pointer">-
-            </button>
-            <div class="flex flex-col items-center"><span
-                class="text-sm font-bold text-gray-400 uppercase tracking-widest">{{ label }}</span><span
-                class="text-xl font-mono font-black text-white">{{ current }} <span class="text-gray-600 text-sm">/
-                {{ max }}</span></span></div>
-            <button @click.stop="$emit('update:current', (current < max ? current + 1 : current)); $emit('updateStat', label, current < max ? current + 1 : current)"
-                    class="w-8 h-8 bg-gray-800 hover:bg-green-900 text-white font-bold rounded-sm cursor-pointer">+
-            </button>
-        </div>`
-};
-
-const ResourceCounter = {
-    props: ['label', 'current', 'max', 'color'],
-    emits: ['edit'],
-    template: `
-        <div class="cpr-panel p-2 bg-[#111] flex flex-col items-center cursor-pointer" @click="$emit('edit')"><span
-            class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">{{ label }}</span>
-            <div class="flex items-baseline gap-1"><span class="text-2xl font-black font-mono"
-                                                         :class="color">{{ current }}</span><span
-                class="text-xs text-gray-600 font-mono">/ {{ max }}</span></div>
-        </div>`
-};
-
-const ItemRow = {
-    props: ['item', 'category', 'all-items'],
-    directives: { icon: vIcon },
-    setup(props) {
-        const expanded = ref(false);
-        const toggle = () => {
-            expanded.value = !expanded.value;
-        };
-        const formatType = (type) => {
-            if (!type) return 'Other';
-            const result = type.replace(/([A-Z])/g, ' $1').trim();
-            return result.charAt(0).toUpperCase() + result.slice(1);
-        };
-
-        const findItem = (id) => {
-            if (!id || !props.allItems) return null;
-            return props.allItems.find(i => i._id === id);
-        };
-
-        const ammoName = computed(() => {
-            if (props.category !== 'weapon' || !props.item.system.installedItems || !props.item.system.installedItems.list) return null;
-            const ammoId = props.item.system.installedItems.list[0];
-            if (!ammoId) return null;
-            const ammoItem = findItem(ammoId);
-            return ammoItem ? ammoItem.name : null;
-        });
-
-        const armorDisplay = computed(() => {
-            if (props.category !== 'armor') return null;
-            const sys = props.item.system;
-            const results = [];
-
-            if (sys.isShield && sys.shieldHitPoints) {
-                results.push({
-                    label: 'Shield HP',
-                    value: `${sys.shieldHitPoints.value} / ${sys.shieldHitPoints.max}`,
-                    icon: 'shield'
-                });
-            }
-
-            if (sys['armor-head'] && sys['armor-head'].sp > 0) {
-                const head = sys['armor-head'];
-                results.push({
-                    label: 'Head',
-                    value: `${head.sp - head.ablation} / ${head.sp}`,
-                    icon: 'user'
-                });
-            }
-
-            if (sys['armor-body'] && sys['armor-body'].sp > 0) {
-                const body = sys['armor-body'];
-                results.push({
-                    label: 'Body',
-                    value: `${body.sp - body.ablation} / ${body.sp}`,
-                    icon: 'user'
-                });
-            }
-
-            return results.length > 0 ? results : null;
-        });
-
-        const statusLine = computed(() => {
-            let percent = null;
-            const sys = props.item.system;
-
-            if (props.category === 'weapon' && sys.magazine && sys.magazine.max > 0) {
-                percent = (sys.magazine.value / sys.magazine.max) * 100;
-            } else if (props.category === 'armor') {
-                if (sys.isShield && sys.shieldHitPoints && sys.shieldHitPoints.max > 0) {
-                    percent = (sys.shieldHitPoints.value / sys.shieldHitPoints.max) * 100;
-                } else {
-                    let totalSp = 0;
-                    let currentSp = 0;
-                    let count = 0;
-
-                    if (sys['armor-head'] && sys['armor-head'].sp > 0) {
-                        totalSp += sys['armor-head'].sp;
-                        currentSp += (sys['armor-head'].sp - sys['armor-head'].ablation);
-                        count++;
-                    }
-                    if (sys['armor-body'] && sys['armor-body'].sp > 0) {
-                        totalSp += sys['armor-body'].sp;
-                        currentSp += (sys['armor-body'].sp - sys['armor-body'].ablation);
-                        count++;
-                    }
-
-                    if (totalSp > 0) {
-                        percent = (currentSp / totalSp) * 100;
-                    }
-                }
-            }
-
-            if (percent === null) return null;
-            percent = Math.min(100, Math.max(0, percent));
-
-            let color = 'bg-green-500';
-            if (percent < 25) color = 'bg-red-500';
-            else if (percent < 60) color = 'bg-amber-500';
-
-            return {
-                width: `${percent}%`,
-                color: color
-            };
-        });
-
-        return { expanded, toggle, formatType, findItem, ammoName, armorDisplay, statusLine };
-    },
-    template: `
-        <div class="cpr-panel bg-[#111] flex flex-col transition-colors border-l-2 relative group overflow-hidden"
-             :class="{
-            'border-red-600': category === 'weapon',
-            'border-blue-600': category === 'armor',
-            'border-yellow-600': category === 'ammo',
-            'border-gray-600': category === 'gear',
-            'border-blue-400': category === 'cyberware'
-         }">
-
-            <div v-if="statusLine" class="absolute top-0 left-0 h-[3px] transition-all duration-500 z-10"
-                 :class="statusLine.color"
-                 :style="{ width: statusLine.width }">
-            </div>
-
-            <div class="flex items-stretch min-h-[3.5rem]">
-                <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
-                    <div class="flex justify-between items-start pr-2">
-                        <div class="flex flex-col">
-                        <span class="text-sm font-bold text-gray-200 group-hover:text-cyan-400 transition-colors">
-                            {{ item.name }}
-                        </span>
-
-                            <div class="flex flex-wrap gap-2 mt-1">
-                                <template v-if="category === 'armor' && armorDisplay">
-                                    <div v-for="stat in armorDisplay" :key="stat.label" class="flex items-center gap-1 mr-2">
-                                        <i v-icon :data-lucide="stat.icon" class="w-3 h-3 text-blue-500"></i>
-                                        <span class="text-[10px] font-mono text-gray-400">
-                                            <span class="text-[8px] uppercase text-gray-600 mr-0.5">{{ stat.label }}:</span>
-                                            {{ stat.value }}
-                                        </span>
-                                    </div>
-                                </template>
-
-                                <div v-if="item.system.magazine && category === 'weapon'" class="flex items-center gap-1">
-                                    <i v-icon data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
-                                    <span class="text-[10px] font-mono text-gray-400">
-                                    {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ item.system.magazine.max }}
-                                        <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
-                                    <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
-                                    <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
-                                </span>
-                                </div>
-
-                                <div v-else-if="(item.system.amount || item.system.count) && category !== 'armor'" class="flex items-center gap-1">
-                                    <i v-icon data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
-                                    <span class="text-[10px] font-mono text-gray-400">
-                                    x{{ item.system.amount || item.system.count }}
-                                        <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
-                                    <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
-                                </span>
-                                </div>
-
-                                <div v-if="category === 'cyberware'" class="flex items-center gap-1">
-                                    <i v-icon data-lucide="cpu" class="w-3 h-3 text-blue-500"></i>
-                                    <span class="text-[10px] font-mono text-blue-400">
-                                    {{ item.system.installedItems.usedSlots }} / {{ item.system.installedItems.slots }}
-                                </span>
-                                </div>
-
-                                <span v-if="item.system.installLocation" class="text-[9px] text-gray-500 uppercase">
-                                [{{ item.system.installLocation }}]
-                            </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button
-                    @click.stop="toggle"
-                    class="w-12 shrink-0 flex items-center justify-center bg-gray-900/30 border-l border-white/5 active:bg-cyan-900/20 transition-colors hover:bg-cyan-900/40 cursor-pointer">
-                    <div class="transition-transform duration-300 flex items-center justify-center"
-                         :class="{ 'rotate-180': expanded }">
-                        <i v-icon data-lucide="chevron-down"
-                           class="w-5 h-5 text-gray-500 group-hover:text-cyan-500">
-                        </i>
-                    </div>
-                </button>
-            </div>
-
-            <transition name="expand">
-                <div v-if="expanded" class="border-t border-white/5 bg-black/40 p-3 shadow-inner">
-                    <div v-if="item.system.description && item.system.description.value"
-                         class="text-gray-300 text-xs leading-relaxed font-sans cpr-description mb-3"
-                         v-html="item.system.description.value">
-                    </div>
-                    <div v-else class="text-gray-600 text-xs italic mb-3">No description available.</div>
-
-                    <div class="grid grid-cols-2 gap-2 text-[10px] uppercase font-bold text-gray-500">
-                        <div v-if="item.system.price" class="bg-gray-900/50 p-1 px-2 border-l-2 border-yellow-600 flex justify-between items-center">
-                            <span>Cost</span>
-                            <span class="text-yellow-600 font-mono">
-                                {{ item.system.price.market }}eb
-                            </span>
-                        </div>
-                        <div v-if="item.system.concealable" class="bg-gray-900/50 p-1 px-2 border-l-2 flex justify-between items-center"
-                             :class="item.system.concealable.concealable ? 'border-green-600' : 'border-red-600'">
-                            <span>Concealable</span>
-                            <span :class="item.system.concealable.concealable ? 'text-green-500' : 'text-red-500'">
-                                {{ (item.system.concealable.concealable ? "Yes" : "No" ) }}
-                            </span>
-                        </div>
-                        <div v-if="item.system.source" class="bg-gray-900/50 p-1 px-2 border-l-2 border-gray-600 flex justify-between items-center">
-                            <span>Source</span>
-                            <span class="text-gray-300 normal-case truncate max-w-[100px] text-right">
-                            {{ typeof item.system.source === 'object' ? item.system.source.book + ' p.' + item.system.source.page : item.system.source }}
-                        </span>
-                        </div>
-                    </div>
-                </div>
-            </transition>
-        </div>
-    `
-};
+// --- DIRECTIVES & UTILS ---
+import { vIcon } from '../directives/icon';
+import { isDeepEqual, debounce } from '../utils/helpers';
+import { cachedPost } from '../utils/api';
 
 export default {
     name: 'CharacterSheet',
     components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, ItemRow },
     directives: { icon: vIcon },
     setup() {
+        // --- STATE ---
         const activeTab = ref('stats');
-        // Changed to shallowRef for performance optimization on large objects
-        const charData = shallowRef(null);
+        const charData = shallowRef(null); // shallowRef for performance on large objects
         const loading = ref(true);
         const error = ref(null);
         const showPopup = ref(false);
         const showImagePopup = ref(false);
         const popupMessage = ref('');
         const baseUrl = ref('');
-
         const mockEnemies = ref([]);
+        const actorUuid = ref(null);
+        const refreshInterval = ref(null);
 
+        // --- CONTROL PANEL STATE ---
         const controlState = ref({
             selectedTarget: null,
             selectedWeapon: null,
@@ -970,7 +638,27 @@ export default {
             reloadRequired: false
         });
 
-        // Helper to refresh icons safely (now mostly used via directives, but kept for popups)
+        const showRollPanel = ref(false);
+        const rollModsLoading = ref(false);
+        const rollModsError = ref(null);
+        const rollModsData = ref(null);
+
+        const dvInfo = ref(null);
+        const dvLoading = ref(false);
+        const dvError = ref(null);
+
+        // --- RESOURCE MODAL STATE ---
+        const showResourceModal = ref(false);
+        const resourceLabel = ref('');
+        const resourceValue = ref(0);
+        const resourceMax = ref(0);
+        const resourceColor = ref('text-white');
+        const bulkSign = ref('+');
+        const bulkAmount = ref(0);
+
+        const collapsedCategories = ref({});
+
+        // --- UTILITIES ---
         const refreshIcons = () => {
             if (window.lucide) {
                 nextTick(() => window.lucide.createIcons());
@@ -981,40 +669,70 @@ export default {
             if (!path) return '';
             if (path.startsWith('http')) return path;
             if (baseUrl.value) return baseUrl.value + "/" + path;
+
             window.axios.get("/getbaseurl").then(response => {
                 baseUrl.value = response.data;
-                console.log(baseUrl.value)
                 return baseUrl.value + "/" + path;
-            })
+            });
         };
 
-        // --- ROLL MODIFIERS PANEL STATE ---
-        const showRollPanel = ref(false);
-        const rollModsLoading = ref(false);
-        const rollModsError = ref(null);
-        const rollModsData = ref(null);
+        // --- DATA FETCHING ---
+        const fetchCharacterData = async (isInitial = false) => {
+            try {
+                if (isInitial) {
+                    const getActors = await window.axios.post("/getactors");
+                    actorUuid.value = getActors.data.uuid;
+                }
 
-        // --- DV INFO STATE ---
-        const dvInfo = ref(null);
-        const dvLoading = ref(false);
-        const dvError = ref(null);
+                if (!actorUuid.value) return;
+
+                const response = await window.axios.post("/actorsheet", { "actorUuid": actorUuid.value });
+
+                // Prevent re-render if data is unchanged
+                if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
+                    if (charData.value.requestId !== response.data.requestId) {
+                        charData.value.requestId = response.data.requestId;
+                    }
+                    return;
+                }
+
+                charData.value = response.data;
+
+                if (isInitial) {
+                    loading.value = false;
+                }
+
+                setTimeout(refreshIcons, 50);
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                if (isInitial) {
+                    if (err.response) {
+                        error.value = err.response.data.error;
+                        popupMessage.value = err.response.data.error;
+                        showPopup.value = true;
+                    }
+                    loading.value = false;
+                }
+            }
+        };
 
         const fetchDVForSelectedWeapon = async () => {
             dvError.value = null;
             dvInfo.value = null;
-            if (!controlState.value.selectedWeapon) return;
-            if (!controlState.value.selectedTarget) return;
+            if (!controlState.value.selectedWeapon || !controlState.value.selectedTarget) return;
+
             try {
                 dvLoading.value = true;
                 const response = await cachedPost('/getvisibletokens', {
                     selectedWeapon: controlState.value.selectedWeapon
                 }, 1000);
+
                 const payload = response?.data?.data?.result;
                 if (!isDeepEqual(dvInfo.value || {}, payload || {})) {
                     dvInfo.value = payload;
                 }
             } catch (e) {
-                console.error('Error fetching DV', e.error);
+                console.error('Error fetching DV', e);
                 dvError.value = 'Unable to fetch DV.';
             } finally {
                 dvLoading.value = false;
@@ -1027,14 +745,17 @@ export default {
             rollModsError.value = null;
             rollModsLoading.value = true;
             rollModsData.value = null;
+
             try {
                 if (!controlState.value.selectedWeapon) {
                     rollModsError.value = 'No weapon selected. Choose a weapon in Control > Select Weapon.';
                     return;
                 }
+
                 const response = await cachedPost('/getrollmodifiers', {
                     selectedWeapon: controlState.value.selectedWeapon
                 }, 2500);
+
                 const data = response?.data?.data;
                 const payload = data?.result ? data.result : data;
 
@@ -1054,128 +775,47 @@ export default {
             }
         };
 
-        const debouncedFetchRollModifiers = debounce(fetchRollModifiers, 250);
+        const getVisibleTokens = () => {
+            cachedPost("/listvisibletokens", {}, 1500).then(response => {
+                const d = response?.data?.data;
+                const payload = d?.result;
+                const list = Array.isArray(payload) ? payload : [];
 
-        const showResourceModal = ref(false);
-        const resourceLabel = ref('');
-        const resourceValue = ref(0);
-        const resourceMax = ref(0);
-        const resourceColor = ref('text-white');
-        const bulkSign = ref('+');
-        const bulkAmount = ref(0);
+                // Patch existing array to prevent v-for destroy/re-create
+                const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
+                const newIds = list.map(e => e.id).sort().join(',');
 
-        const clampResource = (val) => {
-            const max = Number(resourceMax.value) || 0;
-            if (max <= 0) return Math.max(0, Math.floor(val));
-            return Math.max(0, Math.min(max, Math.floor(val)));
-        };
+                if (currentIds !== newIds) {
+                    const prevSelectedId = controlState.value.selectedTarget?.id || null;
+                    mockEnemies.value = list;
 
-        const openResourceModal = (label, current, max, color) => {
-            resourceLabel.value = label;
-            resourceValue.value = clampResource(Number(current) || 0);
-            resourceMax.value = Number(max) || 0;
-            resourceColor.value = color || 'text-white';
-            bulkSign.value = '+';
-            bulkAmount.value = 0;
-            showResourceModal.value = true;
-        };
-
-        const closeResourceModal = () => {
-            showResourceModal.value = false;
-        };
-
-        const stepResource = (delta) => {
-            resourceValue.value = clampResource(resourceValue.value + (delta || 0));
-        };
-
-        const applyBulkChange = () => {
-            const amt = Math.abs(Number(bulkAmount.value) || 0);
-            if (!amt) return;
-            const sign = bulkSign.value === '-' ? -1 : 1;
-            resourceValue.value = clampResource(resourceValue.value + sign * amt);
-        };
-
-        const commitResourceValue = () => {
-            if (charData.value) {
-                if (resourceLabel.value === 'HIT POINTS') {
-                    const hp = charData.value.data.system.derivedStats.hp;
-                    if (hp) hp.value = resourceValue.value;
-                } else if (resourceLabel.value === 'HUMANITY') {
-                    const hum = charData.value.data.system.derivedStats.humanity;
-                    if (hum) hum.value = resourceValue.value;
-                }
-                // Important: Trigger ref update since we mutated a nested prop of a shallowRef
-                triggerRef(charData);
-            }
-            updateStat(resourceLabel.value, resourceValue.value);
-            showResourceModal.value = false;
-        };
-
-        const openRollPanel = async () => {
-            showRollPanel.value = true;
-            await fetchRollModifiers();
-            if (controlState.value.selectedWeapon) {
-                fetchDVForSelectedWeapon();
-            }
-        };
-        const closeRollPanel = () => {
-            showRollPanel.value = false;
-        };
-
-        let refreshInterval = null;
-        let actorUuid = null;
-
-        const fetchCharacterData = async (isInitial = false) => {
-            try {
-                if (isInitial) {
-                    const getActors = await window.axios.post("/getactors");
-                    actorUuid = getActors.data.uuid;
-                }
-                if (!actorUuid) return;
-
-                const response = await window.axios.post("/actorsheet", {"actorUuid" : actorUuid});
-
-                // Optimization: Deep Equality Check prevents re-render if data hasn't changed
-                if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
-                    // Update only metadata/requestId if needed, but skip heavy re-assignment
-                    if (charData.value.requestId !== response.data.requestId) {
-                        charData.value.requestId = response.data.requestId;
+                    if (prevSelectedId) {
+                        const preserved = list.find(t => t.id === prevSelectedId);
+                        if (preserved && controlState.value.selectedTarget?.id !== preserved.id) {
+                            controlState.value.selectedTarget = preserved;
+                        }
                     }
-                    return;
+                } else {
+                    list.forEach(newItem => {
+                        const existing = mockEnemies.value.find(e => e.id === newItem.id);
+                        if (existing) {
+                            if (existing.distanceM !== newItem.distanceM) existing.distanceM = newItem.distanceM;
+                            if (existing.name !== newItem.name) existing.name = newItem.name;
+                        }
+                    });
                 }
 
-                charData.value = response.data;
-                if (isInitial) {
-                    loading.value = false;
+                if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
+                    debouncedFetchDV();
                 }
-                // Refresh icons only when structure actually changes
-                setTimeout(refreshIcons, 50);
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                if (isInitial) {
-                    if (err.response) {
-                        error.value = err.response.data.error;
-                        popupMessage.value = err.response.data.error;
-                        showPopup.value = true;
-                    }
-                    loading.value = false;
-                }
-            }
+            }).catch(err => {
+                console.error('Error fetching visible tokens', err);
+            });
         };
 
-        onMounted(async () => {
-            await fetchCharacterData(true);
-            refreshInterval = setInterval(() => {
-                fetchCharacterData();
-            }, 30000);
-        });
+        const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
-        onUnmounted(() => {
-            if (refreshInterval) {
-                clearInterval(refreshInterval);
-            }
-        });
-
+        // --- COMPUTED ---
         const stats = computed(() => {
             if (!charData.value) return {};
             const { luck, emp, ...rest } = charData.value.data.system.stats;
@@ -1255,9 +895,9 @@ export default {
                     return;
                 }
                 if (groups[item.type]) groups[item.type].push(item);
-                else if (['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(item.type)) {
+                else if (!['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(item.type)) {
+                    groups.gear.push(item);
                 }
-                else groups.gear.push(item);
             });
             return groups;
         });
@@ -1275,6 +915,7 @@ export default {
             return groups;
         });
 
+        // --- METHODS ---
         const calculateBase = (skill) => {
             if (!charData.value) return 0;
             const statVal = charData.value.data.system.stats[skill.system.stat]?.value || 0;
@@ -1292,116 +933,90 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
-        const delayedFetch = () => {
-            setTimeout(() => {
-                fetchCharacterData();
-            }, 3000);
-        };
-
         const sendRequest = (data, url) => {
             window.axios.post(url, data).then(response => {
-                console.log('Stat post successful', response);
-                delayedFetch();
+                setTimeout(() => fetchCharacterData(), 3000);
                 return response;
             }).catch(err => {
-                console.error('Error posting stat', err);
+                console.error('Error posting request', err);
                 popupMessage.value = "Neural uplink failed: Data packet lost.";
                 showPopup.value = true;
                 return err;
             });
-        }
-
-        const getVisibleTokens = () => {
-            cachedPost("/listvisibletokens", {}, 1500).then(response => {
-                const d = response?.data?.data;
-                const payload = d?.result;
-                const list = Array.isArray(payload) ? payload : [];
-
-                // Optimization: Patch existing array to prevent v-for destroy/re-create
-                const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
-                const newIds = list.map(e => e.id).sort().join(',');
-
-                if (currentIds !== newIds) {
-                    // Structure changed (new enemy appeared/died), replace whole list
-                    const prevSelectedId = controlState.value.selectedTarget?.id || null;
-                    mockEnemies.value = list;
-                    // Try to preserve selection
-                    if (prevSelectedId) {
-                        const preserved = list.find(t => t.id === prevSelectedId);
-                        if (preserved && controlState.value.selectedTarget?.id !== preserved.id) {
-                            controlState.value.selectedTarget = preserved;
-                        }
-                    }
-                } else {
-                    // Same enemies, just update properties (like distance) in place
-                    list.forEach(newItem => {
-                        const existing = mockEnemies.value.find(e => e.id === newItem.id);
-                        if (existing) {
-                            // Vue will reactively update only the text that changed
-                            if(existing.distanceM !== newItem.distanceM) existing.distanceM = newItem.distanceM;
-                            if(existing.name !== newItem.name) existing.name = newItem.name;
-                        }
-                    });
-                }
-
-                if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
-                    debouncedFetchDV();
-                }
-            }).catch(err => {
-                console.error('Error fetching visible tokens', err);
-            });
         };
-        const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
-        watch(activeTab, (newTab) => {
-            if (newTab === 'control') {
-                const prevSelectedId = controlState.value.selectedTarget?.id || null;
-                if (prevSelectedId) {
-                    const match = mockEnemies.value.find(t => t.id === prevSelectedId);
-                    if (match && controlState.value.selectedTarget !== match) {
-                        controlState.value.selectedTarget = match;
-                    }
-                }
-                debouncedGetVisibleTokens();
-            }
-        });
-
-        const sendStatRequest = (stat) => {
-            sendRequest({ label: stat }, "/statrollrequest")
-        };
+        const sendStatRequest = (stat) => sendRequest({ label: stat }, "/statrollrequest");
+        const sendSkillRequest = (skill) => sendRequest({ label: skill }, "/skillrollrequest");
+        const sendRoleRequest = (role) => sendRequest({ label: role }, "/rolerollrequest");
+        const sendDeathSave = () => sendRequest({}, "/deathsave");
+        const sendFaceDown = () => sendRequest({}, "/facedown");
 
         const updateStat = (stat, value) => {
-            // FIX: Manual local update because charData is shallowRef
             if (charData.value) {
-                const key = stat.toLowerCase(); // LUCK -> luck
+                const key = stat.toLowerCase();
                 if (charData.value.data.system.stats[key]) {
                     charData.value.data.system.stats[key].value = value;
-                    triggerRef(charData); // Force UI update
+                    triggerRef(charData);
                 }
             }
-            sendRequest({ label: stat, value: value }, "/updatestat")
-        }
-
-        const sendSkillRequest = (skill) => {
-            sendRequest({ label: skill }, "/skillrollrequest")
+            sendRequest({ label: stat, value: value }, "/updatestat");
         };
 
-        const sendRoleRequest = (role) => {
-            sendRequest({ label: role }, "/rolerollrequest")
+        const clampResource = (val) => {
+            const max = Number(resourceMax.value) || 0;
+            if (max <= 0) return Math.max(0, Math.floor(val));
+            return Math.max(0, Math.min(max, Math.floor(val)));
         };
 
-        const sendDeathSave = () => {
-            sendRequest({}, "/deathsave")
+        const openResourceModal = (label, current, max, color) => {
+            resourceLabel.value = label;
+            resourceValue.value = clampResource(Number(current) || 0);
+            resourceMax.value = Number(max) || 0;
+            resourceColor.value = color || 'text-white';
+            bulkSign.value = '+';
+            bulkAmount.value = 0;
+            showResourceModal.value = true;
         };
 
-        const sendFaceDown = () => {
-            sendRequest({}, "/facedown")
+        const closeResourceModal = () => (showResourceModal.value = false);
+        const stepResource = (delta) => (resourceValue.value = clampResource(resourceValue.value + (delta || 0)));
+
+        const applyBulkChange = () => {
+            const amt = Math.abs(Number(bulkAmount.value) || 0);
+            if (!amt) return;
+            const sign = bulkSign.value === '-' ? -1 : 1;
+            resourceValue.value = clampResource(resourceValue.value + sign * amt);
         };
+
+        const commitResourceValue = () => {
+            if (charData.value) {
+                if (resourceLabel.value === 'HIT POINTS') {
+                    const hp = charData.value.data.system.derivedStats.hp;
+                    if (hp) hp.value = resourceValue.value;
+                } else if (resourceLabel.value === 'HUMANITY') {
+                    const hum = charData.value.data.system.derivedStats.humanity;
+                    if (hum) hum.value = resourceValue.value;
+                }
+                triggerRef(charData);
+            }
+            updateStat(resourceLabel.value, resourceValue.value);
+            showResourceModal.value = false;
+        };
+
+        const openRollPanel = async () => {
+            showRollPanel.value = true;
+            await fetchRollModifiers();
+            if (controlState.value.selectedWeapon) {
+                fetchDVForSelectedWeapon();
+            }
+        };
+
+        const closeRollPanel = () => (showRollPanel.value = false);
 
         let moveRefreshTimer = null;
         const moveToken = (direction) => {
             window.axios.post("/movetoken", { direction }).then(() => {
-                delayedFetch();
+                setTimeout(() => fetchCharacterData(), 3000);
             });
             if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
             moveRefreshTimer = setTimeout(() => {
@@ -1412,13 +1027,88 @@ export default {
             }, 4000);
         };
 
-        const goToSettings = () => {
-            window.location.href = '/settings';
+        const targetToken = (tokenId) => {
+            window.axios.post("/targettokens", { token: tokenId }).then(() => {
+                setTimeout(() => fetchCharacterData(), 3000);
+            });
         };
 
-        const goToProfile = () => {
-            window.location.href = '/settings';
+        const rollHit = () => {
+            if (!controlState.value.selectedTarget) return throwError("No Target Selected");
+            if (!controlState.value.selectedWeapon) return throwError("No Weapon Selected");
+            if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
+
+            window.axios.post("/attackroll", controlState.value).then(() => {
+                setTimeout(() => fetchCharacterData(), 3000);
+            });
         };
+
+        const rollDamage = () => {
+            window.axios.post("/damageroll", controlState.value).then(() => {
+                setTimeout(() => fetchCharacterData(), 3000);
+            });
+        };
+
+        const checkReloadRequired = () => {
+            if (controlState.value.selectedWeapon) {
+                const weapon = controlState.value.selectedWeapon;
+                controlState.value.reloadRequired = weapon.system.magazine && weapon.system.magazine.max > 0 && weapon.system.magazine.value === 0;
+            } else {
+                controlState.value.reloadRequired = false;
+            }
+        };
+
+        const reloadWeapon = () => {
+            if (controlState.value.selectedWeapon) {
+                sendRequest(controlState.value, "/reloadweapon");
+            }
+        };
+
+        const throwError = (message) => {
+            popupMessage.value = message;
+            showPopup.value = true;
+        };
+
+        const logout = () => {
+            window.axios.post('/logout').then(() => {
+                window.location.href = '/login';
+            });
+        };
+
+        const close = () => {
+            if (charData.value) showPopup.value = false;
+            else logout();
+        };
+
+        const toggleCategory = (category) => {
+            collapsedCategories.value[category] = !collapsedCategories.value[category];
+            setTimeout(refreshIcons, 50);
+        };
+
+        const goToSettings = () => (window.location.href = '/settings');
+
+        // --- LIFECYCLE ---
+        onMounted(async () => {
+            await fetchCharacterData(true);
+            refreshInterval.value = setInterval(() => fetchCharacterData(), 30000);
+        });
+
+        onUnmounted(() => {
+            if (refreshInterval.value) clearInterval(refreshInterval.value);
+            if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
+        });
+
+        // --- WATCHERS ---
+        watch(activeTab, (newTab) => {
+            if (newTab === 'control') {
+                const prevSelectedId = controlState.value.selectedTarget?.id || null;
+                if (prevSelectedId) {
+                    const match = mockEnemies.value.find(t => t.id === prevSelectedId);
+                    if (match) controlState.value.selectedTarget = match;
+                }
+                debouncedGetVisibleTokens();
+            }
+        });
 
         watch(() => controlState.value.selectedTarget, (newTarget) => {
             if (newTarget) {
@@ -1427,56 +1117,11 @@ export default {
             }
         });
 
-        const targetToken = (tokenId) => {
-            window.axios.post("/targettokens", { token: tokenId }).then(() => {
-                delayedFetch();
-            });
-        }
-
-        const rollHit = () => {
-            console.log("Rolling Hit", controlState.value);
-            if (!controlState.value.selectedTarget) {
-                throwError("No Target Selected")
-                return;
-            }
-            if (!controlState.value.selectedWeapon) {
-                throwError("No Weapon Selected")
-                return;
-            }
-            if (controlState.value.reloadRequired) {
-                throwError("Out of Ammo!")
-                return;
-            }
-            window.axios.post("/attackroll", controlState.value).then(() => {
-                delayedFetch();
-            });
-        };
-
-        const rollDamage = () => {
-            console.log("Rolling Damage", controlState.value);
-            window.axios.post("/damageroll", controlState.value).then(() => {
-                delayedFetch();
-            });
-        };
-
-        const checkReloadRequired = () => {
-            if (controlState.value.selectedWeapon) {
-                const weapon = controlState.value.selectedWeapon;
-                if (weapon.system.magazine && weapon.system.magazine.max > 0) {
-                    controlState.value.reloadRequired = weapon.system.magazine.value === 0;
-                } else {
-                    controlState.value.reloadRequired = false;
-                }
-            } else {
-                controlState.value.reloadRequired = false;
-            }
-        };
-
-        watch(() => controlState.value.selectedWeapon, async (newWeapon) => {
+        watch(() => controlState.value.selectedWeapon, (newWeapon) => {
             checkReloadRequired();
             if (newWeapon) {
                 debouncedFetchDV();
-                debouncedFetchRollModifiers();
+                fetchRollModifiers();
             } else {
                 dvInfo.value = null;
             }
@@ -1492,57 +1137,15 @@ export default {
             }
         }, { deep: true });
 
-        const reloadWeapon = () => {
-            console.log("Reloading Weapon", controlState.value.selectedWeapon);
-            if (controlState.value.selectedWeapon) {
-                sendRequest(controlState.value, "/reloadweapon");
-            }
-        };
-
-        // Removed the global onUpdated hook to prevent excessive icon refresh
-        // onUpdated(() => { if (!loading.value) refreshIcons(); });
-
-        onUnmounted(() => {
-            if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
-        });
-
-        const throwError = (message) => {
-            popupMessage.value = message;
-            showPopup.value = true;
-        }
-
-        const logout = () => {
-            window.axios.post('/logout').then(() => {
-                window.location.href = '/login';
-            });
-        };
-
-        const close = () => {
-            if (charData.value) {
-                showPopup.value = false;
-            } else {
-                logout();
-            }
-        };
-
-        const collapsedCategories = ref({});
-
-        const toggleCategory = (category) => {
-            collapsedCategories.value[category] = !collapsedCategories.value[category];
-            // refreshIcons is still useful here for the expanded section
-            setTimeout(refreshIcons, 50);
-        };
-
         return {
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
             groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
             calculateBase, findItem, formatCategory, getImageUrl, sendStatRequest, sendSkillRequest,
             sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
-            collapsedCategories, toggleCategory,
-            refreshIcons,
+            collapsedCategories, toggleCategory, refreshIcons,
             logout, close,
-            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile, goToSettings,
+            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToSettings,
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
@@ -1552,63 +1155,10 @@ export default {
     }
 };
 </script>
+
+<style scoped src="../../css/components/character-sheet.css"></style>
+
 <style scoped>
-/* Added basic fade transition styles if they were missing */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.2s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
-.fade-from-black-enter-active,
-.fade-from-black-leave-active {
-    transition: all 0.7s cubic-bezier(0.165, 0.84, 0.44, 1);
-    overflow: hidden;
-}
-
-.fade-from-black-enter-from,
-.fade-from-black-leave-to {
-    opacity: 0;
-    max-height: 0;
-    transform: translateY(20px) skewY(2deg);
-    filter: brightness(3) hue-rotate(90deg);
-}
-
-.fade-from-black-enter-to,
-.fade-from-black-leave-from {
-    max-height: 1000px;
-}
-
-@keyframes pulse-purple {
-    0% {
-        background-color: rgba(88, 28, 135, 0.2); /* bg-purple-900/20 */
-        box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
-    }
-    50% {
-        background-color: rgba(88, 28, 135, 0.6); /* darker purple */
-        box-shadow: 0 0 15px 5px rgba(88, 28, 135, 0.4);
-    }
-    100% {
-        background-color: rgba(88, 28, 135, 0.2);
-        box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
-    }
-}
-
-@keyframes loading-bar {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-}
-
-.animate-pulse-purple {
-    animation: pulse-purple 3s infinite ease-in-out;
-    border-color: #7e22ce !important; /* purple-700 */
-    color: #e9d5ff !important; /* purple-200 for readability */
-}
-
 /* Expansion Animation */
 .expand-enter-active,
 .expand-leave-active {
