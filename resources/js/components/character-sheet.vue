@@ -591,7 +591,7 @@
 
 </template>
 
-<script>
+<script @cspNonce>
 /**
  * CharacterSheet.vue
  * Main entry point for the cyberpunk character sheet.
@@ -885,7 +885,7 @@ export default {
             });
             const groups = { weapon: [], armor: [], ammo: [], gear: [] };
             const items = allItems.filter(i => {
-                const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'owned';
+                const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'owned' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
                 return (isEquipped || isToggledWeapon) && !installedIds.has(i._id);
             });

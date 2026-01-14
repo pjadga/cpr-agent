@@ -10,7 +10,7 @@ return [
      * any class that implements `Spatie\Csp\Preset`
      */
     'presets' => [
-        App\Support\Csp\Policy::class,
+        App\Support\Csp\Policy::class
     ],
 
     /**
@@ -25,14 +25,14 @@ return [
      * a new policy or changes to existing CSP policy without breaking anything.
      */
     'report_only_presets' => [
-        //
+
     ],
 
     /**
      * Register additional global report-only CSP directives here.
      */
     'report_only_directives' => [
-     //   [Directive::SCRIPT, [Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE]],
+     //   [Directive::IMG, [Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE]],
     ],
 
     /*

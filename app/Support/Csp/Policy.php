@@ -2,6 +2,8 @@
 
 namespace App\Support\Csp;
 
+use App\Models\Config;
+use App\Models\User;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
 use Spatie\Csp\Preset;
@@ -11,6 +13,8 @@ class Policy implements Preset
 {
     public function configure(\Spatie\Csp\Policy $policy): void
     {
+        $foundryUrl = Config::first()?->foundry_url;
+
         $policy
             ->add(Directive::SCRIPT, [
                 Keyword::SELF,
@@ -28,6 +32,8 @@ class Policy implements Preset
             ])
             ->add(Directive::STYLE, [
                 Keyword::SELF,
+                Keyword::UNSAFE_INLINE,
+                Keyword::UNSAFE_EVAL,
                 'https://fonts.googleapis.com',
                 'https://fonts.bunny.net',
             ])
@@ -39,10 +45,12 @@ class Policy implements Preset
             ->add(Directive::IMG, [
                 Keyword::SELF,
                 'data:',
+                $foundryUrl ? $foundryUrl : '',
             ])
             ->add(Directive::CONNECT, [
                 Keyword::SELF,
                 Keyword::UNSAFE_INLINE,
+                Keyword::UNSAFE_EVAL,
                 'ws:',
                 'wss:',
                 'https://unpkg.com/lucide.min.js.map'
