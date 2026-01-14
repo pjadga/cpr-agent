@@ -5,6 +5,8 @@ use App\Http\Controllers\Data\GetActors;
 use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Rolls\AttackRoll;
 use App\Http\Controllers\Rolls\DamageRoll;
+use App\Http\Controllers\Rolls\DeathSave;
+use App\Http\Controllers\Rolls\FaceDown;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
@@ -14,9 +16,9 @@ use App\Http\Controllers\Token\ListVisibleTokens;
 use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
-use App\Http\Controllers\Views\ConfigController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSetupController;
+use App\Http\Controllers\Views\ConfigController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -46,6 +48,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
 
 Route::middleware(['auth', 'app.configured'])->group(function () {
+    Route::get('/settings', [ProfileSetupController::class, 'show'])->name('settings');
     Route::get('/profile-setup', [ProfileSetupController::class, 'show'])->name('profile-setup.show');
     Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');
 });
@@ -77,6 +80,8 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/damageroll", [DamageRoll::class, "damageRoll"]);
     Route::post("/reloadweapon", [ReloadWeapon::class, "reloadWeapon"]);
     Route::post("/getrollmodifiers", [GetRollModifiers::class, "getRollModifiers"]);
+    Route::post("/deathsave", [DeathSave::class, "getDeathSave"]);
+    Route::post("/facedown", [FaceDown::class, "getFaceDown"]);
 });
 
 require __DIR__.'/auth.php';

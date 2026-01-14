@@ -9,8 +9,7 @@ class ConfigController
 {
     public function index()
     {
-        $config = Config::first() ?? new Config();
-        return view('config', compact('config'));
+        return redirect()->route('settings');
     }
 
     public function store(Request $request)
@@ -25,11 +24,7 @@ class ConfigController
         $config->fill($validated);
         $config->save();
 
-        if ($request->filled('api_key') && $request->filled('base_url')) {
-            return redirect()->route('dashboard')->with('success', 'Configuration updated successfully.');
-        }
-
-        return redirect()->back()->with('success', 'Configuration updated successfully.');
+        return redirect()->route('settings')->with('success', 'Configuration updated successfully.');
     }
 
     public function getBaseUrl(Request $request)

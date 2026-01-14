@@ -46,9 +46,12 @@ class GetVisibleTokens extends FormRequest
               'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
               'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
               'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
-              'Martial Arts': ['Ka Pow'],
-              'Unarmed': ['unarmed'],
-              'Heavy Melee Weapon' : ['heavyMelee']
+              'Martial Arts': ['Ka Pow', 'Hee Ya', 'Whammy', 'SMACK', 'KaCHOW', 'Ka Pow', 'Hee Ya', 'Whammy'],
+              'Unarmed': ['Fists Up, Samurai'],
+              'Light Melee Weapon' : ['Light Melee'],
+              'Medium Melee Weapon' : ['Medium Melee'],
+              'Heavy Melee Weapon' : ['Heavy Melee'],
+              'Very Heavy Melee Weapon' : ['Very Heavy Melee']
 };
             const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
 
@@ -68,17 +71,25 @@ class GetVisibleTokens extends FormRequest
                     'smg': 'SMG',
                     'shotgun': 'Shotgun (Slug)',
                     'sniperRifle': 'Sniper Rifle',
-                    'unarmed' : 'Put \'em Up',
+                    'unarmed' : 'Unarmed',
                     'martialArts' : 'Martial Arts',
                     'grenade' : 'Grenade Launcher',
                     'thrownWeapon': 'Grenade Launcher',
-                    'heavyMelee' : 'Heavy Melee Weapon'
+                    'lightMelee' : 'Light Melee Weapon',
+                    'mediumMelee' : 'Medium Melee Weapon',
+                    'heavyMelee' : 'Heavy Melee Weapon',
+                    'vHeavyMelee' : 'Very Heavy Melee Weapon'
                 };
                 const category = (typeMap[weaponData.system.weaponType] || typeMap[weaponData.system.variety]) || 'Pistol';
 
                 // Find DV
                 const bracketIndex = DISTANCE_BRACKETS.findIndex(limit => distanceM <= limit);
-                const targetDV = bracketIndex !== -1 ? RANGE_DV_TABLE[category][bracketIndex] : 99;
+                let targetDV = bracketIndex !== -1 ? RANGE_DV_TABLE[category][bracketIndex] : 99;
+
+                // Handle cases where we have a string array instead of numeric DV (e.g. Melee/Unarmed)
+                if (Array.isArray(RANGE_DV_TABLE[category]) && typeof RANGE_DV_TABLE[category][0] === 'string') {
+                    targetDV = RANGE_DV_TABLE[category][Math.min(bracketIndex !== -1 ? bracketIndex : 0, RANGE_DV_TABLE[category].length - 1)];
+                }
 
                 const result = {
                     targetName: target.name,

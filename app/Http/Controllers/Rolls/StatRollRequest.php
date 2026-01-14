@@ -24,8 +24,8 @@ class StatRollRequest extends FormRequest
         $label = strtolower($validatedData['label']);
         $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
-        $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
+        $clientId = $user->getClientId();
+        $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
 
         $return = $client->utilities->executeJs($clientId,

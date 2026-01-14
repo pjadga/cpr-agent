@@ -15,7 +15,10 @@
 
         <div class="md:w-1/2 w-full">
             <div class="p-6 bg-gray-900/50 rounded-lg border border-gray-800">
-                <h3 class="text-xl font-bold mb-6 text-pink-500 uppercase tracking-widest border-b border-pink-500/30 pb-2">Bio-ID Registration</h3>
+                <h3 class="text-xl font-bold mb-2 text-pink-500 uppercase tracking-widest border-b border-pink-500/30 pb-2">Bio-ID Registration</h3>
+                <p class="text-[10px] text-yellow-500/80 uppercase mb-6 italic">
+                    Note: Use the same credentials as your Foundry VTT account to enable biometric neural syncing.
+                </p>
 
                 <form method="POST" action="{{ route('register') }}" class="space-y-4">
                     @csrf

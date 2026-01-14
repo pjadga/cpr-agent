@@ -2,12 +2,34 @@
     <div class="min-h-screen pb-28 text-sans">
 
         <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
-            <div class="text-red-500 font-mono animate-pulse text-xl">CONNECTING TO NET...</div>
+            <div class="flex flex-col items-center">
+                <div class="text-lime-500 font-mono animate-pulse text-xl mb-4 tracking-widest">ESTABLISHING NEURAL LINK...</div>
+                <div class="w-64 h-1 bg-gray-900 overflow-hidden relative border border-gray-800">
+                    <div class="absolute inset-0 bg-lime-500 animate-[loading-bar_2s_infinite]"></div>
+                </div>
+                <div class="mt-4 text-[10px] text-gray-500 font-mono uppercase tracking-[0.3em] italic">Initializing Headless Session</div>
+            </div>
         </div>
 
         <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-black">
-            <div class="text-red-500 font-bold border border-red-500 p-4 bg-red-900/20">
-                ERROR: {{ error }}
+            <div class="w-full max-w-md">
+                <div class="border-2 border-red-600 bg-red-900/10 p-6 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
+                    <div class="flex items-center gap-4 mb-4 border-b border-red-600 pb-4">
+                        <i v-icon data-lucide="alert-octagon" class="w-8 h-8 text-red-600"></i>
+                        <h2 class="text-red-500 font-black text-2xl uppercase tracking-tighter">Uplink Failed</h2>
+                    </div>
+                    <div class="text-gray-300 font-mono text-sm leading-relaxed mb-6">
+                        {{ error }}
+                    </div>
+                    <div class="flex gap-4">
+                        <button @click="window.location.reload()" class="flex-1 py-2 bg-red-600 text-black font-bold uppercase text-xs hover:bg-red-500 transition-colors">
+                            Retry Connection
+                        </button>
+                        <button @click="goToSettings" class="flex-1 py-2 border border-red-600 text-red-600 font-bold uppercase text-xs hover:bg-red-600/10 transition-colors">
+                            Neural Config
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -15,7 +37,7 @@
             <div class="cpr-panel w-full max-w-xs bg-black border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-in fade-in zoom-in duration-200">
                 <div class="bg-red-600 p-2 flex justify-between items-center">
                     <span class="text-xs font-black text-black tracking-tighter uppercase italic">SYSTEM ALERT</span>
-                    <button @click="showPopup = false" class="text-black hover:text-white transition-colors">
+                    <button @click="close" class="text-black hover:text-white transition-colors">
                         <i v-icon data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -29,7 +51,7 @@
                             <p class="text-gray-300 text-xs font-mono leading-relaxed">{{ popupMessage }}</p>
                         </div>
                     </div>
-                    <button @click="showPopup = false" class="w-full py-2 bg-red-600/10 border border-red-600 text-red-500 text-xs font-bold uppercase hover:bg-red-600 hover:text-white transition-all">
+                    <button @click="close" class="w-full py-2 bg-red-600/10 border border-red-600 text-red-500 text-xs font-bold uppercase hover:bg-red-600 hover:text-white transition-all">
                         Acknowledge
                     </button>
                 </div>
@@ -184,17 +206,17 @@
                                     {{ charData.data.system.improvementPoints.value }}
                                 </div>
                             </div>
-                            <div class="px-2 text-center w-1/4">
+                            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-gray-800 transition-colors" @click="sendFaceDown">
                                 <div class="text-[9px] text-gray-500 uppercase font-bold">Reputation</div>
                                 <div class="text-white font-mono font-bold">{{
                                         charData.data.system.reputation.value
                                     }}
                                 </div>
                             </div>
-                            <div class="px-2 text-center w-1/4">
+                            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-gray-800 transition-colors" @click="sendDeathSave">
                                 <div class="text-[9px] text-gray-500 uppercase font-bold">Death Save</div>
                                 <div class="text-red-500 font-mono font-bold">
-                                    {{ charData.data.system.derivedStats.deathSave.value }}
+                                    {{ charData.data.system.derivedStats.deathSave.penalty }}
                                 </div>
                             </div>
                         </div>
@@ -482,8 +504,8 @@
                          @click="activeTab = 'gear'"></nav-btn>
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
-                <nav-btn icon="user-cog" label="Profile" :active="activeTab === 'profile'"
-                         @click="goToProfile"></nav-btn>
+                <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
+                         @click="goToSettings"></nav-btn>
             </nav>
 
             <transition name="slide-right">
@@ -1270,9 +1292,16 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
+        const delayedFetch = () => {
+            setTimeout(() => {
+                fetchCharacterData();
+            }, 3000);
+        };
+
         const sendRequest = (data, url) => {
             window.axios.post(url, data).then(response => {
                 console.log('Stat post successful', response);
+                delayedFetch();
                 return response;
             }).catch(err => {
                 console.error('Error posting stat', err);
@@ -1361,9 +1390,19 @@ export default {
             sendRequest({ label: role }, "/rolerollrequest")
         };
 
+        const sendDeathSave = () => {
+            sendRequest({}, "/deathsave")
+        };
+
+        const sendFaceDown = () => {
+            sendRequest({}, "/facedown")
+        };
+
         let moveRefreshTimer = null;
         const moveToken = (direction) => {
-            window.axios.post("/movetoken", { direction });
+            window.axios.post("/movetoken", { direction }).then(() => {
+                delayedFetch();
+            });
             if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
             moveRefreshTimer = setTimeout(() => {
                 getVisibleTokens();
@@ -1373,8 +1412,12 @@ export default {
             }, 4000);
         };
 
+        const goToSettings = () => {
+            window.location.href = '/settings';
+        };
+
         const goToProfile = () => {
-            window.location.href = '/profile-setup';
+            window.location.href = '/settings';
         };
 
         watch(() => controlState.value.selectedTarget, (newTarget) => {
@@ -1385,7 +1428,9 @@ export default {
         });
 
         const targetToken = (tokenId) => {
-            window.axios.post("/targettokens", { token: tokenId });
+            window.axios.post("/targettokens", { token: tokenId }).then(() => {
+                delayedFetch();
+            });
         }
 
         const rollHit = () => {
@@ -1402,12 +1447,16 @@ export default {
                 throwError("Out of Ammo!")
                 return;
             }
-            window.axios.post("/attackroll", controlState.value);
+            window.axios.post("/attackroll", controlState.value).then(() => {
+                delayedFetch();
+            });
         };
 
         const rollDamage = () => {
             console.log("Rolling Damage", controlState.value);
-            window.axios.post("/damageroll", controlState.value);
+            window.axios.post("/damageroll", controlState.value).then(() => {
+                delayedFetch();
+            });
         };
 
         const checkReloadRequired = () => {
@@ -1462,6 +1511,20 @@ export default {
             showPopup.value = true;
         }
 
+        const logout = () => {
+            window.axios.post('/logout').then(() => {
+                window.location.href = '/login';
+            });
+        };
+
+        const close = () => {
+            if (charData.value) {
+                showPopup.value = false;
+            } else {
+                logout();
+            }
+        };
+
         const collapsedCategories = ref({});
 
         const toggleCategory = (category) => {
@@ -1478,11 +1541,13 @@ export default {
             sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
             collapsedCategories, toggleCategory,
             refreshIcons,
-            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile,
+            logout, close,
+            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToProfile, goToSettings,
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
-            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue
+            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
+            sendDeathSave, sendFaceDown
         };
     }
 };
@@ -1531,6 +1596,11 @@ export default {
         background-color: rgba(88, 28, 135, 0.2);
         box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
     }
+}
+
+@keyframes loading-bar {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
 }
 
 .animate-pulse-purple {

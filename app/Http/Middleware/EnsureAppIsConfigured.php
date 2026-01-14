@@ -17,7 +17,7 @@ class EnsureAppIsConfigured
     {
         $config = \App\Models\Config::first();
 
-        if ((!$config || !$config->api_key || !$config->base_url) && !$request->routeIs('config.*')) {
+        if ((!$config || !$config->api_key || !$config->base_url) && !$request->routeIs('config.*') && !$request->routeIs('settings*')) {
             return redirect()->route('config.index');
         }
 

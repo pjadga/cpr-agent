@@ -16,8 +16,8 @@ class CheckProfileSetup
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && !Auth::user()->client_id && !$request->routeIs('profile-setup*')) {
-            return redirect()->route('profile-setup.show');
+        if (Auth::check() && !Auth::user()->client_id && !$request->routeIs('settings*') && !$request->routeIs('profile-setup*')) {
+            return redirect()->route('settings');
         }
 
         return $next($request);
