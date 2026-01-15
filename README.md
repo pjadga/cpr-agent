@@ -17,22 +17,27 @@ Currently functioning but actively being worked on. If you can host a Laravel si
 
 ## Setup & Installation
 
+### Quickest way
+* Download the relevant app to your desktop (dropbox links below for Windowws and Linux 64bit).
+* Use the [Threehats API](https://foundryvtt-rest-api-relay.fly.dev/), create an account and get the API key. 
+* Plug that info into the app (see Configuration below), boot Foundry up (make sure you've got the [module](https://foundryvtt.com/packages/foundry-rest-api) installed) and see if it works!
+
 ### Availability
 The app is available through several methods (details below on DDEV):
 * **Self-Hosting**: Using DDEV (recommended for local/shared development).
-* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available.
-  * 
+* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available - [Dropbox Link](https://www.dropbox.com/scl/fo/qn6pnahxe4vrl2dmxjl9y/APmV2t0u0Et--HFbER7Prpc?rlkey=lag3gxox4hq805elce1d7gxzg&st=ryb211m1&dl=0).
 * **Mobile**: iOS and Android App Store versions are coming later.
 
 ### Self-Hosting with DDEV
 For the best experience while self-hosting and sharing with your players:
 1. Ensure you have [DDEV](https://ddev.readthedocs.io/) installed.
-2. Clone the repository and run `ddev config` if not already configured.
-3. Start the project: `ddev start`.
-4. Install dependencies: `ddev composer install` and `ddev npm install`.
+2. Start the project: `ddev start`. This will give you a URL to visit.
+3. Install dependencies: `ddev composer install` and `ddev npm install`.
+4. Providing there's been no errors, run `ddev artisan migrate:fresh`, `ddev npm run build`. This will refresh the database and build the scripts and styles.
 5. To share the app with players over the internet:
-   * Use `ddev share`. 
+   * Use `ddev share`, check [here](https://docs.ddev.com/en/stable/users/topics/sharing/) for the documentation. 
    * This utilizes **ngrok** to provide a public URL that your players can use to access the companion app.
+* Please note that this has been tested with live URLs, I will be doing more testing using local Foundry & relay envrionments and a share DDEV/NGROK instance.
 
 ## Relay Setup
 The app requires a live Foundry VTT session to link to, with the [ThreeHats Foundry API](https://github.com/ThreeHats/foundryvtt-rest-api) module installed.
@@ -52,3 +57,7 @@ For a comprehensive guide on setting up a relay (using DuckDNS as an example), p
 
 ## Technical Foundation
 This app is built with Laravel and [NativePHP](https://nativephp.com/). It uses a [PHP wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper) for the ThreeHats API to communicate with Foundry VTT.
+
+The setup I've been working with is the Relay & Foundry hosted on my home server (Unraid - using docker-compose), and running that through Swag + Cloudflare to obfuscate the SSL ports and provide DNS services. The relay and Foundry do not communicate locally, all calls are made online. 
+
+I tested the app on my VPS, and after cloning the repo + running a few scripts
