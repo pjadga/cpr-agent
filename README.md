@@ -3,7 +3,16 @@
 A hostable companion app for Cyberpunk Red, designed to bridge the gap between players at a physical table and a Foundry VTT session. This app displays character stats, handles rolls, and allows for token interaction directly from a mobile device or desktop application.
 
 ## State
-Currently functioning but actively being worked on. If you can host a Laravel site, you can get this running.
+Currently functioning but actively being worked on. 
+### Known issues/upcoming features
+* Netrunner role - Net actions not supported yet
+* Sub role rolls not shown (just the main Role)
+* Weapon equip/conceal - The Control section shows all weapons whether they are 'equipped' or not. I'm not sure if this has any impact further than RP.
+* Dynamic shooting modes (currently they all show)
+* Ping targets not working yet.
+* Padding issue at the bottom of the screen.
+* Colour themes
+* Long goal - Originally I had the Agent idea where there's more of a 'phone' aspect. I think for RP purposes the GM could upload scream sheets, stories, add phone numbers of fixers/contacts etc. Getting a text mid gig from a fixer telling em to gtfo would be pretty ace. I'm imagining it working with notes + handouts. Though I feel this is on my way to making a Foundry module of my own...
 
 ## Features
 * **Character Management**: Displays relevant character stats, skills, and roles, all rollable from the app.
@@ -19,13 +28,13 @@ Currently functioning but actively being worked on. If you can host a Laravel si
 
 ### Quickest way
 * Download the relevant app to your desktop (dropbox links below for Windowws and Linux 64bit).
-* Use the [Threehats API](https://foundryvtt-rest-api-relay.fly.dev/), create an account and get the API key. 
+* Use the [Threehats API](https://foundryvtt-rest-api-relay.fly.dev/), create an account and get the API key. Note that the limits will get hit very quickly as the app has to make a fair few calls to keep up with the requests. I've implemented a few caching techniques but it's still fairly hungry.
 * Plug that info into the app (see Configuration below), boot Foundry up (make sure you've got the [module](https://foundryvtt.com/packages/foundry-rest-api) installed) and see if it works!
 
 ### Availability
 The app is available through several methods (details below on DDEV):
 * **Self-Hosting**: Using DDEV (recommended for local/shared development).
-* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available - [Dropbox Link](https://www.dropbox.com/scl/fo/qn6pnahxe4vrl2dmxjl9y/APmV2t0u0Et--HFbER7Prpc?rlkey=lag3gxox4hq805elce1d7gxzg&st=ryb211m1&dl=0).
+* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available - [Dropbox Link](https://www.dropbox.com/scl/fo/qn6pnahxe4vrl2dmxjl9y/APmV2t0u0Et--HFbER7Prpc?rlkey=lag3gxox4hq805elce1d7gxzg&st=ryb211m1&dl=0). The Win EXE will throw an unsigned window at you, click More Info and Run Anyway
 * **Mobile**: iOS and Android App Store versions are coming later.
 
 ### Self-Hosting with DDEV
