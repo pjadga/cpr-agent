@@ -18,9 +18,10 @@ Currently functioning but actively being worked on. If you can host a Laravel si
 ## Setup & Installation
 
 ### Availability
-The app is available through several methods:
+The app is available through several methods (details below on DDEV):
 * **Self-Hosting**: Using DDEV (recommended for local/shared development).
 * **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available.
+  * 
 * **Mobile**: iOS and Android App Store versions are coming later.
 
 ### Self-Hosting with DDEV
@@ -43,9 +44,11 @@ For a comprehensive guide on setting up a relay (using DuckDNS as an example), p
 **[Foundry VTT REST API Relay - DuckDNS Example](https://foundryvtt-rest-api-relay.fly.dev/docs/relay-app-duckdns-example)**
 
 ### Configuration
-1. Each app user logs in and saves their character and Foundry session details.
-2. The site 'admin' can save base URLs for the API and Foundry session.
-3. You will need a **Client ID**, which is generated when setting up the ThreeHats API in Foundry.
+1. On the first run, create an account and you will be shown the configration screen. Fill in the relay API, relay URL, and the Foundry URL.
+2. Once the server fields are saved, they will be the same for all users logging on to the app (if hosted).
+3. If your Foundry session is up and running, and the relay key matches the Three Hats API module, when the server details are saved the Client and Character lists will populate.
+4. Select a character, and you should be ready to roll! Hit the Return to Interface button to go to the character sheet.
+5. You can return here at any time by clicking Profile in the bottom right.
 
 ## Technical Foundation
 This app is built with Laravel and [NativePHP](https://nativephp.com/). It uses a [PHP wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper) for the ThreeHats API to communicate with Foundry VTT.

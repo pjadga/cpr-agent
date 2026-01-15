@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen pb-28 text-sans">
+    <div class="min-h-screen pb-[152px] text-sans">
 
         <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
             <div class="flex flex-col items-center">
