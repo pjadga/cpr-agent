@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen pb-[152px] text-sans">
+    <div class="min-h-screen pb-100 text-sans">
 
         <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
             <div class="flex flex-col items-center">
@@ -149,7 +149,7 @@
 
                 <transition name="fade">
 
-                    <div v-if="activeTab === 'stats'" key="stats" class="space-y-5 absolute w-full top-0 left-0 p-3">
+                    <div v-if="activeTab === 'stats'" key="stats" class="space-y-5 absolute w-full top-0 left-0 p-3 pb-20">
 
                         <div class="grid grid-cols-2 gap-3">
                             <resource-counter label="HIT POINTS"
@@ -253,7 +253,7 @@
                         </div>
                     </div>
 
-                    <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3">
+                    <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3 pb-20">
                         <div v-if="roleItem" @click="sendRoleRequest(roleItem.name)" class="relative bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner cursor-pointer group">
                             <div class="flex justify-between items-center pr-2">
                                 <div>
@@ -303,7 +303,7 @@
                         </div>
                     </div>
 
-                    <div v-else-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3">
+                    <div v-else-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
                         <div>
                             <h3 @click="toggleCategory('cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cyan-950/20 p-1 transition-colors">
@@ -382,7 +382,7 @@
 
                     </div>
 
-                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20 absolute w-full top-0 left-0 p-3">
+                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20 absolute w-full top-0 left-0 p-3 pb-20">
 
                         <div class="flex justify-center my-6">
                             <div class="grid grid-cols-3 gap-2 p-4 bg-gray-900/50 rounded-full border border-gray-800 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
@@ -588,7 +588,6 @@
 
         </div>
     </div>
-
 </template>
 
 <script @cspNonce>
