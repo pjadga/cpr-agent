@@ -34,7 +34,7 @@ Currently functioning but actively being worked on.
 ### Availability
 The app is available through several methods (details below on DDEV):
 * **Self-Hosting**: Using DDEV (recommended for local/shared development).
-* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available - [Dropbox Link](https://www.dropbox.com/scl/fo/qn6pnahxe4vrl2dmxjl9y/APmV2t0u0Et--HFbER7Prpc?rlkey=lag3gxox4hq805elce1d7gxzg&st=ryb211m1&dl=0).
+* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available - [Dropbox Link](https://www.dropbox.com/scl/fo/qn6pnahxe4vrl2dmxjl9y/APmV2t0u0Et--HFbER7Prpc?rlkey=lag3gxox4hq805elce1d7gxzg&st=ryb211m1&dl=0). The Win EXE will throw an unsigned window at you, click More Info and Run Anyway
 * **Mobile**: iOS and Android App Store versions are coming later.
 
 ### Self-Hosting with DDEV
