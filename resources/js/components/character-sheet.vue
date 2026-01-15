@@ -254,13 +254,61 @@
                     </div>
 
                     <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3 pb-20">
-                        <div v-if="roleItem" @click="sendRoleRequest(roleItem.name)" class="relative bg-yellow-900/20 border border-yellow-600/30 p-3 clip-corner cursor-pointer group">
-                            <div class="flex justify-between items-center pr-2">
-                                <div>
-                                    <h3 class="text-yellow-500 font-bold uppercase text-sm">{{ roleItem.name }}</h3>
-                                    <p class="text-[10px] text-gray-400">{{ roleItem.system.mainRoleAbility }}</p>
+                        <div v-if="roleItem" class="relative bg-black/60 border border-yellow-500/30 overflow-hidden clip-corner shadow-[0_0_15px_rgba(234,179,8,0.1)]">
+                            <!-- Role Header -->
+                            <div class="flex items-stretch bg-gradient-to-r from-yellow-900/40 to-transparent border-b border-yellow-500/20">
+                                <div @click="sendRoleRequest(roleItem.name)" class="flex-grow p-3 cursor-pointer hover:bg-yellow-500/10 transition-colors group">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="text-yellow-500 font-black uppercase text-base tracking-tighter group-hover:text-yellow-400 transition-colors">{{ roleItem.name }}</h3>
+                                            <p class="text-[10px] text-yellow-500/60 font-mono uppercase tracking-widest">{{ roleItem.system.mainRoleAbility }}</p>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="text-2xl font-black text-white leading-none">{{ roleItem.system.rank }}</span>
+                                            <span class="text-[8px] text-yellow-500/50 uppercase font-bold">Rank</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="text-2xl font-black text-white">{{ roleItem.system.rank }}</span>
+                                <div @click="toggleRoleExpansion(roleItem._id)" class="w-10 flex items-center justify-center border-l border-yellow-500/20 cursor-pointer hover:bg-yellow-500/10 transition-colors">
+                                    <i v-icon data-lucide="chevron-down" class="w-5 h-5 text-yellow-500/50 transition-transform duration-300" :class="{'rotate-180': expandedRoleItems[roleItem._id]}"></i>
+                                </div>
+                            </div>
+
+                            <!-- Role Description -->
+                            <transition name="expand">
+                                <div v-if="expandedRoleItems[roleItem._id]" class="p-3 bg-yellow-900/5 border-b border-yellow-500/10">
+                                    <div class="text-[11px] text-gray-300 leading-relaxed cpr-description" v-html="roleItem.system.description.value"></div>
+                                </div>
+                            </transition>
+
+                            <!-- Role Abilities -->
+                            <div v-if="roleItem.system.abilities && Object.keys(roleItem.system.abilities).length > 0" class="divide-y divide-yellow-500/10">
+                                <div v-for="(ability, key) in roleItem.system.abilities" :key="key" class="group/ability">
+                                    <div class="flex items-stretch hover:bg-yellow-500/5 transition-colors">
+                                        <div @click="sendRoleAbilityRequest(roleItem.name, ability.name)" class="flex-grow p-2 pl-4 cursor-pointer">
+                                            <div class="flex justify-between items-center">
+                                                <div>
+                                                    <h4 class="text-yellow-500/90 font-bold uppercase text-xs group-hover/ability:text-yellow-400 transition-colors">{{ ability.name }}</h4>
+                                                    <p class="text-[9px] text-gray-500 font-mono">{{ ability.stat || 'Special' }}</p>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <span class="text-lg font-black text-white/80">{{ ability.rank }}</span>
+                                                    <div class="w-1 h-8 bg-yellow-500/20 group-hover/ability:bg-yellow-500/40 transition-colors"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div @click="toggleRoleExpansion(roleItem._id + key)" class="w-8 flex items-center justify-center border-l border-yellow-500/10 cursor-pointer hover:bg-yellow-500/10 transition-colors">
+                                            <i v-icon data-lucide="info" class="w-3.5 h-3.5 text-yellow-500/30 group-hover/ability:text-yellow-500/60"></i>
+                                        </div>
+                                    </div>
+                                    <!-- Ability Description -->
+                                    <transition name="expand">
+                                        <div v-if="expandedRoleItems[roleItem._id + key]" class="p-3 bg-black/40 text-[10px] text-gray-400 italic border-t border-yellow-500/5">
+                                            <div v-if="ability.description" v-html="ability.description"></div>
+                                            <div v-else>No additional data available for this ability.</div>
+                                        </div>
+                                    </transition>
+                                </div>
                             </div>
                         </div>
 
@@ -656,6 +704,7 @@ export default {
         const bulkAmount = ref(0);
 
         const collapsedCategories = ref({});
+        const expandedRoleItems = ref({});
 
         // --- UTILITIES ---
         const refreshIcons = () => {
@@ -946,7 +995,8 @@ export default {
 
         const sendStatRequest = (stat) => sendRequest({ label: stat }, "/statrollrequest");
         const sendSkillRequest = (skill) => sendRequest({ label: skill }, "/skillrollrequest");
-        const sendRoleRequest = (role) => sendRequest({ label: role }, "/rolerollrequest");
+        const sendRoleRequest = (role) => sendRequest({ label: role, role: role, isAbility: false  }, "/rolerollrequest");
+        const sendRoleAbilityRequest = (role, ability) => sendRequest({ label: ability, role: role, isAbility: true }, "/rolerollrequest");
         const sendDeathSave = () => sendRequest({}, "/deathsave");
         const sendFaceDown = () => sendRequest({}, "/facedown");
 
@@ -1084,6 +1134,11 @@ export default {
             setTimeout(refreshIcons, 50);
         };
 
+        const toggleRoleExpansion = (id) => {
+            expandedRoleItems.value[id] = !expandedRoleItems.value[id];
+            setTimeout(refreshIcons, 50);
+        };
+
         const goToSettings = () => (window.location.href = '/settings');
 
         // --- LIFECYCLE ---
@@ -1142,14 +1197,14 @@ export default {
             groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
             calculateBase, findItem, formatCategory, getImageUrl, sendStatRequest, sendSkillRequest,
             sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
-            collapsedCategories, toggleCategory, refreshIcons,
+            collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems, refreshIcons,
             logout, close,
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToSettings,
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
             openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
-            sendDeathSave, sendFaceDown
+            sendDeathSave, sendFaceDown, sendRoleAbilityRequest
         };
     }
 };

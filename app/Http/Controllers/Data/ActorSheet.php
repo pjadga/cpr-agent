@@ -56,7 +56,6 @@ class ActorSheet extends FormRequest
                     'wealth'            => $characterData['system']['wealth'] ?? ['value' => 0],
                     'improvementPoints' => $characterData['system']['improvementPoints'] ?? ['value' => 0],
                     'roleInfo'          => $characterData['system']['roleInfo'] ?? [],
-
                     // Crucial for the "Equipped" section in your Vue app
                     'externalData'      => $characterData['system']['externalData'] ?? [],
                 ],
@@ -105,6 +104,8 @@ class ActorSheet extends FormRequest
                 'stat'      => $sys['stat'] ?? '',
                 'category'  => $sys['category'] ?? '', // Important for your new grouping logic
                 'skillType' => $sys['skillType'] ?? '',
+                'abilities' => $sys['abilities'] ?? [],
+
 
                 // Combat / Weapon Specifics
                 'damage'      => $sys['damage'] ?? '',
