@@ -115,7 +115,7 @@ class ActorSheet extends FormRequest
                 'magazine'         => $sys['magazine'] ?? 0,
                 'equipped' => $sys['equipped'] ?? 0,
                 'isWeapon' => $sys['isWeapon'] ?? false,
-                'usage' => $sys['usage'] ?? '',
+                'fireModes' => $sys['fireModes'] ?? [],
 
                 // Cyberware Specifics
                 'installLocation' => $sys['installLocation'] ?? '',

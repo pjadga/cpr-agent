@@ -32,23 +32,30 @@
                                 </div>
                             </template>
 
-                            <div v-if="item.system.magazine && category === 'weapon'" class="flex items-center gap-1">
-                                <i v-icon data-lucide="logs" class="w-3 h-3 text-gray-500"></i>
+                            <div v-if="category === 'weapon'" class="flex items-center gap-1">
+                                <i v-icon data-lucide="logs" class="w-3 h-3 text-gray-500" v-if="!isMeleeOrUnarmed"></i>
                                 <span class="text-[10px] font-mono text-gray-400">
-                                {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ item.system.magazine.max }}
-                                    <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
-                                <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
-                                <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
-                            </span>
+                                    <template v-if="!isMeleeOrUnarmed && item.system.magazine">
+                                        {{ item.system.magazine.value }} <span class="text-gray-600">/</span> {{ ammoTotal }}
+                                        <span v-if="ammoName" class="ml-1 text-yellow-600">[{{ ammoName }}]</span>
+                                    </template>
+                                    <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-red-400 font-bold">{{ item.system.damage }}</span>
+                                    <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
+                                </span>
+                            </div>
+
+                            <div v-else-if="category === 'ammo'" class="flex items-center gap-1">
+                                <i v-icon data-lucide="hash" class="w-3 h-3 text-yellow-500"></i>
+                                <span class="text-lg font-black font-mono text-yellow-500">
+                                    {{ item.system.amount || item.system.count || 0 }}
+                                </span>
                             </div>
 
                             <div v-else-if="(item.system.amount || item.system.count) && category !== 'armor'" class="flex items-center gap-1">
                                 <i v-icon data-lucide="hash" class="w-3 h-3 text-gray-500"></i>
                                 <span class="text-[10px] font-mono text-gray-400">
-                                x{{ item.system.amount || item.system.count }}
-                                    <span v-if="item.system.damage" class="ml-2 text-red-400 font-bold">{{ item.system.damage }}</span>
-                                <span v-if="item.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ item.system.rof }}</span>
-                            </span>
+                                    x{{ item.system.amount || item.system.count }}
+                                </span>
                             </div>
 
                             <div v-if="category === 'cyberware'" class="flex items-center gap-1">
@@ -137,6 +144,37 @@ export default {
             return props.allItems.find(i => i._id === id);
         };
 
+        const isMeleeOrUnarmed = computed(() => {
+            const type = props.item.system.weaponType || '';
+            return type.toLowerCase().includes('melee') || type === 'unarmed' || props.item.system.isMelee || props.category === 'melee';
+        });
+
+        const ammoTotal = computed(() => {
+            if (props.category !== 'weapon' || !props.allItems) return null;
+            if (isMeleeOrUnarmed.value) return null;
+
+            // First, try to find the installed ammo
+            if (props.item.system.installedItems && props.item.system.installedItems.list) {
+                const ammoId = props.item.system.installedItems.list[0];
+                if (ammoId) {
+                    const ammoItem = findItem(ammoId);
+                    if (ammoItem) {
+                        return ammoItem.system.amount || ammoItem.system.count || 0;
+                    }
+                }
+            }
+
+            // Fallback to searching by weapon type if no specific ammo is installed
+            const wType = props.item.system.weaponType;
+            if (!wType) return props.item.system.magazine?.max || 0;
+
+            const total = props.allItems
+                .filter(i => i.type === 'ammo' && i.system.ammoType === wType)
+                .reduce((sum, i) => sum + (i.system.amount || i.system.count || 0), 0);
+
+            return total || props.item.system.magazine?.max || 0;
+        });
+
         const ammoName = computed(() => {
             if (props.category !== 'weapon' || !props.item.system.installedItems || !props.item.system.installedItems.list) return null;
             const ammoId = props.item.system.installedItems.list[0];
@@ -183,7 +221,7 @@ export default {
             let percent = null;
             const sys = props.item.system;
 
-            if (props.category === 'weapon' && sys.magazine && sys.magazine.max > 0) {
+            if (props.category === 'weapon' && sys.magazine && sys.magazine.max > 0 && !isMeleeOrUnarmed.value) {
                 percent = (sys.magazine.value / sys.magazine.max) * 100;
             } else if (props.category === 'armor') {
                 if (sys.isShield && sys.shieldHitPoints && sys.shieldHitPoints.max > 0) {
@@ -223,7 +261,7 @@ export default {
             };
         });
 
-        return { expanded, toggle, formatType, findItem, ammoName, armorDisplay, statusLine };
+        return { expanded, toggle, formatType, findItem, ammoName, ammoTotal, isMeleeOrUnarmed, armorDisplay, statusLine };
     }
 };
 </script>

@@ -505,18 +505,19 @@
 
                         <div class="cpr-panel p-4 bg-[#111]">
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
-                            <div class="grid grid-cols-4 gap-2">
-                                <button v-for="mode in ['Single', 'Aimed', 'Auto', 'Suppress']" :key="mode"
-                                        @click="controlState.fireMode = mode"
-                                        class="py-3 text-xs font-bold uppercase border transition-colors flex flex-col items-center gap-1"
-                                        :class="controlState.fireMode === mode ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
-                                    <i v-if="mode === 'Single'" v-icon data-lucide="locate" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Aimed'" v-icon data-lucide="locate-fixed" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Auto'" v-icon data-lucide="zap" class="w-4 h-4"></i>
-                                    <i v-if="mode === 'Suppress'" v-icon data-lucide="shield-alert" class="w-4 h-4"></i>
-                                    {{ mode }}
+                            <transition-group
+                                name="mode-list"
+                                tag="div"
+                                class="flex gap-2"
+                            >
+                                <button v-for="mode in availableFireModes" :key="mode.id"
+                                        @click="controlState.fireMode = mode.id"
+                                        class="flex-1 py-3 text-[10px] font-bold uppercase border transition-all flex flex-col items-center gap-1 min-w-0"
+                                        :class="controlState.fireMode === mode.id ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
+                                    <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i>
+                                    {{ mode.label }}
                                 </button>
-                            </div>
+                            </transition-group>
                         </div>
 
                         <div v-if="dvInfo && controlState.selectedWeapon" class="text-center py-3">
@@ -654,6 +655,12 @@ import AdjustableStat from './character-sheet/AdjustableStat.vue';
 import ResourceCounter from './character-sheet/ResourceCounter.vue';
 import ItemRow from './character-sheet/ItemRow.vue';
 
+// --- COMPOSABLES ---
+import { useCharacterData } from '../composables/useCharacterData';
+import { useCombat } from '../composables/useCombat';
+import { useRollModifiers } from '../composables/useRollModifiers';
+import { useResources } from '../composables/useResources';
+
 // --- DIRECTIVES & UTILS ---
 import { vIcon } from '../directives/icon';
 import { isDeepEqual, debounce } from '../utils/helpers';
@@ -664,18 +671,21 @@ export default {
     components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, ItemRow },
     directives: { icon: vIcon },
     setup() {
-        // --- STATE ---
+        // --- COMPOSABLES ---
+        const {
+            charData,
+            loading,
+            error: dataError,
+            getImageUrl,
+            fetchCharacterData,
+            refreshIcons
+        } = useCharacterData();
+
         const activeTab = ref('stats');
-        const charData = shallowRef(null); // shallowRef for performance on large objects
-        const loading = ref(true);
-        const error = ref(null);
         const showPopup = ref(false);
         const showImagePopup = ref(false);
         const popupMessage = ref('');
-        const baseUrl = ref('');
-        const mockEnemies = ref([]);
-        const actorUuid = ref(null);
-        const refreshInterval = ref(null);
+        const error = computed(() => dataError.value);
 
         // --- CONTROL PANEL STATE ---
         const controlState = ref({
@@ -685,181 +695,94 @@ export default {
             reloadRequired: false
         });
 
-        const showRollPanel = ref(false);
-        const rollModsLoading = ref(false);
-        const rollModsError = ref(null);
-        const rollModsData = ref(null);
+        const throwError = (message) => {
+            popupMessage.value = message;
+            showPopup.value = true;
+        };
 
-        const dvInfo = ref(null);
-        const dvLoading = ref(false);
-        const dvError = ref(null);
+        const {
+            mockEnemies,
+            dvInfo,
+            dvLoading,
+            dvError,
+            debouncedFetchDV,
+            getVisibleTokens,
+            moveToken,
+            rollHit,
+            rollDamage,
+            checkReloadRequired,
+            reloadWeapon,
+            fetchDVForSelectedWeapon
+        } = useCombat(controlState, charData, fetchCharacterData, throwError);
 
-        // --- RESOURCE MODAL STATE ---
-        const showResourceModal = ref(false);
-        const resourceLabel = ref('');
-        const resourceValue = ref(0);
-        const resourceMax = ref(0);
-        const resourceColor = ref('text-white');
-        const bulkSign = ref('+');
-        const bulkAmount = ref(0);
+        const {
+            showRollPanel,
+            rollModsLoading,
+            rollModsError,
+            rollModsData,
+            openRollPanel: openRollPanelBase,
+            closeRollPanel,
+            fetchRollModifiers
+        } = useRollModifiers(controlState);
+
+        const openRollPanel = async () => {
+            await openRollPanelBase();
+            if (controlState.value.selectedWeapon) {
+                debouncedFetchDV();
+            }
+        };
 
         const collapsedCategories = ref({});
         const expandedRoleItems = ref({});
 
-        // --- UTILITIES ---
-        const refreshIcons = () => {
-            if (window.lucide) {
-                nextTick(() => window.lucide.createIcons());
-            }
-        };
-
-        const getImageUrl = (path) => {
-            if (!path) return '';
-            if (path.startsWith('http')) return path;
-            if (baseUrl.value) return baseUrl.value + "/" + path;
-
-            window.axios.get("/getbaseurl").then(response => {
-                baseUrl.value = response.data;
-                return baseUrl.value + "/" + path;
+        const logout = () => {
+            window.axios.post('/logout').then(() => {
+                window.location.href = '/login';
             });
         };
 
-        // --- DATA FETCHING ---
-        const fetchCharacterData = async (isInitial = false) => {
-            try {
-                if (isInitial) {
-                    const getActors = await window.axios.post("/getactors");
-                    actorUuid.value = getActors.data.uuid;
-                }
-
-                if (!actorUuid.value) return;
-
-                const response = await window.axios.post("/actorsheet", { "actorUuid": actorUuid.value });
-
-                // Prevent re-render if data is unchanged
-                if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
-                    if (charData.value.requestId !== response.data.requestId) {
-                        charData.value.requestId = response.data.requestId;
-                    }
-                    return;
-                }
-
-                charData.value = response.data;
-
-                if (isInitial) {
-                    loading.value = false;
-                }
-
-                setTimeout(refreshIcons, 50);
-            } catch (err) {
-                console.error("Fetch Error:", err);
-                if (isInitial) {
-                    if (err.response) {
-                        error.value = err.response.data.error;
-                        popupMessage.value = err.response.data.error;
-                        showPopup.value = true;
-                    }
-                    loading.value = false;
-                }
-            }
+        const close = () => {
+            if (charData.value) showPopup.value = false;
+            else logout();
         };
 
-        const fetchDVForSelectedWeapon = async () => {
-            dvError.value = null;
-            dvInfo.value = null;
-            if (!controlState.value.selectedWeapon || !controlState.value.selectedTarget) return;
-
-            try {
-                dvLoading.value = true;
-                const response = await cachedPost('/getvisibletokens', {
-                    selectedWeapon: controlState.value.selectedWeapon
-                }, 1000);
-
-                const payload = response?.data?.data?.result;
-                if (!isDeepEqual(dvInfo.value || {}, payload || {})) {
-                    dvInfo.value = payload;
-                }
-            } catch (e) {
-                console.error('Error fetching DV', e);
-                dvError.value = 'Unable to fetch DV.';
-            } finally {
-                dvLoading.value = false;
-            }
-        };
-
-        const debouncedFetchDV = debounce(fetchDVForSelectedWeapon, 250);
-
-        const fetchRollModifiers = async () => {
-            rollModsError.value = null;
-            rollModsLoading.value = true;
-            rollModsData.value = null;
-
-            try {
-                if (!controlState.value.selectedWeapon) {
-                    rollModsError.value = 'No weapon selected. Choose a weapon in Control > Select Weapon.';
-                    return;
-                }
-
-                const response = await cachedPost('/getrollmodifiers', {
-                    selectedWeapon: controlState.value.selectedWeapon
-                }, 2500);
-
-                const data = response?.data?.data;
-                const payload = data?.result ? data.result : data;
-
-                if (!isDeepEqual(rollModsData.value || {}, payload || {})) {
-                    rollModsData.value = payload;
-                }
-
-                if (rollModsData.value?.error) {
-                    rollModsError.value = rollModsData.value.error;
-                    rollModsData.value = null;
-                }
-            } catch (e) {
-                console.error('Error fetching roll modifiers', e);
-                rollModsError.value = 'Unable to fetch roll modifiers.';
-            } finally {
-                rollModsLoading.value = false;
-            }
-        };
-
-        const getVisibleTokens = () => {
-            cachedPost("/listvisibletokens", {}, 1500).then(response => {
-                const d = response?.data?.data;
-                const payload = d?.result;
-                const list = Array.isArray(payload) ? payload : [];
-
-                // Patch existing array to prevent v-for destroy/re-create
-                const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
-                const newIds = list.map(e => e.id).sort().join(',');
-
-                if (currentIds !== newIds) {
-                    const prevSelectedId = controlState.value.selectedTarget?.id || null;
-                    mockEnemies.value = list;
-
-                    if (prevSelectedId) {
-                        const preserved = list.find(t => t.id === prevSelectedId);
-                        if (preserved && controlState.value.selectedTarget?.id !== preserved.id) {
-                            controlState.value.selectedTarget = preserved;
-                        }
-                    }
-                } else {
-                    list.forEach(newItem => {
-                        const existing = mockEnemies.value.find(e => e.id === newItem.id);
-                        if (existing) {
-                            if (existing.distanceM !== newItem.distanceM) existing.distanceM = newItem.distanceM;
-                            if (existing.name !== newItem.name) existing.name = newItem.name;
-                        }
-                    });
-                }
-
-                if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
-                    debouncedFetchDV();
-                }
+        const sendRequest = (data, url) => {
+            window.axios.post(url, data).then(response => {
+                setTimeout(() => fetchCharacterData(), 3000);
+                return response;
             }).catch(err => {
-                console.error('Error fetching visible tokens', err);
+                console.error('Error posting request', err);
+                popupMessage.value = "Neural uplink failed: Data packet lost.";
+                showPopup.value = true;
+                return err;
             });
         };
+
+        const updateStat = (stat, value) => {
+            if (charData.value) {
+                const key = stat.toLowerCase();
+                if (charData.value.data.system.stats[key]) {
+                    charData.value.data.system.stats[key].value = value;
+                    triggerRef(charData);
+                }
+            }
+            sendRequest({ label: stat, value: value }, "/updatestat");
+        };
+
+        const {
+            showResourceModal,
+            resourceLabel,
+            resourceValue,
+            resourceMax,
+            resourceColor,
+            bulkSign,
+            bulkAmount,
+            openResourceModal,
+            closeResourceModal,
+            stepResource,
+            applyBulkChange,
+            commitResourceValue
+        } = useResources(charData, updateStat);
 
         const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
@@ -963,7 +886,6 @@ export default {
             return groups;
         });
 
-        // --- METHODS ---
         const calculateBase = (skill) => {
             if (!charData.value) return 0;
             const statVal = charData.value.data.system.stats[skill.system.stat]?.value || 0;
@@ -981,153 +903,12 @@ export default {
             return result.charAt(0).toUpperCase() + result.slice(1);
         };
 
-        const sendRequest = (data, url) => {
-            window.axios.post(url, data).then(response => {
-                setTimeout(() => fetchCharacterData(), 3000);
-                return response;
-            }).catch(err => {
-                console.error('Error posting request', err);
-                popupMessage.value = "Neural uplink failed: Data packet lost.";
-                showPopup.value = true;
-                return err;
-            });
-        };
-
         const sendStatRequest = (stat) => sendRequest({ label: stat }, "/statrollrequest");
         const sendSkillRequest = (skill) => sendRequest({ label: skill }, "/skillrollrequest");
         const sendRoleRequest = (role) => sendRequest({ label: role, role: role, isAbility: false  }, "/rolerollrequest");
         const sendRoleAbilityRequest = (role, ability) => sendRequest({ label: ability, role: role, isAbility: true }, "/rolerollrequest");
         const sendDeathSave = () => sendRequest({}, "/deathsave");
         const sendFaceDown = () => sendRequest({}, "/facedown");
-
-        const updateStat = (stat, value) => {
-            if (charData.value) {
-                const key = stat.toLowerCase();
-                if (charData.value.data.system.stats[key]) {
-                    charData.value.data.system.stats[key].value = value;
-                    triggerRef(charData);
-                }
-            }
-            sendRequest({ label: stat, value: value }, "/updatestat");
-        };
-
-        const clampResource = (val) => {
-            const max = Number(resourceMax.value) || 0;
-            if (max <= 0) return Math.max(0, Math.floor(val));
-            return Math.max(0, Math.min(max, Math.floor(val)));
-        };
-
-        const openResourceModal = (label, current, max, color) => {
-            resourceLabel.value = label;
-            resourceValue.value = clampResource(Number(current) || 0);
-            resourceMax.value = Number(max) || 0;
-            resourceColor.value = color || 'text-white';
-            bulkSign.value = '+';
-            bulkAmount.value = 0;
-            showResourceModal.value = true;
-        };
-
-        const closeResourceModal = () => (showResourceModal.value = false);
-        const stepResource = (delta) => (resourceValue.value = clampResource(resourceValue.value + (delta || 0)));
-
-        const applyBulkChange = () => {
-            const amt = Math.abs(Number(bulkAmount.value) || 0);
-            if (!amt) return;
-            const sign = bulkSign.value === '-' ? -1 : 1;
-            resourceValue.value = clampResource(resourceValue.value + sign * amt);
-        };
-
-        const commitResourceValue = () => {
-            if (charData.value) {
-                if (resourceLabel.value === 'HIT POINTS') {
-                    const hp = charData.value.data.system.derivedStats.hp;
-                    if (hp) hp.value = resourceValue.value;
-                } else if (resourceLabel.value === 'HUMANITY') {
-                    const hum = charData.value.data.system.derivedStats.humanity;
-                    if (hum) hum.value = resourceValue.value;
-                }
-                triggerRef(charData);
-            }
-            updateStat(resourceLabel.value, resourceValue.value);
-            showResourceModal.value = false;
-        };
-
-        const openRollPanel = async () => {
-            showRollPanel.value = true;
-            await fetchRollModifiers();
-            if (controlState.value.selectedWeapon) {
-                fetchDVForSelectedWeapon();
-            }
-        };
-
-        const closeRollPanel = () => (showRollPanel.value = false);
-
-        let moveRefreshTimer = null;
-        const moveToken = (direction) => {
-            window.axios.post("/movetoken", { direction }).then(() => {
-                setTimeout(() => fetchCharacterData(), 3000);
-            });
-            if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
-            moveRefreshTimer = setTimeout(() => {
-                getVisibleTokens();
-                if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
-                    debouncedFetchDV();
-                }
-            }, 4000);
-        };
-
-        const targetToken = (tokenId) => {
-            window.axios.post("/targettokens", { token: tokenId }).then(() => {
-                setTimeout(() => fetchCharacterData(), 3000);
-            });
-        };
-
-        const rollHit = () => {
-            if (!controlState.value.selectedTarget) return throwError("No Target Selected");
-            if (!controlState.value.selectedWeapon) return throwError("No Weapon Selected");
-            if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
-
-            window.axios.post("/attackroll", controlState.value).then(() => {
-                setTimeout(() => fetchCharacterData(), 3000);
-            });
-        };
-
-        const rollDamage = () => {
-            window.axios.post("/damageroll", controlState.value).then(() => {
-                setTimeout(() => fetchCharacterData(), 3000);
-            });
-        };
-
-        const checkReloadRequired = () => {
-            if (controlState.value.selectedWeapon) {
-                const weapon = controlState.value.selectedWeapon;
-                controlState.value.reloadRequired = weapon.system.magazine && weapon.system.magazine.max > 0 && weapon.system.magazine.value === 0;
-            } else {
-                controlState.value.reloadRequired = false;
-            }
-        };
-
-        const reloadWeapon = () => {
-            if (controlState.value.selectedWeapon) {
-                sendRequest(controlState.value, "/reloadweapon");
-            }
-        };
-
-        const throwError = (message) => {
-            popupMessage.value = message;
-            showPopup.value = true;
-        };
-
-        const logout = () => {
-            window.axios.post('/logout').then(() => {
-                window.location.href = '/login';
-            });
-        };
-
-        const close = () => {
-            if (charData.value) showPopup.value = false;
-            else logout();
-        };
 
         const toggleCategory = (category) => {
             collapsedCategories.value[category] = !collapsedCategories.value[category];
@@ -1141,15 +922,22 @@ export default {
 
         const goToSettings = () => (window.location.href = '/settings');
 
-        // --- LIFECYCLE ---
-        onMounted(async () => {
-            await fetchCharacterData(true);
-            refreshInterval.value = setInterval(() => fetchCharacterData(), 30000);
-        });
-
-        onUnmounted(() => {
-            if (refreshInterval.value) clearInterval(refreshInterval.value);
-            if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
+        const availableFireModes = computed(() => {
+            const modes = [
+                { id: 'Single', label: 'Single', icon: 'locate' },
+                { id: 'Aimed', label: 'Aimed', icon: 'locate-fixed' }
+            ];
+            const weapon = controlState.value.selectedWeapon;
+            if (weapon && weapon.system && weapon.system.fireModes) {
+                const fm = weapon.system.fireModes;
+                if (typeof fm.autoFire === 'number' && fm.autoFire !== 0) {
+                    modes.push({ id: 'Auto', label: `Auto (${fm.autoFire})`, icon: 'zap' });
+                }
+                if (fm.suppressiveFire) {
+                    modes.push({ id: 'Suppress', label: 'Suppress', icon: 'shield-alert' });
+                }
+            }
+            return modes;
         });
 
         // --- WATCHERS ---
@@ -1175,7 +963,14 @@ export default {
             checkReloadRequired();
             if (newWeapon) {
                 debouncedFetchDV();
+                // Pre-fetch roll modifiers without opening the panel
                 fetchRollModifiers();
+
+                // Ensure current fireMode is still available for the new weapon
+                const availableIds = availableFireModes.value.map(m => m.id);
+                if (!availableIds.includes(controlState.value.fireMode)) {
+                    controlState.value.fireMode = 'Single';
+                }
             } else {
                 dvInfo.value = null;
             }
@@ -1200,6 +995,7 @@ export default {
             collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems, refreshIcons,
             logout, close,
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToSettings,
+            availableFireModes,
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
@@ -1244,5 +1040,21 @@ export default {
 }
 .cpr-description strong {
     color: #ef4444; /* red-500 */
+}
+
+/* Firing Mode List Animation */
+.mode-list-move,
+.mode-list-enter-active,
+.mode-list-leave-active {
+    transition: all 0.3s ease;
+}
+.mode-list-enter-from,
+.mode-list-leave-to {
+    opacity: 0;
+    transform: scale(0.8);
+}
+.mode-list-leave-active {
+    position: absolute;
+    opacity: 0;
 }
 </style>

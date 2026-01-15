@@ -1,6 +1,6 @@
 import { ref, watch, onUnmounted } from 'vue';
-import { debounce, cachedPost } from '../utils/helpers';
-
+import { debounce } from '../utils/helpers';
+import { cachedPost } from '../utils/api';
 /**
  * Composable for combat-related logic (movement, target selection, rolls)
  */
@@ -163,6 +163,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         rollHit,
         rollDamage,
         checkReloadRequired,
-        reloadWeapon
+        reloadWeapon,
+        fetchDVForSelectedWeapon
     };
 }

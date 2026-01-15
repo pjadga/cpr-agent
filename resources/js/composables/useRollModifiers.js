@@ -1,6 +1,6 @@
 import { ref } from 'vue';
-import { debounce, cachedPost, isDeepEqual } from '../utils/helpers';
-
+import { debounce, isDeepEqual } from '../utils/helpers';
+import { cachedPost } from '../utils/api';
 /**
  * Composable for fetching and managing roll modifiers (bonuses/penalties)
  */
@@ -66,6 +66,7 @@ export function useRollModifiers(controlState) {
         rollModsData,
         debouncedFetchRollModifiers,
         openRollPanel,
-        closeRollPanel
+        closeRollPanel,
+        fetchRollModifiers
     };
 }
