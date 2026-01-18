@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Cyberdeck\InstallProgram;
+use App\Http\Controllers\Cyberdeck\RemoveProgram;
+use App\Http\Controllers\Cyberdeck\ToggleRez;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
 use App\Http\Controllers\Data\GetRollModifiers;
@@ -82,6 +85,9 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/getrollmodifiers", [GetRollModifiers::class, "getRollModifiers"]);
     Route::post("/deathsave", [DeathSave::class, "getDeathSave"]);
     Route::post("/facedown", [FaceDown::class, "getFaceDown"]);
+    Route::post("/installprogram", [InstallProgram::class, "installProgram"]);
+    Route::post("/uninstallprogram", [RemoveProgram::class, "removeProgram"]);
+    Route::post("/toggleprogramrez", [ToggleRez::class, "toggleRez"]);
 });
 
 require __DIR__.'/auth.php';

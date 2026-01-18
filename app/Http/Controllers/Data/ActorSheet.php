@@ -121,6 +121,13 @@ class ActorSheet extends FormRequest
                 'installLocation' => $sys['installLocation'] ?? '',
                 'installedItems'  => $sys['installedItems'] ?? [], // Keeps slot data
                 'cyberwareType' => $sys['type'] ?? '',
+                'class' => $sys['class'] ?? '',
+                'isRezzed' => $sys['isRezzed'] ?? false,
+                'def' => $sys['def'] ?? 0,
+                'atk' => $sys['atk'] ?? 0,
+                'rez' => $sys['rez'] ?? 0,
+                'per' => $sys['per'] ?? 0,
+                'spd' => $sys['spd'] ?? 0,
 
                 // Armor Specifics
                 'armor-head' => $sys['headLocation'] ?? [],

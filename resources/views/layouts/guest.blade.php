@@ -4,6 +4,10 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
 
         <title>{{ config('app.name', 'Cyberpunk') }}</title>
 
