@@ -430,7 +430,23 @@
 
                     </div>
 
-                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20 absolute w-full top-0 left-0 p-3 pb-20">
+                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20 absolute w-full top-0 left-0 p-3 pb-20 transition-colors duration-500"
+                         :class="controlState.spaceMode === 'netspace' ? 'bg-blue-950/20' : ''">
+
+                        <div class="flex justify-center mb-6">
+                            <div class="flex p-1 bg-gray-900 rounded-lg border border-gray-800 shadow-lg w-full max-w-xs">
+                                <button @click="controlState.spaceMode = 'meatspace'"
+                                        class="flex-1 py-2 text-xs font-bold uppercase tracking-widest transition-all rounded-md flex items-center justify-center gap-2"
+                                        :class="controlState.spaceMode === 'meatspace' ? 'bg-red-600 text-black shadow-[0_0_10px_rgba(220,38,38,0.5)]' : 'text-gray-500 hover:text-gray-300'">
+                                    <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Meatspace
+                                </button>
+                                <button @click="controlState.spaceMode = 'netspace'"
+                                        class="flex-1 py-2 text-xs font-bold uppercase tracking-widest transition-all rounded-md flex items-center justify-center gap-2"
+                                        :class="controlState.spaceMode === 'netspace' ? 'bg-blue-500 text-black shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'text-gray-500 hover:text-gray-300'">
+                                    <i v-icon data-lucide="cpu" class="w-3.5 h-3.5"></i> Netspace
+                                </button>
+                            </div>
+                        </div>
 
                         <div class="flex justify-center my-6">
                             <div class="grid grid-cols-3 gap-2 p-4 bg-gray-900/50 rounded-full border border-gray-800 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
@@ -478,64 +494,99 @@
                             </div>
                         </div>
 
-                        <div>
-                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Select Weapon</h3>
-                            <div class="space-y-2">
-                                <div v-if="groupedEquipped.weapon.length === 0" class="text-gray-600 text-xs italic p-2 border border-dashed border-gray-800 text-center">
-                                    No weapons equipped.
-                                </div>
-                                <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
-                                     @click="controlState.selectedWeapon = weapon"
-                                     class="cursor-pointer transition-all duration-200">
-                                    <div class="relative" :class="{'border-2 border-red-600': controlState.selectedWeapon?._id === weapon._id}">
-                                        <item-row :item="weapon" category="weapon" :all-items="charData.data.items"></item-row>
-                                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="absolute -top-2 -right-2 bg-red-600 text-black text-[9px] font-black px-1 uppercase z-20">Active</div>
+                        <div v-if="controlState.spaceMode === 'meatspace'" class="space-y-6">
+                            <div>
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Select Weapon</h3>
+                                <div class="space-y-2">
+                                    <div v-if="groupedEquipped.weapon.length === 0" class="text-gray-600 text-xs italic p-2 border border-dashed border-gray-800 text-center">
+                                        No weapons equipped.
+                                    </div>
+                                    <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
+                                         @click="controlState.selectedWeapon = weapon"
+                                         class="cursor-pointer transition-all duration-200">
+                                        <div class="relative" :class="{'border-2 border-red-600': controlState.selectedWeapon?._id === weapon._id}">
+                                            <item-row :item="weapon" category="weapon" :all-items="charData.data.items"></item-row>
+                                            <div v-if="controlState.selectedWeapon?._id === weapon._id" class="absolute -top-2 -right-2 bg-red-600 text-black text-[9px] font-black px-1 uppercase z-20">Active</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="mb-4">
-                            <button @click="reloadWeapon"
-                                    class="w-full py-4 bg-blue-900/20 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
-                                    :class="{'animate-pulse-purple': controlState.reloadRequired}">
-                                <i v-icon data-lucide="refresh-cw" class="w-5 h-5"></i> Reload Equipped Weapon
-                            </button>
-                        </div>
-
-                        <div class="cpr-panel p-4 bg-[#111]">
-                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
-                            <transition-group
-                                name="mode-list"
-                                tag="div"
-                                class="flex gap-2"
-                            >
-                                <button v-for="mode in availableFireModes" :key="mode.id"
-                                        @click="controlState.fireMode = mode.id"
-                                        class="flex-1 py-3 text-[10px] font-bold uppercase border transition-all flex flex-col items-center gap-1 min-w-0"
-                                        :class="controlState.fireMode === mode.id ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
-                                    <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i>
-                                    {{ mode.label }}
+                            <div class="mb-4">
+                                <button @click="reloadWeapon"
+                                        class="w-full py-4 bg-blue-900/20 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
+                                        :class="{'animate-pulse-purple': controlState.reloadRequired}">
+                                    <i v-icon data-lucide="refresh-cw" class="w-5 h-5"></i> Reload Equipped Weapon
                                 </button>
-                            </transition-group>
+                            </div>
+
+                            <div class="cpr-panel p-4 bg-[#111]">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
+                                <transition-group
+                                    name="mode-list"
+                                    tag="div"
+                                    class="flex gap-2"
+                                >
+                                    <button v-for="mode in availableFireModes" :key="mode.id"
+                                            @click="controlState.fireMode = mode.id"
+                                            class="flex-1 py-3 text-[10px] font-bold uppercase border transition-all flex flex-col items-center gap-1 min-w-0"
+                                            :class="controlState.fireMode === mode.id ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
+                                        <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i>
+                                        {{ mode.label }}
+                                    </button>
+                                </transition-group>
+                            </div>
+
+                            <div v-if="dvInfo && controlState.selectedWeapon" class="text-center py-3">
+                                <div class="text-4xl font-black tracking-widest" :class="dvInfo.dv === 'Out of Range' ? 'text-red-500' : 'text-white'">
+                                    DV: <span>{{ dvInfo.dv }}</span>
+                                </div>
+                                <div class="text-[15px] text-gray-500 uppercase font-bold mt-1" v-if="dvInfo.distanceMeters && dvInfo.weaponCategory">
+                                    {{ dvInfo.weaponCategory }} • {{ dvInfo.distanceMeters }}m
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 pt-4 sticky bottom-20 z-40 bg-gradient-to-t from-black via-black to-transparent p-3 -mx-3">
+                                <button @click="rollHit" class="cpr-panel bg-red-900/20 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
+                                    <i v-icon data-lucide="crosshair" class="w-5 h-5"></i> Roll Hit
+                                </button>
+                                <button @click="rollDamage" class="cpr-panel bg-yellow-900/20 border-2 border-yellow-600 text-yellow-500 hover:bg-yellow-500 hover:text-black py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
+                                    <i v-icon data-lucide="skull" class="w-5 h-5"></i> Roll Dmg
+                                </button>
+                            </div>
                         </div>
 
-                        <div v-if="dvInfo && controlState.selectedWeapon" class="text-center py-3">
-                            <div class="text-4xl font-black tracking-widest" :class="dvInfo.dv === 'Out of Range' ? 'text-red-500' : 'text-white'">
-                                DV: <span>{{ dvInfo.dv }}</span>
+                        <div v-else-if="controlState.spaceMode === 'netspace'" class="space-y-6">
+                            <div>
+                                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 px-1">Cyberdeck & Programs</h3>
+                                <div class="space-y-2">
+                                    <div v-if="cyberdeckItems.length === 0" class="text-gray-600 text-xs italic p-2 border border-dashed border-gray-800 text-center">
+                                        No Cyberdeck or Programs found.
+                                    </div>
+                                    <div v-for="item in cyberdeckItems" :key="item._id"
+                                         @click="rollProgram(item)"
+                                         class="cursor-pointer transition-all duration-200">
+                                        <div class="relative group" :class="{'border-2 border-blue-500': controlState.selectedProgram?._id === item._id}">
+                                            <item-row :item="item" :category="item.type" :all-items="charData.data.items"></item-row>
+                                            <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 pointer-events-none transition-colors"></div>
+                                            <div v-if="controlState.selectedProgram?._id === item._id" class="absolute -top-2 -right-2 bg-blue-500 text-black text-[9px] font-black px-1 uppercase z-20">Last Used</div>
+                                            <div class="absolute right-12 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <div class="bg-blue-500 text-black text-[10px] font-black px-2 py-1 uppercase rounded-sm flex items-center gap-1">
+                                                    <i v-icon data-lucide="zap" class="w-3 h-3"></i> Execute
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-[15px] text-gray-500 uppercase font-bold mt-1" v-if="dvInfo.distanceMeters && dvInfo.weaponCategory">
-                                {{ dvInfo.weaponCategory }} • {{ dvInfo.distanceMeters }}m
-                            </div>
-                        </div>
 
-                        <div class="grid grid-cols-2 gap-3 pt-4 sticky bottom-20 z-40 bg-gradient-to-t from-black via-black to-transparent p-3 -mx-3">
-                            <button @click="rollHit" class="cpr-panel bg-red-900/20 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i v-icon data-lucide="crosshair" class="w-5 h-5"></i> Roll Hit
-                            </button>
-                            <button @click="rollDamage" class="cpr-panel bg-yellow-900/20 border-2 border-yellow-600 text-yellow-500 hover:bg-yellow-500 hover:text-black py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
-                                <i v-icon data-lucide="skull" class="w-5 h-5"></i> Roll Dmg
-                            </button>
+                            <div class="cpr-panel p-6 bg-blue-900/10 border border-blue-500/30 text-center space-y-4">
+                                <i v-icon data-lucide="monitor" class="w-12 h-12 text-blue-500 mx-auto animate-pulse"></i>
+                                <div>
+                                    <h4 class="text-blue-400 font-black uppercase tracking-tighter text-lg">Neural Uplink Active</h4>
+                                    <p class="text-[10px] text-blue-500/60 font-mono uppercase tracking-widest">Select a program to execute in the NET</p>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
@@ -689,8 +740,10 @@ export default {
 
         // --- CONTROL PANEL STATE ---
         const controlState = ref({
+            spaceMode: 'meatspace',
             selectedTarget: null,
             selectedWeapon: null,
+            selectedProgram: null,
             fireMode: 'Single',
             reloadRequired: false
         });
@@ -812,7 +865,7 @@ export default {
                 }
             });
             const cyberware = allItems.filter(i =>
-                ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(i.type) &&
+                ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal', 'cyberdeck'].includes(i.type) &&
                 !installedIds.has(i._id)
             );
             const groups = {};
@@ -866,11 +919,43 @@ export default {
                     return;
                 }
                 if (groups[item.type]) groups[item.type].push(item);
-                else if (!['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal'].includes(item.type)) {
+                else if (!['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal', 'cyberdeck', 'program'].includes(item.type)) {
                     groups.gear.push(item);
                 }
             });
             return groups;
+        });
+
+        const cyberdeckItems = computed(() => {
+            if (!charData.value) return [];
+            const allItems = charData.value.data.items;
+            // First, get all items of type 'program'
+            const allPrograms = allItems.filter(i => i.type === 'program');
+
+            // Get all cyberdecks
+            const decks = allItems.filter(i => i.type === 'cyberdeck');
+
+            const result = [];
+            const programsInDecks = new Set();
+
+            decks.forEach(deck => {
+                result.push(deck);
+                if (deck.system.installedItems && deck.system.installedItems.list) {
+                    deck.system.installedItems.list.forEach(id => {
+                        const prog = allPrograms.find(i => i._id === id);
+                        if (prog) {
+                            result.push(prog);
+                            programsInDecks.add(id);
+                        }
+                    });
+                }
+            });
+
+            // Also include programs that aren't installed in a deck but are on the person
+            const uninstalledPrograms = allPrograms.filter(p => !programsInDecks.has(p._id));
+            result.push(...uninstalledPrograms);
+
+            return result;
         });
 
         const groupedSkills = computed(() => {
@@ -908,6 +993,13 @@ export default {
         const sendRoleRequest = (role) => sendRequest({ label: role, role: role, isAbility: false  }, "/rolerollrequest");
         const sendRoleAbilityRequest = (role, ability) => sendRequest({ label: ability, role: role, isAbility: true }, "/rolerollrequest");
         const sendDeathSave = () => sendRequest({}, "/deathsave");
+        const rollProgram = (program) => {
+            controlState.value.selectedProgram = program;
+            sendRequest({
+                ...controlState.value,
+                selectedProgram: program
+            }, "/programroll");
+        };
         const sendFaceDown = () => sendRequest({}, "/facedown");
 
         const toggleCategory = (category) => {
@@ -988,19 +1080,19 @@ export default {
 
         return {
             charData, loading, error, activeTab,
-            stats, luck, emp, roleItem,
+            stats, luck, emp, roleItem, cyberdeckItems,
             groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
             calculateBase, findItem, formatCategory, getImageUrl, sendStatRequest, sendSkillRequest,
-            sendRoleRequest, updateStat, showPopup, showImagePopup, popupMessage,
+            sendRoleRequest, sendRoleAbilityRequest, updateStat, showPopup, showImagePopup, popupMessage,
             collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems, refreshIcons,
-            logout, close,
+            logout, close, rollProgram,
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToSettings,
             availableFireModes,
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
             openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
-            sendDeathSave, sendFaceDown, sendRoleAbilityRequest
+            sendDeathSave, sendFaceDown
         };
     }
 };

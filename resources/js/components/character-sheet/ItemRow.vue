@@ -146,7 +146,7 @@ export default {
 
         const isMeleeOrUnarmed = computed(() => {
             const type = props.item.system.weaponType || '';
-            return type.toLowerCase().includes('melee') || type === 'unarmed' || props.item.system.isMelee || props.category === 'melee';
+            return type.toLowerCase().includes('melee') || type.toLowerCase().includes('martial') || type === 'unarmed' || props.item.system.isMelee || props.category === 'melee';
         });
 
         const ammoTotal = computed(() => {
