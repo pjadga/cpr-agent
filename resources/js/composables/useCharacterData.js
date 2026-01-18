@@ -25,15 +25,35 @@ export function useCharacterData() {
      * Construct full image URL
      */
     const getImageUrl = (path) => {
-        if (!path) return '';
+        if (!path) return '/systems/cyberpunk-red-core/icons/compendium/default/Default_Program.svg';
         if (path.startsWith('http')) return path;
-        if (baseUrl.value) return baseUrl.value + "/" + path;
 
-        // Fetch base URL if not yet available
-        window.axios.get("/getbaseurl").then(response => {
-            baseUrl.value = response.data;
-            return baseUrl.value + "/" + path;
-        });
+        let cleanPath = path;
+        if (path.startsWith('systems/cyberpunk-red-core/')) {
+            cleanPath = path.replace('systems/cyberpunk-red-core/', '/systems/cyberpunk-red-core/');
+        }
+
+        if (cleanPath.startsWith('/')) {
+            if (baseUrl.value) {
+                return baseUrl.value + cleanPath;
+            }
+            return cleanPath;
+        }
+
+        if (baseUrl.value) return baseUrl.value + "/" + cleanPath;
+        return cleanPath;
+    };
+
+    /**
+     * Fetch base URL for images
+     */
+    const fetchBaseUrl = async () => {
+        try {
+            const response = await window.axios.get("/getbaseurl");
+            baseUrl.value = response.data.replace(/\/$/, ''); // Remove trailing slash if any
+        } catch (err) {
+            console.error("Error fetching base URL:", err);
+        }
     };
 
     /**
@@ -73,9 +93,10 @@ export function useCharacterData() {
     };
 
     onMounted(async () => {
+        await fetchBaseUrl();
         await fetchCharacterData(true);
-        // Poll for updates every 30 seconds
-        refreshInterval = setInterval(() => fetchCharacterData(), 30000);
+        // Poll for updates every 60 seconds (reduced frequency)
+        refreshInterval = setInterval(() => fetchCharacterData(), 60000);
     });
 
     onUnmounted(() => {

@@ -35,3 +35,31 @@ export function arraysEqualShallow(a, b) {
     const bIds = b.map(i => i.id || JSON.stringify(i)).join(',');
     return aIds === bIds;
 }
+
+/**
+ * Find an item by ID in a list
+ */
+export function findItemInList(id, list) {
+    if (!id || !list) return null;
+    return list.find(i => i._id === id);
+}
+
+/**
+ * Format internal names into human-readable categories
+ */
+export function formatCategoryName(cat) {
+    if (!cat) return 'Other';
+    if (cat === 'installedPrograms') return 'Installed Programs';
+    const result = cat.replace(/([A-Z])/g, ' $1').trim();
+    return result.charAt(0).toUpperCase() + result.slice(1);
+}
+
+/**
+ * Strips HTML tags from a string
+ */
+export function stripHtmlTags(html) {
+    if(!html) return '';
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+}

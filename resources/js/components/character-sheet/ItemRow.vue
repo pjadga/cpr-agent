@@ -14,6 +14,9 @@
         </div>
 
         <div class="flex items-stretch min-h-[3.5rem]">
+            <div class="flex items-center pl-3 py-2 shrink-0">
+                <img :src="getImageUrl(item.img)" class="w-10 h-10 object-cover border border-gray-700 bg-black/50" />
+            </div>
             <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
                 <div class="flex justify-between items-start pr-2">
                     <div class="flex flex-col">
@@ -122,6 +125,8 @@
 <script>
 import { ref, computed } from 'vue';
 import { vIcon } from '../../directives/icon';
+import { useCharacterData } from '../../composables/useCharacterData';
+import { findItemInList, formatCategoryName } from '../../utils/helpers';
 
 export default {
     name: 'ItemRow',
@@ -129,20 +134,15 @@ export default {
     directives: { icon: vIcon },
     emits: ['click'],
     setup(props) {
+        const { getImageUrl } = useCharacterData();
         const expanded = ref(false);
         const toggle = () => {
             expanded.value = !expanded.value;
         };
-        const formatType = (type) => {
-            if (!type) return 'Other';
-            const result = type.replace(/([A-Z])/g, ' $1').trim();
-            return result.charAt(0).toUpperCase() + result.slice(1);
-        };
 
-        const findItem = (id) => {
-            if (!id || !props.allItems) return null;
-            return props.allItems.find(i => i._id === id);
-        };
+        const formatType = formatCategoryName;
+
+        const findItem = (id) => findItemInList(id, props.allItems);
 
         const isMeleeOrUnarmed = computed(() => {
             const type = props.item.system.weaponType || '';
@@ -261,7 +261,7 @@ export default {
             };
         });
 
-        return { expanded, toggle, formatType, findItem, ammoName, ammoTotal, isMeleeOrUnarmed, armorDisplay, statusLine };
+        return { expanded, toggle, formatType, findItem, ammoName, ammoTotal, isMeleeOrUnarmed, armorDisplay, statusLine, getImageUrl };
     }
 };
 </script>

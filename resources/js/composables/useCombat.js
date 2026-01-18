@@ -70,12 +70,14 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
     const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
+    const debouncedFetchCharacterData = debounce(fetchCharacterData, 1000);
+
     /**
      * Move character token
      */
     const moveToken = (direction) => {
         window.axios.post("/movetoken", { direction }).then(() => {
-            setTimeout(fetchCharacterData, 3000);
+            debouncedFetchCharacterData();
         });
         if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
         moveRefreshTimer = setTimeout(() => {
@@ -91,7 +93,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const targetToken = (tokenId) => {
         window.axios.post("/targettokens", { token: tokenId }).then(() => {
-            setTimeout(fetchCharacterData, 3000);
+            debouncedFetchCharacterData();
         });
     };
 
@@ -104,7 +106,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
 
         window.axios.post("/attackroll", controlState.value).then(() => {
-            setTimeout(fetchCharacterData, 3000);
+            debouncedFetchCharacterData();
         });
     };
 
@@ -113,7 +115,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const rollDamage = () => {
         window.axios.post("/damageroll", controlState.value).then(() => {
-            setTimeout(fetchCharacterData, 3000);
+            debouncedFetchCharacterData();
         });
     };
 
@@ -135,7 +137,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const reloadWeapon = () => {
         if (controlState.value.selectedWeapon) {
             window.axios.post("/reloadweapon", controlState.value).then(() => {
-                setTimeout(fetchCharacterData, 3000);
+                debouncedFetchCharacterData();
             });
         }
     };

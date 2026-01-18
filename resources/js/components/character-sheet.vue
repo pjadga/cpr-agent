@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen pb-100 text-sans">
+    <div class="min-h-screen pb-100 text-sans bg-[#050505]">
 
         <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
             <div class="flex flex-col items-center">
@@ -33,90 +33,47 @@
             </div>
         </div>
 
-        <div v-if="showPopup" class="fixed inset-0 z-[100] flex items-center justify-center p-6 backdrop-blur-sm bg-black/60">
-            <div class="cpr-panel w-full max-w-xs bg-black border-2 border-red-600 shadow-[0_0_20px_rgba(220,38,38,0.3)] animate-in fade-in zoom-in duration-200">
-                <div class="bg-red-600 p-2 flex justify-between items-center">
-                    <span class="text-xs font-black text-black tracking-tighter uppercase italic">SYSTEM ALERT</span>
-                    <button @click="close" class="text-black hover:text-white transition-colors">
-                        <i v-icon data-lucide="x" class="w-4 h-4"></i>
-                    </button>
-                </div>
-                <div class="p-4 space-y-4">
-                    <div class="flex gap-3">
-                        <div class="shrink-0 w-10 h-10 border border-red-500 flex items-center justify-center text-red-500 bg-red-900/10">
-                            <i v-icon data-lucide="alert-triangle" class="w-6 h-6"></i>
-                        </div>
-                        <div class="space-y-1">
-                            <h4 class="text-red-500 font-bold text-sm uppercase">Connection Error</h4>
-                            <p class="text-gray-300 text-xs font-mono leading-relaxed">{{ popupMessage }}</p>
-                        </div>
-                    </div>
-                    <button @click="close" class="w-full py-2 bg-red-600/10 border border-red-600 text-red-500 text-xs font-bold uppercase hover:bg-red-600 hover:text-white transition-all">
-                        Acknowledge
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
-            <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200" @click.stop>
-                <div class="absolute top-0 right-0 m-4">
-                    <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
-                        <i v-icon data-lucide="x" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
-                <div class="mt-4 text-center">
-                    <h2 class="text-white font-bold uppercase tracking-widest text-lg">{{ charData.data.name }}</h2>
-                </div>
-            </div>
-        </div>
-
-        <div v-if="showResourceModal" class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/70" @click="closeResourceModal">
-            <div class="w-full max-w-xs bg-[#0b0b0b] border border-gray-800 shadow-2xl" @click.stop>
-                <div class="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-black/40">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Adjust {{ resourceLabel }}</span>
-                    <button class="text-gray-400 hover:text-white" @click="closeResourceModal"><i v-icon data-lucide="x" class="w-4 h-4"></i></button>
-                </div>
-                <div class="p-4 space-y-4">
-                    <div class="flex items-center justify-center gap-3">
-                        <button class="w-10 h-10 bg-gray-900 border border-gray-700 text-white font-bold hover:bg-red-900/40" @click="stepResource(-1)">-</button>
-                        <div class="text-center">
-                            <div class="text-xs text-gray-500 uppercase font-bold tracking-widest">Current</div>
-                            <div class="text-4xl font-black font-mono" :class="resourceColor">{{ resourceValue }}</div>
-                            <div class="text-xs text-gray-600 font-mono">/ {{ resourceMax }}</div>
-                        </div>
-                        <button class="w-10 h-10 bg-gray-900 border border-gray-700 text-white font-bold hover:bg-green-900/40" @click="stepResource(1)">+</button>
-                    </div>
-
-                    <div class="space-y-2">
-                        <div class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Bulk adjust</div>
-                        <div class="flex items-center gap-2 w-full">
-                            <div class="flex shrink-0">
-                                <button class="px-4 py-3 text-base border border-gray-700 rounded-sm"
-                                        :class="bulkSign === '+' ? 'bg-green-900/40 text-green-300' : 'bg-gray-900 text-gray-300'"
-                                        @click="bulkSign = '+'">+</button>
-                                <button class="px-4 py-3 text-base border border-gray-700 -ml-px rounded-sm"
-                                        :class="bulkSign === '-' ? 'bg-red-900/40 text-red-300' : 'bg-gray-900 text-gray-300'"
-                                        @click="bulkSign = '-'">-</button>
-                            </div>
-                            <input type="number" inputmode="numeric" pattern="[0-9]*" min="0"
-                                   class="flex-1 min-w-0 bg-black border border-gray-800 px-3 py-2 text-white placeholder-gray-600"
-                                   v-model.number="bulkAmount" placeholder="Amount"/>
-                            <button class="shrink-0 px-4 py-3 bg-gray-900 border border-gray-700 text-white text-base hover:bg-gray-800"
-                                    @click="applyBulkChange">Apply</button>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2 pt-2">
-                        <button class="flex-1 py-2 bg-red-600/10 border border-red-600 text-red-500 text-xs font-bold uppercase hover:bg-red-600 hover:text-black transition-colors" @click="closeResourceModal">Cancel</button>
-                        <button class="flex-1 py-2 bg-green-600/10 border border-green-600 text-green-500 text-xs font-bold uppercase hover:bg-green-600 hover:text-black transition-colors" @click="commitResourceValue">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <div v-if="!loading && charData && !error">
+            <!-- Modals & Popups -->
+            <cyberdeck-config
+                v-if="showCyberdeckConfig"
+                :active-cyberdeck="activeCyberdeck"
+                :available-programs="availablePrograms"
+                @close="showCyberdeckConfig = false"
+                @install="installProgram"
+                @uninstall="uninstallProgram">
+            </cyberdeck-config>
+
+            <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
+                <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200" @click.stop>
+                    <div class="absolute top-0 right-0 m-4">
+                        <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
+                            <i v-icon data-lucide="x" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                    <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
+                    <div class="mt-4 text-center">
+                        <h2 class="text-white font-bold uppercase tracking-widest text-lg">{{ charData.data.name }}</h2>
+                    </div>
+                </div>
+            </div>
+
+            <resource-modal
+                :show="showResourceModal"
+                :resource-label="resourceLabel"
+                :resource-value="resourceValue"
+                :resource-max="resourceMax"
+                :resource-color="resourceColor"
+                :bulk-sign="bulkSign"
+                :bulk-amount="bulkAmount"
+                @close="closeResourceModal"
+                @step="stepResource"
+                @update:bulkSign="bulkSign = $event"
+                @update:bulkAmount="bulkAmount = $event"
+                @applyBulk="applyBulkChange"
+                @save="commitResourceValue">
+            </resource-modal>
+
             <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
                 <div class="flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
@@ -148,449 +105,71 @@
             <main class="p-3 max-w-md mx-auto space-y-4 relative min-h-[60vh]">
 
                 <transition name="fade">
+                    <stats-tab
+                        v-if="activeTab === 'stats'"
+                        :active-tab="activeTab"
+                        :char-data="charData"
+                        :stats="stats"
+                        :luck="luck"
+                        :emp="emp"
+                        :grouped-equipped="groupedEquipped"
+                        @open-resource="openResourceModal"
+                        @stat-request="sendStatRequest"
+                        @update-stat="updateStat"
+                        @facedown="sendFaceDown"
+                        @deathsave="sendDeathSave"
+                        @item-click="handleItemClick"
+                    ></stats-tab>
 
-                    <div v-if="activeTab === 'stats'" key="stats" class="space-y-5 absolute w-full top-0 left-0 p-3 pb-20">
+                    <skills-tab
+                        v-else-if="activeTab === 'skills'"
+                        :active-tab="activeTab"
+                        :role-item="roleItem"
+                        :expanded-role-items="expandedRoleItems"
+                        :grouped-skills="groupedSkills"
+                        :collapsed-categories="collapsedCategories"
+                        :calculate-base="calculateBase"
+                        @role-request="sendRoleRequest"
+                        @role-ability-request="sendRoleAbilityRequest"
+                        @toggle-role="toggleRoleExpansion"
+                        @toggle-category="toggleCategory"
+                        @skill-request="sendSkillRequest"
+                    ></skills-tab>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <resource-counter label="HIT POINTS"
-                                              :current="charData.data.system.derivedStats.hp.value"
-                                              :max="charData.data.system.derivedStats.hp.max"
-                                              color="text-green-500"
-                                              @edit="openResourceModal('HIT POINTS', charData.data.system.derivedStats.hp.value, charData.data.system.derivedStats.hp.max, 'text-green-500')">
-                            </resource-counter>
-                            <resource-counter label="HUMANITY"
-                                              :current="charData.data.system.derivedStats.humanity.value"
-                                              :max="charData.data.system.derivedStats.humanity.max"
-                                              color="text-blue-500"
-                                              @edit="openResourceModal('HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-blue-500')">
-                            </resource-counter>
-                        </div>
+                    <gear-tab
+                        v-else-if="activeTab === 'gear'"
+                        :active-tab="activeTab"
+                        :collapsed-categories="collapsedCategories"
+                        :grouped-cyberware="groupedCyberware"
+                        :grouped-gear="groupedGear"
+                        :char-data="charData"
+                        @toggle-category="toggleCategory"
+                        @item-click="handleItemClick"
+                    ></gear-tab>
 
-                        <div class="grid grid-cols-4 gap-2">
-                            <simple-stat label="INT" :value="stats.int?.value" @click="sendStatRequest('INT')"></simple-stat>
-                            <simple-stat label="REF" :value="stats.ref?.value" @click="sendStatRequest('REF')"></simple-stat>
-                            <simple-stat label="DEX" :value="stats.dex?.value" @click="sendStatRequest('DEX')"></simple-stat>
-                            <simple-stat label="TECH" :value="stats.tech?.value" @click="sendStatRequest('TECH')"></simple-stat>
-                            <simple-stat label="COOL" :value="stats.cool?.value" @click="sendStatRequest('COOL')"></simple-stat>
-                            <simple-stat label="WILL" :value="stats.will?.value" @click="sendStatRequest('WILL')"></simple-stat>
-                            <simple-stat label="MOVE" :value="stats.move?.value" @click="sendStatRequest('MOVE')"></simple-stat>
-                            <simple-stat label="BODY" :value="stats.body?.value" @click="sendStatRequest('BODY')"></simple-stat>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <adjustable-stat label="LUCK"
-                                             v-model:current="luck.value"
-                                             :max="luck.max"
-                                             @updateStat="updateStat"
-                                             @sendStatRequest="sendStatRequest">
-                            </adjustable-stat>
-                            <adjustable-stat label="EMP"
-                                             v-model:current="emp.value"
-                                             :max="emp.max"
-                                             @updateStat="updateStat"
-                                             @sendStatRequest="sendStatRequest">
-                            </adjustable-stat>
-                        </div>
-
-                        <div class="bg-[#111] border border-gray-800 p-3 flex justify-between divide-x divide-gray-800">
-                            <div class="px-2 text-center w-1/4">
-                                <div class="text-[9px] text-gray-500 uppercase font-bold">Eurobucks</div>
-                                <div class="text-yellow-500 font-mono font-bold">{{
-                                        charData.data.system.wealth.value
-                                    }}eb
-                                </div>
-                            </div>
-                            <div class="px-2 text-center w-1/4">
-                                <div class="text-[9px] text-gray-500 uppercase font-bold">IP</div>
-                                <div class="text-white font-mono font-bold">
-                                    {{ charData.data.system.improvementPoints.value }}
-                                </div>
-                            </div>
-                            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-gray-800 transition-colors" @click="sendFaceDown">
-                                <div class="text-[9px] text-gray-500 uppercase font-bold">Reputation</div>
-                                <div class="text-white font-mono font-bold">{{
-                                        charData.data.system.reputation.value
-                                    }}
-                                </div>
-                            </div>
-                            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-gray-800 transition-colors" @click="sendDeathSave">
-                                <div class="text-[9px] text-gray-500 uppercase font-bold">Death Save</div>
-                                <div class="text-red-500 font-mono font-bold">
-                                    {{ charData.data.system.derivedStats.deathSave.penalty }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 class="text-sm font-bold text-white uppercase mb-4 border-b border-red-900 pb-1 flex items-center gap-2">
-                                <i v-icon data-lucide="crosshair" class="w-4 h-4 text-red-500"></i> Currently Equipped
-                            </h3>
-
-                            <div v-for="(items, category) in groupedEquipped" :key="category">
-                                <div v-if="items.length > 0" class="mb-4">
-                                    <h4 class="text-[9px] font-bold text-gray-500 uppercase mb-2 tracking-widest pl-1">{{ category }}</h4>
-                                    <div class="space-y-2">
-                                        <div v-for="item in items" :key="item._id">
-                                            <item-row
-                                                :item="item"
-                                                :category="category"
-                                                :all-items="charData.data.items"
-                                                @click="$emit('click', item)">
-                                            </item-row>
-                                            <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
-                                                 class="ml-6 mt-1 space-y-1 border-l border-red-900/50 pl-2">
-                                                <div v-for="childId in item.system.installedItems.list" :key="childId">
-                                                    <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" @click="$emit('click', charData.data.items.find(i => i._id === childId))"></item-row>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div v-if="Object.values(groupedEquipped).flat().length === 0" class="text-gray-600 text-xs italic p-2 text-center">
-                                No items equipped.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-else-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3 pb-20">
-                        <div v-if="roleItem" class="relative bg-black/60 border border-yellow-500/30 overflow-hidden clip-corner shadow-[0_0_15px_rgba(234,179,8,0.1)]">
-                            <!-- Role Header -->
-                            <div class="flex items-stretch bg-gradient-to-r from-yellow-900/40 to-transparent border-b border-yellow-500/20">
-                                <div @click="sendRoleRequest(roleItem.name)" class="flex-grow p-3 cursor-pointer hover:bg-yellow-500/10 transition-colors group">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="text-yellow-500 font-black uppercase text-base tracking-tighter group-hover:text-yellow-400 transition-colors">{{ roleItem.name }}</h3>
-                                            <p class="text-[10px] text-yellow-500/60 font-mono uppercase tracking-widest">{{ roleItem.system.mainRoleAbility }}</p>
-                                        </div>
-                                        <div class="flex flex-col items-end">
-                                            <span class="text-2xl font-black text-white leading-none">{{ roleItem.system.rank }}</span>
-                                            <span class="text-[8px] text-yellow-500/50 uppercase font-bold">Rank</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div @click="toggleRoleExpansion(roleItem._id)" class="w-10 flex items-center justify-center border-l border-yellow-500/20 cursor-pointer hover:bg-yellow-500/10 transition-colors">
-                                    <i v-icon data-lucide="chevron-down" class="w-5 h-5 text-yellow-500/50 transition-transform duration-300" :class="{'rotate-180': expandedRoleItems[roleItem._id]}"></i>
-                                </div>
-                            </div>
-
-                            <!-- Role Description -->
-                            <transition name="expand">
-                                <div v-if="expandedRoleItems[roleItem._id]" class="p-3 bg-yellow-900/5 border-b border-yellow-500/10">
-                                    <div class="text-[11px] text-gray-300 leading-relaxed cpr-description" v-html="roleItem.system.description.value"></div>
-                                </div>
-                            </transition>
-
-                            <!-- Role Abilities -->
-                            <div v-if="roleItem.system.abilities && Object.keys(roleItem.system.abilities).length > 0" class="divide-y divide-yellow-500/10">
-                                <div v-for="(ability, key) in roleItem.system.abilities" :key="key" class="group/ability">
-                                    <div class="flex items-stretch hover:bg-yellow-500/5 transition-colors">
-                                        <div @click="sendRoleAbilityRequest(roleItem.name, ability.name)" class="flex-grow p-2 pl-4 cursor-pointer">
-                                            <div class="flex justify-between items-center">
-                                                <div>
-                                                    <h4 class="text-yellow-500/90 font-bold uppercase text-xs group-hover/ability:text-yellow-400 transition-colors">{{ ability.name }}</h4>
-                                                    <p class="text-[9px] text-gray-500 font-mono">{{ ability.stat || 'Special' }}</p>
-                                                </div>
-                                                <div class="flex items-center gap-3">
-                                                    <span class="text-lg font-black text-white/80">{{ ability.rank }}</span>
-                                                    <div class="w-1 h-8 bg-yellow-500/20 group-hover/ability:bg-yellow-500/40 transition-colors"></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div @click="toggleRoleExpansion(roleItem._id + key)" class="w-8 flex items-center justify-center border-l border-yellow-500/10 cursor-pointer hover:bg-yellow-500/10 transition-colors">
-                                            <i v-icon data-lucide="info" class="w-3.5 h-3.5 text-yellow-500/30 group-hover/ability:text-yellow-500/60"></i>
-                                        </div>
-                                    </div>
-                                    <!-- Ability Description -->
-                                    <transition name="expand">
-                                        <div v-if="expandedRoleItems[roleItem._id + key]" class="p-3 bg-black/40 text-[10px] text-gray-400 italic border-t border-yellow-500/5">
-                                            <div v-if="ability.description" v-html="ability.description"></div>
-                                            <div v-else>No additional data available for this ability.</div>
-                                        </div>
-                                    </transition>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-for="(group, categoryKey) in groupedSkills" :key="categoryKey">
-                            <div
-                                @click="toggleCategory(categoryKey)"
-                                class="flex items-center justify-between mb-2 mt-4 bg-gray-900 py-1 px-2 border-l-2 border-red-500 cursor-pointer hover:bg-cyan-950/40 transition-colors group">
-                                <span class="text-white font-bold text-xs uppercase group-hover:text-cyan-400 transition-colors">{{
-                                        formatCategory(categoryKey)
-                                    }}</span>
-                                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[categoryKey] }">
-                                    <i v-icon data-lucide="chevron-down"
-                                       class="w-4 h-4 text-red-500 group-hover:text-cyan-500"></i>
-                                </div>
-                            </div>
-                            <div v-show="!collapsedCategories[categoryKey]" class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800">
-                                <div v-for="(skill, index) in group" :key="skill.name"
-                                     @click="sendSkillRequest(skill.name)"
-                                     class="flex justify-between items-center bg-[#0a0a0a] p-2 hover:bg-cyan-950/20 cursor-pointer group transition-colors">
-                                    <div class="flex flex-col">
-                                        <div class="flex items-baseline gap-2">
-                                            <span class="text-sm font-medium text-gray-300 group-hover:text-cyan-400 transition-colors">{{ skill.name }}</span>
-                                            <span class="text-[9px] text-red-500 font-bold uppercase tracking-wider">({{
-                                                    skill.system.stat
-                                                }})</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-3">
-
-                                        <span class="text-[9px] text-gray-600 uppercase font-mono">Lvl {{
-                                                skill.system.level
-                                            }}</span>
-                                        <div
-                                            class="w-8 h-8 flex items-center justify-center bg-[#151515] border border-gray-700 text-red-500 font-bold font-mono text-sm rounded-sm">
-                                            {{ calculateBase(skill) }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div v-else-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
-
-                        <div>
-                            <h3 @click="toggleCategory('cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cyan-950/20 p-1 transition-colors">
-                                <div class="flex items-center gap-2">
-                                    <i v-icon data-lucide="zap" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400"></i> <span class="group-hover:text-cyan-400 transition-colors">Cyberware</span>
-                                </div>
-                                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
-                                    <i v-icon data-lucide="chevron-down"
-                                       class="w-4 h-4 text-blue-500 group-hover:text-cyan-500"></i>
-                                </div>
-                            </h3>
-                            <transition name="fade-from-black">
-                                <div v-show="!collapsedCategories['cyberware']" class="space-y-2">
-                                    <div v-for="(group, type) in groupedCyberware" :key="type">
-                                        <h4 class="text-[10px] font-bold text-blue-400 uppercase mb-2 mt-4 tracking-widest border-b border-blue-900/30 pb-1">
-                                            {{ type }}
-                                        </h4>
-                                        <div class="space-y-2">
-                                            <div v-for="cw in group" :key="cw._id">
-                                                <item-row
-                                                    :item="cw"
-                                                    category="cyberware"
-                                                    :all-items="charData.data.items"
-                                                    @click="$emit('click', cw)">
-                                                </item-row>
-                                                <div v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
-                                                     class="ml-6 mt-1 space-y-1 border-l border-blue-900/50 pl-2">
-                                                    <div v-for="childId in cw.system.installedItems.list" :key="childId">
-                                                        <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" category="cyberware" :all-items="charData.data.items" @click="$emit('click', charData.data.items.find(i => i._id === childId))"></item-row>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </transition>
-                        </div>
-
-                        <div v-for="(items, category) in groupedGear" :key="category">
-                            <div v-if="items.length > 0">
-                                <h3 @click="toggleCategory(category)" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group mt-6 hover:bg-cyan-950/20 p-1 transition-colors">
-                                    <div class="flex items-center gap-2">
-                                        <i v-if="category === 'weapon'" v-icon data-lucide="sword" class="w-4 h-4 text-red-500 group-hover:text-cyan-400 transition-colors"></i>
-                                        <i v-else-if="category === 'armor'" v-icon data-lucide="shield" class="w-4 h-4 text-blue-500 group-hover:text-cyan-400 transition-colors"></i>
-                                        <i v-else-if="category === 'ammo'" v-icon data-lucide="database" class="w-4 h-4 text-yellow-500 group-hover:text-cyan-400 transition-colors"></i>
-                                        <i v-else v-icon data-lucide="package" class="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition-colors"></i>
-
-                                        <span class="group-hover:text-cyan-400 transition-colors">{{ category }}</span>
-                                    </div>
-                                    <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[category] }">
-                                        <i v-icon data-lucide="chevron-down"
-                                           class="w-4 h-4 text-gray-500 group-hover:text-cyan-500"></i>
-                                    </div>
-                                </h3>
-
-                                <transition name="fade-from-black">
-                                    <div v-show="!collapsedCategories[category]" class="space-y-2">
-                                        <div v-for="item in items" :key="item._id">
-                                            <item-row
-                                                :item="item"
-                                                :category="category"
-                                                :all-items="charData.data.items"
-                                                @click="$emit('click', item)">
-                                            </item-row>
-                                            <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
-                                                 class="ml-6 mt-1 space-y-1 border-l border-gray-700/50 pl-2">
-                                                <div v-for="childId in item.system.installedItems.list" :key="childId">
-                                                    <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" @click="$emit('click', charData.data.items.find(i => i._id === childId))"></item-row>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </transition>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div v-else-if="activeTab === 'control'" key="control" class="space-y-6 pb-20 absolute w-full top-0 left-0 p-3 pb-20 transition-colors duration-500"
-                         :class="controlState.spaceMode === 'netspace' ? 'bg-blue-950/20' : ''">
-
-                        <div class="flex justify-center mb-6">
-                            <div class="flex p-1 bg-gray-900 rounded-lg border border-gray-800 shadow-lg w-full max-w-xs">
-                                <button @click="controlState.spaceMode = 'meatspace'"
-                                        class="flex-1 py-2 text-xs font-bold uppercase tracking-widest transition-all rounded-md flex items-center justify-center gap-2"
-                                        :class="controlState.spaceMode === 'meatspace' ? 'bg-red-600 text-black shadow-[0_0_10px_rgba(220,38,38,0.5)]' : 'text-gray-500 hover:text-gray-300'">
-                                    <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Meatspace
-                                </button>
-                                <button @click="controlState.spaceMode = 'netspace'"
-                                        class="flex-1 py-2 text-xs font-bold uppercase tracking-widest transition-all rounded-md flex items-center justify-center gap-2"
-                                        :class="controlState.spaceMode === 'netspace' ? 'bg-blue-500 text-black shadow-[0_0_10px_rgba(59,130,246,0.5)]' : 'text-gray-500 hover:text-gray-300'">
-                                    <i v-icon data-lucide="cpu" class="w-3.5 h-3.5"></i> Netspace
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex justify-center my-6">
-                            <div class="grid grid-cols-3 gap-2 p-4 bg-gray-900/50 rounded-full border border-gray-800 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-                                <div></div>
-                                <button @touchstart.prevent="moveToken('up')" @click="moveToken('up')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i v-icon data-lucide="chevron-up" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
-                                </button>
-                                <div></div>
-
-                                <button @touchstart.prevent="moveToken('left')" @click="moveToken('left')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i v-icon data-lucide="chevron-left" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
-                                </button>
-                                <div class="w-16 h-16 flex items-center justify-center">
-                                    <div class="w-4 h-4 bg-red-900/50 rounded-full animate-pulse"></div>
-                                </div>
-                                <button @touchstart.prevent="moveToken('right')" @click="moveToken('right')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i v-icon data-lucide="chevron-right" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
-                                </button>
-
-                                <div></div>
-                                <button @touchstart.prevent="moveToken('down')" @click="moveToken('down')" class="w-16 h-16 bg-[#151515] border border-gray-700 hover:border-red-500 hover:bg-red-900/20 active:bg-red-600 active:text-black rounded-lg flex items-center justify-center transition-all group">
-                                    <i v-icon data-lucide="chevron-down" class="w-8 h-8 text-gray-400 group-hover:text-red-500 group-active:text-black"></i>
-                                </button>
-                                <div></div>
-                            </div>
-                        </div>
-
-                        <div class="cpr-panel p-4 bg-[#111]">
-                            <h3 class="text-xs font-bold text-red-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-                                <i v-icon data-lucide="target" class="w-4 h-4"></i> Select Target
-                            </h3>
-                            <div class="relative">
-                                <select v-model="controlState.selectedTarget" class="w-full bg-black border border-gray-700 text-white p-3 text-sm appearance-none focus:border-red-500 focus:outline-none">
-                                    <option :value="null">-- NO TARGET --</option>
-                                    <option v-for="enemy in mockEnemies" :key="enemy.id" :value="enemy">
-                                        {{ enemy.name }} {{ enemy.distanceM }}m
-                                    </option>
-                                </select>
-                                <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-red-500">
-                                    <i v-icon data-lucide="chevron-down" class="w-4 h-4"></i>
-                                </div>
-                            </div>
-                            <div v-if="controlState.selectedTarget" class="mt-2 text-[10px] text-gray-500 font-mono text-right">
-                                Distance {{controlState.selectedTarget.distanceM}}m
-                            </div>
-                        </div>
-
-                        <div v-if="controlState.spaceMode === 'meatspace'" class="space-y-6">
-                            <div>
-                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Select Weapon</h3>
-                                <div class="space-y-2">
-                                    <div v-if="groupedEquipped.weapon.length === 0" class="text-gray-600 text-xs italic p-2 border border-dashed border-gray-800 text-center">
-                                        No weapons equipped.
-                                    </div>
-                                    <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
-                                         @click="controlState.selectedWeapon = weapon"
-                                         class="cursor-pointer transition-all duration-200">
-                                        <div class="relative" :class="{'border-2 border-red-600': controlState.selectedWeapon?._id === weapon._id}">
-                                            <item-row :item="weapon" category="weapon" :all-items="charData.data.items"></item-row>
-                                            <div v-if="controlState.selectedWeapon?._id === weapon._id" class="absolute -top-2 -right-2 bg-red-600 text-black text-[9px] font-black px-1 uppercase z-20">Active</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-4">
-                                <button @click="reloadWeapon"
-                                        class="w-full py-4 bg-blue-900/20 border-2 border-blue-600 text-blue-500 hover:bg-blue-600 hover:text-white text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
-                                        :class="{'animate-pulse-purple': controlState.reloadRequired}">
-                                    <i v-icon data-lucide="refresh-cw" class="w-5 h-5"></i> Reload Equipped Weapon
-                                </button>
-                            </div>
-
-                            <div class="cpr-panel p-4 bg-[#111]">
-                                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Firing Mode</h3>
-                                <transition-group
-                                    name="mode-list"
-                                    tag="div"
-                                    class="flex gap-2"
-                                >
-                                    <button v-for="mode in availableFireModes" :key="mode.id"
-                                            @click="controlState.fireMode = mode.id"
-                                            class="flex-1 py-3 text-[10px] font-bold uppercase border transition-all flex flex-col items-center gap-1 min-w-0"
-                                            :class="controlState.fireMode === mode.id ? 'bg-red-600 text-black border-red-600' : 'bg-black text-gray-500 border-gray-800 hover:border-gray-500'">
-                                        <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i>
-                                        {{ mode.label }}
-                                    </button>
-                                </transition-group>
-                            </div>
-
-                            <div v-if="dvInfo && controlState.selectedWeapon" class="text-center py-3">
-                                <div class="text-4xl font-black tracking-widest" :class="dvInfo.dv === 'Out of Range' ? 'text-red-500' : 'text-white'">
-                                    DV: <span>{{ dvInfo.dv }}</span>
-                                </div>
-                                <div class="text-[15px] text-gray-500 uppercase font-bold mt-1" v-if="dvInfo.distanceMeters && dvInfo.weaponCategory">
-                                    {{ dvInfo.weaponCategory }} • {{ dvInfo.distanceMeters }}m
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3 pt-4 sticky bottom-20 z-40 bg-gradient-to-t from-black via-black to-transparent p-3 -mx-3">
-                                <button @click="rollHit" class="cpr-panel bg-red-900/20 border-2 border-red-600 text-red-500 hover:bg-red-600 hover:text-white py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    <i v-icon data-lucide="crosshair" class="w-5 h-5"></i> Roll Hit
-                                </button>
-                                <button @click="rollDamage" class="cpr-panel bg-yellow-900/20 border-2 border-yellow-600 text-yellow-500 hover:bg-yellow-500 hover:text-black py-4 text-sm font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2">
-                                    <i v-icon data-lucide="skull" class="w-5 h-5"></i> Roll Dmg
-                                </button>
-                            </div>
-                        </div>
-
-                        <div v-else-if="controlState.spaceMode === 'netspace'" class="space-y-6">
-                            <div>
-                                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 px-1">Cyberdeck & Programs</h3>
-                                <div class="space-y-2">
-                                    <div v-if="cyberdeckItems.length === 0" class="text-gray-600 text-xs italic p-2 border border-dashed border-gray-800 text-center">
-                                        No Cyberdeck or Programs found.
-                                    </div>
-                                    <div v-for="item in cyberdeckItems" :key="item._id"
-                                         @click="rollProgram(item)"
-                                         class="cursor-pointer transition-all duration-200">
-                                        <div class="relative group" :class="{'border-2 border-blue-500': controlState.selectedProgram?._id === item._id}">
-                                            <item-row :item="item" :category="item.type" :all-items="charData.data.items"></item-row>
-                                            <div class="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 pointer-events-none transition-colors"></div>
-                                            <div v-if="controlState.selectedProgram?._id === item._id" class="absolute -top-2 -right-2 bg-blue-500 text-black text-[9px] font-black px-1 uppercase z-20">Last Used</div>
-                                            <div class="absolute right-12 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <div class="bg-blue-500 text-black text-[10px] font-black px-2 py-1 uppercase rounded-sm flex items-center gap-1">
-                                                    <i v-icon data-lucide="zap" class="w-3 h-3"></i> Execute
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="cpr-panel p-6 bg-blue-900/10 border border-blue-500/30 text-center space-y-4">
-                                <i v-icon data-lucide="monitor" class="w-12 h-12 text-blue-500 mx-auto animate-pulse"></i>
-                                <div>
-                                    <h4 class="text-blue-400 font-black uppercase tracking-tighter text-lg">Neural Uplink Active</h4>
-                                    <p class="text-[10px] text-blue-500/60 font-mono uppercase tracking-widest">Select a program to execute in the NET</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
+                    <control-tab
+                        v-else-if="activeTab === 'control'"
+                        :active-tab="activeTab"
+                        :control-state="controlState"
+                        :mock-enemies="mockEnemies"
+                        :grouped-equipped="groupedEquipped"
+                        :available-fire-modes="availableFireModes"
+                        :dv-loading="dvLoading"
+                        :dv-error="dvError"
+                        :dv-info="dvInfo"
+                        :active-cyberdeck="activeCyberdeck"
+                        :program-categories="programCategories"
+                        :expanded-programs="expandedPrograms"
+                        @roll-hit="rollHit"
+                        @roll-damage="rollDamage"
+                        @reload="reloadWeapon"
+                        @move="moveToken"
+                        @open-cyberdeck-config="showCyberdeckConfig = true"
+                        @program-roll-request="sendRequest($event, '/programroll')"
+                        @toggle-program-details="toggleProgramDetails"
+                        @toggle-rez="toggleRez"
+                        @roll-program="rollProgram"
+                    ></control-tab>
                 </transition>
             </main>
 
@@ -608,83 +187,16 @@
                          @click="goToSettings"></nav-btn>
             </nav>
 
-            <transition name="slide-right">
-                <aside v-if="showRollPanel" class="fixed top-0 right-0 h-full w-[20rem] max-w-[85vw] z-[60] bg-black/95 border-l border-red-900 shadow-[0_0_30px_rgba(220,38,38,0.35)]">
-                    <div class="flex items-center justify-between p-3 border-b border-red-900 bg-black/70 sticky top-0">
-                        <div class="flex items-center gap-2">
-                            <i v-icon data-lucide="dice-6" class="w-4 h-4 text-red-500"></i>
-                            <span class="text-xs font-black uppercase tracking-widest text-red-500">Roll Modifiers</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button @click="fetchRollModifiers" class="p-1 text-gray-300 hover:text-white">
-                                <i v-icon data-lucide="refresh-cw" class="w-4 h-4"></i>
-                            </button>
-                            <button @click="closeRollPanel" class="p-1 text-gray-300 hover:text-white">
-                                <i v-icon data-lucide="x" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="p-3 space-y-3 overflow-y-auto h-full pb-24">
-                        <div v-if="rollModsLoading" class="text-center py-8 text-gray-400 text-xs">Loading modifiers...</div>
-
-                        <div v-else-if="rollModsError" class="border border-red-700 bg-red-900/20 text-red-400 text-xs p-3">
-                            {{ rollModsError }}
-                            <div v-if="!controlState.selectedWeapon" class="mt-2">
-                                <button @click="activeTab='control'; closeRollPanel()" class="text-[10px] uppercase font-bold border border-red-600 text-red-500 px-2 py-1 hover:bg-red-600 hover:text-black transition-colors">Go to Control</button>
-                            </div>
-                        </div>
-
-                        <div v-else-if="rollModsData" class="space-y-4">
-                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
-                                <div class="text-[10px] text-gray-500 uppercase font-bold">Actor</div>
-                                <div class="text-white font-bold">{{ rollModsData.actorName }}</div>
-                            </div>
-
-                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
-                                <div class="flex items-center justify-between">
-                                    <div class="text-[10px] text-gray-500 uppercase font-bold">Base Bonus</div>
-                                    <div class="text-green-400 font-mono font-bold">+{{ rollModsData.baseBonus }}</div>
-                                </div>
-                                <div v-if="rollModsData.breakdown" class="mt-2 text-[11px] text-gray-300 font-mono space-y-1">
-                                    <div class="flex justify-between"><span>{{ (rollModsData.breakdown.statName || 'STAT').toUpperCase() }}</span><span>+{{ rollModsData.breakdown.statValue }}</span></div>
-                                    <div class="flex justify-between"><span>{{ rollModsData.breakdown.skillName }}</span><span>+{{ rollModsData.breakdown.skillLevel }}</span></div>
-                                    <div class="flex justify-between"><span>Weapon Acc</span><span>+{{ rollModsData.breakdown.weaponAcc }}</span></div>
-                                </div>
-                            </div>
-
-                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
-                                <div class="flex items-center justify-between">
-                                    <div class="text-[10px] text-gray-500 uppercase font-bold">Total Penalty</div>
-                                    <div :class="{'text-red-400': rollModsData.totalPenalty < 0, 'text-gray-300': rollModsData.totalPenalty === 0, 'text-green-400': rollModsData.totalPenalty > 0}" class="font-mono font-bold">{{ rollModsData.totalPenalty }}</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
-                                <div class="flex items-center justify-between">
-                                    <div class="text-[10px] text-gray-500 uppercase font-bold">Final Roll Modifier</div>
-                                    <div :class="{'text-green-400': rollModsData.finalModifier >= 0, 'text-red-400': rollModsData.finalModifier < 0}" class="font-mono font-bold">{{ rollModsData.finalModifier }}</div>
-                                </div>
-                            </div>
-
-                            <div class="bg-[#0b0b0b] border border-gray-800 p-3">
-                                <div class="text-[10px] text-gray-500 uppercase font-bold mb-2">Injuries & Effects</div>
-                                <div v-if="!rollModsData.injuries || rollModsData.injuries.length === 0" class="text-xs text-gray-500 italic">No injuries affecting rolls.</div>
-                                <div v-else class="space-y-2">
-                                    <div v-for="(inj, idx) in rollModsData.injuries" :key="idx" class="border border-gray-800 p-2 bg-black/40">
-                                        <div class="flex items-center justify-between">
-                                            <div class="text-xs font-bold text-white">{{ inj.title }}</div>
-                                            <div :class="{'text-red-400': inj.penalty < 0, 'text-gray-300': inj.penalty === 0, 'text-green-400': inj.penalty > 0}" class="text-[11px] font-mono">{{ inj.penalty }}</div>
-                                        </div>
-                                        <div v-if="inj.description" class="text-[11px] text-gray-400 mt-1">{{ inj.description }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-else class="text-xs text-gray-400">No data available.</div>
-                    </div>
-                </aside>
-            </transition>
+            <roll-modifier-panel
+                :show="showRollPanel"
+                :loading="rollModsLoading"
+                :error="rollModsError"
+                :data="rollModsData"
+                :has-weapon="!!controlState.selectedWeapon"
+                @close="closeRollPanel"
+                @refresh="fetchRollModifiers"
+                @go-to-control="activeTab='control'; closeRollPanel()"
+            ></roll-modifier-panel>
 
         </div>
     </div>
@@ -701,25 +213,31 @@ import { computed, onMounted, ref, shallowRef, triggerRef, nextTick, watch, onUn
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
-import SimpleStat from './character-sheet/SimpleStat.vue';
-import AdjustableStat from './character-sheet/AdjustableStat.vue';
 import ResourceCounter from './character-sheet/ResourceCounter.vue';
 import ItemRow from './character-sheet/ItemRow.vue';
+import CyberdeckConfig from './character-sheet/CyberdeckConfig.vue';
+import ControlTab from './character-sheet/ControlTab.vue';
+import GearTab from './character-sheet/GearTab.vue';
+import ProgramRow from './character-sheet/ProgramRow.vue';
+import ResourceModal from './character-sheet/ResourceModal.vue';
+import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
+import SkillsTab from './character-sheet/SkillsTab.vue';
+import StatsTab from './character-sheet/StatsTab.vue';
 
 // --- COMPOSABLES ---
 import { useCharacterData } from '../composables/useCharacterData';
 import { useCombat } from '../composables/useCombat';
 import { useRollModifiers } from '../composables/useRollModifiers';
 import { useResources } from '../composables/useResources';
+import { useNetrunner } from '../composables/useNetrunner';
 
 // --- DIRECTIVES & UTILS ---
 import { vIcon } from '../directives/icon';
-import { isDeepEqual, debounce } from '../utils/helpers';
-import { cachedPost } from '../utils/api';
+import { isDeepEqual, debounce, findItemInList, formatCategoryName, stripHtmlTags } from '../utils/helpers';
 
 export default {
     name: 'CharacterSheet',
-    components: { NavBtn, SimpleStat, AdjustableStat, ResourceCounter, ItemRow },
+    components: {CyberdeckConfig, NavBtn, ResourceCounter, ItemRow, ControlTab, GearTab, ProgramRow, ResourceModal, RollModifierPanel, SkillsTab, StatsTab },
     directives: { icon: vIcon },
     setup() {
         // --- COMPOSABLES ---
@@ -748,6 +266,14 @@ export default {
             reloadRequired: false
         });
 
+        watch(() => charData.value?.data.flags?.['cyberpunk-red-core']?.fightState, (newVal) => {
+            if (newVal === 'Netspace') {
+                controlState.value.spaceMode = 'netspace';
+            } else if (newVal === 'Meatspace') {
+                controlState.value.spaceMode = 'meatspace';
+            }
+        }, { immediate: true });
+
         const throwError = (message) => {
             popupMessage.value = message;
             showPopup.value = true;
@@ -765,7 +291,8 @@ export default {
             rollDamage,
             checkReloadRequired,
             reloadWeapon,
-            fetchDVForSelectedWeapon
+            fetchDVForSelectedWeapon,
+            targetToken
         } = useCombat(controlState, charData, fetchCharacterData, throwError);
 
         const {
@@ -777,6 +304,23 @@ export default {
             closeRollPanel,
             fetchRollModifiers
         } = useRollModifiers(controlState);
+
+        const {
+            activeCyberdeck,
+            availablePrograms,
+            programCategories,
+            showCyberdeckConfig,
+            expandedPrograms,
+            isEffectivelyRezzed,
+            canBeRezzed,
+            installProgram,
+            uninstallProgram,
+            toggleRez,
+            rollProgram: rollProgramBase,
+            toggleProgramDetails
+        } = useNetrunner(charData, sendRequest, throwError);
+
+        const rollProgram = (program) => rollProgramBase(program, controlState);
 
         const openRollPanel = async () => {
             await openRollPanelBase();
@@ -801,7 +345,7 @@ export default {
 
         const sendRequest = (data, url) => {
             window.axios.post(url, data).then(response => {
-                setTimeout(() => fetchCharacterData(), 3000);
+                debouncedFetchCharacterData(); // Throttled refresh
                 return response;
             }).catch(err => {
                 console.error('Error posting request', err);
@@ -811,11 +355,14 @@ export default {
             });
         };
 
+        const debouncedFetchCharacterData = debounce(() => fetchCharacterData(), 1000);
+
         const updateStat = (stat, value) => {
             if (charData.value) {
                 const key = stat.toLowerCase();
-                if (charData.value.data.system.stats[key]) {
-                    charData.value.data.system.stats[key].value = value;
+                const targetStat = charData.value.data.system.stats[key];
+                if (targetStat) {
+                    targetStat.value = value;
                     triggerRef(charData);
                 }
             }
@@ -839,7 +386,8 @@ export default {
 
         const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
-        // --- COMPUTED ---
+        // --- COMPUTED PROPERTIES ---
+
         const stats = computed(() => {
             if (!charData.value) return {};
             const { luck, emp, ...rest } = charData.value.data.system.stats;
@@ -855,22 +403,26 @@ export default {
             return charData.value.data.items.find(i => i._id === id);
         });
 
-        const groupedCyberware = computed(() => {
-            if (!charData.value) return {};
-            const allItems = charData.value.data.items;
-            const installedIds = new Set();
-            allItems.forEach(item => {
+        const installedIds = computed(() => {
+            const ids = new Set();
+            if (!charData.value) return ids;
+            charData.value.data.items.forEach(item => {
                 if (item.system.installedItems && item.system.installedItems.list) {
-                    item.system.installedItems.list.forEach(id => installedIds.add(id));
+                    item.system.installedItems.list.forEach(id => ids.add(id));
                 }
             });
-            const cyberware = allItems.filter(i =>
+            return ids;
+        });
+
+        const groupedCyberware = computed(() => {
+            if (!charData.value) return {};
+            const cyberware = charData.value.data.items.filter(i =>
                 ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal', 'cyberdeck'].includes(i.type) &&
-                !installedIds.has(i._id)
+                !installedIds.value.has(i._id)
             );
             const groups = {};
             cyberware.forEach(cw => {
-                const type = cw.system.cyberwareType || 'Other';
+                const type = cw.system.cyberwareType || 'Cyberdeck';
                 if (!groups[type]) groups[type] = [];
                 groups[type].push(cw);
             });
@@ -879,17 +431,10 @@ export default {
 
         const groupedGear = computed(() => {
             if (!charData.value) return {};
-            const allItems = charData.value.data.items;
-            const installedIds = new Set();
-            allItems.forEach(item => {
-                if (item.system.installedItems && item.system.installedItems.list) {
-                    item.system.installedItems.list.forEach(id => installedIds.add(id));
-                }
-            });
             const groups = { weapon: [], armor: [], ammo: [], gear: [] };
-            const items = allItems.filter(i =>
+            const items = charData.value.data.items.filter(i =>
                 ['weapon', 'armor', 'gear', 'ammo'].includes(i.type) &&
-                !installedIds.has(i._id)
+                !installedIds.value.has(i._id)
             );
             items.forEach(item => {
                 if (groups[item.type]) groups[item.type].push(item);
@@ -901,18 +446,16 @@ export default {
         const groupedEquipped = computed(() => {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
-            const installedIds = new Set();
-            allItems.forEach(item => {
-                if ((item.system.installedItems && item.system.installedItems.list) && item.system.isWeapon === true) {
-                    item.system.installedItems.list.forEach(id => installedIds.add(id));
-                }
-            });
-            const groups = { weapon: [], armor: [], ammo: [], gear: [] };
+            const groups = { weapon: [], armor: [], ammo: [], gear: [], installedPrograms: [] };
+
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'owned' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
-                return (isEquipped || isToggledWeapon) && !installedIds.has(i._id);
+                const isProgram = i.type === 'program';
+                const isCyberdeck = i.type === 'cyberdeck';
+                return (isEquipped || isToggledWeapon || isProgram || isCyberdeck) && !installedIds.value.has(i._id);
             });
+
             items.forEach(item => {
                 if (item.system.isWeapon) {
                     groups['weapon'].push(item);
@@ -923,39 +466,15 @@ export default {
                     groups.gear.push(item);
                 }
             });
-            return groups;
-        });
 
-        const cyberdeckItems = computed(() => {
-            if (!charData.value) return [];
-            const allItems = charData.value.data.items;
-            // First, get all items of type 'program'
-            const allPrograms = allItems.filter(i => i.type === 'program');
-
-            // Get all cyberdecks
-            const decks = allItems.filter(i => i.type === 'cyberdeck');
-
-            const result = [];
-            const programsInDecks = new Set();
-
-            decks.forEach(deck => {
-                result.push(deck);
-                if (deck.system.installedItems && deck.system.installedItems.list) {
-                    deck.system.installedItems.list.forEach(id => {
-                        const prog = allPrograms.find(i => i._id === id);
-                        if (prog) {
-                            result.push(prog);
-                            programsInDecks.add(id);
-                        }
-                    });
+            // Ensure cyberdeck itself shows up in Gear if equipped and not installed in something else
+            items.forEach(item => {
+                if (item.type === 'cyberdeck' && !installedIds.value.has(item._id)) {
+                    groups.gear.push(item);
                 }
             });
 
-            // Also include programs that aren't installed in a deck but are on the person
-            const uninstalledPrograms = allPrograms.filter(p => !programsInDecks.has(p._id));
-            result.push(...uninstalledPrograms);
-
-            return result;
+            return groups;
         });
 
         const groupedSkills = computed(() => {
@@ -971,35 +490,24 @@ export default {
             return groups;
         });
 
+        // --- HELPER FUNCTIONS ---
+
         const calculateBase = (skill) => {
             if (!charData.value) return 0;
             const statVal = charData.value.data.system.stats[skill.system.stat]?.value || 0;
             return skill.system.level + statVal;
         };
 
-        const findItem = (id) => {
-            if (!id || !charData.value) return null;
-            return charData.value.data.items.find(i => i._id === id);
-        };
+        const findItem = (id) => findItemInList(id, charData.value?.data.items);
 
-        const formatCategory = (cat) => {
-            if (!cat) return 'Other';
-            const result = cat.replace(/([A-Z])/g, ' $1').trim();
-            return result.charAt(0).toUpperCase() + result.slice(1);
-        };
+        const formatCategory = formatCategoryName;
 
+        // --- REQUEST WRAPPERS ---
         const sendStatRequest = (stat) => sendRequest({ label: stat }, "/statrollrequest");
         const sendSkillRequest = (skill) => sendRequest({ label: skill }, "/skillrollrequest");
         const sendRoleRequest = (role) => sendRequest({ label: role, role: role, isAbility: false  }, "/rolerollrequest");
         const sendRoleAbilityRequest = (role, ability) => sendRequest({ label: ability, role: role, isAbility: true }, "/rolerollrequest");
         const sendDeathSave = () => sendRequest({}, "/deathsave");
-        const rollProgram = (program) => {
-            controlState.value.selectedProgram = program;
-            sendRequest({
-                ...controlState.value,
-                selectedProgram: program
-            }, "/programroll");
-        };
         const sendFaceDown = () => sendRequest({}, "/facedown");
 
         const toggleCategory = (category) => {
@@ -1079,20 +587,34 @@ export default {
         }, { deep: true });
 
         return {
+            // State
             charData, loading, error, activeTab,
-            stats, luck, emp, roleItem, cyberdeckItems,
+            stats, luck, emp, roleItem,
             groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
-            calculateBase, findItem, formatCategory, getImageUrl, sendStatRequest, sendSkillRequest,
-            sendRoleRequest, sendRoleAbilityRequest, updateStat, showPopup, showImagePopup, popupMessage,
-            collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems, refreshIcons,
-            logout, close, rollProgram,
-            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, goToSettings,
-            availableFireModes,
-            showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
+
+            // Netrunner specific
+            activeCyberdeck, availablePrograms, programCategories, showCyberdeckConfig,
+            installProgram, uninstallProgram, toggleRez, rollProgram, canBeRezzed, isEffectivelyRezzed,
+            expandedPrograms, toggleProgramDetails,
+
+            // UI Helpers
+            calculateBase, findItem, formatCategory, getImageUrl,
+            showPopup, showImagePopup, popupMessage, collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems,
+            ItemRow, ControlTab, GearTab, ProgramRow, ResourceModal, RollModifiersModal, SkillsTab, StatsTab,
+
+            // Actions
+            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat,
+            sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings,
+
+            // Combat
+            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,
             dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
+
+            // Modals
+            showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
-            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
-            sendDeathSave, sendFaceDown
+            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue, CyberdeckConfig,
+            stripHtmlTags
         };
     }
 };
