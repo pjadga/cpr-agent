@@ -44,15 +44,18 @@ class ProgramRoll extends FormRequest
 
         $js = "
         let skillRoll = game.actors.get('$actorId');
-        skillRoll.sheet._onRoll(
-        {
+
+        const dummyBtn = document.createElement('a');
+        dummyBtn.dataset.rollType = 'interfaceAbility';
+        dummyBtn.dataset.cyberdeckId = '$cyberdeckId';
+        dummyBtn.dataset.rollTitle = '$programName';
+        dummyBtn.dataset.interfaceAbility = '$programName';
+        dummyBtn.dataset.itemId = '$cyberdeckId';
+
+        skillRoll.sheet._onRoll( {
         type: 'click',
-        currentTarget: {
-        'data-roll-type': 'interfaceAbility',
-        'data-interface-ability': '$programName',
-        'data-cyberdeck-id': '$cyberdeckId'
-        }})
-        ";
+        currentTarget: dummyBtn
+        })";
         $return = $client->utilities->executeJs($clientId, $js);
 
         return response()->json([
