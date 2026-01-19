@@ -44,7 +44,7 @@ return [
     /*
      * Headers will only be added if this setting is set to true.
      */
-    'enabled' => env('CSP_ENABLED', true),
+    'enabled' => env('CSP_ENABLED', false),
 
     /**
      * Headers will be added when Vite is hot reloading.

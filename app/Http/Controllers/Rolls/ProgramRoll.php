@@ -45,7 +45,7 @@ class ProgramRoll extends FormRequest
                     const dummyBtn = document.createElement('a');
                     dummyBtn.dataset.rollType = 'attack';
                     dummyBtn.dataset.itemId = weaponId;
-                    dummyBtn.dataset.rollTitle = fireMode + ' Attack';
+                    dummyBtn.dataset.rollTitle = 'Program Roll';
 
                     // 5. Execute the Roll
                     await actor.sheet._onRoll({
@@ -62,8 +62,9 @@ class ProgramRoll extends FormRequest
 
 
 
-        $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        $return = $client->utilities->executeJs($clientId, $js);
 
+        $diceTotal = null;
         if (isset($return["success"]) && $return["success"]) {
             //Attack has rolled, get the dice number
             $diceTotal = $client->roll->getLastRoll($clientId);

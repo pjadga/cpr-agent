@@ -24,7 +24,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             const response = await cachedPost('/getvisibletokens', {
                 selectedWeapon: controlState.value.selectedWeapon
             }, 1000);
-            dvInfo.value = response?.data?.data?.result;
+            // Handle both potential response formats
+            dvInfo.value = response?.data?.data?.dv || response?.data?.data?.result?.dv;
         } catch (e) {
             console.error('Error fetching DV', e);
             dvError.value = 'Unable to fetch DV.';
@@ -40,7 +41,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const getVisibleTokens = () => {
         cachedPost("/listvisibletokens", {}, 1500).then(response => {
-            const list = response?.data?.data?.result || [];
+            const list = response?.data?.data?.result || response?.data?.data || [];
 
             // Update existing list to prevent complete re-render if possible
             const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
@@ -60,6 +61,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
                         if (existing.name !== newItem.name) existing.name = newItem.name;
                     }
                 });
+                // Ensure list remains sorted by distance even if IDs didn't change but positions did
+                mockEnemies.value.sort((a, b) => a.distanceM - b.distanceM);
             }
 
             if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {

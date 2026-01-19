@@ -1,17 +1,19 @@
 import { ref, onMounted, onUnmounted, shallowRef, nextTick } from 'vue';
 import { isDeepEqual } from '../utils/helpers';
 
+// Shared state to prevent multiple fetches/intervals
+const charData = shallowRef(null);
+const loading = ref(true);
+const error = ref(null);
+const baseUrl = ref(localStorage.getItem('cpr_base_url') || '');
+let refreshInterval = null;
+let actorUuid = localStorage.getItem('cpr_actor_uuid') || null;
+let useCount = 0;
+
 /**
  * Composable to handle fetching and polling character data
  */
 export function useCharacterData() {
-    const charData = shallowRef(null);
-    const loading = ref(true);
-    const error = ref(null);
-    const baseUrl = ref('');
-    let refreshInterval = null;
-    let actorUuid = null;
-
     /**
      * Efficiently refresh Lucide icons
      */
@@ -48,9 +50,12 @@ export function useCharacterData() {
      * Fetch base URL for images
      */
     const fetchBaseUrl = async () => {
+        if (baseUrl.value) return; // Use cached value if available
         try {
             const response = await window.axios.get("/getbaseurl");
-            baseUrl.value = response.data.replace(/\/$/, ''); // Remove trailing slash if any
+            const url = response.data.replace(/\/$/, ''); // Remove trailing slash if any
+            baseUrl.value = url;
+            localStorage.setItem('cpr_base_url', url);
         } catch (err) {
             console.error("Error fetching base URL:", err);
         }
@@ -61,9 +66,10 @@ export function useCharacterData() {
      */
     const fetchCharacterData = async (isInitial = false) => {
         try {
-            if (isInitial) {
+            if (isInitial && !actorUuid) {
                 const getActors = await window.axios.post("/getactors");
                 actorUuid = getActors.data.uuid;
+                localStorage.setItem('cpr_actor_uuid', actorUuid);
             }
             if (!actorUuid) return;
 
@@ -93,14 +99,21 @@ export function useCharacterData() {
     };
 
     onMounted(async () => {
-        await fetchBaseUrl();
-        await fetchCharacterData(true);
-        // Poll for updates every 60 seconds (reduced frequency)
-        refreshInterval = setInterval(() => fetchCharacterData(), 60000);
+        useCount++;
+        if (useCount === 1) {
+            await fetchBaseUrl();
+            await fetchCharacterData(true);
+            // Poll for updates every 60 seconds (reduced frequency)
+            refreshInterval = setInterval(() => fetchCharacterData(), 60000);
+        }
     });
 
     onUnmounted(() => {
-        if (refreshInterval) clearInterval(refreshInterval);
+        useCount--;
+        if (useCount === 0 && refreshInterval) {
+            clearInterval(refreshInterval);
+            refreshInterval = null;
+        }
     });
 
     return {

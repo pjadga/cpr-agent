@@ -74,6 +74,23 @@
                 @save="commitResourceValue">
             </resource-modal>
 
+            <combat-panel
+                :show="showCombatPanel"
+                :selected-weapon="controlState.selectedWeapon"
+                :available-fire-modes="availableFireModes"
+                :fire-mode="controlState.fireMode"
+                :dv-loading="dvLoading"
+                :dv-error="dvError"
+                :dv-info="dvInfo"
+                :reload-required="controlState.reloadRequired"
+                @close="showCombatPanel = false"
+                @roll-hit="rollHit"
+                @roll-damage="rollDamage"
+                @reload="reloadWeapon"
+                @move="moveToken"
+                @update:fireMode="controlState.fireMode = $event">
+            </combat-panel>
+
             <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
                 <div class="flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
@@ -165,6 +182,7 @@
                         @reload="reloadWeapon"
                         @move="moveToken"
                         @open-cyberdeck-config="showCyberdeckConfig = true"
+                        @open-combat-panel="showCombatPanel = true"
                         @program-roll-request="sendRequest($event, '/programroll')"
                         @toggle-program-details="toggleProgramDetails"
                         @toggle-rez="toggleRez"
@@ -209,16 +227,14 @@
  * Handles character data fetching, stat updates, skills, gear, and combat controls.
  */
 
-import { computed, onMounted, ref, shallowRef, triggerRef, nextTick, watch, onUnmounted } from "vue";
+import { computed, ref, triggerRef, watch } from "vue";
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
-import ResourceCounter from './character-sheet/ResourceCounter.vue';
-import ItemRow from './character-sheet/ItemRow.vue';
 import CyberdeckConfig from './character-sheet/CyberdeckConfig.vue';
+import CombatPanel from './character-sheet/CombatPanel.vue';
 import ControlTab from './character-sheet/ControlTab.vue';
 import GearTab from './character-sheet/GearTab.vue';
-import ProgramRow from './character-sheet/ProgramRow.vue';
 import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
@@ -233,11 +249,11 @@ import { useNetrunner } from '../composables/useNetrunner';
 
 // --- DIRECTIVES & UTILS ---
 import { vIcon } from '../directives/icon';
-import { isDeepEqual, debounce, findItemInList, formatCategoryName, stripHtmlTags } from '../utils/helpers';
+import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
 
 export default {
     name: 'CharacterSheet',
-    components: {CyberdeckConfig, NavBtn, ResourceCounter, ItemRow, ControlTab, GearTab, ProgramRow, ResourceModal, RollModifierPanel, SkillsTab, StatsTab },
+    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, ResourceModal, RollModifierPanel, SkillsTab, StatsTab },
     directives: { icon: vIcon },
     setup() {
         // --- COMPOSABLES ---
@@ -253,8 +269,42 @@ export default {
         const activeTab = ref('stats');
         const showPopup = ref(false);
         const showImagePopup = ref(false);
+        const showCombatPanel = ref(false);
         const popupMessage = ref('');
         const error = computed(() => dataError.value);
+
+        // --- UTILS & HELPERS ---
+        const throwError = (message) => {
+            popupMessage.value = message;
+            showPopup.value = true;
+        };
+
+        const debouncedFetchCharacterData = debounce(() => fetchCharacterData(), 1000);
+
+        const sendRequest = (data, url) => {
+            window.axios.post(url, data).then(response => {
+                debouncedFetchCharacterData(); // Throttled refresh
+                return response;
+            }).catch(err => {
+                console.error('Error posting request', err);
+                popupMessage.value = "Neural uplink failed: Data packet lost.";
+                showPopup.value = true;
+                return err;
+            });
+        };
+
+        const updateStat = (stat, value) => {
+            const numericValue = Number(value);
+            if (charData.value) {
+                const key = stat.toLowerCase();
+                const targetStat = charData.value.data.system.stats[key];
+                if (targetStat) {
+                    targetStat.value = numericValue;
+                    triggerRef(charData);
+                }
+            }
+            sendRequest({ label: stat, value: numericValue }, "/updatestat");
+        };
 
         // --- CONTROL PANEL STATE ---
         const controlState = ref({
@@ -273,11 +323,6 @@ export default {
                 controlState.value.spaceMode = 'meatspace';
             }
         }, { immediate: true });
-
-        const throwError = (message) => {
-            popupMessage.value = message;
-            showPopup.value = true;
-        };
 
         const {
             mockEnemies,
@@ -341,32 +386,6 @@ export default {
         const close = () => {
             if (charData.value) showPopup.value = false;
             else logout();
-        };
-
-        const sendRequest = (data, url) => {
-            window.axios.post(url, data).then(response => {
-                debouncedFetchCharacterData(); // Throttled refresh
-                return response;
-            }).catch(err => {
-                console.error('Error posting request', err);
-                popupMessage.value = "Neural uplink failed: Data packet lost.";
-                showPopup.value = true;
-                return err;
-            });
-        };
-
-        const debouncedFetchCharacterData = debounce(() => fetchCharacterData(), 1000);
-
-        const updateStat = (stat, value) => {
-            if (charData.value) {
-                const key = stat.toLowerCase();
-                const targetStat = charData.value.data.system.stats[key];
-                if (targetStat) {
-                    targetStat.value = value;
-                    triggerRef(charData);
-                }
-            }
-            sendRequest({ label: stat, value: value }, "/updatestat");
         };
 
         const {
@@ -586,6 +605,13 @@ export default {
             }
         }, { deep: true });
 
+        const handleItemClick = (item) => {
+            if (item.system.isWeapon || item.type === 'weapon') {
+                controlState.value.selectedWeapon = item;
+                // activeTab.value = 'control';
+            }
+        };
+
         return {
             // State
             charData, loading, error, activeTab,
@@ -599,8 +625,8 @@ export default {
 
             // UI Helpers
             calculateBase, findItem, formatCategory, getImageUrl,
-            showPopup, showImagePopup, popupMessage, collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems,
-            ItemRow, ControlTab, GearTab, ProgramRow, ResourceModal, RollModifiersModal, SkillsTab, StatsTab,
+            showPopup, showImagePopup, showCombatPanel, popupMessage, collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems,
+            handleItemClick,
 
             // Actions
             sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat,
@@ -613,8 +639,7 @@ export default {
             // Modals
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
-            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue, CyberdeckConfig,
-            stripHtmlTags
+            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue
         };
     }
 };

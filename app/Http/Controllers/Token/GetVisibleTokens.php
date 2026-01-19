@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Token;
 
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
-use JShrink\Minifier;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,18 +51,18 @@ class GetVisibleTokens extends FormRequest
               'Medium Melee Weapon' : ['Medium Melee'],
               'Heavy Melee Weapon' : ['Heavy Melee'],
               'Very Heavy Melee Weapon' : ['Very Heavy Melee']
-};
+            };
             const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
 
-            const jim = canvas.tokens.placeables.find(t => t.id === '$tokenId')
+            const jim = canvas.tokens.get('$tokenId');
             const target = Array.from(game.user.targets)[0];
 
             if (jim && target) {
-                // Distance Calculation (128px = 1m)
-                const distancePx = Math.sqrt(Math.pow(target.center.x - jim.center.x, 2) + Math.pow(target.center.y - jim.center.y, 2));
+                const distX = target.center.x - jim.center.x;
+                const distY = target.center.y - jim.center.y;
+                const distancePx = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
                 const distanceM = Math.ceil(distancePx / 128);
 
-                // Weapon Mapping
                 const weaponData = jim.actor.items.get('$weaponId');
                 const typeMap = {
                     'heavyPistol': 'Pistol',
@@ -82,11 +81,9 @@ class GetVisibleTokens extends FormRequest
                 };
                 const category = (typeMap[weaponData.system.weaponType] || typeMap[weaponData.system.variety]) || 'Pistol';
 
-                // Find DV
                 const bracketIndex = DISTANCE_BRACKETS.findIndex(limit => distanceM <= limit);
                 let targetDV = bracketIndex !== -1 ? RANGE_DV_TABLE[category][bracketIndex] : 99;
 
-                // Handle cases where we have a string array instead of numeric DV (e.g. Melee/Unarmed)
                 if (Array.isArray(RANGE_DV_TABLE[category]) && typeof RANGE_DV_TABLE[category][0] === 'string') {
                     targetDV = RANGE_DV_TABLE[category][Math.min(bracketIndex !== -1 ? bracketIndex : 0, RANGE_DV_TABLE[category].length - 1)];
                 }
@@ -98,7 +95,6 @@ class GetVisibleTokens extends FormRequest
                     dv: targetDV === 99 ? 'Out of Range' : targetDV
                 };
 
-                console.log('TARGET_DV_PACKET:', JSON.stringify(result));
                 return result;
             }
             return { error: 'No valid token/target' };
@@ -108,7 +104,7 @@ class GetVisibleTokens extends FormRequest
         $cacheKey = sprintf('dvinfo:%s:%s:%s', $clientId, $tokenId, $weaponId);
         $ttl = now()->addSeconds(1);
         $return = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
-            return $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+            return $client->utilities->executeJs($clientId, $js);
         });
 
         return response()->json([

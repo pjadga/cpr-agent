@@ -57,7 +57,7 @@ class DamageRoll extends FormRequest
                     targetToken.setTarget(false);
                 }";
 
-        $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        $return = $client->utilities->executeJs($clientId, $js);
 
         return response()->json([
             'success' => true,

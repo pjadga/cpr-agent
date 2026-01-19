@@ -6,13 +6,13 @@
                               :current="charData.data.system.derivedStats.hp.value"
                               :max="charData.data.system.derivedStats.hp.max"
                               color="text-red-500"
-                              @click="$emit('open-resource', 'HIT POINTS', charData.data.system.derivedStats.hp.value, charData.data.system.derivedStats.hp.max, 'text-red-500')">
+                              @edit="$emit('open-resource', 'HIT POINTS', charData.data.system.derivedStats.hp.value, charData.data.system.derivedStats.hp.max, 'text-red-500')">
             </resource-counter>
             <resource-counter label="HUMANITY"
                               :current="charData.data.system.derivedStats.humanity.value"
                               :max="charData.data.system.derivedStats.humanity.max"
                               color="text-cyan-400"
-                              @click="$emit('open-resource', 'HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-cyan-400')">
+                              @edit="$emit('open-resource', 'HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-cyan-400')">
             </resource-counter>
         </div>
 
@@ -31,13 +31,13 @@
             <adjustable-stat label="LUCK"
                              :current="luck.value"
                              :max="luck.max"
-                             @updateStat="(val) => $emit('update-stat', 'LUCK', val)"
+                             @updateStat="(label, val) => $emit('update-stat', label, val)"
                              @sendStatRequest="$emit('stat-request', 'LUCK')">
             </adjustable-stat>
             <adjustable-stat label="EMP"
                              :current="emp.value"
                              :max="emp.max"
-                             @updateStat="(val) => $emit('update-stat', 'EMP', val)"
+                             @updateStat="(label, val) => $emit('update-stat', label, val)"
                              @sendStatRequest="$emit('stat-request', 'EMP')">
             </adjustable-stat>
         </div>

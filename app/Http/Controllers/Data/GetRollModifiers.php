@@ -108,7 +108,7 @@ class GetRollModifiers extends FormRequest
         $cacheKey = sprintf('rollmods:%s:%s:%s', $clientId, $actorId, $weaponId);
         $ttl = now()->addSeconds(3);
         $return = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
-            return $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+            return $client->utilities->executeJs($clientId, $js);
         });
 
         return response()->json([

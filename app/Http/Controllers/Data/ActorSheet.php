@@ -24,6 +24,7 @@ class ActorSheet extends FormRequest
 
         $client = $this->getFoundryClient();
         $clientId = auth()->user()->getClientId();
+        $actor = str_replace('Actor.', '', $validatedData["actorUuid"]);
         $data = $client->entity->getActorSheetAsJson($clientId, $validatedData["actorUuid"]);
 
         $characterData = $data['data'] ?? [];

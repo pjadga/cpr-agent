@@ -19,27 +19,43 @@
                 <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                     <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Target Acquisition
                 </h3>
-                <div class="grid grid-cols-1 gap-2">
-                    <div v-for="enemy in mockEnemies" :key="enemy.id"
-                         @click="controlState.selectedTarget = enemy"
-                         class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all"
-                         :class="controlState.selectedTarget?.id === enemy.id ? 'border-red-600 bg-red-900/10' : 'border-gray-800 bg-[#0a0a0a] hover:border-gray-600'">
-                        <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-red-900/20 border border-red-900/40 flex items-center justify-center text-red-500 font-bold text-xs">
-                                {{ enemy.name[0] }}
+                <div class="relative">
+                    <button @click="showTargetDropdown = !showTargetDropdown"
+                            class="w-full p-3 bg-[#0a0a0a] border border-gray-800 flex items-center justify-between text-left transition-colors hover:border-gray-600">
+                        <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
+                            <div class="w-6 h-6 rounded-full bg-red-900/20 border border-red-900/40 flex items-center justify-center text-red-500 font-bold text-[10px]">
+                                {{ controlState.selectedTarget.name[0] }}
                             </div>
-                            <div>
-                                <div class="text-xs font-bold text-white uppercase">{{ enemy.name }}</div>
-                                <div class="text-[9px] text-gray-500 font-mono">{{ enemy.distanceM }}m away</div>
+                            <span class="text-xs font-bold text-white uppercase">{{ controlState.selectedTarget.name }}</span>
+                            <span class="text-[9px] text-gray-500 font-mono">({{ controlState.selectedTarget.distanceM }}m)</span>
+                        </div>
+                        <span v-else class="text-xs text-gray-600 uppercase italic font-mono">No Hostile Signal Locked</span>
+                        <i v-icon data-lucide="chevron-down" class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{'rotate-180': showTargetDropdown}"></i>
+                    </button>
+
+                    <transition name="expand">
+                        <div v-if="showTargetDropdown" class="absolute z-50 w-full mt-1 bg-[#050505] border border-gray-800 shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
+                            <div v-for="enemy in mockEnemies" :key="enemy.id"
+                                 @click="controlState.selectedTarget = enemy; showTargetDropdown = false"
+                                 class="p-3 flex items-center justify-between cursor-pointer hover:bg-red-900/20 transition-colors">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-900/20 border border-red-900/40 flex items-center justify-center text-red-500 font-bold text-xs">
+                                        {{ enemy.name[0] }}
+                                    </div>
+                                    <div>
+                                        <div class="text-xs font-bold text-white uppercase">{{ enemy.name }}</div>
+                                        <div class="text-[9px] text-gray-500 font-mono">{{ enemy.distanceM }}m away</div>
+                                    </div>
+                                </div>
+                                <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-red-500">
+                                    <i v-icon data-lucide="target" class="w-4 h-4"></i>
+                                </div>
+                            </div>
+                            <div v-if="mockEnemies.length === 0" class="p-6 text-center">
+                                <span class="text-[10px] text-gray-600 uppercase font-mono italic">No hostile signals detected</span>
                             </div>
                         </div>
-                        <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-red-500">
-                            <i v-icon data-lucide="target" class="w-5 h-5 animate-pulse"></i>
-                        </div>
-                    </div>
-                    <div v-if="mockEnemies.length === 0" class="p-6 border border-dashed border-gray-800 text-center">
-                        <span class="text-[10px] text-gray-600 uppercase font-mono italic">No hostile signals detected</span>
-                    </div>
+                    </transition>
                 </div>
             </div>
 
@@ -50,13 +66,29 @@
                 <div class="space-y-2">
                     <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
                          @click="controlState.selectedWeapon = weapon"
-                         class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all"
+                         class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all relative overflow-hidden"
                          :class="controlState.selectedWeapon?._id === weapon._id ? 'border-orange-600 bg-orange-900/10' : 'border-gray-800 bg-[#0a0a0a] hover:border-gray-600'">
+
+                        <div v-if="getStatusLine(weapon)"
+                             class="absolute top-0 left-0 h-[2px] transition-all duration-500 z-10"
+                             :class="getStatusLine(weapon).color"
+                             :style="{ width: getStatusLine(weapon).width }">
+                        </div>
+
                         <div class="flex items-center gap-3">
                             <img :src="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-gray-800">
                             <div>
                                 <div class="text-xs font-bold text-white uppercase">{{ weapon.name }}</div>
-                                <div class="text-[9px] text-gray-500 font-mono">{{ weapon.system.weaponType }} | {{ weapon.system.damage }}</div>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <span class="text-[10px] font-mono text-gray-400">
+                                        <template v-if="!isMeleeOrUnarmed(weapon) && weapon.system.magazine">
+                                            {{ weapon.system.magazine.value }} <span class="text-gray-600">/</span> {{ getAmmoTotal(weapon) }}
+                                            <span v-if="getAmmoName(weapon)" class="ml-1 text-yellow-600 text-[8px]">[{{ getAmmoName(weapon) }}]</span>
+                                        </template>
+                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-red-400 font-bold">{{ weapon.system.damage }}</span>
+                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ weapon.system.rof }}</span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                         <div v-if="controlState.selectedWeapon?._id === weapon._id" class="text-orange-500">
@@ -66,57 +98,15 @@
                 </div>
             </div>
 
-            <div v-if="controlState.selectedWeapon" class="space-y-4 pt-2 border-t border-gray-800/50 animate-in slide-in-from-bottom-4 duration-300">
-                <div class="flex items-center justify-between bg-black/40 border border-gray-800 p-3">
-                    <div>
-                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Fire Mode</div>
-                        <div class="flex gap-1">
-                            <button v-for="mode in availableFireModes" :key="mode.id"
-                                    @click="controlState.fireMode = mode.id"
-                                    class="px-2 py-1 text-[9px] font-black uppercase border transition-all flex items-center gap-1"
-                                    :class="controlState.fireMode === mode.id ? 'bg-orange-600 border-orange-600 text-black' : 'border-gray-800 text-gray-500 hover:text-gray-300'">
-                                <i v-icon :data-lucide="mode.icon" class="w-3 h-3"></i> {{ mode.label }}
-                            </button>
-                        </div>
+            <!-- Trigger for Combat Panel -->
+            <div class="fixed bottom-24 right-6 z-[60]">
+                <button @click="$emit('open-combat-panel')"
+                        class="w-16 h-16 bg-red-600 text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.5)] active:scale-95 transition-all border-4 border-black group">
+                    <i v-icon data-lucide="crosshair" class="w-8 h-8 group-hover:rotate-90 transition-transform duration-500"></i>
+                    <div class="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border-2 border-black" v-if="controlState.selectedWeapon">
+                        <div class="w-2 h-2 bg-red-600 rounded-full animate-ping"></div>
                     </div>
-                    <div class="text-right">
-                        <div class="text-[10px] text-gray-500 uppercase font-bold mb-1">Target DV</div>
-                        <div v-if="dvLoading" class="text-orange-500 animate-pulse font-mono font-bold">CALC...</div>
-                        <div v-else-if="dvError" class="text-red-500 font-mono text-xs">ERR</div>
-                        <div v-else class="text-2xl font-black text-white font-mono leading-none">{{ dvInfo || '--' }}</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <button @click="$emit('roll-hit')"
-                            :disabled="controlState.reloadRequired"
-                            class="py-4 bg-red-600 text-black font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-red-500 transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed">
-                        <span class="text-xl">Execute Attack</span>
-                        <span v-if="controlState.reloadRequired" class="text-[10px] animate-pulse">Out of Ammo!</span>
-                    </button>
-                    <button @click="$emit('roll-damage')"
-                            class="py-4 border-2 border-red-600 text-red-500 font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-red-600 hover:text-black transition-all active:scale-95">
-                        <span class="text-xl">Roll Damage</span>
-                    </button>
-                </div>
-
-                <button v-if="controlState.selectedWeapon.system.magazine"
-                        @click="$emit('reload')"
-                        class="w-full py-2 bg-gray-900 border border-gray-800 text-gray-400 font-bold uppercase text-[10px] tracking-widest hover:bg-gray-800 hover:text-white transition-all">
-                    Reload Systems
                 </button>
-            </div>
-
-            <div>
-                <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-3">Tactical Movement</h3>
-                <div class="grid grid-cols-3 gap-2 max-w-[200px] mx-auto">
-                    <div></div>
-                    <button @click="$emit('move', 'up')" class="p-4 bg-gray-900 border border-gray-800 text-white hover:bg-gray-800 active:bg-red-900/40 transition-colors"><i v-icon data-lucide="chevron-up"></i></button>
-                    <div></div>
-                    <button @click="$emit('move', 'left')" class="p-4 bg-gray-900 border border-gray-800 text-white hover:bg-gray-800 active:bg-red-900/40 transition-colors"><i v-icon data-lucide="chevron-left"></i></button>
-                    <button @click="$emit('move', 'down')" class="p-4 bg-gray-900 border border-gray-800 text-white hover:bg-gray-800 active:bg-red-900/40 transition-colors"><i v-icon data-lucide="chevron-down"></i></button>
-                    <button @click="$emit('move', 'right')" class="p-4 bg-gray-900 border border-gray-800 text-white hover:bg-gray-800 active:bg-red-900/40 transition-colors"><i v-icon data-lucide="chevron-right"></i></button>
-                </div>
             </div>
         </div>
 
@@ -198,6 +188,7 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import { vIcon } from '../../directives/icon';
 import { useCharacterData } from '../../composables/useCharacterData';
 import ProgramRow from './ProgramRow.vue';
@@ -213,12 +204,85 @@ export default {
     directives: { icon: vIcon },
     emits: [
         'roll-hit', 'roll-damage', 'reload', 'move',
-        'open-cyberdeck-config', 'program-roll-request',
+        'open-cyberdeck-config', 'open-combat-panel', 'program-roll-request',
         'toggle-program-details', 'toggle-rez', 'roll-program'
     ],
     setup() {
-        const { getImageUrl } = useCharacterData();
-        return { getImageUrl };
+        const { getImageUrl, charData } = useCharacterData();
+        const showTargetDropdown = ref(false);
+
+        const isMeleeOrUnarmed = (item) => {
+            const type = item.system.weaponType || '';
+            return type.toLowerCase().includes('melee') || type.toLowerCase().includes('martial') || type === 'unarmed' || item.system.isMelee;
+        };
+
+        const getAmmoTotal = (weapon) => {
+            if (!charData.value) return 0;
+            const allItems = charData.value.data.items;
+
+            // First, try to find the installed ammo
+            if (weapon.system.installedItems && weapon.system.installedItems.list) {
+                const ammoId = weapon.system.installedItems.list[0];
+                if (ammoId) {
+                    const ammoItem = allItems.find(i => i._id === ammoId);
+                    if (ammoItem) {
+                        return ammoItem.system.amount || ammoItem.system.count || 0;
+                    }
+                }
+            }
+
+            // Fallback to searching by weapon type if no specific ammo is installed
+            const wType = weapon.system.weaponType;
+            if (!wType) return weapon.system.magazine?.max || 0;
+
+            const total = allItems
+                .filter(i => i.type === 'ammo' && i.system.ammoType === wType)
+                .reduce((sum, i) => sum + (i.system.amount || i.system.count || 0), 0);
+
+            return total || weapon.system.magazine?.max || 0;
+        };
+
+        const getAmmoName = (weapon) => {
+            if (!charData.value || !weapon.system.installedItems || !weapon.system.installedItems.list) return null;
+            const ammoId = weapon.system.installedItems.list[0];
+            if (!ammoId) return null;
+            const ammoItem = charData.value.data.items.find(i => i._id === ammoId);
+            return ammoItem ? ammoItem.name : null;
+        };
+
+        const getStatusLine = (weapon) => {
+            const sys = weapon.system;
+            if (isMeleeOrUnarmed(weapon) || !sys.magazine || sys.magazine.max <= 0) return null;
+
+            let percent = (sys.magazine.value / sys.magazine.max) * 100;
+            percent = Math.min(100, Math.max(0, percent));
+
+            let color = 'bg-green-500';
+            if (percent < 25) color = 'bg-red-500';
+            else if (percent < 60) color = 'bg-amber-500';
+
+            return {
+                width: `${percent}%`,
+                color: color
+            };
+        };
+
+        return { getImageUrl, showTargetDropdown, isMeleeOrUnarmed, getAmmoTotal, getAmmoName, getStatusLine };
     }
 }
 </script>
+
+<style scoped>
+.expand-enter-active,
+.expand-leave-active {
+    transition: all 0.2s ease-out;
+    max-height: 500px;
+    opacity: 1;
+}
+.expand-enter-from,
+.expand-leave-to {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+</style>

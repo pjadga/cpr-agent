@@ -21,12 +21,12 @@ class ListVisibleTokens extends FormRequest
         //language=JS
         $js = "
         const PIXELS_PER_METER = canvas.grid.size;
-        const tokenId = '$tokenId';//Saved Token ID
-        const jim = canvas.tokens.placeables.find(t => t.id === tokenId); //RIP Jim
+        const tokenId = '$tokenId';
+        const jim = canvas.tokens.get(tokenId);
 
         if (!jim) {
-            console.error(`Could not find a token on scene.`);
-            return 'Nope!!!'
+            console.error('Could not find token ' + tokenId + ' on scene.');
+            return [];
         } else {
             const d = canvas.dimensions;
             const jimX = jim.center.x;
@@ -43,7 +43,7 @@ class ListVisibleTokens extends FormRequest
                 .map(t => {
                     const distX = t.center.x - jimX;
                     const distY = t.center.y - jimY;
-                    const distancePx = Math.sqrt(distX**2 + distY**2);
+                    const distancePx = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
                     const distanceMeters = (distancePx / PIXELS_PER_METER).toFixed(2);
                     return {
                         name: t.name,
@@ -61,7 +61,7 @@ class ListVisibleTokens extends FormRequest
         $cacheKey = sprintf('visibletokens:%s:%s', $clientId, $tokenId);
         $ttl = now()->addSeconds(2);
         $result = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
-            return $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+            return $client->utilities->executeJs($clientId, $js);
         });
 
         return response()->json([

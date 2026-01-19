@@ -28,13 +28,14 @@ class ToggleRez extends FormRequest
         $user = auth()->user();
         $clientId = $user->client_id;
         $actorId = $user->default_actor_id;
+        $targetState = $targetState ? 1 : 0;
 
         //language=js
         $js = "
             const programId = '$programId';
             const targetState = $targetState;
 
-            const actor = game.actors.get($actorId);
+            const actor = game.actors.get('$actorId');
             if (!actor) return { error: 'Actor not found' };
 
             const program = actor.items.get(programId);

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Token;
 
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
-use JShrink\Minifier;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -32,9 +31,7 @@ class ReloadWeapon extends FormRequest
         weapon.reload();
         ";
 
-        $return = $client->utilities->executeJs($clientId,
-            \JShrink\Minifier::minify($js)
-        );
+        $return = $client->utilities->executeJs($clientId, $js);
 
         return response()->json([
             'success' => true,

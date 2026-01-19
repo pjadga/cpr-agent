@@ -111,8 +111,9 @@ class AttackRoll extends FormRequest
 
 
 
-        $return = $client->utilities->executeJs($clientId, \JShrink\Minifier::minify($js));
+        $return = $client->utilities->executeJs($clientId, $js);
 
+        $diceTotal = null;
         if (isset($return["success"]) && $return["success"]) {
             //Attack has rolled, get the dice number
             $diceTotal = $client->roll->getLastRoll($clientId);
