@@ -125,16 +125,16 @@
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-px bg-blue-900/30 border border-blue-500/30 mb-6 relative z-10">
-                        <div class="bg-black/80 p-3 text-center flex flex-col items-center">
-                            <div class="text-[9px] text-blue-400/80 uppercase font-bold tracking-widest mb-1">Defense</div>
-                            <div class="text-3xl font-black text-white leading-none">{{ activeCyberdeck.system.quality === 'poor' ? '7' : activeCyberdeck.system.quality === 'excellent' ? '11' : '9' }}</div>
-                        </div>
-                        <div class="bg-black/80 p-3 text-center flex flex-col items-center">
-                            <div class="text-[9px] text-blue-400/80 uppercase font-bold tracking-widest mb-1">Speed</div>
-                            <div class="text-3xl font-black text-white leading-none">{{ activeCyberdeck.system.spd || '4' }}</div>
-                        </div>
-                    </div>
+<!--                    <div class="grid grid-cols-2 gap-px bg-blue-900/30 border border-blue-500/30 mb-6 relative z-10">-->
+<!--                        <div class="bg-black/80 p-3 text-center flex flex-col items-center">-->
+<!--                            <div class="text-[9px] text-blue-400/80 uppercase font-bold tracking-widest mb-1">Defense</div>-->
+<!--                            <div class="text-3xl font-black text-white leading-none">{{ activeCyberdeck.system.quality === 'poor' ? '7' : activeCyberdeck.system.quality === 'excellent' ? '11' : '9' }}</div>-->
+<!--                        </div>-->
+<!--                        <div class="bg-black/80 p-3 text-center flex flex-col items-center">-->
+<!--                            <div class="text-[9px] text-blue-400/80 uppercase font-bold tracking-widest mb-1">Speed</div>-->
+<!--                            <div class="text-3xl font-black text-white leading-none">{{ activeCyberdeck.system.spd || '4' }}</div>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
                     <h4 class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10">

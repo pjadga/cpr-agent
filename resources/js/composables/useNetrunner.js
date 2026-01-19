@@ -95,12 +95,13 @@ export function useNetrunner(charData, sendRequest, throwError) {
 
     const rollProgram = (program, activeDeck, controlState) => {
         if (controlState) controlState.value.selectedProgram = program;
+        console.log(program);
         sendRequest({
             cyberdeckId: activeDeck._id,
             programId: program._id,
             programName: program.name,
             type: program.type,
-            executionType: (program.atk > 0 ? "attack" : "defense"),
+            executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk" ),
         }, '/programroll');
     };
 
