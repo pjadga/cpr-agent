@@ -144,7 +144,7 @@
                     <div class="grid grid-cols-3 gap-2 relative z-10">
                         <button v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap']"
                                 :key="action"
-                                @click="$emit('program-roll-request', { label: action, type: 'interface' })"
+                                @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
                                 class="py-3 bg-blue-900/20 border border-blue-500/30 text-[9px] font-bold text-blue-100 uppercase hover:bg-blue-500 hover:text-black hover:border-blue-400 transition-all">
                             {{ action }}
                         </button>

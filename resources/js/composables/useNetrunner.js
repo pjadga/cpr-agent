@@ -96,10 +96,10 @@ export function useNetrunner(charData, sendRequest, throwError) {
     const rollProgram = (program, controlState) => {
         if (controlState) controlState.value.selectedProgram = program;
         sendRequest({
-            _id: program._id,
-            name: program.name,
-            atk: program.system.atk,
-            def: program.system.def
+            programId: program._id,
+            programName: program.name,
+            type: program.type,
+            executionType: (program.atk > 0 ? "atk" : "def"),
         }, '/programroll');
     };
 

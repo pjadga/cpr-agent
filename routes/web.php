@@ -10,6 +10,7 @@ use App\Http\Controllers\Rolls\AttackRoll;
 use App\Http\Controllers\Rolls\DamageRoll;
 use App\Http\Controllers\Rolls\DeathSave;
 use App\Http\Controllers\Rolls\FaceDown;
+use App\Http\Controllers\Rolls\ProgramRoll;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
@@ -88,6 +89,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/installprogram", [InstallProgram::class, "installProgram"]);
     Route::post("/uninstallprogram", [RemoveProgram::class, "removeProgram"]);
     Route::post("/toggleprogramrez", [ToggleRez::class, "toggleRez"]);
+    Route::post("/programroll", [ProgramRoll::class, "programRoll"]);
 });
 
 require __DIR__.'/auth.php';
