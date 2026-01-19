@@ -163,7 +163,7 @@
                                     :is-expanded="expandedPrograms[prog._id]"
                                     @toggle-details="$emit('toggle-program-details', prog._id)"
                                     @toggle-rez="$emit('toggle-rez', prog)"
-                                    @execute="$emit('roll-program', prog)">
+                                    @execute="$emit('roll-program', prog, activeCyberdeck)">
                                 </program-row>
                             </div>
                         </div>

@@ -93,13 +93,14 @@ export function useNetrunner(charData, sendRequest, throwError) {
         sendRequest({ programId: program._id, isRezzed: !program.system.isRezzed }, '/toggleprogramrez');
     };
 
-    const rollProgram = (program, controlState) => {
+    const rollProgram = (program, activeDeck, controlState) => {
         if (controlState) controlState.value.selectedProgram = program;
         sendRequest({
+            cyberdeckId: activeDeck._id,
             programId: program._id,
             programName: program.name,
             type: program.type,
-            executionType: (program.atk > 0 ? "atk" : "def"),
+            executionType: (program.atk > 0 ? "attack" : "defense"),
         }, '/programroll');
     };
 

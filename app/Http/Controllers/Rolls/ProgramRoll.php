@@ -24,7 +24,7 @@ class ProgramRoll extends FormRequest
 
         //Need to get the actors either ID or Name -
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
-        $programName = $validatedData['programName']  ?? null;
+        $programName = lcfirst($validatedData['programName'])  ?? null;
         $programId = $validatedData['programId']  ?? null;
         $cyberdeckId = $validatedData['cyberdeckId']  ?? null;
         $executionType = $validatedData['executionType']  ?? null;
@@ -35,6 +35,7 @@ class ProgramRoll extends FormRequest
 
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
+        $rollType = ($executionType ? 'cyberdeckProgram' : 'interfaceAbility');
 
         //This JS may cause issues with targeting if there are many people trying to target.
         //The targeting from the dropdown is now removed.
@@ -46,11 +47,13 @@ class ProgramRoll extends FormRequest
         let skillRoll = game.actors.get('$actorId');
 
         const dummyBtn = document.createElement('a');
-        dummyBtn.dataset.rollType = 'interfaceAbility';
+        dummyBtn.dataset.rollType = '$rollType'
         dummyBtn.dataset.cyberdeckId = '$cyberdeckId';
         dummyBtn.dataset.rollTitle = '$programName';
         dummyBtn.dataset.interfaceAbility = '$programName';
         dummyBtn.dataset.itemId = '$cyberdeckId';
+        dummyBtn.dataset.programId = '$programId';
+        dummyBtn.dataset.executionType = '$executionType';
 
         skillRoll.sheet._onRoll( {
         type: 'click',

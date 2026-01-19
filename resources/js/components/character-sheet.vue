@@ -364,7 +364,7 @@ export default {
             toggleProgramDetails
         } = useNetrunner(charData, sendRequest, throwError);
 
-        const rollProgram = (program) => rollProgramBase(program, controlState);
+        const rollProgram = (program, activeCyberdeck) => rollProgramBase(program, activeCyberdeck, controlState);
 
         const openRollPanel = async () => {
             await openRollPanelBase();
