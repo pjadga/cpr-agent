@@ -18,12 +18,12 @@
                     <div class="flex items-center justify-between bg-black/40 border border-gray-800 p-3 rounded-sm">
                         <div class="flex-1">
                             <div class="text-[10px] text-gray-500 uppercase font-bold mb-2">Select Fire Mode</div>
-                            <div class="flex flex-wrap gap-2">
+                            <div class="grid grid-cols-2 gap-2">
                                 <button v-for="mode in availableFireModes" :key="mode.id"
                                         @click="$emit('update:fireMode', mode.id)"
-                                        class="px-3 py-2 text-[10px] font-black uppercase border transition-all flex items-center gap-2 rounded-sm"
+                                        class="px-4 py-3 text-xs font-black uppercase border transition-all flex items-center justify-center gap-2 rounded-sm"
                                         :class="fireMode === mode.id ? 'bg-orange-600 border-orange-600 text-black' : 'border-gray-800 text-gray-400 hover:text-gray-200 hover:border-gray-600'">
-                                    <i v-icon :data-lucide="mode.icon" class="w-3.5 h-3.5"></i> {{ mode.label }}
+                                    <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i> {{ mode.label }}
                                 </button>
                             </div>
                         </div>

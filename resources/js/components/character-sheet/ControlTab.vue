@@ -109,9 +109,6 @@
         <div v-else-if="controlState.spaceMode === 'netspace'" class="space-y-6 animate-in fade-in duration-300">
             <div v-if="activeCyberdeck" class="relative">
                 <div class="cpr-panel p-4 bg-blue-950/20 border border-blue-500/30 mb-4 overflow-hidden group">
-                    <div class="absolute top-0 right-0 p-2 opacity-20 group-hover:opacity-100 transition-opacity">
-                        <i v-icon data-lucide="cpu" class="w-16 h-16 text-blue-500"></i>
-                    </div>
                     <div class="relative z-10 flex justify-between items-start mb-4">
                         <div>
                             <h3 class="text-lg font-black text-white uppercase tracking-tighter">{{ activeCyberdeck.name }}</h3>
@@ -138,7 +135,7 @@
 
                     <h4 class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10">
-                        <button v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap']"
+                        <button v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap', 'Defense', 'Speed']"
                                 :key="action"
                                 @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
                                 class="py-3 bg-blue-900/20 border border-blue-500/30 text-[9px] font-bold text-blue-100 uppercase hover:bg-blue-500 hover:text-black hover:border-blue-400 transition-all">

@@ -45,12 +45,12 @@ class GetVisibleTokens extends FormRequest
               'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
               'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
               'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
-              'Martial Arts': ['Ka Pow', 'Hee Ya', 'Whammy', 'SMACK', 'KaCHOW', 'Ka Pow', 'Hee Ya', 'Whammy'],
-              'Unarmed': ['Fists Up, Samurai'],
-              'Light Melee Weapon' : ['Light Melee'],
-              'Medium Melee Weapon' : ['Medium Melee'],
-              'Heavy Melee Weapon' : ['Heavy Melee'],
-              'Very Heavy Melee Weapon' : ['Very Heavy Melee']
+              'Martial Arts': ['VS'],
+              'Unarmed': ['VS'],
+              'Light Melee Weapon' : ['VS'],
+              'Medium Melee Weapon' : ['VS'],
+              'Heavy Melee Weapon' : ['VS'],
+              'Very Heavy Melee Weapon' : ['VS']
             };
             const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
 

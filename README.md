@@ -5,12 +5,8 @@ A hostable companion app for Cyberpunk Red, designed to bridge the gap between p
 ## State
 Currently functioning but actively being worked on. 
 ### Known issues/upcoming features
-* Netrunner role - Net actions not supported yet
-* Sub role rolls not shown (just the main Role)
 * Weapon equip/conceal - The Control section shows all weapons whether they are 'equipped' or not. I'm not sure if this has any impact further than RP.
-* Dynamic shooting modes (currently they all show)
 * Ping targets not working yet.
-* Padding issue at the bottom of the screen.
 * Colour themes
 * Long goal - Originally I had the Agent idea where there's more of a 'phone' aspect. I think for RP purposes the GM could upload scream sheets, stories, add phone numbers of fixers/contacts etc. Getting a text mid gig from a fixer telling em to gtfo would be pretty ace. I'm imagining it working with notes + handouts. Though I feel this is on my way to making a Foundry module of my own...
 
@@ -23,7 +19,9 @@ Currently functioning but actively being worked on.
     * Calculated DV values per weapon.
     * Weapon selection, reloading, and multiple firing modes.
     * Hit and Damage rolls based on target and selected weapon.
-
+* **Netrunning Support**
+  * Cyberdeck configuration - rez/de-rez and installation of programs.
+  * Net actions and Programs rollable.
 ## Setup & Installation
 
 ### Quickest way
