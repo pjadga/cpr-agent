@@ -41,7 +41,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const getVisibleTokens = () => {
         cachedPost("/listvisibletokens", {}, 1500).then(response => {
-            const list = response?.data?.data?.result || response?.data?.data || [];
+            const listData = response?.data?.data?.result || response?.data?.data || [];
+            const list = Array.isArray(listData) ? listData : [];
 
             // Update existing list to prevent complete re-render if possible
             const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
@@ -127,7 +128,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const checkReloadRequired = () => {
         const weapon = controlState.value.selectedWeapon;
-        if (weapon?.system.magazine && weapon.system.magazine.max > 0) {
+        if (weapon?.system?.magazine && weapon.system.magazine.max > 0) {
             controlState.value.reloadRequired = weapon.system.magazine.value === 0;
         } else {
             controlState.value.reloadRequired = false;
@@ -167,6 +168,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         moveToken,
         rollHit,
         rollDamage,
+        targetToken,
         checkReloadRequired,
         reloadWeapon,
         fetchDVForSelectedWeapon

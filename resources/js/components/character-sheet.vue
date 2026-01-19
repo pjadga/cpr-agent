@@ -336,8 +336,7 @@ export default {
             rollDamage,
             checkReloadRequired,
             reloadWeapon,
-            fetchDVForSelectedWeapon,
-            targetToken
+            fetchDVForSelectedWeapon
         } = useCombat(controlState, charData, fetchCharacterData, throwError);
 
         const {
@@ -568,13 +567,6 @@ export default {
                     if (match) controlState.value.selectedTarget = match;
                 }
                 debouncedGetVisibleTokens();
-            }
-        });
-
-        watch(() => controlState.value.selectedTarget, (newTarget) => {
-            if (newTarget) {
-                targetToken(newTarget.id);
-                debouncedFetchDV();
             }
         });
 

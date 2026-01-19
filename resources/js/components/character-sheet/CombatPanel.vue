@@ -60,18 +60,7 @@
                     <span class="text-xs text-gray-500 uppercase font-bold tracking-widest">No Weapon Selected</span>
                 </div>
 
-                <!-- Tactical Movement -->
-                <div class="pt-4 border-t border-gray-800/50">
-                    <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Tactical Positioning</h3>
-                    <div class="grid grid-cols-3 gap-3 max-w-[180px] mx-auto">
-                        <div></div>
-                        <button @click="$emit('move', 'up')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-up" class="w-6 h-6"></i></button>
-                        <div></div>
-                        <button @click="$emit('move', 'left')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-left" class="w-6 h-6"></i></button>
-                        <button @click="$emit('move', 'down')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-down" class="w-6 h-6"></i></button>
-                        <button @click="$emit('move', 'right')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-right" class="w-6 h-6"></i></button>
-                    </div>
-                </div>
+
             </div>
         </div>
     </transition>
@@ -87,7 +76,7 @@ export default {
         'dvLoading', 'dvError', 'dvInfo', 'reloadRequired'
     ],
     directives: { icon: vIcon },
-    emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'move', 'update:fireMode']
+    emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'update:fireMode']
 }
 </script>
 
