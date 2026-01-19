@@ -24,10 +24,11 @@ class ProgramRoll extends FormRequest
 
         //Need to get the actors either ID or Name -
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
-        $programName = $validatedData['programName'];
-//        $programId = $validatedData['programId'];
-        $cyberdeckId = $validatedData['cyberdeckId'];
-//        $executionType = $validatedData['executionType'];
+        $programName = $validatedData['programName']  ?? null;
+        $programId = $validatedData['programId']  ?? null;
+        $cyberdeckId = $validatedData['cyberdeckId']  ?? null;
+        $executionType = $validatedData['executionType']  ?? null;
+        $type = $validatedData['type']  ?? null;
 
         $client = $this->getFoundryClient();
         $user = auth()->user();
@@ -38,20 +39,19 @@ class ProgramRoll extends FormRequest
         //This JS may cause issues with targeting if there are many people trying to target.
         //The targeting from the dropdown is now removed.
         //language=js
+
+
+
         $js = "
-            let skillRoll = game.actors.get('$actorId');
-            let progRoll = await skillRoll.sheet._onRoll(
-            {
-            'data-roll-type': 'interfaceAbility',
-            'data-interface-ability': '$programName',
-            'data-cyberdeck-id': '$cyberdeckId',
-            type: 'click',
-            currentTarget: {
-            'data-roll-type': 'interfaceAbility',
-            'data-interface-ability': '$programName',
-            'data-cyberdeck-id': '$cyberdeckId'
-            }})
-            console.log(progRoll);
+        let skillRoll = game.actors.get('$actorId');
+        skillRoll.sheet._onRoll(
+        {
+        type: 'click',
+        currentTarget: {
+        'data-roll-type': 'interfaceAbility',
+        'data-interface-ability': '$programName',
+        'data-cyberdeck-id': '$cyberdeckId'
+        }})
         ";
         $return = $client->utilities->executeJs($clientId, $js);
 
