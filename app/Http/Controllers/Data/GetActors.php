@@ -29,6 +29,7 @@ class GetActors extends FormRequest
         });
 
         // Simplified for now, just returning the character data
+        $character['uuid'] = "Actor.$actorId";
         return response()->json($character, 200);
     }
 }

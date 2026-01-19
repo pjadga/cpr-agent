@@ -66,11 +66,18 @@ export function useCharacterData() {
      */
     const fetchCharacterData = async (isInitial = false) => {
         try {
-            if (isInitial && !actorUuid) {
+            if (isInitial) {
                 const getActors = await window.axios.post("/getactors");
-                actorUuid = getActors.data.uuid;
-                localStorage.setItem('cpr_actor_uuid', actorUuid);
+                const serverUuid = getActors.data.uuid;
+
+                if (serverUuid && serverUuid !== actorUuid) {
+                    actorUuid = serverUuid;
+                    localStorage.setItem('cpr_actor_uuid', actorUuid);
+                    // If UUID changed, clear old data to force full reload
+                    charData.value = null;
+                }
             }
+
             if (!actorUuid) return;
 
             const response = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
