@@ -1,3 +1,9 @@
+# Mobile Update
+I'm currently in the process of testing an IOS version and soon will have an android version. They will work along side the Desktop/Hosted app as they share the same codebase, and all will still require the Threehats Relay to work (for now).
+
+I'll be opening up testing of mobile devices as soon as I'm happy with the fucntioning of the app.
+
+
 # Cyberpunk Red Companion App
 
 A hostable companion app for Cyberpunk Red, designed to bridge the gap between players at a physical table and a Foundry VTT session. This app displays character stats, handles rolls, and allows for token interaction directly from a mobile device or desktop application.
