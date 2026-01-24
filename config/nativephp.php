@@ -6,7 +6,7 @@ return [
      * It is used to determine if the app needs to be updated.
      * Increment this value every time you release a new version of your app.
      */
-    'version' => env('NATIVEPHP_APP_VERSION', '1.0.1'),
+    'version' => env('NATIVEPHP_APP_VERSION', '1.0.2'),
 
     /**
      * The ID of your application. This should be a unique identifier
@@ -73,6 +73,7 @@ return [
         'NATIVEPHP_AZURE_ENDPOINT',
         'NATIVEPHP_AZURE_CERTIFICATE_PROFILE_NAME',
         'NATIVEPHP_AZURE_CODE_SIGNING_ACCOUNT_NAME',
+        "DB_*"
     ],
 
     /**
