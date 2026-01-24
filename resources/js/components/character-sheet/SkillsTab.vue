@@ -1,5 +1,5 @@
 <template>
-    <div v-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3 pb-20">
+    <div v-if="activeTab === 'skills'" key="skills" class="space-y-4 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         <div v-if="roleItem" class="relative bg-black/60 border border-yellow-500/30 overflow-hidden clip-corner shadow-[0_0_15px_rgba(234,179,8,0.1)]">
             <div class="flex items-stretch bg-gradient-to-r from-yellow-900/40 to-transparent border-b border-yellow-500/20">
                 <div @click="$emit('role-request', roleItem.name)" class="flex-grow p-3 cursor-pointer hover:bg-yellow-500/10 transition-colors group">

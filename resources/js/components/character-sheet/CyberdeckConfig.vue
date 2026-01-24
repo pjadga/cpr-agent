@@ -1,5 +1,5 @@
 <template>
-    <div v-if="activeCyberdeck" class="fixed inset-0 z-[130] flex items-center justify-center p-6 backdrop-blur-md bg-black/80">
+    <div v-if="activeCyberdeck" class="fixed inset-0 z-[130] flex items-center justify-center p-6 backdrop-blur-md bg-black/80 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]">
         <div class="cpr-panel w-full max-w-2xl bg-[#050505] border-2 border-blue-500 shadow-[0_0_40px_rgba(59,130,246,0.3)] flex flex-col max-h-[85vh]">
             <div class="bg-blue-600 p-3 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2">

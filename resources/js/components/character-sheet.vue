@@ -45,8 +45,8 @@
             </cyberdeck-config>
 
             <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
-                <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200" @click.stop>
-                    <div class="absolute top-0 right-0 m-4">
+                <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]" @click.stop>
+                    <div class="absolute top-0 right-0 m-4 mt-[calc(1rem+env(safe-area-inset-top))] mr-[calc(1rem+env(safe-area-inset-right))]">
                         <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
                             <i v-icon data-lucide="x" class="w-6 h-6"></i>
                         </button>
@@ -91,7 +91,7 @@
                 @update:fireMode="controlState.fireMode = $event">
             </combat-panel>
 
-            <header class="p-3 bg-black/90 sticky top-0 z-50 border-b border-red-900 backdrop-blur-md">
+            <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-red-900 backdrop-blur-md">
                 <div class="flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div

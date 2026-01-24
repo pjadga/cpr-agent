@@ -1,5 +1,5 @@
 <template>
-    <div v-if="show" class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/70" @click="$emit('close')">
+    <div v-if="show" class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-black/70 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]" @click="$emit('close')">
         <div class="w-full max-w-xs bg-[#0b0b0b] border border-gray-800 shadow-2xl" @click.stop>
             <div class="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-black/40">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Adjust {{ resourceLabel }}</span>

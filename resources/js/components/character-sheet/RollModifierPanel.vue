@@ -1,7 +1,7 @@
 <template>
     <transition name="slide-right">
-        <aside v-if="show" class="fixed top-0 right-0 h-full w-[20rem] max-w-[85vw] z-[60] bg-black/95 border-l border-red-900 shadow-[0_0_30px_rgba(220,38,38,0.35)]">
-            <div class="flex items-center justify-between p-3 border-b border-red-900 bg-black/70 sticky top-0">
+        <aside v-if="show" class="fixed top-0 right-0 h-full w-[20rem] max-w-[85vw] z-[60] bg-black/95 border-l border-red-900 shadow-[0_0_30px_rgba(220,38,38,0.35)] flex flex-col">
+            <div class="flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b border-red-900 bg-black/70 sticky top-0 shrink-0">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="dice-6" class="w-4 h-4 text-red-500"></i>
                     <span class="text-xs font-black uppercase tracking-widest text-red-500">Roll Modifiers</span>
@@ -15,7 +15,7 @@
                     </button>
                 </div>
             </div>
-            <div class="p-3 space-y-3 overflow-y-auto h-full pb-24">
+            <div class="p-3 space-y-3 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.75rem+env(safe-area-inset-right))]">
                 <div v-if="loading" class="text-center py-8 text-gray-400 text-xs">Loading modifiers...</div>
 
                 <div v-else-if="error" class="border border-red-700 bg-red-900/20 text-red-400 text-xs p-3">

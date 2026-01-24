@@ -1,6 +1,6 @@
 <template>
     <transition name="slide-up">
-        <div v-if="show" class="fixed inset-x-0 bottom-0 z-[70] bg-black/95 border-t border-red-900 shadow-[0_-10px_30px_rgba(220,38,38,0.3)] pb-10">
+        <div v-if="show" class="fixed inset-x-0 bottom-0 z-[70] bg-black/95 border-t border-red-900 shadow-[0_-10px_30px_rgba(220,38,38,0.3)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <!-- Header/Handle -->
             <div class="flex items-center justify-between p-3 border-b border-red-900/50 bg-red-950/10">
                 <div class="flex items-center gap-2">
