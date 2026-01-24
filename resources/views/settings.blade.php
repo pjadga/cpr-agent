@@ -6,9 +6,17 @@
         <h2 class="text-4xl font-bold glow-lime text-lime-500 uppercase tracking-tighter">
             System Configuration & Neural Link
         </h2>
-        <a href="{{ route('dashboard') }}" class="cyber-button bg-gray-800 border-gray-700 text-xs px-4 py-2 uppercase">
-            Return to Interface
-        </a>
+        <div class="flex gap-4">
+            <a href="{{ route('dashboard') }}" class="cyber-button bg-gray-800 border-gray-700 text-xs px-4 py-2 uppercase">
+                Return to Interface
+            </a>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="cyber-button bg-red-900 border-red-800 text-xs px-4 py-2 uppercase hover:bg-red-700">
+                    Disconnect
+                </button>
+            </form>
+        </div>
     </div>
 
     @if(session('success'))

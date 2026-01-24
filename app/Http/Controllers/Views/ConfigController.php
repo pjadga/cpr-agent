@@ -20,7 +20,7 @@ class ConfigController
             'foundry_url' => 'nullable|string',
         ]);
 
-        $config = Config::first() ?: new Config();
+        $config = $request->user()->config ?: new Config(['user_id' => $request->user()->id]);
         $config->fill($validated);
         $config->save();
 
@@ -29,11 +29,11 @@ class ConfigController
 
     public function getBaseUrl(Request $request)
     {
-        return Config::first()->base_url ?? null;
+        return $request->user()->config->base_url ?? null;
     }
 
     public function getFoundryUrl(Request $request)
     {
-        return Config::first()->foundry_url ?? null;
+        return $request->user()->config->foundry_url ?? null;
     }
 }
