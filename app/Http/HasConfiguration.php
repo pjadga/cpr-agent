@@ -2,8 +2,8 @@
 
 namespace App\Http;
 
-use App\Support\Foundry\FoundryService;
 use App\Models\Config;
+use FoundryClient\FoundryClient;
 
 trait HasConfiguration
 {
@@ -22,8 +22,8 @@ trait HasConfiguration
     /**
      * @throws \Exception
      */
-    public function getFoundryClient(): FoundryService
+    public function getFoundryClient(): FoundryClient
     {
-        return new FoundryService($this->getApiKey(), $this->getBaseUrl());
+        return new FoundryClient($this->getApiKey(), $this->getBaseUrl());
     }
 }

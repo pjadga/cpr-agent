@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Rolls;
 
 use App\Http\HasConfiguration;
-use App\Support\Foundry\FoundryService;
+use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
