@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Data;
 
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
+use App\Support\Foundry\FoundryService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
