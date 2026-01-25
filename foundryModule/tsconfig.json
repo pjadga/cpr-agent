@@ -8,10 +8,10 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./",
-    "rootDir": "./scripts",
+    "rootDir": "./src",
     "lib": ["DOM", "ESNext"],
     "types": ["@league-of-foundry-developers/foundry-vtt-types"]
   },
-  "include": ["scripts/**/*"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
