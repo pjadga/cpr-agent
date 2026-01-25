@@ -1,0 +1,14 @@
+{
+  "name": "cpra-foundry-bridge",
+  "title": "CPRA Foundry Bridge",
+  "description": "Bridge between Cyberpunk Red Companion App and Foundry VTT",
+  "version": "1.0.0",
+  "author": "Chris",
+  "minimumCoreVersion": "12",
+  "compatibleCoreVersion": "12",
+  "esmodules": ["main.js"],
+  "styles": [],
+  "flags": {
+    "allowJsEval": true
+  }
+}

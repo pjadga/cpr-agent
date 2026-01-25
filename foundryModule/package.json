@@ -1,0 +1,14 @@
+{
+  "name": "cpra-foundry-bridge",
+  "version": "1.0.0",
+  "description": "Bridge between Cyberpunk Red Companion App and Foundry VTT",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@league-of-foundry-developers/foundry-vtt-types": "^12.0.0"
+  }
+}
