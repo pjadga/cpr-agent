@@ -22,7 +22,7 @@
             </div>
             <div class="mb-3">
                 <label for="base_url" class="form-label">Base URL</label>
-                <input type="text" name="base_url" class="form-label w-100" id="base_url" value="{{ old('base_url', $config->base_url) }}">
+                <input type="text" name="base_url" class="form-label w-100" id="base_url" value="{{ old('base_url', $config->base_url ?? config('services.foundry.base_url')) }}">
             </div>
             <div class="mb-3">
                 <label for="foundry_url" class="form-label">Foundry URL</label>

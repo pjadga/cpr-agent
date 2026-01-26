@@ -20,6 +20,14 @@ class ConfigController
             'foundry_url' => 'nullable|string',
         ]);
 
+        if (isset($validated['base_url'])) {
+            $validated['base_url'] = rtrim($validated['base_url'], '/');
+        }
+
+        if (isset($validated['foundry_url'])) {
+            $validated['foundry_url'] = rtrim($validated['foundry_url'], '/');
+        }
+
         $config = $request->user()->config ?: new Config(['user_id' => $request->user()->id]);
         $config->fill($validated);
         $config->save();
@@ -29,7 +37,7 @@ class ConfigController
 
     public function getBaseUrl(Request $request)
     {
-        return $request->user()->config->base_url ?? null;
+        return $request->user()->config->base_url ?? config('services.foundry.base_url');
     }
 
     public function getFoundryUrl(Request $request)

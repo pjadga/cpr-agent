@@ -22,7 +22,7 @@ class ProfileSetupController extends Controller
 
         $actors = [];
 
-        if ($config->api_key && $config->base_url) {
+        if ($config->api_key && ($config->base_url || config('services.foundry.base_url'))) {
             try {
                 $client = $this->getFoundryClient();
                 $clientId = $client->api->getClientId();

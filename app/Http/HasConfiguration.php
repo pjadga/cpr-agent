@@ -16,7 +16,7 @@ trait HasConfiguration
     public function getBaseUrl(): string
     {
         $config = auth()->user()->config;
-        return $config->base_url;
+        return $config->base_url ?? config('services.foundry.base_url');
     }
 
     /**
