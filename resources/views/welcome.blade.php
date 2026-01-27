@@ -24,6 +24,12 @@
                     @endif
                 @endauth
             </div>
+
+            <div class="mt-8">
+                <a href="{{ route('how-to-use') }}" class="text-gray-400 hover:text-red-500 uppercase tracking-widest text-sm transition-colors">
+                    How to Use
+                </a>
+            </div>
         </div>
     </div>
 </div>

@@ -34,7 +34,15 @@
             <form action="{{ route('config.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
-                    <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-gray-400" />
+                    <div class="flex items-center gap-2">
+                        <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-gray-400" />
+                        <div class="group relative flex items-center">
+                            <i data-lucide="help-circle" class="w-3 h-3 text-gray-500 hover:text-pink-500 cursor-help transition-colors"></i>
+                            <div class="absolute left-full ml-2 w-48 p-2 bg-gray-900 border border-pink-500 text-[10px] text-gray-200 uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                Must be the same key added to your Foundry ThreeHats module.
+                            </div>
+                        </div>
+                    </div>
                     <x-text-input type="text" name="api_key" id="api_key" value="{{ old('api_key', $config->api_key) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
 {{--                <div>--}}
@@ -42,7 +50,15 @@
 {{--                    <x-text-input type="text" name="base_url" id="base_url" value="{{ old('base_url', $config->base_url ?? config('services.foundry.base_url')) }}" class="cyber-input-field mt-1 w-full" />--}}
 {{--                </div>--}}
                 <div>
-                    <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-gray-400" />
+                    <div class="flex items-center gap-2">
+                        <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-gray-400" />
+                        <div class="group relative flex items-center">
+                            <i data-lucide="help-circle" class="w-3 h-3 text-gray-500 hover:text-pink-500 cursor-help transition-colors"></i>
+                            <div class="absolute left-full ml-2 w-48 p-2 bg-gray-900 border border-pink-500 text-[10px] text-gray-200 uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                The full URL of your Foundry VTT instance.
+                            </div>
+                        </div>
+                    </div>
                     <x-text-input type="text" name="foundry_url" id="foundry_url" value="{{ old('foundry_url', $config->foundry_url) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
                 <button type="submit" class="cyber-button bg-pink-600 border-pink-500 w-full uppercase font-bold py-2">
@@ -72,7 +88,15 @@
                     @csrf
                     <!-- Client ID -->
                     <div>
-                        <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-lime-400" />
+                        <div class="flex items-center gap-2">
+                            <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-lime-400" />
+                            <div class="group relative flex items-center">
+                                <i data-lucide="help-circle" class="w-3 h-3 text-gray-500 hover:text-lime-500 cursor-help transition-colors"></i>
+                                <div class="absolute left-full ml-2 w-48 p-2 bg-gray-900 border border-lime-500 text-[10px] text-gray-200 uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                    Appears once the GM account is connected and running in Foundry.
+                                </div>
+                            </div>
+                        </div>
                         <select id="client_id" name="client_id" class="cyber-select-field mt-1">
                             <option value="" disabled {{ !$user->client_id ? 'selected' : '' }}>Select Client ID</option>
                             @foreach($clientIds as $id => $name)
@@ -86,7 +110,15 @@
 
                     <!-- Default Actor ID -->
                     <div>
-                        <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-lime-400" />
+                        <div class="flex items-center gap-2">
+                            <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-lime-400" />
+                            <div class="group relative flex items-center">
+                                <i data-lucide="help-circle" class="w-3 h-3 text-gray-500 hover:text-lime-500 cursor-help transition-colors"></i>
+                                <div class="absolute left-full ml-2 w-48 p-2 bg-gray-900 border border-lime-500 text-[10px] text-gray-200 uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                    Loads playable characters and player-owned characters from the current session.
+                                </div>
+                            </div>
+                        </div>
                         <select id="actor_selection" class="cyber-select-field mt-1">
                             <option value="" disabled {{ !$user->default_actor_id ? 'selected' : '' }}>Select Biometric Data</option>
                             @foreach($actors as $actor)

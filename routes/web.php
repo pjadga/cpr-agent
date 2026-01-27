@@ -47,6 +47,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/how-to-use', function () {
+    return view('how-to-use');
+})->name('how-to-use');
+
 Route::get('/dashboard', function () {
     return view('api');
 })->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
