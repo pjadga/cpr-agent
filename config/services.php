@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'foundry' => [
+        'base_url' => env('BASE_URL', 'https://agent-relay.surrealdisco.co.uk'),
+    ],
+
 ];

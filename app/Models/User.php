@@ -64,4 +64,9 @@ class User extends Authenticatable
     {
         return $this->default_token_id;
     }
+
+    public function config(): HasOne
+    {
+        return $this->hasOne(Config::class);
+    }
 }

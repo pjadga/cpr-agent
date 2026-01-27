@@ -14,7 +14,7 @@ class ProfileSetupController extends Controller
     public function show()
     {
         $user = Auth::user();
-        $config = Config::first() ?? new Config();
+        $config = $user->config ?? new Config();
 
         $clientIds = [
             'foundry-xECODN3n8rO4E5Cj' => 'No Client Available'
@@ -22,7 +22,7 @@ class ProfileSetupController extends Controller
 
         $actors = [];
 
-        if ($config->api_key && $config->base_url) {
+        if ($config->api_key && ($config->base_url || config('services.foundry.base_url'))) {
             try {
                 $client = $this->getFoundryClient();
                 $clientId = $client->api->getClientId();

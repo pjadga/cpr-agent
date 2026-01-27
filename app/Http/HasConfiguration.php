@@ -9,14 +9,14 @@ trait HasConfiguration
 {
     public function getApiKey(): string
     {
-        $config = Config::first();
+        $config = auth()->user()->config;
         return $config->api_key;
     }
 
     public function getBaseUrl(): string
     {
-        $config = Config::first();
-        return $config->base_url;
+        $config = auth()->user()->config;
+        return $config->base_url ?? config('services.foundry.base_url');
     }
 
     /**

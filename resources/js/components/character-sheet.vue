@@ -92,7 +92,7 @@
             </combat-panel>
 
             <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-red-900 backdrop-blur-md">
-                <div class="flex items-center gap-3 justify-between">
+                <div class="pt-3 flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
                             class="absolute inset-0 border border-[var(--cpr-red)] bg-gray-900 flex items-center justify-center overflow-hidden">
