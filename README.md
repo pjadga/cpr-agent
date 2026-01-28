@@ -1,7 +1,37 @@
-# Mobile Update
-I'm currently in the process of testing an IOS version and soon will have an android version. They will work along side the Desktop/Hosted app as they share the same codebase, and all will still require the Threehats Relay to work (for now).
+# How to Use
+* Save the page to your Homescreen if using a mobile or tablet. It will remove the address bar and it will have more of an 'app' feel.
+* On Safari, Hit the 3 dots in the bottom right -> Share -> Scroll Down -> Add to Home Screen.
+* From Google: "
+  To the right of the address bar, tap More More and then Add to home screen and then Create shortcut."
 
-I'll be opening up testing of mobile devices as soon as I'm happy with the functioning of the app.
+## 1. Preparation
+* Ensure you have the [Cyberpunk Red module](https://foundryvtt.com/packages/cyberpunk-red-core) installed in Foundry VTT.
+* Install the [ThreeHats API module](https://foundryvtt.com/packages/foundry-rest-api) in your Foundry VTT instance.
+
+## 2. Account Setup
+Sign up to this app. Your personal data is not used for any purposes other than authentication.
+*Note: Account deletion is accessible at any time through your account settings.*
+
+## 3. Configuration
+1. Navigate to the **Config** page.
+2. Input your **Foundry URL**.
+3. Input your **API Key** (this must be the same one added to your Foundry ThreeHats module).
+4. Click **Save**.
+
+## 4. Foundry Module Settings
+In the ThreeHats module settings within Foundry VTT, add the following as the relay link:
+`wss://agent-relay.surrealdisco.co.uk`
+
+*This relay is self-hosted through IONOS on a VPS. Call frequency is monitored to improve the app and manage costs.*
+
+## 5. Connecting Characters
+1. Once the GM account is up and running, refresh the **Config** page.
+2. A **Foundry Client** should now appear in the dropdown menu.
+3. Selecting that client will load the **Playable Characters** and **Player Owned characters** currently in the session.
+
+## Workarounds
+* The Modifiers window opens in Foundry whenever I roll.
+  * Head over to the Settings in Foundry - Cyberpunk RED - CORE, and toggle the "Invert Function of CTRL".
 
 
 # Cyberpunk Red Companion App

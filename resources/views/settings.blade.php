@@ -97,7 +97,7 @@
                                 </div>
                             </div>
                         </div>
-                        <select id="client_id" name="client_id" class="cyber-select-field mt-1">
+                        <select id="client_id" name="client_id" class="cyber-select-field mt-1 text-base">
                             <option value="" disabled {{ !$user->client_id ? 'selected' : '' }}>Select Client ID</option>
                             @foreach($clientIds as $id => $name)
                                 <option value="{{ $id }}" {{ $user->client_id == $id ? 'selected' : '' }} class="cyber-select-option">
@@ -119,7 +119,7 @@
                                 </div>
                             </div>
                         </div>
-                        <select id="actor_selection" class="cyber-select-field mt-1">
+                        <select id="actor_selection" class="cyber-select-field mt-1 text-base">
                             <option value="" disabled {{ !$user->default_actor_id ? 'selected' : '' }}>Select Biometric Data</option>
                             @foreach($actors as $actor)
                                 <option value="{{ $actor['actorId'] }}|{{ $actor['tokenId'] }}" {{ $user->default_actor_id == $actor["actorId"] && $user->default_token_id == $actor["tokenId"] ? 'selected' : '' }} class="cyber-select-option">
