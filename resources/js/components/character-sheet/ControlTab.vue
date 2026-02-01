@@ -1,7 +1,7 @@
 <template>
     <div v-if="activeTab === 'control'" key="control" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
-        <div class="flex bg-[#0a0a0a] border border-gray-800 p-1 rounded-sm">
+        <div class="flex bg-[var(--cpr-black)] border border-gray-800 p-1 rounded-sm">
             <button @click="controlState.spaceMode = 'meatspace'"
                     class="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
                     :class="controlState.spaceMode === 'meatspace' ? 'bg-red-600 text-black' : 'text-gray-500 hover:text-gray-300'">
@@ -21,7 +21,7 @@
                 </h3>
                 <div class="relative">
                     <button @click="showTargetDropdown = !showTargetDropdown"
-                            class="w-full p-3 bg-[#0a0a0a] border border-gray-800 flex items-center justify-between text-left transition-colors hover:border-gray-600">
+                            class="w-full p-3 bg-[var(--cpr-black)] border border-gray-800 flex items-center justify-between text-left transition-colors hover:border-gray-600">
                         <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
 
                             <span class="text-xs font-bold text-white uppercase">{{ controlState.selectedTarget.name }}</span>
@@ -32,7 +32,7 @@
                     </button>
 
                     <transition name="expand">
-                        <div v-if="showTargetDropdown" class="absolute z-50 w-full mt-1 bg-[#050505] border border-gray-800 shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
+                        <div v-if="showTargetDropdown" class="absolute z-50 w-full mt-1 bg-[var(--cpr-black-deep)] border border-gray-800 shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
                             <div v-for="enemy in mockEnemies" :key="enemy.id"
                                  @click="controlState.selectedTarget = enemy; showTargetDropdown = false"
                                  class="p-3 flex items-center justify-between cursor-pointer hover:bg-red-900/20 transition-colors">
@@ -63,7 +63,7 @@
                     <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
                          @click="controlState.selectedWeapon = weapon"
                          class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all relative overflow-hidden"
-                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-orange-600 bg-orange-900/10' : 'border-gray-800 bg-[#0a0a0a] hover:border-gray-600'">
+                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-orange-600 bg-orange-900/10' : 'border-gray-800 bg-[var(--cpr-black)] hover:border-gray-600'">
 
                         <div v-if="getStatusLine(weapon)"
                              class="absolute top-0 left-0 h-[2px] transition-all duration-500 z-10"

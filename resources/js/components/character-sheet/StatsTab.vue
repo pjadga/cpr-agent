@@ -42,7 +42,7 @@
             </adjustable-stat>
         </div>
 
-        <div class="bg-[#111] border border-gray-800 p-3 flex justify-between divide-x divide-gray-800">
+        <div class="bg-[var(--cpr-black-soft)] border border-gray-800 p-3 flex justify-between divide-x divide-gray-800">
             <div class="px-2 text-center w-1/4">
                 <div class="text-[9px] text-gray-500 uppercase font-bold">Eurobucks</div>
                 <div class="text-yellow-500 font-mono font-bold">{{

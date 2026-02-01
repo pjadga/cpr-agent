@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto p-8">
-    <div class="flex justify-between items-center mb-8 border-b-2 border-gray-800 pb-4">
+    <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-gray-800 pb-4">
         <h2 class="text-4xl font-bold glow-lime text-lime-500 uppercase tracking-tighter">
-            System Configuration & Neural Link
+            Agent Settings
         </h2>
-        <div class="flex gap-4">
+        <div class="flex gap-2 pt-2">
             <a href="{{ route('dashboard') }}" class="cyber-button bg-gray-800 border-gray-700 text-xs px-4 py-2 uppercase w-32 text-center">
                 Return
             </a>
@@ -35,7 +35,7 @@
                 @csrf
                 <div>
                     <div class="flex items-center gap-2">
-                        <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-gray-400" />
+                        <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-pink-500" />
                         <div class="group relative flex items-center">
                             <i data-lucide="help-circle" class="w-3 h-3 text-gray-500 hover:text-pink-500 cursor-help transition-colors"></i>
                             <div class="absolute left-full ml-2 w-48 p-2 bg-gray-900 border border-pink-500 text-[10px] text-gray-200 uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
@@ -51,7 +51,7 @@
 {{--                </div>--}}
                 <div>
                     <div class="flex items-center gap-2">
-                        <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-gray-400" />
+                        <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-pink-500" />
                         <div class="group relative flex items-center">
                             <i data-lucide="help-circle" class="w-3 h-3 text-gray-500 hover:text-pink-500 cursor-help transition-colors"></i>
                             <div class="absolute left-full ml-2 w-48 p-2 bg-gray-900 border border-pink-500 text-[10px] text-gray-200 uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
@@ -61,7 +61,7 @@
                     </div>
                     <x-text-input type="text" name="foundry_url" id="foundry_url" value="{{ old('foundry_url', $config->foundry_url) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
-                <button type="submit" class="cyber-button bg-pink-600 border-pink-500 w-full uppercase font-bold py-2">
+                <button type="submit" class="cyber-button bg-pink-600 border-pink-500 text-black w-full uppercase font-bold py-2">
                     Update Core Settings
                 </button>
             </form>
@@ -158,13 +158,13 @@
                     @method('patch')
 
                     <div>
-                        <x-input-label for="name" :value="__('User Handle')" class="text-xs uppercase text-gray-500" />
+                        <x-input-label for="name" :value="__('User Handle')" class="text-xs uppercase text-blue-500" />
                         <x-text-input id="name" name="name" type="text" class="cyber-input-field mt-1 w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
                         <x-input-error class="mt-1 text-red-500 text-[10px] uppercase" :messages="$errors->get('name')" />
                     </div>
 
                     <div>
-                        <x-input-label for="email" :value="__('Neural ID (Email)')" class="text-xs uppercase text-gray-500" />
+                        <x-input-label for="email" :value="__('Neural ID (Email)')" class="text-xs uppercase text-blue-500" />
                         <x-text-input id="email" name="email" type="email" class="cyber-input-field mt-1 w-full" :value="old('email', $user->email)" required autocomplete="username" />
                         <x-input-error class="mt-1 text-red-500 text-[10px] uppercase" :messages="$errors->get('email')" />
                     </div>
@@ -178,32 +178,32 @@
             <!-- Security/Password -->
             <div class="space-y-6">
                 <h4 class="text-lg font-bold text-gray-400 uppercase tracking-widest border-b border-gray-800 pb-2">
-                    Security Encryption
+                    Change Password
                 </h4>
                 <form method="post" action="{{ route('password.update') }}" class="space-y-4">
                     @csrf
                     @method('put')
 
                     <div>
-                        <x-input-label for="update_password_current_password" :value="__('Current Encryption Key')" class="text-xs uppercase text-gray-500" />
+                        <x-input-label for="update_password_current_password" :value="__('Current Password')" class="text-xs uppercase text-blue-500" />
                         <x-text-input id="update_password_current_password" name="current_password" type="password" class="cyber-input-field mt-1 w-full" autocomplete="current-password" />
                         <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-1 text-red-500 text-[10px] uppercase" />
                     </div>
 
                     <div>
-                        <x-input-label for="update_password_password" :value="__('New Encryption Key')" class="text-xs uppercase text-gray-500" />
+                        <x-input-label for="update_password_password" :value="__('New Password')" class="text-xs uppercase text-blue-500" />
                         <x-text-input id="update_password_password" name="password" type="password" class="cyber-input-field mt-1 w-full" autocomplete="new-password" />
                         <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-1 text-red-500 text-[10px] uppercase" />
                     </div>
 
                     <div>
-                        <x-input-label for="update_password_password_confirmation" :value="__('Confirm Encryption Key')" class="text-xs uppercase text-gray-500" />
+                        <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" class="text-xs uppercase text-blue-500" />
                         <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="cyber-input-field mt-1 w-full" autocomplete="new-password" />
                         <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-1 text-red-500 text-[10px] uppercase" />
                     </div>
 
                     <button type="submit" class="cyber-button bg-blue-900 border-blue-800 w-full uppercase font-bold py-2 hover:bg-blue-700">
-                        Update Encryption
+                        Update
                     </button>
                 </form>
             </div>

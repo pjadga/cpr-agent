@@ -69,7 +69,7 @@
             <div v-show="!collapsedCategories[categoryKey]" class="grid grid-cols-1 gap-px bg-gray-800 border border-gray-800">
                 <div v-for="(skill, index) in group" :key="skill.name"
                      @click="$emit('skill-request', skill.name)"
-                     class="flex justify-between items-center bg-[#0a0a0a] p-2 hover:bg-cyan-950/20 cursor-pointer group transition-colors gap-3">
+                     class="flex justify-between items-center bg-[var(--cpr-black)] p-2 hover:bg-cyan-950/20 cursor-pointer group transition-colors gap-3">
                     <div class="flex items-center gap-3 flex-1">
                         <div class="flex flex-col">
                             <div class="flex items-baseline gap-2">
@@ -85,7 +85,7 @@
                                 skill.system.level
                             }}</span>
                         <div
-                            class="w-8 h-8 flex items-center justify-center bg-[#151515] border border-gray-700 text-red-500 font-bold font-mono text-sm rounded-sm">
+                            class="w-8 h-8 flex items-center justify-center bg-[var(--cpr-black-elevated)] border border-gray-700 text-red-500 font-bold font-mono text-sm rounded-sm">
                             {{ calculateBase(skill) }}
                         </div>
                     </div>

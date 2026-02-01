@@ -30,16 +30,16 @@
 
 @keyframes pulse-purple {
     0% {
-        background-color: rgba(88, 28, 135, 0.2); /* bg-purple-900/20 */
-        box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
+        background-color: rgba(168, 85, 247, 0.2); /* var(--cpr-purple) with opacity */
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4);
     }
     50% {
-        background-color: rgba(88, 28, 135, 0.6); /* darker purple */
-        box-shadow: 0 0 15px 5px rgba(88, 28, 135, 0.4);
+        background-color: rgba(168, 85, 247, 0.6);
+        box-shadow: 0 0 15px 5px rgba(168, 85, 247, 0.4);
     }
     100% {
-        background-color: rgba(88, 28, 135, 0.2);
-        box-shadow: 0 0 0 0 rgba(88, 28, 135, 0.4);
+        background-color: rgba(168, 85, 247, 0.2);
+        box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4);
     }
 }
 
@@ -50,8 +50,8 @@
 
 .animate-pulse-purple {
     animation: pulse-purple 3s infinite ease-in-out;
-    border-color: #7e22ce !important; /* purple-700 */
-    color: #e9d5ff !important; /* purple-200 for readability */
+    border-color: var(--cpr-purple-dark) !important;
+    color: var(--cpr-text-main) !important;
 }
 
 /* Expansion Animation */
@@ -84,5 +84,5 @@
     margin-bottom: 0.5rem;
 }
 .cpr-description strong {
-    color: #ef4444; /* red-500 */
+    color: var(--cpr-red);
 }

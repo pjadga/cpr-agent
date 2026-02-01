@@ -1,5 +1,5 @@
 <template>
-    <div class="group relative bg-[#0a0a0a] border transition-all duration-300"
+    <div class="group relative bg-[var(--cpr-black)] border transition-all duration-300"
          :class="isEffectivelyRezzed(prog) ? 'border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'border-gray-800 hover:border-blue-500/50'">
 
         <div class="absolute left-0 top-0 bottom-0 w-1 transition-colors duration-300"

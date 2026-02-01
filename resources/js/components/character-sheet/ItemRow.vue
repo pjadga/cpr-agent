@@ -1,5 +1,5 @@
 <template>
-    <div class="cpr-panel bg-[#111] flex flex-col transition-colors border-l-2 relative group overflow-hidden"
+    <div class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group overflow-hidden"
          :class="{
             'border-red-600': category === 'weapon',
             'border-blue-600': category === 'armor',

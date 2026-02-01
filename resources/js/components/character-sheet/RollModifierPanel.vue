@@ -26,12 +26,12 @@
                 </div>
 
                 <div v-else-if="data" class="space-y-4">
-                    <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                    <div class="bg-[var(--cpr-black-deep)] border border-gray-800 p-3">
                         <div class="text-[10px] text-gray-500 uppercase font-bold">Actor</div>
                         <div class="text-white font-bold">{{ data.actorName }}</div>
                     </div>
 
-                    <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                    <div class="bg-[var(--cpr-black-deep)] border border-gray-800 p-3">
                         <div class="flex items-center justify-between">
                             <div class="text-[10px] text-gray-500 uppercase font-bold">Base Bonus</div>
                             <div class="text-green-400 font-mono font-bold">+{{ data.baseBonus }}</div>
@@ -43,21 +43,21 @@
                         </div>
                     </div>
 
-                    <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                    <div class="bg-[var(--cpr-black-deep)] border border-gray-800 p-3">
                         <div class="flex items-center justify-between">
                             <div class="text-[10px] text-gray-500 uppercase font-bold">Total Penalty</div>
                             <div :class="{'text-red-400': data.totalPenalty < 0, 'text-gray-300': data.totalPenalty === 0, 'text-green-400': data.totalPenalty > 0}" class="font-mono font-bold">{{ data.totalPenalty }}</div>
                         </div>
                     </div>
 
-                    <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                    <div class="bg-[var(--cpr-black-deep)] border border-gray-800 p-3">
                         <div class="flex items-center justify-between">
                             <div class="text-[10px] text-gray-500 uppercase font-bold">Final Roll Modifier</div>
                             <div :class="{'text-green-400': data.finalModifier >= 0, 'text-red-400': data.finalModifier < 0}" class="font-mono font-bold">{{ data.finalModifier }}</div>
                         </div>
                     </div>
 
-                    <div class="bg-[#0b0b0b] border border-gray-800 p-3">
+                    <div class="bg-[var(--cpr-black-deep)] border border-gray-800 p-3">
                         <div class="text-[10px] text-gray-500 uppercase font-bold mb-2">Injuries & Effects</div>
                         <div v-if="!data.injuries || data.injuries.length === 0" class="text-xs text-gray-500 italic">No injuries affecting rolls.</div>
                         <div v-else class="space-y-2">

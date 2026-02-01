@@ -1,9 +1,9 @@
 <template>
-    <div class="min-h-screen pb-100 text-sans bg-[#050505]">
+    <div class="min-h-screen pb-100 text-sans bg-[var(--cpr-black-deep)]">
 
-        <div v-if="loading" class="flex h-screen items-center justify-center bg-black">
+        <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-black">
             <div class="flex flex-col items-center">
-                <div class="text-lime-500 font-mono animate-pulse text-xl mb-4 tracking-widest">ESTABLISHING NEURAL LINK...</div>
+                <div class="text-lime-500 font-mono animate-pulse text-xl">ESTABLISHING NEURAL LINK...</div>
                 <div class="w-64 h-1 bg-gray-900 overflow-hidden relative border border-gray-800">
                     <div class="absolute inset-0 bg-lime-500 animate-[loading-bar_2s_infinite]"></div>
                 </div>
@@ -192,7 +192,7 @@
             </main>
 
             <nav
-                class="fixed bottom-0 inset-x-0 bg-[#050505] border-t border-red-900/30 flex justify-around p-2 pb-6 z-50">
+                class="fixed bottom-0 inset-x-0 bg-[var(--cpr-black-deep)] border-t border-red-900/30 flex justify-around p-2 pb-6 z-50">
                 <nav-btn icon="activity" label="Stats" :active="activeTab === 'stats'"
                          @click="activeTab = 'stats'"></nav-btn>
                 <nav-btn icon="brain" label="Skills" :active="activeTab === 'skills'"
@@ -670,7 +670,7 @@ export default {
     margin-bottom: 0.5rem;
 }
 .cpr-description strong {
-    color: #ef4444; /* red-500 */
+    color: var(--cpr-red);
 }
 
 /* Firing Mode List Animation */
