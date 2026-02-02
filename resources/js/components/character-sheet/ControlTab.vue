@@ -1,54 +1,54 @@
 <template>
     <div v-if="activeTab === 'control'" key="control" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
-        <div class="flex bg-[var(--cpr-black)] border border-gray-800 p-1 rounded-sm">
+        <div class="flex bg-cpr-black border border-cpr-border p-1 rounded-sm">
             <button @click="controlState.spaceMode = 'meatspace'"
                     class="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
-                    :class="controlState.spaceMode === 'meatspace' ? 'bg-red-600 text-black' : 'text-gray-500 hover:text-gray-300'">
+                    :class="controlState.spaceMode === 'meatspace' ? 'bg-cpr-red text-black' : 'text-cpr-text-dim hover:text-cpr-text-main'">
                 Meatspace
             </button>
             <button @click="controlState.spaceMode = 'netspace'"
                     class="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
-                    :class="controlState.spaceMode === 'netspace' ? 'bg-blue-600 text-black' : 'text-gray-500 hover:text-gray-300'">
+                    :class="controlState.spaceMode === 'netspace' ? 'bg-cpr-cyan-dark text-black' : 'text-cpr-text-dim hover:text-cpr-text-main'">
                 Netspace
             </button>
         </div>
 
         <div v-if="controlState.spaceMode === 'meatspace'" class="space-y-6 animate-in fade-in duration-300">
             <div>
-                <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                <h3 class="text-xs font-black text-cpr-text-dim uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                     <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Target Acquisition
                 </h3>
                 <div class="relative">
                     <button @click="showTargetDropdown = !showTargetDropdown"
-                            class="w-full p-3 bg-[var(--cpr-black)] border border-gray-800 flex items-center justify-between text-left transition-colors hover:border-gray-600">
+                            class="w-full p-3 bg-cpr-black border border-cpr-border flex items-center justify-between text-left transition-colors hover:border-cpr-border-muted">
                         <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
 
                             <span class="text-xs font-bold text-white uppercase">{{ controlState.selectedTarget.name }}</span>
-                            <span class="text-[9px] text-gray-500 font-mono">({{ controlState.selectedTarget.distanceM }}m)</span>
+                            <span class="text-[9px] text-cpr-text-dim font-mono">({{ controlState.selectedTarget.distanceM }}m)</span>
                         </div>
-                        <span v-else class="text-xs text-gray-600 uppercase italic font-mono">No Hostile Signal Locked</span>
-                        <i v-icon data-lucide="chevron-down" class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{'rotate-180': showTargetDropdown}"></i>
+                        <span v-else class="text-xs text-cpr-text-dim uppercase italic font-mono">No Hostile Signal Locked</span>
+                        <i v-icon data-lucide="chevron-down" class="w-4 h-4 text-cpr-text-dim transition-transform duration-200" :class="{'rotate-180': showTargetDropdown}"></i>
                     </button>
 
                     <transition name="expand">
-                        <div v-if="showTargetDropdown" class="absolute z-50 w-full mt-1 bg-[var(--cpr-black-deep)] border border-gray-800 shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
+                        <div v-if="showTargetDropdown" class="absolute z-50 w-full mt-1 bg-cpr-black-deep border border-cpr-border shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
                             <div v-for="enemy in mockEnemies" :key="enemy.id"
                                  @click="controlState.selectedTarget = enemy; showTargetDropdown = false"
-                                 class="p-3 flex items-center justify-between cursor-pointer hover:bg-red-900/20 transition-colors">
+                                 class="p-3 flex items-center justify-between cursor-pointer hover:bg-cpr-red-dark/20 transition-colors">
                                 <div class="flex items-center gap-3">
 
                                     <div>
                                         <div class="text-xs font-bold text-white uppercase">{{ enemy.name }}</div>
-                                        <div class="text-[9px] text-gray-500 font-mono">{{ enemy.distanceM }}m away</div>
+                                        <div class="text-[9px] text-cpr-text-dim font-mono">{{ enemy.distanceM }}m away</div>
                                     </div>
                                 </div>
-                                <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-red-500">
+                                <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-cpr-red">
                                     <i v-icon data-lucide="target" class="w-4 h-4"></i>
                                 </div>
                             </div>
                             <div v-if="mockEnemies.length === 0" class="p-6 text-center">
-                                <span class="text-[10px] text-gray-600 uppercase font-mono italic">No hostile signals detected</span>
+                                <span class="text-[10px] text-cpr-text-dim uppercase font-mono italic">No hostile signals detected</span>
                             </div>
                         </div>
                     </transition>
@@ -56,14 +56,14 @@
             </div>
 
             <div>
-                <h3 class="text-xs font-black text-gray-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                <h3 class="text-xs font-black text-cpr-text-dim uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                     <i v-icon data-lucide="zap" class="w-3.5 h-3.5"></i> Weapon Systems
                 </h3>
                 <div class="space-y-2">
                     <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
                          @click="controlState.selectedWeapon = weapon"
                          class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all relative overflow-hidden"
-                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-orange-600 bg-orange-900/10' : 'border-gray-800 bg-[var(--cpr-black)] hover:border-gray-600'">
+                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-cpr-orange bg-cpr-orange-dark/10' : 'border-cpr-border bg-cpr-black hover:border-cpr-border-muted'">
 
                         <div v-if="getStatusLine(weapon)"
                              class="absolute top-0 left-0 h-[2px] transition-all duration-500 z-10"
@@ -72,22 +72,22 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <img :src="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-gray-800">
+                            <img :src="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-cpr-border">
                             <div>
-                                <div class="text-xs font-bold text-white uppercase">{{ weapon.name }}</div>
+                                <div class="text-xs font-bold  uppercase">{{ weapon.name }}</div>
                                 <div class="flex items-center gap-2 mt-0.5">
-                                    <span class="text-[10px] font-mono text-gray-400">
+                                    <span class="text-[10px] font-mono text-cpr-text-muted">
                                         <template v-if="!isMeleeOrUnarmed(weapon) && weapon.system.magazine">
-                                            {{ weapon.system.magazine.value }} <span class="text-gray-600">/</span> {{ getAmmoTotal(weapon) }}
-                                            <span v-if="getAmmoName(weapon)" class="ml-1 text-yellow-600 text-[8px]">[{{ getAmmoName(weapon) }}]</span>
+                                            {{ weapon.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ getAmmoTotal(weapon) }}
+                                            <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{ getAmmoName(weapon) }}]</span>
                                         </template>
-                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-red-400 font-bold">{{ weapon.system.damage }}</span>
-                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-orange-400">ROF:{{ weapon.system.rof }}</span>
+                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-cpr-red font-bold">{{ weapon.system.damage }}</span>
+                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-orange">ROF:{{ weapon.system.rof }}</span>
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="text-orange-500">
+                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="text-cpr-orange">
                             <i v-icon data-lucide="check-circle-2" class="w-5 h-5"></i>
                         </div>
                     </div>
@@ -97,10 +97,10 @@
             <!-- Trigger for Combat Panel -->
             <div class="fixed bottom-24 right-6 z-[60]">
                 <button @click="$emit('open-combat-panel')"
-                        class="w-16 h-16 bg-red-600 text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.5)] active:scale-95 transition-all border-4 border-black group">
+                        class="w-16 h-16 bg-cpr-red text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.5)] active:scale-95 transition-all border-4 border-black group">
                     <i v-icon data-lucide="crosshair" class="w-8 h-8 group-hover:rotate-90 transition-transform duration-500"></i>
                     <div class="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border-2 border-black" v-if="controlState.selectedWeapon">
-                        <div class="w-2 h-2 bg-red-600 rounded-full animate-ping"></div>
+                        <div class="w-2 h-2 bg-cpr-red rounded-full animate-ping"></div>
                     </div>
                 </button>
             </div>
@@ -108,37 +108,37 @@
 
         <div v-else-if="controlState.spaceMode === 'netspace'" class="space-y-6 animate-in fade-in duration-300">
             <div v-if="activeCyberdeck" class="relative">
-                <div class="cpr-panel p-4 bg-blue-950/20 border border-blue-500/30 mb-4 overflow-hidden group">
+                <div class="cpr-panel p-4 bg-cpr-black-deep/20 border border-cpr-cyan/30 mb-4 overflow-hidden group">
                     <div class="relative z-10 flex justify-between items-start mb-4">
                         <div>
                             <h3 class="text-lg font-black text-white uppercase tracking-tighter">{{ activeCyberdeck.name }}</h3>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[9px] px-1.5 py-0.5 bg-blue-500 text-black font-black uppercase">Active Deck</span>
-                                <span class="text-[9px] text-blue-400 font-mono font-bold uppercase">{{ activeCyberdeck.system.quality }} Quality</span>
+                                <span class="text-[9px] px-1.5 py-0.5 bg-cpr-cyan text-black font-black uppercase">Active Deck</span>
+                                <span class="text-[9px] text-cpr-cyan font-mono font-bold uppercase">{{ activeCyberdeck.system.quality }} Quality</span>
                             </div>
                         </div>
-                        <button @click="$emit('open-cyberdeck-config')" class="flex items-center gap-1.5 px-3 py-1.5 bg-blue-900/40 border border-blue-500/50 text-[10px] font-bold text-blue-100 uppercase hover:bg-blue-500 hover:text-black transition-all shadow-[0_0_10px_rgba(59,130,246,0.2)]">
+                        <button @click="$emit('open-cyberdeck-config')" class="flex items-center gap-1.5 px-3 py-1.5 bg-cpr-cyan-dark/40 border border-cpr-cyan/50 text-[10px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-cyan hover:text-black transition-all shadow-[0_0_10px_rgba(59,130,246,0.2)]">
                             <i v-icon data-lucide="settings" class="w-3 h-3"></i> Config
                         </button>
                     </div>
 
-<!--                    <div class="grid grid-cols-2 gap-px bg-blue-900/30 border border-blue-500/30 mb-6 relative z-10">-->
-<!--                        <div class="bg-black/80 p-3 text-center flex flex-col items-center">-->
-<!--                            <div class="text-[9px] text-blue-400/80 uppercase font-bold tracking-widest mb-1">Defense</div>-->
+<!--                    <div class="grid grid-cols-2 gap-px bg-cpr-cyan-dark/30 border border-cpr-cyan/30 mb-6 relative z-10">-->
+<!--                        <div class="bg-cpr-black/80 p-3 text-center flex flex-col items-center">-->
+<!--                            <div class="text-[9px] text-cpr-cyan/80 uppercase font-bold tracking-widest mb-1">Defense</div>-->
 <!--                            <div class="text-3xl font-black text-white leading-none">{{ activeCyberdeck.system.quality === 'poor' ? '7' : activeCyberdeck.system.quality === 'excellent' ? '11' : '9' }}</div>-->
 <!--                        </div>-->
-<!--                        <div class="bg-black/80 p-3 text-center flex flex-col items-center">-->
-<!--                            <div class="text-[9px] text-blue-400/80 uppercase font-bold tracking-widest mb-1">Speed</div>-->
+<!--                        <div class="bg-cpr-black/80 p-3 text-center flex flex-col items-center">-->
+<!--                            <div class="text-[9px] text-cpr-cyan/80 uppercase font-bold tracking-widest mb-1">Speed</div>-->
 <!--                            <div class="text-3xl font-black text-white leading-none">{{ activeCyberdeck.system.spd || '4' }}</div>-->
 <!--                        </div>-->
 <!--                    </div>-->
 
-                    <h4 class="text-[10px] font-bold text-blue-500 uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-cyan uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10">
                         <button v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap', 'Defense', 'Speed']"
                                 :key="action"
                                 @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
-                                class="py-3 bg-blue-900/20 border border-blue-500/30 text-[9px] font-bold text-blue-100 uppercase hover:bg-blue-500 hover:text-black hover:border-blue-400 transition-all">
+                                class="py-3 bg-cpr-cyan-dark/20 border border-cpr-cyan/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-cyan hover:text-black hover:border-cpr-cyan transition-all">
                             {{ action }}
                         </button>
                     </div>
@@ -147,9 +147,9 @@
                 <div v-if="activeCyberdeck" class="space-y-6">
                     <div v-for="(programs, category) in programCategories" :key="category">
                         <div v-if="programs.length > 0">
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest border-l-4 border-blue-500 pl-2 mb-3 flex items-center justify-between">
+                            <h3 class="text-xs font-black text-white uppercase tracking-widest border-l-4 border-cpr-cyan pl-2 mb-3 flex items-center justify-between">
                                 {{ category }}
-                                <span class="text-[9px] text-gray-500 font-mono font-normal">{{ programs.length }} Installed</span>
+                                <span class="text-[9px] text-cpr-text-dim font-mono font-normal">{{ programs.length }} Installed</span>
                             </h3>
 
                             <div class="space-y-3">
@@ -167,11 +167,11 @@
                     </div>
                 </div>
 
-                <div v-if="!activeCyberdeck" class="cpr-panel p-8 bg-red-900/10 border border-red-500/30 text-center space-y-4">
-                    <i v-icon data-lucide="alert-triangle" class="w-12 h-12 text-red-500/40 mx-auto"></i>
+                <div v-if="!activeCyberdeck" class="cpr-panel p-8 bg-cpr-red-dark/10 border border-cpr-red/30 text-center space-y-4">
+                    <i v-icon data-lucide="alert-triangle" class="w-12 h-12 text-cpr-red/40 mx-auto"></i>
                     <div>
-                        <h4 class="text-red-400 font-black uppercase tracking-tighter text-lg">No Cyberdeck Detected</h4>
-                        <p class="text-[10px] text-red-500/60 font-mono uppercase tracking-widest mt-2">Equip a Cyberdeck in Gear to access Netspace.</p>
+                        <h4 class="text-cpr-red font-black uppercase tracking-tighter text-lg">No Cyberdeck Detected</h4>
+                        <p class="text-[10px] text-cpr-red/60 font-mono uppercase tracking-widest mt-2">Equip a Cyberdeck in Gear to access Netspace.</p>
                     </div>
                 </div>
             </div>
@@ -181,15 +181,15 @@
         </div>
 
         <!-- Tactical Movement -->
-        <div class="pt-4 border-t border-gray-800/50">
-            <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Tactical Positioning</h3>
+        <div class="pt-4 border-t border-cpr-border/50">
+            <h3 class="text-[10px] font-black text-cpr-text-dim uppercase tracking-[0.3em] mb-4 text-center">Tactical Positioning</h3>
             <div class="grid grid-cols-3 gap-3 max-w-[180px] mx-auto">
                 <div></div>
-                <button @click="$emit('move', 'up')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-up" class="w-6 h-6"></i></button>
+                <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-up" class="w-6 h-6"></i></button>
                 <div></div>
-                <button @click="$emit('move', 'left')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-left" class="w-6 h-6"></i></button>
-                <button @click="$emit('move', 'down')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-down" class="w-6 h-6"></i></button>
-                <button @click="$emit('move', 'right')" class="aspect-square bg-gray-900 border border-gray-700 text-white flex items-center justify-center hover:bg-gray-800 active:bg-red-900/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-left" class="w-6 h-6"></i></button>
+                <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-down" class="w-6 h-6"></i></button>
+                <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-right" class="w-6 h-6"></i></button>
             </div>
         </div>
     </div>
@@ -266,7 +266,7 @@ export default {
             percent = Math.min(100, Math.max(0, percent));
 
             let color = 'bg-green-500';
-            if (percent < 25) color = 'bg-red-500';
+            if (percent < 25) color = 'bg-cpr-red';
             else if (percent < 60) color = 'bg-amber-500';
 
             return {

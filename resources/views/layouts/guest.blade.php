@@ -19,7 +19,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased bg-black text-gray-100">
+    <body class="font-sans antialiased bg-cpr-black text-cpr-text-main">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
             <div class="w-full sm:max-w-4xl mt-6 px-6 py-4 cpr-panel shadow-2xl overflow-hidden sm:rounded-lg border-t-4 border-t-red-600">
                 {{ $slot }}

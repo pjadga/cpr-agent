@@ -20,7 +20,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="https://unpkg.com/lucide@latest" @cspNonce></script>
     </head>
-    <body class="bg-black text-gray-100 font-sans antialiased nativephp-safe-area">
+    <body class="bg-cpr-black text-cpr-text-main font-sans antialiased nativephp-safe-area">
         @yield('content')
 
         <script @cspNonce>

@@ -1,31 +1,31 @@
 <template>
-    <div class="min-h-screen pb-100 text-sans bg-[var(--cpr-black-deep)]">
+    <div class="min-h-screen pb-100 text-sans bg-cpr-black-deep">
 
-        <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-black">
+        <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
-                <div class="text-lime-500 font-mono animate-pulse text-xl">ESTABLISHING NEURAL LINK...</div>
-                <div class="w-64 h-1 bg-gray-900 overflow-hidden relative border border-gray-800">
-                    <div class="absolute inset-0 bg-lime-500 animate-[loading-bar_2s_infinite]"></div>
+                <div class="text-cpr-lime font-mono animate-pulse text-xl">ESTABLISHING NEURAL LINK...</div>
+                <div class="w-64 h-1 bg-cpr-black-deep overflow-hidden relative border border-cpr-border">
+                    <div class="absolute inset-0 bg-cpr-lime animate-[loading-bar_2s_infinite]"></div>
                 </div>
-                <div class="mt-4 text-[10px] text-gray-500 font-mono uppercase tracking-[0.3em] italic">Initializing Headless Session</div>
+                <div class="mt-4 text-[10px] text-cpr-text-dim font-mono uppercase tracking-[0.3em] italic">Initializing Headless Session</div>
             </div>
         </div>
 
-        <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-black">
+        <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-cpr-black">
             <div class="w-full max-w-md">
-                <div class="border-2 border-red-600 bg-red-900/10 p-6 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
-                    <div class="flex items-center gap-4 mb-4 border-b border-red-600 pb-4">
-                        <i v-icon data-lucide="alert-octagon" class="w-8 h-8 text-red-600"></i>
-                        <h2 class="text-red-500 font-black text-2xl uppercase tracking-tighter">Uplink Failed</h2>
+                <div class="border-2 border-cpr-red bg-cpr-red-dark/10 p-6 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
+                    <div class="flex items-center gap-4 mb-4 border-b border-cpr-red pb-4">
+                        <i v-icon data-lucide="alert-octagon" class="w-8 h-8 text-cpr-red"></i>
+                        <h2 class="text-cpr-red font-black text-2xl uppercase tracking-tighter">Uplink Failed</h2>
                     </div>
-                    <div class="text-gray-300 font-mono text-sm leading-relaxed mb-6">
+                    <div class="text-cpr-text-main font-mono text-sm leading-relaxed mb-6">
                         {{ error }}
                     </div>
                     <div class="flex gap-4">
-                        <button @click="window.location.reload()" class="flex-1 py-2 bg-red-600 text-black font-bold uppercase text-xs hover:bg-red-500 transition-colors">
+                        <button @click="window.location.reload()" class="flex-1 py-2 bg-cpr-red text-black font-bold uppercase text-xs hover:bg-cpr-red transition-colors">
                             Retry Connection
                         </button>
-                        <button @click="goToSettings" class="flex-1 py-2 border border-red-600 text-red-600 font-bold uppercase text-xs hover:bg-red-600/10 transition-colors">
+                        <button @click="goToSettings" class="flex-1 py-2 border border-cpr-red text-cpr-red font-bold uppercase text-xs hover:bg-cpr-red/10 transition-colors">
                             Neural Config
                         </button>
                     </div>
@@ -44,14 +44,14 @@
                 @uninstall="uninstallProgram">
             </cyberdeck-config>
 
-            <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-black/80">
+            <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-cpr-black/80">
                 <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]" @click.stop>
                     <div class="absolute top-0 right-0 m-4 mt-[calc(1rem+env(safe-area-inset-top))] mr-[calc(1rem+env(safe-area-inset-right))]">
-                        <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-black/50 rounded-full p-2">
+                        <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-cpr-black/50 rounded-full p-2">
                             <i v-icon data-lucide="x" class="w-6 h-6"></i>
                         </button>
                     </div>
-                    <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
+                    <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
                     <div class="mt-4 text-center">
                         <h2 class="text-white font-bold uppercase tracking-widest text-lg">{{ charData.data.name }}</h2>
                     </div>
@@ -91,15 +91,15 @@
                 @update:fireMode="controlState.fireMode = $event">
             </combat-panel>
 
-            <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-red-900 backdrop-blur-md">
+            <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-red-dark backdrop-blur-md">
                 <div class="pt-3 flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
-                            class="absolute inset-0 border border-[var(--cpr-red)] bg-gray-900 flex items-center justify-center overflow-hidden">
+                            class="absolute inset-0 border border-[var(--cpr-red)] bg-cpr-black-deep flex items-center justify-center overflow-hidden">
                             <img v-if="charData.data.img" :src="getImageUrl(charData.data.img)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" :alt="charData.data.name">
-                            <span v-else class="text-xl font-bold text-red-500">{{ charData.data.name[0] }}</span>
+                            <span v-else class="text-xl font-bold text-cpr-red">{{ charData.data.name[0] }}</span>
                         </div>
-                        <div class="absolute inset-0 bg-red-600/0 group-hover:bg-red-600/20 transition-colors duration-300 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cpr-red/0 group-hover:bg-cpr-red/20 transition-colors duration-300 flex items-center justify-center">
                             <i v-icon data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
@@ -107,12 +107,12 @@
                         <h1 class="text-2xl font-bold uppercase truncate leading-none text-white">{{
                                 charData.data.name
                             }}</h1>
-                        <span class="text-[10px] text-red-500 uppercase font-bold tracking-widest">{{
+                        <span class="text-[10px] text-cpr-red uppercase font-bold tracking-widest">{{
                                 charData.data.system.roleInfo.activeRole
                             }}</span>
                     </div>
                     <div class="shrink-0">
-                        <button @click="openRollPanel" class="p-2 border border-red-600 text-red-500 hover:bg-red-600 hover:text-black transition-colors" title="Show Roll Modifiers">
+                        <button @click="openRollPanel" class="p-2 border border-cpr-red text-cpr-red hover:bg-cpr-red hover:text-black transition-colors" title="Show Roll Modifiers">
                             <i v-icon data-lucide="dice-6" class="w-5 h-5"></i>
                         </button>
                     </div>
@@ -192,7 +192,7 @@
             </main>
 
             <nav
-                class="fixed bottom-0 inset-x-0 bg-[var(--cpr-black-deep)] border-t border-red-900/30 flex justify-around p-2 pb-6 z-50">
+                class="fixed bottom-0 inset-x-0 bg-cpr-black-deep border-t border-cpr-red-dark/30 flex justify-around p-2 pb-6 z-50">
                 <nav-btn icon="activity" label="Stats" :active="activeTab === 'stats'"
                          @click="activeTab = 'stats'"></nav-btn>
                 <nav-btn icon="brain" label="Skills" :active="activeTab === 'skills'"
