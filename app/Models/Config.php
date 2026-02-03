@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Config extends Model
 {
-    protected $fillable = ['api_key', 'base_url', 'foundry_url', 'user_id'];
+    protected $fillable = ['api_key', 'base_url', 'foundry_url', 'user_id', 'theme'];
 
     public function user()
     {

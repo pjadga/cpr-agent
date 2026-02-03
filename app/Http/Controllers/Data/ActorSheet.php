@@ -22,18 +22,30 @@ class ActorSheet extends FormRequest
             'actorUuid' => 'required|string|max:255'
         ]);
 
-        $client = $this->getFoundryClient();
-        $clientId = auth()->user()->getClientId();
-        $actor = str_replace('Actor.', '', $validatedData["actorUuid"]);
-        $data = $client->entity->getActorSheetAsJson($clientId, $validatedData["actorUuid"]);
+        $user = auth()->user();
+        $characterData = null;
+        $isOffline = false;
 
-        $characterData = $data['data'] ?? [];
+        try {
+            $client = $this->getFoundryClient();
+            $clientId = $user->getClientId();
+            $data = $client->entity->getActorSheetAsJson($clientId, $validatedData["actorUuid"]);
+            $characterData = $data['data'] ?? [];
+
+            if (!empty($characterData)) {
+                // Save for offline use
+                $user->update(['character_data' => $characterData]);
+            }
+        } catch (\Exception $e) {
+            $isOffline = true;
+            $characterData = $user->character_data;
+        }
 
         if (empty($characterData)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Data successfully submitted!',
-                'error' => "Can't Find Actor",
+                'error' => "Can't Find Actor and no offline data available",
             ], 400);
         }
 
@@ -41,14 +53,16 @@ class ActorSheet extends FormRequest
             // Generate a request ID for tracking (useful for React/Vue keys)
             'requestId' => uniqid('entity_'),
 
+            'isOffline' => $isOffline,
+
             // Pass through IDs
-            'type'      => $this->rawJson['type'] ?? 'character',
-            'uuid'      => $this->rawJson['uuid'] ?? '',
+            'type'      => $characterData['type'] ?? 'character',
+            'uuid'      => $characterData['uuid'] ?? '',
 
             // The core data object your Vue app expects
             'data'      => [
                 'name' => $characterData['name'] ?? 'Unknown Character',
-                'img'  => $characterData['img'] ?? $this->rawJson['img'] ?? '', // Sometimes img is on root, sometimes in data
+                'img'  => $characterData['img'] ?? '',
 
                 'system' => [
                     'stats'             => $characterData['system']['stats'] ?? [],

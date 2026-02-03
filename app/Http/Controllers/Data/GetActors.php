@@ -15,21 +15,28 @@ class GetActors extends FormRequest
 
     public function getActors(Request $request)
     {
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-
-        // Use user's client_id if available, otherwise fallback to a default or dummy for testing
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
-        // Cache actor data briefly to reduce repeated calls when the sheet opens/rerenders
-        $cacheKey = sprintf('actors:%s:%s', $clientId, $actorId);
-        $ttl = now()->addSeconds(30);
-        $character = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $actorId) {
-            return $client->entity->getEntity($clientId, $client->entity::UUID, "Actor.$actorId");
-        });
 
-        // Simplified for now, just returning the character data
-        $character['uuid'] = "Actor.$actorId";
-        return response()->json($character, 200);
+        try {
+            $client = $this->getFoundryClient();
+            $clientId = $user->getClientId();
+            // Cache actor data briefly to reduce repeated calls when the sheet opens/rerenders
+            $cacheKey = sprintf('actors:%s:%s', $clientId, $actorId);
+            $ttl = now()->addSeconds(30);
+            $character = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $actorId) {
+                return $client->entity->getEntity($clientId, $client->entity::UUID, "Actor.$actorId");
+            });
+
+            // Simplified for now, just returning the character data
+            $character['uuid'] = "Actor.$actorId";
+            return response()->json($character, 200);
+        } catch (\Exception $e) {
+            // If offline, return a dummy response with the actorUuid so the frontend can still call /actorsheet
+            return response()->json([
+                'uuid' => "Actor." . ($actorId ?: 'demo'),
+                'isOffline' => true
+            ], 200);
+        }
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
@@ -36,10 +37,16 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        $demoData = null;
+        if (File::exists(base_path('json.json'))) {
+            $demoData = json_decode(File::get(base_path('json.json')), true);
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'character_data' => $demoData,
         ]);
 
         event(new Registered($user));

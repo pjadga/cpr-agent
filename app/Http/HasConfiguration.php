@@ -7,13 +7,13 @@ use FoundryClient\FoundryClient;
 
 trait HasConfiguration
 {
-    public function getApiKey(): string
+    public function getApiKey(): ?string
     {
         $config = auth()->user()->config;
-        return $config->api_key;
+        return $config?->api_key;
     }
 
-    public function getBaseUrl(): string
+    public function getFoundryBaseUrl(): ?string
     {
         $config = auth()->user()->config;
         return $config->base_url ?? config('services.foundry.base_url');
@@ -24,6 +24,13 @@ trait HasConfiguration
      */
     public function getFoundryClient(): FoundryClient
     {
-        return new FoundryClient($this->getApiKey(), $this->getBaseUrl());
+        $apiKey = $this->getApiKey();
+        $baseUrl = $this->getFoundryBaseUrl();
+
+        if (!$apiKey || !$baseUrl) {
+            throw new \Exception("Missing Foundry API Key or Base URL configuration.");
+        }
+
+        return new FoundryClient($apiKey, $baseUrl);
     }
 }

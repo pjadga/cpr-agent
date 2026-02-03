@@ -25,6 +25,7 @@ class User extends Authenticatable
         'client_id',
         'default_actor_id',
         'default_token_id',
+        'character_data',
     ];
 
     /**
@@ -47,22 +48,23 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'character_data' => 'array',
         ];
     }
 
     public function getClientId(): string
     {
-        return $this->client_id;
+        return $this->client_id ?? '';
     }
 
     public function getActorId(): string
     {
-        return $this->default_actor_id;
+        return $this->default_actor_id ?? '';
     }
 
     public function getTokenId(): string
     {
-        return $this->default_token_id;
+        return $this->default_token_id ?? '';
     }
 
     public function config(): HasOne
