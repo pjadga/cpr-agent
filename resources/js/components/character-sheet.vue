@@ -3,7 +3,7 @@
 
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
-                <div class="text-cpr-lime font-mono animate-pulse text-xl">ESTABLISHING NEURAL LINK...</div>
+                <div class="text-cpr-lime font-mono animate-pulse text-xl">INITIALIZING AGENT...</div>
                 <div class="w-64 h-1 bg-cpr-black-deep overflow-hidden relative border border-cpr-border">
                     <div class="absolute inset-0 bg-cpr-lime animate-[loading-bar_2s_infinite]"></div>
                 </div>
@@ -26,7 +26,7 @@
                             Retry Connection
                         </button>
                         <button @click="goToSettings" class="flex-1 py-2 border border-cpr-red text-cpr-red font-bold uppercase text-xs hover:bg-cpr-red/10 transition-colors">
-                            Neural Config
+                            Agent Config
                         </button>
                     </div>
                 </div>
@@ -287,7 +287,7 @@ export default {
                 return response;
             }).catch(err => {
                 console.error('Error posting request', err);
-                popupMessage.value = "Neural uplink failed: Data packet lost.";
+                popupMessage.value = "Uplink failed: Data packet lost.";
                 showPopup.value = true;
                 return err;
             });

@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mb-8 text-cpr-text-muted italic">
-            First time link detected. Please synchronize your neural interface with a Foundry instance and select your default biometric signature (Actor).
+            First time link detected. Please synchronize your Agent interface with a Foundry instance and select your default biometric signature (Actor).
         </p>
 
         <form method="POST" action="{{ route('profile-setup.store') }}" class="space-y-8">

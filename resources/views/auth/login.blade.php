@@ -3,11 +3,11 @@
         <div class="md:w-1/2">
             <h2 class="text-4xl font-bold mb-4 glow-red text-cpr-red uppercase tracking-tighter">Welcome to Night City</h2>
             <p class="text-cpr-text-main mb-6 leading-relaxed">
-                Connect your interface. Log in to access your character data and neural links.
+                Connect your interface. Log in to access your character data and Agent links.
                 The streets of 2077 don't wait for anyone.
             </p>
             <div class="rounded shadow-2xl border-2 border-cpr-red-dark overflow-hidden group">
-                <img src="{{ asset('images/external/login-bg.jpg') }}"
+                <img src="{{ asset('images/external/splash-square.png') }}"
                      alt="Cyberpunk Cityscape"
                      class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500">
             </div>
@@ -18,7 +18,7 @@
                 <h3 class="text-xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Authentication Required</h3>
                 <div class="flex justify-between items-center mb-6">
                     <p class="text-[10px] text-cpr-yellow/80 uppercase italic">
-                        Note: Ensure your credentials match your Foundry VTT login for seamless neural synchronization.
+                        Note: Ensure your credentials match your Foundry VTT login for seamless synchronization.
                     </p>
                     <a href="{{ route('how-to-use') }}" class="text-[10px] text-cpr-red hover:text-cpr-red uppercase font-bold transition-colors">
                         How to Use
@@ -33,7 +33,7 @@
 
                     <!-- Email Address -->
                     <div>
-                        <x-input-label for="email" :value="__('Neural ID (Email)')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="email" class="cyber-input-field mt-1" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>

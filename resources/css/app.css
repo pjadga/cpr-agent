@@ -109,13 +109,13 @@ body {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-.glow-cyan { text-shadow: 0 0 5px var(--cpr-cyan), 0 0 10px var(--cpr-cyan-dark), 0 0 15px var(--cpr-cyan-dark); }
-.glow-pink { text-shadow: 0 0 5px var(--cpr-pink), 0 0 10px var(--cpr-pink-dark), 0 0 15px var(--cpr-pink-dark); }
-.glow-lime { text-shadow: 0 0 5px var(--cpr-lime), 0 0 10px var(--cpr-lime-dark), 0 0 15px var(--cpr-lime-dark); }
-.glow-purple { text-shadow: 0 0 5px var(--cpr-purple), 0 0 10px var(--cpr-purple-dark), 0 0 15px var(--cpr-purple-dark); }
-.glow-red { text-shadow: 0 0 5px var(--cpr-red), 0 0 10px var(--cpr-red-dark), 0 0 15px var(--cpr-red-dark); }
-.glow-orange { text-shadow: 0 0 5px var(--cpr-orange), 0 0 10px var(--cpr-orange-dark), 0 0 15px var(--cpr-orange-dark); }
-.glow-teal { text-shadow: 0 0 5px var(--cpr-teal), 0 0 10px var(--cpr-teal-dark), 0 0 15px var(--cpr-teal-dark); }
+.glow-cyan { text-shadow: 0 0 5px var(--cpr-cyan); }
+.glow-pink { text-shadow: 0 0 5px var(--cpr-pink); }
+.glow-lime { text-shadow: 0 0 5px var(--cpr-lime); }
+.glow-purple { text-shadow: 0 0 5px var(--cpr-purple); }
+.glow-red { text-shadow: 0 0 5px var(--cpr-red); }
+.glow-orange { text-shadow: 0 0 5px var(--cpr-orange); }
+.glow-teal { text-shadow: 0 0 5px var(--cpr-teal); }
 
 
 .cyber-button {
@@ -184,11 +184,11 @@ body {
 /* Helper to mark sections for JS sidebar generation */
 .api-section {}
 
-.glow-cyan { text-shadow: 0 0 5px var(--cpr-cyan), 0 0 10px var(--cpr-cyan-dark); }
-.glow-pink { text-shadow: 0 0 5px var(--cpr-pink), 0 0 10px var(--cpr-pink-dark); }
-.glow-lime { text-shadow: 0 0 5px var(--cpr-lime), 0 0 10px var(--cpr-lime-dark); }
-.glow-purple { text-shadow: 0 0 5px var(--cpr-purple), 0 0 10px var(--cpr-purple-dark); }
-.glow-red { text-shadow: 0 0 5px var(--cpr-red), 0 0 10px var(--cpr-red-dark); }
+.glow-cyan { text-shadow: 0 0 5px var(--cpr-cyan); }
+.glow-pink { text-shadow: 0 0 5px var(--cpr-pink); }
+.glow-lime { text-shadow: 0 0 5px var(--cpr-lime); }
+.glow-purple { text-shadow: 0 0 5px var(--cpr-purple); }
+.glow-red { text-shadow: 0 0 5px var(--cpr-red); }
 
 .cyber-button {
     @apply text-white font-medium py-2.5 px-5 rounded-md shadow-md transition duration-150 ease-in-out tracking-wider border-2;

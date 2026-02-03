@@ -71,9 +71,9 @@
         <div class="space-y-6">
             <div class="flex justify-between items-center border-b border-cpr-lime/30 pb-2">
                 <h3 class="text-xl font-bold text-cpr-lime uppercase tracking-widest">
-                    User Neural Link
+                    Agent Sync
                 </h3>
-                <a href="{{ route('settings') }}" class="text-cpr-lime hover:text-cpr-lime transition-colors" title="Refresh Neural Link">
+                <a href="{{ route('settings') }}" class="text-cpr-lime hover:text-cpr-lime transition-colors" title="Refresh Sync">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -81,7 +81,7 @@
             </div>
             @if(!$config->api_key || (!$config->base_url && !config('services.foundry.base_url')))
                 <div class="bg-cpr-red-dark/30 border border-cpr-red-dark text-cpr-red p-4 text-xs italic">
-                    SYSTEM OFFLINE: Configure Core System Settings to enable User Neural Link synchronization.
+                    SYSTEM OFFLINE: Configure Core System Settings to enable Agent synchronization.
                 </div>
             @else
                 <form method="POST" action="{{ route('profile-setup.store') }}" class="space-y-4">
@@ -134,7 +134,7 @@
 
 
                     <button type="submit" class="cyber-button bg-cpr-lime-dark border-cpr-lime w-full uppercase font-bold py-2">
-                        Commit Neural Link
+                        Commit Sync
                     </button>
                 </form>
             @endif
@@ -164,7 +164,7 @@
                     </div>
 
                     <div>
-                        <x-input-label for="email" :value="__('Neural ID (Email)')" class="text-xs uppercase text-cpr-cyan" />
+                        <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-cyan" />
                         <x-text-input id="email" name="email" type="email" class="cyber-input-field mt-1 w-full" :value="old('email', $user->email)" required autocomplete="username" />
                         <x-input-error class="mt-1 text-cpr-red text-[10px] uppercase" :messages="$errors->get('email')" />
                     </div>
@@ -214,7 +214,7 @@
             <div class="flex flex-col md:flex-row items-center justify-between gap-6 bg-cpr-red-dark/10 p-6 border border-cpr-red-dark/20">
                 <div>
                     <h4 class="text-lg font-bold text-cpr-red uppercase tracking-widest">Terminate Account</h4>
-                    <p class="text-xs text-cpr-red/60 uppercase mt-1">Warning: This action is permanent and will wipe all neural link data.</p>
+                    <p class="text-xs text-cpr-red/60 uppercase mt-1">Warning: This action is permanent and will wipe all Agent sync data.</p>
                 </div>
 
                 <button

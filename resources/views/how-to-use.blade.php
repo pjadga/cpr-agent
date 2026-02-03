@@ -1,11 +1,11 @@
 @extends('layouts.cyberpunk')
 
 @section('content')
-<div class="min-h-screen flex flex-col items-center justify-center p-6 bg-[url('{{ asset('images/external/login-bg.jpg') }}')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-cpr-black/80">
+<div class="min-h-screen flex flex-col items-center justify-center p-6 bg-[url('{{ asset('images/external/splash-dark.png') }}')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-cpr-black/80">
     <div class="cpr-panel p-8 max-w-4xl w-full border-t-4 border-t-red-600 shadow-2xl backdrop-blur-sm overflow-y-auto max-h-[90vh]">
         <div class="mb-8 border-b border-cpr-red/30 pb-4">
             <h1 class="text-4xl font-black glow-red text-cpr-red uppercase tracking-tighter">How to Use</h1>
-            <p class="text-cpr-text-muted italic">Follow these steps to synchronize your neural interface with Night City.</p>
+            <p class="text-cpr-text-muted italic">Follow these steps to synchronize your Agent interface with Night City.</p>
         </div>
 
         <div class="space-y-8 text-cpr-text-main">

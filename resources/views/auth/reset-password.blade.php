@@ -10,7 +10,7 @@
 
             <!-- Email Address -->
             <div>
-                <x-input-label for="email" :value="__('Neural ID (Email)')" class="text-xs uppercase text-cpr-text-muted" />
+                <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-text-muted" />
                 <x-text-input id="email" class="cyber-input-field mt-1" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
