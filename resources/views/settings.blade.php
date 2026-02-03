@@ -61,6 +61,15 @@
                     </div>
                     <x-text-input type="text" name="foundry_url" id="foundry_url" value="{{ old('foundry_url', $config->foundry_url) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
+
+                <div>
+                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-pink" />
+                    <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">
+                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>
+                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (Chill)</option>
+                    </select>
+                </div>
+
                 <button type="submit" class="cyber-button bg-cpr-pink-dark border-cpr-pink text-black w-full uppercase font-bold py-2">
                     Update Core Settings
                 </button>
@@ -69,11 +78,11 @@
 
         <!-- User Profile Synchronization -->
         <div class="space-y-6">
-            <div class="flex justify-between items-center border-b border-cpr-lime/30 pb-2">
-                <h3 class="text-xl font-bold text-cpr-lime uppercase tracking-widest">
+            <div class="flex justify-between items-center border-b border-cpr-yellow/30 pb-2">
+                <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest">
                     Agent Sync
                 </h3>
-                <a href="{{ route('settings') }}" class="text-cpr-lime hover:text-cpr-lime transition-colors" title="Refresh Sync">
+                <a href="{{ route('settings') }}" class="text-cpr-yellow hover:text-cpr-yellow transition-colors" title="Refresh Sync">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -89,10 +98,10 @@
                     <!-- Client ID -->
                     <div>
                         <div class="flex items-center gap-2">
-                            <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-cpr-lime" />
+                            <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-cpr-yellow" />
                             <div class="group relative flex items-center">
-                                <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-lime cursor-help transition-colors"></i>
-                                <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-lime text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
+                                <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
                                     Appears once the GM account is connected and running in Foundry.
                                 </div>
                             </div>
@@ -111,10 +120,10 @@
                     <!-- Default Actor ID -->
                     <div>
                         <div class="flex items-center gap-2">
-                            <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-cpr-lime" />
+                            <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-cpr-yellow" />
                             <div class="group relative flex items-center">
-                                <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-lime cursor-help transition-colors"></i>
-                                <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-lime text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
+                                <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
                                     Loads playable characters and player-owned characters from the current session.
                                 </div>
                             </div>
@@ -133,7 +142,7 @@
                     </div>
 
 
-                    <button type="submit" class="cyber-button bg-cpr-lime-dark border-cpr-lime w-full uppercase font-bold py-2">
+                    <button type="submit" class="cyber-button bg-cpr-yellow-dark border-cpr-yellow w-full uppercase font-bold py-2 text-black">
                         Commit Sync
                     </button>
                 </form>

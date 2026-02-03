@@ -9,10 +9,11 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-white: #b6d6ff;
+    --color-white: #f5f5f5;
     --color-cpr-red: var(--cpr-red);
     --color-cpr-red-dark: var(--cpr-red-dark);
     --color-cpr-yellow: var(--cpr-yellow);
+    --color-cpr-yellow-dark: var(--cpr-yellow-dark);
     --color-cpr-cyan: var(--cpr-cyan);
     --color-cpr-cyan-dark: var(--cpr-cyan-dark);
     --color-cpr-pink: var(--cpr-pink);
@@ -42,43 +43,67 @@
 }
 
 :root {
-    /* Brand/Accent Colors */
-    --cpr-red: #a30f0f;
-    --cpr-red-dark: #7e0808;
-    --cpr-yellow: #facc15;
-    --cpr-yellow-dark: #ca8a04;
-    --cpr-cyan: #1995a8;
-    --cpr-cyan-dark: #06657d;
+    /* Brand/Accent Colors - CPR Red and Yellow are main */
+    --cpr-red: #da0000;
+    --cpr-red-dark: #a30000;
+    --cpr-yellow: #fcee0a;
+    --cpr-yellow-dark: #cfc100;
+
+    /* Secondary/Tertiary Colors */
     --cpr-pink: #e238a0;
     --cpr-pink-dark: #a21051;
+    --cpr-teal: #14b8a6;
+    --cpr-teal-dark: #0d9488;
+
+    /* Others */
+    --cpr-cyan: #1995a8;
+    --cpr-cyan-dark: #06657d;
     --cpr-lime: #84cc16;
     --cpr-lime-dark: #65a30d;
     --cpr-purple: #a855f7;
     --cpr-purple-dark: #9333ea;
     --cpr-orange: #f97316;
     --cpr-orange-dark: #ea580c;
-    --cpr-teal: #14b8a6;
-    --cpr-teal-dark: #0d9488;
     --cpr-magenta: #d946ef;
     --cpr-magenta-dark: #a21caf;
 
-    /* Base Colors */
+    /* Base Colors - Night Mode (Default) */
     --cpr-black: #0a0a0a;
     --cpr-black-deep: #050505;
     --cpr-black-soft: rgba(17, 17, 17, 0.51);
     --cpr-black-elevated: rgba(39, 33, 33, 0.73);
     --cpr-panel: rgba(20, 20, 20, 0.76);
-    --cpr-panel-hover: rgba(163, 15, 15, 0.44); /* Using cpr-red */
+    --cpr-panel-hover: rgba(218, 0, 0, 0.44); /* Using cpr-red */
     --cpr-border: #2a2a2a;
     --cpr-border-dark: #1f2937;
     --cpr-border-muted: #374151;
-    --cpr-border-accent: rgba(163, 15, 15, 0.44);
+    --cpr-border-accent: rgba(218, 0, 0, 0.44);
 
-    /* Text Colors */
+    /* Text Colors - Night Mode */
     --cpr-text-main: #cdcdcd;
     --cpr-text-muted: #96b1ca;
-    --cpr-text-bright: #ffffff;
+    --cpr-text-bright: #f5f5f5;
     --cpr-text-dim: #636e73;
+}
+
+.theme-day {
+    /* Base Colors - Day Mode */
+    --cpr-black: #e5e7eb;
+    --cpr-black-deep: #f3f4f6;
+    --cpr-black-soft: rgba(249, 250, 251, 0.8);
+    --cpr-black-elevated: rgba(229, 231, 235, 0.9);
+    --cpr-panel: rgba(255, 255, 255, 0.85);
+    --cpr-panel-hover: rgba(218, 0, 0, 0.1);
+    --cpr-border: #d1d5db;
+    --cpr-border-dark: #9ca3af;
+    --cpr-border-muted: #cbd5e1;
+    --cpr-border-accent: rgba(218, 0, 0, 0.2);
+
+    /* Text Colors - Day Mode */
+    --cpr-text-main: #1f2937;
+    --cpr-text-muted: #4b5563;
+    --cpr-text-bright: #111827;
+    --cpr-text-dim: #6b7280;
 }
 
 body {
@@ -118,24 +143,6 @@ body {
 .glow-teal { text-shadow: 0 0 5px var(--cpr-teal); }
 
 
-.cyber-button {
-    @apply text-white text-shadow-black font-bold py-1.5 px-10 rounded-md shadow-md transition duration-150 ease-in-out tracking-wider border-2;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
-}
-.cyber-button:hover { @apply shadow-lg transform scale-105; }
-.cyber-button:active { @apply transform scale-95; }
-
-.cyber-button.bg-cpr-cyan { @apply focus:ring-cpr-cyan; }
-.cyber-button.bg-cpr-lime { @apply focus:ring-cpr-lime; }
-.cyber-button.bg-cpr-yellow { @apply focus:ring-cpr-yellow text-cpr-black; }
-.cyber-button.bg-cpr-yellow:hover { @apply text-cpr-black; }
-.cyber-button.bg-cpr-red { @apply focus:ring-cpr-red; }
-.cyber-button.bg-cpr-purple { @apply focus:ring-cpr-purple; }
-.cyber-button.bg-cpr-pink { @apply focus:ring-cpr-pink; }
-.cyber-button.bg-cpr-orange { @apply focus:ring-cpr-orange; }
-.cyber-button.bg-cpr-teal { @apply focus:ring-cpr-teal; }
-
-
 .cyber-input-field, .cyber-textarea-field, .cyber-select-field {
     @apply block w-full p-3 border rounded-md shadow-sm text-base;
     @apply bg-cpr-black-soft border-cpr-border text-cpr-text-main;
@@ -152,122 +159,7 @@ body {
 }
 .cyber-select-option { @apply bg-cpr-black-soft text-cpr-text-main p-2; }
 
-.input-grid { @apply grid gap-2 mb-2; } /* For multiple inputs in a row/column before a button */
-.input-grid > * { @apply mb-0; } /* Remove default bottom margin for items in the grid */
 
-
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--cpr-border-dark); border-radius: 10px; }
-::-webkit-scrollbar-thumb { background: var(--cpr-pink-dark); border-radius: 10px; border: 2px solid var(--cpr-border-dark);}
-::-webkit-scrollbar-thumb:hover { background: var(--cpr-pink); }
-* { scrollbar-width: auto; scrollbar-color: var(--cpr-pink-dark) var(--cpr-border-dark);}
-.modal-scroll-content::-webkit-scrollbar-thumb { background: var(--cpr-lime);}
-.modal-scroll-content { scrollbar-color: var(--cpr-lime) var(--cpr-border-dark);}
-
-
-/* Sidebar specific styles */
-.cyber-sidebar { scrollbar-width: thin; scrollbar-color: var(--cpr-cyan) var(--cpr-border-muted); }
-.cyber-sidebar::-webkit-scrollbar-thumb { background: var(--cpr-cyan); }
-.cyber-sidebar::-webkit-scrollbar-thumb:hover { background: var(--cpr-cyan); opacity: 0.8; }
-.sidebar-text-lime { color: var(--cpr-lime); }
-.sidebar-text-yellow { color: var(--cpr-yellow); }
-.sidebar-text-red { color: var(--cpr-red); }
-.sidebar-text-purple { color: var(--cpr-purple); }
-.sidebar-text-cyan { color: var(--cpr-cyan); }
-.sidebar-text-orange { color: var(--cpr-orange); }
-.sidebar-text-teal { color: var(--cpr-teal); }
-
-.sidebar-section-active { color: var(--cpr-pink); font-weight: 600; transform: scale(1.05); }
-.sidebar-subsection-active { color: var(--cpr-pink); font-weight: 600; }
-
-/* Helper to mark sections for JS sidebar generation */
-.api-section {}
-
-.glow-cyan { text-shadow: 0 0 5px var(--cpr-cyan); }
-.glow-pink { text-shadow: 0 0 5px var(--cpr-pink); }
-.glow-lime { text-shadow: 0 0 5px var(--cpr-lime); }
-.glow-purple { text-shadow: 0 0 5px var(--cpr-purple); }
-.glow-red { text-shadow: 0 0 5px var(--cpr-red); }
-
-.cyber-button {
-    @apply text-white font-medium py-2.5 px-5 rounded-md shadow-md transition duration-150 ease-in-out tracking-wider border-2;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900;
-}
-.cyber-button:hover {
-    @apply shadow-lg transform scale-105;
-}
-.cyber-button.bg-cpr-cyan { @apply focus:ring-cpr-cyan; }
-.cyber-button.bg-cpr-lime { @apply focus:ring-cpr-lime; }
-.cyber-button.bg-cpr-yellow { @apply focus:ring-cpr-yellow text-cpr-black; }
-.cyber-button.bg-cpr-yellow:hover { @apply text-cpr-black; }
-.cyber-button.bg-cpr-red { @apply focus:ring-cpr-red; }
-.cyber-button.bg-cpr-purple { @apply focus:ring-cpr-purple; }
-.cyber-button.bg-cpr-pink { @apply focus:ring-cpr-pink; }
-
-
-.cyber-input, .cyber-textarea {
-    @apply block w-full p-3 border-2 rounded-md shadow-sm transition-all duration-300 ease-in-out;
-    @apply bg-cpr-black-soft border-cpr-border text-cpr-text-main placeholder-cpr-text-dim;
-    transform-origin: center;
-    position: relative;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-    background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.05));
-    display: block;
-}
-
-/* Grid layout for form inputs */
-.input-grid {
-    @apply grid gap-2;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-}
-
-/* Style inputs based on their parent container's heading color using classes */
-.p-4 h4.text-cpr-lime ~ .cyber-input,
-.p-4 h4.text-cpr-lime ~ .mb-2 + .cyber-input {
-    border-color: var(--cpr-lime-dark);
-    @apply focus:border-cpr-lime focus:ring-cpr-lime;
-    box-shadow: 0 0 5px rgba(132, 204, 22, 0.2);
-    background-image: linear-gradient(to bottom,
-    rgba(132, 204, 22, 0.05),
-    rgba(63, 98, 18, 0.1)
-    );
-}
-
-.p-4 h4.text-cpr-yellow ~ .cyber-input,
-.p-4 h4.text-cpr-yellow ~ .cyber-textarea,
-.p-4 h4.text-cpr-yellow ~ .mb-2 + .cyber-input {
-    border-color: var(--cpr-yellow);
-    @apply focus:border-cpr-yellow focus:ring-cpr-yellow;
-    box-shadow: 0 0 5px rgba(250, 204, 21, 0.2);
-    background-image: linear-gradient(to bottom,
-    rgba(250, 204, 21, 0.05),
-    rgba(113, 63, 18, 0.1)
-    );
-}
-
-.p-4 h4.text-cpr-red ~ .cyber-input,
-.p-4 h4.text-cpr-red ~ .mb-2 + .cyber-input {
-    border-color: var(--cpr-red);
-    @apply focus:border-cpr-red focus:ring-cpr-red;
-    box-shadow: 0 0 5px rgba(239, 68, 68, 0.2);
-    background-image: linear-gradient(to bottom,
-    rgba(239, 68, 68, 0.05),
-    rgba(127, 29, 29, 0.1)
-    );
-}
-
-.p-4 h4.text-cpr-purple ~ .cyber-input,
-.p-4 h4.text-cpr-purple ~ .cyber-textarea,
-.p-4 h4.text-cpr-purple ~ .mb-2 + .cyber-input {
-    border-color: var(--cpr-purple);
-    @apply focus:border-cpr-purple focus:ring-cpr-purple;
-    box-shadow: 0 0 5px rgba(168, 85, 247, 0.2);
-    background-image: linear-gradient(to bottom,
-    rgba(168, 85, 247, 0.05),
-    rgba(88, 28, 135, 0.1)
-    );
-}
 
 /* Smooth scrolling for the whole page */
 html {

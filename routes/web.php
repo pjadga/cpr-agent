@@ -73,7 +73,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
-    Route::get('/getbaseurl', [ConfigController::class, 'getFoundryUrl']);
+    Route::get('/getbaseurl', [ConfigController::class, 'getFoundryBaseUrl']);
     Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);

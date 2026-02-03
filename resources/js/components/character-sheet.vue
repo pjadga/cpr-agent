@@ -3,9 +3,9 @@
 
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
-                <div class="text-cpr-lime font-mono animate-pulse text-xl">INITIALIZING AGENT...</div>
+                <div class="text-cpr-yellow font-mono animate-pulse text-xl">INITIALIZING AGENT...</div>
                 <div class="w-64 h-1 bg-cpr-black-deep overflow-hidden relative border border-cpr-border">
-                    <div class="absolute inset-0 bg-cpr-lime animate-[loading-bar_2s_infinite]"></div>
+                    <div class="absolute inset-0 bg-cpr-red animate-[loading-bar_2s_infinite]"></div>
                 </div>
                 <div class="mt-4 text-[10px] text-cpr-text-dim font-mono uppercase tracking-[0.3em] italic">Initializing Headless Session</div>
             </div>
@@ -53,7 +53,12 @@
                     </div>
                     <img :src="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
                     <div class="mt-4 text-center">
-                        <h2 class="text-white font-bold uppercase tracking-widest text-lg">{{ charData.data.name }}</h2>
+                        <h2 class="text-white font-bold uppercase tracking-widest text-lg">
+                            {{ charData.data.name }}
+                        </h2>
+                        <div v-if="charData.isOffline" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
+                            Offline Mode - Agent Synced via Local Cache
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,28 +96,36 @@
                 @update:fireMode="controlState.fireMode = $event">
             </combat-panel>
 
-            <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-red-dark backdrop-blur-md">
+            <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-yellow-dark backdrop-blur-md">
                 <div class="pt-3 flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
-                            class="absolute inset-0 border border-[var(--cpr-red)] bg-cpr-black-deep flex items-center justify-center overflow-hidden">
+                            class="absolute inset-0 border border-[var(--cpr-yellow)] bg-cpr-black-deep flex items-center justify-center overflow-hidden">
                             <img v-if="charData.data.img" :src="getImageUrl(charData.data.img)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" :alt="charData.data.name">
-                            <span v-else class="text-xl font-bold text-cpr-red">{{ charData.data.name[0] }}</span>
+                            <span v-else class="text-xl font-bold text-cpr-yellow">{{ charData.data.name[0] }}</span>
                         </div>
-                        <div class="absolute inset-0 bg-cpr-red/0 group-hover:bg-cpr-red/20 transition-colors duration-300 flex items-center justify-center">
+                        <div class="absolute inset-0 bg-cpr-yellow/0 group-hover:bg-cpr-yellow/20 transition-colors duration-300 flex items-center justify-center">
                             <i v-icon data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <h1 class="text-2xl font-bold uppercase truncate leading-none text-white">{{
-                                charData.data.name
-                            }}</h1>
-                        <span class="text-[10px] text-cpr-red uppercase font-bold tracking-widest">{{
+                        <div class="flex items-center gap-2">
+                            <h1 v-if="charData.isOffline" class="text-2xl font-bold uppercase truncate leading-none text-white">
+                                <span class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
+                                    Offline
+                                </span>
+                                {{ charData.data.name }}
+                            </h1>
+                            <h1 v-else class="text-2xl font-bold uppercase truncate leading-none text-white">
+                                {{ charData.data.name }}
+                            </h1>
+                        </div>
+                        <span class="text-[10px] text-cpr-yellow uppercase font-bold tracking-widest">{{
                                 charData.data.system.roleInfo.activeRole
                             }}</span>
                     </div>
                     <div class="shrink-0">
-                        <button @click="openRollPanel" class="p-2 border border-cpr-red text-cpr-red hover:bg-cpr-red hover:text-black transition-colors" title="Show Roll Modifiers">
+                        <button @click="openRollPanel" class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors" title="Show Roll Modifiers">
                             <i v-icon data-lucide="dice-6" class="w-5 h-5"></i>
                         </button>
                     </div>

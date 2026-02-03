@@ -1,19 +1,6 @@
 <x-guest-layout>
-    <div class="flex flex-col md:flex-row gap-8 items-center">
-        <div class="md:w-1/2">
-            <h2 class="text-4xl font-bold mb-4 glow-red text-cpr-red uppercase tracking-tighter">Welcome to Night City</h2>
-            <p class="text-cpr-text-main mb-6 leading-relaxed">
-                Connect your interface. Log in to access your character data and Agent links.
-                The streets of 2077 don't wait for anyone.
-            </p>
-            <div class="rounded shadow-2xl border-2 border-cpr-red-dark overflow-hidden group">
-                <img src="{{ asset('images/external/splash-square.png') }}"
-                     alt="Cyberpunk Cityscape"
-                     class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-500">
-            </div>
-        </div>
-
-        <div class="md:w-1/2 w-full">
+    <div class="flex flex-col items-center">
+        <div class="w-full max-w-xl">
             <div class="p-6 bg-cpr-black-deep/50 rounded-lg border border-cpr-border">
                 <h3 class="text-xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Authentication Required</h3>
                 <div class="flex justify-between items-center mb-6">
