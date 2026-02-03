@@ -1,7 +1,7 @@
 <template>
     <div v-if="activeTab === 'control'" key="control" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
-        <div class="flex bg-cpr-black border border-cpr-border p-1 rounded-sm">
+        <div v-if="hasNetspaceOptions" class="flex bg-cpr-black border border-cpr-border p-1 rounded-sm">
             <button @click="controlState.spaceMode = 'meatspace'"
                     class="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
                     :class="controlState.spaceMode === 'meatspace' ? 'bg-cpr-red text-black' : 'text-cpr-text-dim hover:text-cpr-text-main'">
@@ -14,7 +14,7 @@
             </button>
         </div>
 
-        <div v-if="controlState.spaceMode === 'meatspace'" class="space-y-6 animate-in fade-in duration-300">
+        <div v-if="(controlState.spaceMode === 'meatspace' || !hasNetspaceOptions)" class="space-y-6 animate-in fade-in duration-300">
             <div>
                 <h3 class="text-xs font-black text-cpr-text-dim uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                     <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Target Acquisition
@@ -106,7 +106,7 @@
             </div>
         </div>
 
-        <div v-else-if="controlState.spaceMode === 'netspace'" class="space-y-6 animate-in fade-in duration-300">
+        <div v-else-if="controlState.spaceMode === 'netspace' && hasNetspaceOptions" class="space-y-6 animate-in fade-in duration-300">
             <div v-if="activeCyberdeck" class="relative">
                 <div class="cpr-panel p-4 bg-cpr-black-deep/20 border border-cpr-cyan/30 mb-4 overflow-hidden group">
                     <div class="relative z-10 flex justify-between items-start mb-4">
@@ -196,7 +196,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { vIcon } from '../../directives/icon';
 import { useCharacterData } from '../../composables/useCharacterData';
 import ProgramRow from './ProgramRow.vue';
@@ -215,7 +215,7 @@ export default {
         'open-cyberdeck-config', 'open-combat-panel', 'program-roll-request',
         'toggle-program-details', 'toggle-rez', 'roll-program'
     ],
-    setup() {
+    setup(props) {
         const { getImageUrl, charData } = useCharacterData();
         const showTargetDropdown = ref(false);
 
@@ -275,7 +275,11 @@ export default {
             };
         };
 
-        return { getImageUrl, showTargetDropdown, isMeleeOrUnarmed, getAmmoTotal, getAmmoName, getStatusLine };
+        const hasNetspaceOptions = computed(() => {
+            return !!props.activeCyberdeck;
+        });
+
+        return { getImageUrl, showTargetDropdown, isMeleeOrUnarmed, getAmmoTotal, getAmmoName, getStatusLine, hasNetspaceOptions };
     }
 }
 </script>

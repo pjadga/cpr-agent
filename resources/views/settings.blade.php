@@ -62,13 +62,13 @@
                     <x-text-input type="text" name="foundry_url" id="foundry_url" value="{{ old('foundry_url', $config->foundry_url) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
 
-                <div>
-                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-pink" />
-                    <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">
-                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>
-                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (Chill)</option>
-                    </select>
-                </div>
+{{--                <div>--}}
+{{--                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-pink" />--}}
+{{--                    <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">--}}
+{{--                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>--}}
+{{--                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (Chill)</option>--}}
+{{--                    </select>--}}
+{{--                </div>--}}
 
                 <button type="submit" class="cyber-button bg-cpr-pink-dark border-cpr-pink text-black w-full uppercase font-bold py-2">
                     Update Core Settings
@@ -168,7 +168,7 @@
 
                     <div>
                         <x-input-label for="name" :value="__('User Handle')" class="text-xs uppercase text-cpr-cyan" />
-                        <x-text-input id="name" name="name" type="text" class="cyber-input-field mt-1 w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+                        <x-text-input id="name" name="name" type="text" class="cyber-input-field mt-1 w-full" :value="old('name', $user->name)" required autocomplete="name" />
                         <x-input-error class="mt-1 text-cpr-red text-[10px] uppercase" :messages="$errors->get('name')" />
                     </div>
 
