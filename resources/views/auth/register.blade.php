@@ -1,12 +1,17 @@
 <x-guest-layout>
-    <div class="flex flex-col items-center">
-        <div class="w-full max-w-xl">
-            <div class="p-6 bg-cpr-black-deep/50 rounded-lg border border-cpr-border">
-                <h3 class="text-xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Bio-ID Registration</h3>
-                <p class="text-[10px] text-cpr-yellow/80 uppercase mb-6 italic">
-                    Note: Use the same credentials as your Foundry VTT account to enable biometric synchronization.
-                </p>
+    <div class="w-full mb-6">
+        <h3 class="text-xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Bio-ID Registration</h3>
+        <p class="text-[10px] text-cpr-yellow/80 uppercase italic">
+            Note: Use the same credentials as your Foundry VTT account to enable biometric synchronization.
+        </p>
+    </div>
 
+    <div class="flex flex-col md:flex-row items-center md:items-stretch gap-0 md:gap-6">
+        <div class="w-full md:w-1/2 hidden md:block">
+            <img src="{{ asset('images/external/splash-square.png') }}" alt="Cyberpunk Red Logo" class="w-full h-full rounded-lg border border-cpr-border bg-black object-contain">
+        </div>
+        <div class="w-full md:w-1/2 max-w-xl">
+            <div class="p-6 bg-cpr-black-deep/50 rounded-lg border border-cpr-border">
                 <form method="POST" action="{{ route('register') }}" class="space-y-4">
                     @csrf
 

@@ -1,17 +1,22 @@
 <x-guest-layout>
-    <div class="flex flex-col items-center">
-        <div class="w-full max-w-xl">
-            <div class="p-6 bg-cpr-black-deep/50 rounded-lg border border-cpr-border">
-                <h3 class="text-xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Authentication Required</h3>
-                <div class="flex justify-between items-center mb-6">
-                    <p class="text-[10px] text-cpr-yellow/80 uppercase italic">
-                        Note: Ensure your credentials match your Foundry VTT login for seamless synchronization.
-                    </p>
-                    <a href="{{ route('how-to-use') }}" class="text-[10px] text-cpr-red hover:text-cpr-red uppercase font-bold transition-colors">
-                        How to Use
-                    </a>
-                </div>
+    <div class="w-full mb-6">
+        <h3 class="text-2xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Authentication Required</h3>
+        <div class="flex justify-between items-center">
+            <p class="text-[12px] text-cpr-yellow/80 uppercase italic">
+                Note: Ensure your credentials match your Foundry VTT login for seamless synchronization.
+            </p>
+            <a href="{{ route('how-to-use') }}" class="text-[12px] text-cpr-red hover:text-cpr-yellow uppercase font-bold transition-colors">
+                How to Use
+            </a>
+        </div>
+    </div>
 
+    <div class="flex flex-col md:flex-row items-center md:items-stretch gap-0 md:gap-6">
+        <div class="w-full md:w-1/2 hidden md:block">
+            <img src="{{ asset('images/external/splash-square.png') }}" alt="Cyberpunk Red Logo" class="w-full h-full bg-black object-contain rounded-lg border border-cpr-border">
+        </div>
+        <div class="w-full md:w-1/2 max-w-xl">
+            <div class="p-6 bg-cpr-black-deep/50 rounded-lg border border-cpr-border">
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
