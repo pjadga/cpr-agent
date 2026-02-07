@@ -124,7 +124,14 @@
                                 charData.data.system.roleInfo.activeRole
                             }}</span>
                     </div>
-                    <div class="shrink-0">
+                    <div class="shrink-0 flex items-center gap-2">
+                        <button @click="rollInitiative" class="group relative flex items-center gap-2 px-3 py-2 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]" title="Initiative Roll">
+                            <i v-icon data-lucide="swords" class="w-5 h-5 animate-pulse group-hover:animate-none"></i>
+                            <span class="text-xs font-black uppercase tracking-widest hidden sm:inline">Initiative</span>
+                            <!-- Spooky Glow Overlay -->
+                            <div class="absolute inset-0 bg-cpr-red/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        </button>
+
                         <button @click="openRollPanel" class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors" title="Die Roller">
                             <i v-icon data-lucide="dice-6" class="w-5 h-5"></i>
                         </button>
@@ -317,6 +324,10 @@ export default {
                 }
             }
             sendRequest({ label: stat, value: numericValue }, "/updatestat");
+        };
+
+        const rollInitiative = () => {
+            sendRequest({}, "/initiativeroll");
         };
 
         // --- CONTROL PANEL STATE ---
@@ -634,7 +645,7 @@ export default {
             handleItemClick,
 
             // Actions
-            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat,
+            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, rollInitiative,
             sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings,
 
             // Combat

@@ -4,7 +4,7 @@
             <div class="flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="dice-6" class="w-4 h-4 text-cpr-red"></i>
-                    <span class="text-xs font-black uppercase tracking-widest text-cpr-red">Die Roller</span>
+                    <span class="text-xs font-black uppercase tracking-widest text-cpr-red">Dice Roller & Mods</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button @click="$emit('refresh')" class="p-1 text-cpr-text-main hover:text-white">
@@ -15,7 +15,26 @@
                     </button>
                 </div>
             </div>
-            <div class="p-3 space-y-3 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.75rem+env(safe-area-inset-right))]">
+            <div class="p-3 space-y-3 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.75rem+env(safe-area-inset-right))] relative">
+                <!-- Roll Result Popup -->
+                <transition name="fade">
+                    <div v-if="showResultPopup" class="absolute inset-0 z-[70] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm">
+                        <div class="bg-cpr-black border-2 border-cpr-red shadow-[0_0_50px_rgba(220,38,38,0.5)] p-8 text-center relative overflow-hidden group">
+                            <!-- Background Glitch Effect -->
+                            <div class="absolute inset-0 bg-cpr-red/5 animate-pulse"></div>
+                            <div class="absolute -inset-full bg-gradient-to-r from-transparent via-cpr-red/10 to-transparent rotate-45 translate-x-[-100%] animate-[shimmer_2s_infinite]"></div>
+
+                            <div class="relative z-10">
+                                <div class="text-[10px] text-cpr-red uppercase font-black tracking-[0.2em] mb-2 animate-bounce">Uplink Confirmed</div>
+                                <div class="text-6xl font-black text-white font-mono drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-4">{{ lastResult?.total }}</div>
+                                <div class="text-xs text-cpr-lime font-mono uppercase tracking-widest">{{ lastResult?.formula }}</div>
+
+                                <button @click="showResultPopup = false" class="mt-8 px-6 py-2 bg-cpr-red text-black text-xs font-black uppercase hover:bg-white transition-colors">Acknowledge</button>
+                            </div>
+                        </div>
+                    </div>
+                </transition>
+
                 <!-- Die Roller Section (Always Visible) -->
                 <div class="bg-cpr-black-deep border border-cpr-red/30 p-3 space-y-3 mb-4">
                     <div class="text-[10px] text-cpr-red uppercase font-bold tracking-wider mb-2 flex items-center gap-2">
@@ -110,7 +129,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { vIcon } from '../../directives/icon';
 import axios from 'axios';
 
@@ -119,10 +138,12 @@ export default {
     props: ['show', 'loading', 'error', 'data', 'hasWeapon'],
     directives: { icon: vIcon },
     emits: ['close', 'refresh', 'go-to-control'],
-    setup() {
+    setup(props) {
         const formula = ref('');
         const diceCounts = ref({});
         const rolling = ref(false);
+        const lastResult = ref(null);
+        const showResultPopup = ref(false);
 
         const addDie = (die) => {
             if (!diceCounts.value[die]) {
@@ -149,11 +170,25 @@ export default {
 
             rolling.value = true;
             try {
-                await axios.post('/make-roll', {
+                const response = await axios.post('/make-roll', {
                     formula: formula.value,
                     flavor: 'Manual Roll',
                     createChatMessage: true
                 });
+
+                if (response.data.success) {
+                    // The actual roll data is nested in data.data.data.roll based on user feedback
+                    const rollData = response.data.data?.data?.roll || response.data.data?.roll;
+                    if (rollData) {
+                        lastResult.value = rollData;
+                        showResultPopup.value = true;
+                        // Auto-hide after 5 seconds if not acknowledged
+                        setTimeout(() => {
+                            showResultPopup.value = false;
+                        }, 5000);
+                    }
+                }
+
                 // Clear formula after successful roll
                 clearFormula();
             } catch (e) {
@@ -166,6 +201,8 @@ export default {
         return {
             formula,
             rolling,
+            lastResult,
+            showResultPopup,
             addDie,
             clearFormula,
             rollFormula
@@ -183,5 +220,30 @@ export default {
 .slide-right-leave-to {
     transform: translateX(100%);
     opacity: 0.5;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(200%) rotate(45deg); }
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+}
+.scrollbar-thumb-cpr-red\/30::-webkit-scrollbar-thumb {
+    background: rgba(220, 38, 38, 0.3);
+    border-radius: 2px;
+}
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
 }
 </style>
