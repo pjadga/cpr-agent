@@ -4,7 +4,7 @@
             <div class="flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="dice-6" class="w-4 h-4 text-cpr-red"></i>
-                    <span class="text-xs font-black uppercase tracking-widest text-cpr-red">Roll Modifiers</span>
+                    <span class="text-xs font-black uppercase tracking-widest text-cpr-red">Die Roller</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button @click="$emit('refresh')" class="p-1 text-cpr-text-main hover:text-white">
@@ -16,6 +16,37 @@
                 </div>
             </div>
             <div class="p-3 space-y-3 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.75rem+env(safe-area-inset-right))]">
+                <!-- Die Roller Section (Always Visible) -->
+                <div class="bg-cpr-black-deep border border-cpr-red/30 p-3 space-y-3 mb-4">
+                    <div class="text-[10px] text-cpr-red uppercase font-bold tracking-wider mb-2 flex items-center gap-2">
+                        <i v-icon data-lucide="dice-5" class="w-3 h-3"></i> Quick Dice
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2">
+                        <button v-for="die in ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100']"
+                                :key="die"
+                                @click="addDie(die)"
+                                class="flex flex-col items-center justify-center p-2 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
+                            <span class="text-xs font-bold text-cpr-text-main group-hover:text-white uppercase">{{ die }}</span>
+                        </button>
+                        <button @click="clearFormula"
+                                class="flex items-center justify-center p-2 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
+                            <i v-icon data-lucide="trash-2" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-red"></i>
+                        </button>
+                    </div>
+
+                    <div v-if="formula" class="mt-3 space-y-2">
+                        <div class="bg-cpr-black p-2 border border-cpr-border-dark flex items-center justify-between">
+                            <span class="text-sm font-mono text-cpr-lime">{{ formula }}</span>
+                            <button @click="rollFormula"
+                                    :disabled="rolling"
+                                    class="bg-cpr-red text-black text-[10px] font-black uppercase px-3 py-1 hover:bg-cpr-red-light disabled:opacity-50 transition-colors">
+                                {{ rolling ? 'Rolling...' : 'Roll' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div v-if="loading" class="text-center py-8 text-cpr-text-muted text-xs">Loading modifiers...</div>
 
                 <div v-else-if="error" class="border border-cpr-red-dark bg-cpr-red-dark/20 text-cpr-red text-xs p-3">
@@ -79,13 +110,67 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import { vIcon } from '../../directives/icon';
+import axios from 'axios';
 
 export default {
     name: 'RollModifierPanel',
     props: ['show', 'loading', 'error', 'data', 'hasWeapon'],
     directives: { icon: vIcon },
-    emits: ['close', 'refresh', 'go-to-control']
+    emits: ['close', 'refresh', 'go-to-control'],
+    setup() {
+        const formula = ref('');
+        const diceCounts = ref({});
+        const rolling = ref(false);
+
+        const addDie = (die) => {
+            if (!diceCounts.value[die]) {
+                diceCounts.value[die] = 0;
+            }
+            diceCounts.value[die]++;
+            updateFormula();
+        };
+
+        const updateFormula = () => {
+            const parts = Object.entries(diceCounts.value)
+                .filter(([_, count]) => count > 0)
+                .map(([die, count]) => `${count}${die}`);
+            formula.value = parts.join(' + ');
+        };
+
+        const clearFormula = () => {
+            formula.value = '';
+            diceCounts.value = {};
+        };
+
+        const rollFormula = async () => {
+            if (!formula.value || rolling.value) return;
+
+            rolling.value = true;
+            try {
+                await axios.post('/make-roll', {
+                    formula: formula.value,
+                    flavor: 'Manual Roll',
+                    createChatMessage: true
+                });
+                // Clear formula after successful roll
+                clearFormula();
+            } catch (e) {
+                console.error('Failed to roll dice', e);
+            } finally {
+                rolling.value = false;
+            }
+        };
+
+        return {
+            formula,
+            rolling,
+            addDie,
+            clearFormula,
+            rollFormula
+        };
+    }
 }
 </script>
 

@@ -28,7 +28,6 @@ export function useCharacterData() {
      */
     const getImageUrl = (path) => {
         if (!path) return '/systems/cyberpunk-red-core/icons/compendium/default/Default_Program.svg';
-        if (path.startsWith('http')) return path;
 
         let cleanPath = path;
         if (path.startsWith('systems/cyberpunk-red-core/')) {

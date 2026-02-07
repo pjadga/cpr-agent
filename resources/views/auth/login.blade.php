@@ -5,7 +5,7 @@
             <p class="text-[12px] text-cpr-yellow/80 uppercase italic">
                 Note: Ensure your credentials match your Foundry VTT login for seamless synchronization.
             </p>
-            <a href="{{ route('how-to-use') }}" class="text-[12px] text-cpr-red hover:text-cpr-yellow uppercase font-bold transition-colors">
+            <a href="{{ route('how-to-use') }}" class="text-[12px] text-cpr-red hover:text-cpr-yellow uppercase font-bold transition-colors border-b border-cpr-red/300 pb-1">
                 How to Use
             </a>
         </div>

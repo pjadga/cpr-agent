@@ -14,6 +14,7 @@ use App\Http\Controllers\Rolls\ProgramRoll;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
+use App\Http\Controllers\Rolls\DiceRoller;
 use App\Http\Controllers\Token\GetVisibleTokens;
 use App\Http\Controllers\Token\MoveToken;
 use App\Http\Controllers\Token\ListVisibleTokens;
@@ -86,6 +87,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/targettokens", [TargetTokens::class, "targetTokens"]);
     Route::post("/attackroll", [AttackRoll::class, "attackRoll"]);
     Route::post("/damageroll", [DamageRoll::class, "damageRoll"]);
+    Route::post("/make-roll", [DiceRoller::class, "makeRoll"]);
     Route::post("/reloadweapon", [ReloadWeapon::class, "reloadWeapon"]);
     Route::post("/getrollmodifiers", [GetRollModifiers::class, "getRollModifiers"]);
     Route::post("/deathsave", [DeathSave::class, "getDeathSave"]);

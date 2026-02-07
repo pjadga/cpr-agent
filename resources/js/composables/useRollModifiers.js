@@ -2,7 +2,7 @@ import { ref } from 'vue';
 import { debounce, isDeepEqual } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
 /**
- * Composable for fetching and managing roll modifiers (bonuses/penalties)
+ * Composable for fetching and managing die rolls and modifiers
  */
 export function useRollModifiers(controlState) {
     const showRollPanel = ref(false);

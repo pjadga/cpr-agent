@@ -125,7 +125,7 @@
                             }}</span>
                     </div>
                     <div class="shrink-0">
-                        <button @click="openRollPanel" class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors" title="Show Roll Modifiers">
+                        <button @click="openRollPanel" class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors" title="Die Roller">
                             <i v-icon data-lucide="dice-6" class="w-5 h-5"></i>
                         </button>
                     </div>
