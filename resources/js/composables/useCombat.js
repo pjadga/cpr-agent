@@ -109,8 +109,18 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (!controlState.value.selectedWeapon) return throwError("No Weapon Selected");
         if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
 
-        window.axios.post("/attackroll", controlState.value).then(() => {
+        window.axios.post("/attackroll", controlState.value).then((response) => {
             debouncedFetchCharacterData();
+            if (response.data && response.data.data) {
+                let rollData = response.data.data;
+                // Handle list of rolls from getRolls(limit: 5)
+                if (rollData.data && Array.isArray(rollData.data) && rollData.data.length > 0) {
+                    const lastRoll = rollData.data[0];
+                    throwError(`Roll Result: ${lastRoll.rollTotal}`);
+                } else if (typeof rollData === 'number') {
+                    throwError(`Roll Result: ${rollData}`);
+                }
+            }
         });
     };
 
@@ -118,8 +128,18 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      * Execute a damage roll
      */
     const rollDamage = () => {
-        window.axios.post("/damageroll", controlState.value).then(() => {
+        window.axios.post("/damageroll", controlState.value).then((response) => {
             debouncedFetchCharacterData();
+            if (response.data && response.data.data) {
+                let rollData = response.data.data;
+                // Handle list of rolls from getRolls(limit: 5)
+                if (rollData.data && Array.isArray(rollData.data) && rollData.data.length > 0) {
+                    const lastRoll = rollData.data[0];
+                    throwError(`Roll Result: ${lastRoll.rollTotal}`);
+                } else if (typeof rollData === 'number') {
+                    throwError(`Roll Result: ${rollData}`);
+                }
+            }
         });
     };
 

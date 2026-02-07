@@ -236,6 +236,31 @@
                 @go-to-control="activeTab='control'; closeRollPanel()"
             ></roll-modifier-panel>
 
+            <!-- Global Popup Modal -->
+            <div v-if="showPopup"
+                 class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
+                 @click="showPopup = false">
+                <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.2)]"
+                     @click.stop>
+                    <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-red-dark/30 bg-cpr-red-dark/10">
+                        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-red">System Notification</span>
+                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showPopup = false">
+                            <i v-icon data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 text-center space-y-4">
+                        <div class="text-lg font-black font-mono text-white tracking-tight leading-tight">
+                            {{ popupMessage }}
+                        </div>
+                        <button
+                            class="w-full py-2 bg-cpr-red/10 border border-cpr-red/40 text-cpr-red text-[10px] font-bold uppercase tracking-widest hover:bg-cpr-red hover:text-black transition-all"
+                            @click="showPopup = false">
+                            Acknowledge
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
@@ -304,6 +329,18 @@ export default {
         const sendRequest = (data, url) => {
             window.axios.post(url, data).then(response => {
                 debouncedFetchCharacterData(); // Throttled refresh
+                if (response.data && response.data.data) {
+                    let rollData = response.data.data;
+                    // Handle list of rolls from getRolls(limit: 5)
+                    if (rollData.data && Array.isArray(rollData.data) && rollData.data.length > 0) {
+                        const lastRoll = rollData.data[0];
+                        popupMessage.value = `Roll Result: ${lastRoll.rollTotal}`;
+                        showPopup.value = true;
+                    } else if (typeof rollData === 'number') {
+                        popupMessage.value = `Roll Result: ${rollData}`;
+                        showPopup.value = true;
+                    }
+                }
                 return response;
             }).catch(err => {
                 console.error('Error posting request', err);
@@ -384,11 +421,34 @@ export default {
             installProgram,
             uninstallProgram,
             toggleRez,
-            rollProgram: rollProgramBase,
+            rollProgram: baseRollProgram,
             toggleProgramDetails
         } = useNetrunner(charData, sendRequest, throwError);
 
-        const rollProgram = (program, activeCyberdeck) => rollProgramBase(program, activeCyberdeck, controlState);
+        const rollProgram = (program, activeDeck) => {
+            if (controlState) controlState.value.selectedProgram = program;
+            window.axios.post('/programroll', {
+                cyberdeckId: activeDeck._id,
+                programId: program._id,
+                programName: program.name,
+                type: program.type,
+                executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk" ),
+            }).then(response => {
+                debouncedFetchCharacterData();
+                if (response.data && response.data.data) {
+                    let rollData = response.data.data;
+                    // Handle list of rolls from getRolls(limit: 5)
+                    if (rollData.data && Array.isArray(rollData.data) && rollData.data.length > 0) {
+                        const lastRoll = rollData.data[0];
+                        popupMessage.value = `Roll Result: ${lastRoll.rollTotal}`;
+                        showPopup.value = true;
+                    } else if (typeof rollData === 'number') {
+                        popupMessage.value = `Roll Result: ${rollData}`;
+                        showPopup.value = true;
+                    }
+                }
+            });
+        };
 
         const openRollPanel = async () => {
             await openRollPanelBase();
