@@ -1,45 +1,34 @@
 @import 'tailwindcss';
 @tailwind utilities;
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
 
-    --color-white: #f5f5f5;
+    --color-white: #e5e5e5; /* Dimmed from pure white */
+
+    /* Strict Palette */
     --color-cpr-red: var(--cpr-red);
     --color-cpr-red-dark: var(--cpr-red-dark);
     --color-cpr-yellow: var(--cpr-yellow);
     --color-cpr-yellow-dark: var(--cpr-yellow-dark);
-    --color-cpr-cyan: var(--cpr-cyan);
-    --color-cpr-cyan-dark: var(--cpr-cyan-dark);
-    --color-cpr-pink: var(--cpr-pink);
-    --color-cpr-pink-dark: var(--cpr-pink-dark);
-    --color-cpr-lime: var(--cpr-lime);
-    --color-cpr-lime-dark: var(--cpr-lime-dark);
-    --color-cpr-purple: var(--cpr-purple);
-    --color-cpr-purple-dark: var(--cpr-purple-dark);
-    --color-cpr-orange: var(--cpr-orange);
-    --color-cpr-orange-dark: var(--cpr-orange-dark);
     --color-cpr-teal: var(--cpr-teal);
     --color-cpr-teal-dark: var(--cpr-teal-dark);
 
+    /* Neutrals */
     --color-cpr-black: var(--cpr-black);
     --color-cpr-black-deep: var(--cpr-black-deep);
     --color-cpr-black-soft: var(--cpr-black-soft);
     --color-cpr-black-elevated: var(--cpr-black-elevated);
+
     --color-cpr-border: var(--cpr-border);
     --color-cpr-border-dark: var(--cpr-border-dark);
     --color-cpr-border-muted: var(--cpr-border-muted);
+
     --color-cpr-text-main: var(--cpr-text-main);
     --color-cpr-text-muted: var(--cpr-text-muted);
     --color-cpr-text-dim: var(--cpr-text-dim);
     --color-cpr-text-bright: var(--cpr-text-bright);
-    --color-cpr-magenta: var(--cpr-magenta);
-    --color-cpr-magenta-dark: var(--cpr-magenta-dark);
 }
 
 :root {
@@ -49,69 +38,43 @@
     --cpr-yellow: #fcee0a;
     --cpr-yellow-dark: #cfc100;
 
-    /* Secondary/Tertiary Colors */
-    --cpr-pink: #e238a0;
-    --cpr-pink-dark: #a21051;
+    /* Secondary/Tertiary Colors - Stripped back */
     --cpr-teal: #14b8a6;
     --cpr-teal-dark: #0d9488;
 
-    /* Others */
-    --cpr-cyan: #1995a8;
-    --cpr-cyan-dark: #06657d;
-    --cpr-lime: #84cc16;
-    --cpr-lime-dark: #65a30d;
-    --cpr-purple: #a855f7;
-    --cpr-purple-dark: #9333ea;
-    --cpr-orange: #f97316;
-    --cpr-orange-dark: #ea580c;
-    --cpr-magenta: #d946ef;
-    --cpr-magenta-dark: #a21caf;
+    /* Base Colors - Softened Night Mode */
+    --cpr-black: #1a1a1a;
+    --cpr-black-deep: #141414; /* Was #050505 */
+    --cpr-black-soft: rgba(35, 35, 35, 0.51);
+    --cpr-black-elevated: rgba(50, 50, 50, 0.73);
 
-    /* Base Colors - Night Mode (Default) */
-    --cpr-black: #0a0a0a;
-    --cpr-black-deep: #050505;
-    --cpr-black-soft: rgba(17, 17, 17, 0.51);
-    --cpr-black-elevated: rgba(39, 33, 33, 0.73);
-    --cpr-panel: rgba(20, 20, 20, 0.76);
-    --cpr-panel-hover: rgba(218, 0, 0, 0.44); /* Using cpr-red */
-    --cpr-border: #2a2a2a;
-    --cpr-border-dark: #1f2937;
-    --cpr-border-muted: #374151;
+    --cpr-panel: rgba(28, 28, 28, 0.85);
+    --cpr-panel-hover: rgba(218, 0, 0, 0.15);
+
+    --cpr-border: #333333;
+    --cpr-border-dark: #262626;
+    --cpr-border-muted: #404040;
     --cpr-border-accent: rgba(218, 0, 0, 0.44);
 
-    /* Text Colors - Night Mode */
-    --cpr-text-main: #cdcdcd;
-    --cpr-text-muted: #96b1ca;
-    --cpr-text-bright: #f5f5f5;
-    --cpr-text-dim: #636e73;
-}
-
-.theme-day {
-    /* Base Colors - Day Mode */
-    --cpr-black: #e5e7eb;
-    --cpr-black-deep: #f3f4f6;
-    --cpr-black-soft: rgba(249, 250, 251, 0.8);
-    --cpr-black-elevated: rgba(229, 231, 235, 0.9);
-    --cpr-panel: rgba(255, 255, 255, 0.85);
-    --cpr-panel-hover: rgba(218, 0, 0, 0.1);
-    --cpr-border: #d1d5db;
-    --cpr-border-dark: #9ca3af;
-    --cpr-border-muted: #cbd5e1;
-    --cpr-border-accent: rgba(218, 0, 0, 0.2);
-
-    /* Text Colors - Day Mode */
-    --cpr-text-main: #1f2937;
-    --cpr-text-muted: #4b5563;
-    --cpr-text-bright: #111827;
-    --cpr-text-dim: #6b7280;
+    /* Text Colors - Softened Contrast */
+    --cpr-text-main: #b0b0b0; /* Was #cdcdcd */
+    --cpr-text-muted: #7d8c99;
+    --cpr-text-bright: #e5e5e5; /* Was #f5f5f5 */
+    --cpr-text-dim: #555f66;
 }
 
 body {
-    font-family: 'Rajdhani', sans-serif;
-    background-color: var(--cpr-black);
-    color: var(--cpr-text-main);
     touch-action: manipulation;
 }
+
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--cpr-black-soft); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: var(--cpr-yellow-dark); border-radius: 10px; border: 2px solid var(--cpr-black-soft);}
+::-webkit-scrollbar-thumb:hover { background: var(--cpr-yellow-dark); }
+* { scrollbar-width: auto; scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);}
+.modal-scroll-content::-webkit-scrollbar-thumb { background: var(--cpr-yellow-dark);}
+.modal-scroll-content { scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);}
 
 .font-mono { font-family: 'Roboto Mono', monospace; }
 
@@ -134,19 +97,14 @@ body {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
-.glow-cyan { text-shadow: 0 0 5px var(--cpr-cyan); }
-.glow-pink { text-shadow: 0 0 5px var(--cpr-pink); }
-.glow-lime { text-shadow: 0 0 5px var(--cpr-lime); }
-.glow-purple { text-shadow: 0 0 5px var(--cpr-purple); }
-.glow-red { text-shadow: 0 0 5px var(--cpr-red); }
-.glow-orange { text-shadow: 0 0 5px var(--cpr-orange); }
-.glow-teal { text-shadow: 0 0 5px var(--cpr-teal); }
-
+.glow-red { text-shadow: 0 0 8px rgba(218, 0, 0, 0.4); }
+.glow-teal { text-shadow: 0 0 8px rgba(20, 184, 166, 0.4); }
+.glow-yellow { text-shadow: 0 0 8px rgba(184, 181, 20, 0.4); }
 
 .cyber-input-field, .cyber-textarea-field, .cyber-select-field {
     @apply block w-full p-3 border rounded-md shadow-sm text-base;
     @apply bg-cpr-black-soft border-cpr-border text-cpr-text-main;
-    @apply focus:ring-2 focus:ring-cpr-pink focus:border-cpr-pink placeholder-cpr-text-dim;
+    @apply focus:ring-2 focus:ring-cpr-yellow focus:border-cpr-yellow placeholder-cpr-text-dim;
     font-size: 16px;
 }
 .cyber-textarea-field { @apply min-h-[70px] leading-relaxed; }
@@ -158,22 +116,3 @@ body {
     padding-right: 2.5rem;
 }
 .cyber-select-option { @apply bg-cpr-black-soft text-cpr-text-main p-2; }
-
-
-
-/* Smooth scrolling for the whole page */
-html {
-    scroll-behavior: smooth;
-}
-
-/* --- Global Scrollbar Styles (from your provided stylesheet) --- */
-/* These ensure consistent scrollbar appearance across the app */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--cpr-black-soft); border-radius: 10px; }
-::-webkit-scrollbar-thumb { background: var(--cpr-pink-dark); border-radius: 10px; border: 2px solid var(--cpr-black-soft);}
-::-webkit-scrollbar-thumb:hover { background: var(--cpr-pink); }
-* { scrollbar-width: auto; scrollbar-color: var(--cpr-pink-dark) var(--cpr-black-soft);}
-
-/* Specific scrollbar for the modal content, matching your theme */
-.modal-scroll-content::-webkit-scrollbar-thumb { background: var(--cpr-lime);}
-.modal-scroll-content { scrollbar-color: var(--cpr-lime) var(--cpr-black-soft);}

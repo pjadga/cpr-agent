@@ -9,7 +9,7 @@
             </button>
             <button @click="controlState.spaceMode = 'netspace'"
                     class="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
-                    :class="controlState.spaceMode === 'netspace' ? 'bg-cpr-cyan-dark text-black' : 'text-cpr-text-dim hover:text-cpr-text-main'">
+                    :class="controlState.spaceMode === 'netspace' ? 'bg-cpr-teal-dark text-black' : 'text-cpr-text-dim hover:text-cpr-text-main'">
                 Netspace
             </button>
         </div>
@@ -63,7 +63,7 @@
                     <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
                          @click="controlState.selectedWeapon = weapon"
                          class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all relative overflow-hidden"
-                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-cpr-orange bg-cpr-orange-dark/10' : 'border-cpr-border bg-cpr-black hover:border-cpr-border-muted'">
+                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-cpr-yellow bg-cpr-yellow-dark/10' : 'border-cpr-border bg-cpr-black hover:border-cpr-border-muted'">
 
                         <div v-if="getStatusLine(weapon)"
                              class="absolute top-0 left-0 h-[2px] transition-all duration-500 z-10"
@@ -82,12 +82,12 @@
                                             <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{ getAmmoName(weapon) }}]</span>
                                         </template>
                                         <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-cpr-red font-bold">{{ weapon.system.damage }}</span>
-                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-orange">ROF:{{ weapon.system.rof }}</span>
+                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-yellow">ROF:{{ weapon.system.rof }}</span>
                                     </span>
                                 </div>
                             </div>
                         </div>
-                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="text-cpr-orange">
+                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="text-cpr-yellow">
                             <i v-icon data-lucide="check-circle-2" class="w-5 h-5"></i>
                         </div>
                     </div>
@@ -108,36 +108,36 @@
 
         <div v-else-if="controlState.spaceMode === 'netspace' && hasNetspaceOptions" class="space-y-6 animate-in fade-in duration-300">
             <div v-if="activeCyberdeck" class="relative">
-                <div class="cpr-panel p-4 bg-cpr-black-deep/20 border border-cpr-cyan/30 mb-4 overflow-hidden group">
+                <div class="cpr-panel p-4 bg-cpr-black-deep/20 border border-cpr-teal/30 mb-4 overflow-hidden group">
                     <div class="relative z-10 flex justify-between items-start mb-4">
                         <div>
                             <h3 class="text-lg font-black text-white uppercase tracking-tighter">{{ activeCyberdeck.name }}</h3>
                             <div class="flex items-center gap-2 mt-1">
-                                <span class="text-[9px] px-1.5 py-0.5 bg-cpr-cyan text-black font-black uppercase">Active Deck</span>
-                                <span class="text-[9px] text-cpr-cyan font-mono font-bold uppercase">{{ activeCyberdeck.system.quality }} Quality</span>
+                                <span class="text-[9px] px-1.5 py-0.5 bg-cpr-teal text-black font-black uppercase">Active Deck</span>
+                                <span class="text-[9px] text-cpr-teal font-mono font-bold uppercase">{{ activeCyberdeck.system.quality }} Quality</span>
                             </div>
                         </div>
-                        <button @click="$emit('open-cyberdeck-config')" class="flex items-center gap-1.5 px-3 py-1.5 bg-cpr-cyan-dark/40 border border-cpr-cyan/50 text-[10px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-cyan hover:text-black transition-all shadow-[0_0_10px_rgba(59,130,246,0.2)]">
+                        <button @click="$emit('open-cyberdeck-config')" class="flex items-center gap-1.5 px-3 py-1.5 bg-cpr-teal-dark/40 border border-cpr-teal/50 text-[10px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black transition-all shadow-[0_0_10px_rgba(20,184,166,0.2)]">
                             <i v-icon data-lucide="settings" class="w-3 h-3"></i> Config
                         </button>
                     </div>
 
-                    <h4 class="text-[10px] font-bold text-cpr-cyan uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Quick Actions</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-teal uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Quick Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10 mb-2">
                         <button v-for="action in ['Jack In', 'Breach', 'Quickhack']"
                                 :key="action"
                                 @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
-                                class="py-3 bg-cpr-cyan-dark/20 border border-cpr-cyan/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-cyan hover:text-black hover:border-cpr-cyan transition-all">
+                                class="py-3 bg-cpr-teal-dark/20 border border-cpr-teal/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black hover:border-cpr-teal transition-all">
                             {{ action }}
                         </button>
                     </div>
 
-                    <h4 class="text-[10px] font-bold text-cpr-cyan uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-teal uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10">
                         <button v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap', 'Defense', 'Speed']"
                                 :key="action"
                                 @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
-                                class="py-3 bg-cpr-cyan-dark/20 border border-cpr-cyan/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-cyan hover:text-black hover:border-cpr-cyan transition-all">
+                                class="py-3 bg-cpr-teal-dark/20 border border-cpr-teal/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black hover:border-cpr-teal transition-all">
                             {{ action }}
                         </button>
                     </div>
@@ -146,7 +146,7 @@
                 <div v-if="activeCyberdeck" class="space-y-6">
                     <div v-for="(programs, category) in programCategories" :key="category">
                         <div v-if="programs.length > 0">
-                            <h3 class="text-xs font-black text-white uppercase tracking-widest border-l-4 border-cpr-cyan pl-2 mb-3 flex items-center justify-between">
+                            <h3 class="text-xs font-black text-white uppercase tracking-widest border-l-4 border-cpr-teal pl-2 mb-3 flex items-center justify-between">
                                 {{ category }}
                                 <span class="text-[9px] text-cpr-text-dim font-mono font-normal">{{ programs.length }} Installed</span>
                             </h3>

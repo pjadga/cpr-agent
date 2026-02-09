@@ -57,24 +57,24 @@
         <div v-for="(group, categoryKey) in groupedSkills" :key="categoryKey">
             <div
                 @click="$emit('toggle-category', categoryKey)"
-                class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-cyan-dark/40 transition-colors group">
-                <span class="text-white font-bold text-xs uppercase group-hover:text-cpr-cyan transition-colors">{{
+                class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-teal-dark/30 transition-colors group">
+                <span class="text-white font-bold text-sm uppercase group-hover:text-cpr-teal transition-colors">{{
                         formatCategory(categoryKey)
                     }}</span>
                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories[categoryKey] }">
                     <i v-icon data-lucide="chevron-down"
-                       class="w-4 h-4 text-cpr-red group-hover:text-cpr-cyan"></i>
+                       class="w-4 h-4 text-cpr-red group-hover:text-cpr-teal"></i>
                 </div>
             </div>
             <div v-show="!collapsedCategories[categoryKey]" class="grid grid-cols-1 gap-px bg-cpr-black-elevated border border-cpr-border">
                 <div v-for="(skill, index) in group" :key="skill.name"
                      @click="$emit('skill-request', skill.name)"
-                     class="flex justify-between items-center bg-cpr-black p-2 hover:bg-cpr-cyan-dark/20 cursor-pointer group transition-colors gap-3">
+                     class="flex justify-between items-center bg-cpr-black p-2 hover:bg-cpr-teal-dark/20 cursor-pointer group transition-colors gap-3">
                     <div class="flex items-center gap-3 flex-1">
                         <div class="flex flex-col">
                             <div class="flex items-baseline gap-2">
-                                <span class="text-sm font-medium text-cpr-text-main group-hover:text-cpr-cyan transition-colors">{{ skill.name }}</span>
-                                <span class="text-[9px] text-cpr-red font-bold uppercase tracking-wider">({{
+                                <span class="text-sm font-medium text-cpr-text-main group-hover:text-cpr-teal transition-colors">{{ skill.name }}</span>
+                                <span class="text-[10px] text-cpr-red font-black uppercase tracking-wider">({{
                                         skill.system.stat
                                     }})</span>
                             </div>

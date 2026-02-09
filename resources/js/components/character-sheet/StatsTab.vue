@@ -11,8 +11,8 @@
             <resource-counter label="HUMANITY"
                               :current="charData.data.system.derivedStats.humanity.value"
                               :max="charData.data.system.derivedStats.humanity.max"
-                              color="text-cpr-cyan"
-                              @edit="$emit('open-resource', 'HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-cpr-cyan')">
+                              color="text-cpr-teal"
+                              @edit="$emit('open-resource', 'HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-cpr-teal')">
             </resource-counter>
         </div>
 
@@ -44,27 +44,27 @@
 
         <div class="bg-[var(--cpr-black-soft)] border border-cpr-border p-3 flex justify-between divide-x divide-gray-800">
             <div class="px-2 text-center w-1/4">
-                <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
+                <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
                 <div class="text-cpr-yellow font-mono font-bold">{{
                         charData.data.system.wealth.value
                     }}eb
                 </div>
             </div>
             <div class="px-2 text-center w-1/4">
-                <div class="text-[9px] text-cpr-text-dim uppercase font-bold">IP</div>
+                <div class="text-[10px] text-cpr-text-dim uppercase font-bold">IP</div>
                 <div class="text-white font-mono font-bold">
                     {{ charData.data.system.improvementPoints.value }}
                 </div>
             </div>
             <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors" @click="$emit('facedown')">
-                <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Reputation</div>
+                <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Reputation</div>
                 <div class="text-white font-mono font-bold">{{
                         charData.data.system.reputation.value
                     }}
                 </div>
             </div>
             <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors" @click="$emit('deathsave')">
-                <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Death Save</div>
+                <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Death Save</div>
                 <div class="text-cpr-red font-mono font-bold">
                     {{ charData.data.system.derivedStats.deathSave.penalty }}
                 </div>
@@ -78,7 +78,7 @@
 
             <div v-for="(items, category) in groupedEquipped" :key="category">
                 <div v-if="items.length > 0" class="mb-4">
-                    <h4 class="text-[9px] font-bold text-cpr-text-dim uppercase mb-2 tracking-widest pl-1">{{ formatCategory(category) }}</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-text-dim uppercase mb-2 tracking-widest pl-1">{{ formatCategory(category) }}</h4>
                     <div class="space-y-2">
                         <div v-for="item in items" :key="item._id">
                             <item-row
@@ -97,7 +97,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="Object.values(groupedEquipped).flat().length === 0" class="text-cpr-text-dim text-xs italic p-2 text-center">
+            <div v-if="Object.values(groupedEquipped).flat().length === 0" class="text-cpr-text-dim text-sm italic p-2 text-center">
                 No items equipped.
             </div>
         </div>

@@ -3,7 +3,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto p-8">
     <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
-        <h2 class="text-4xl font-bold text-cpr-lime uppercase tracking-tighter">
+        <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
             Agent Settings
         </h2>
         <div class="flex gap-2 pt-2">
@@ -20,7 +20,7 @@
     </div>
 
     @if(session('success'))
-        <div class="bg-cpr-lime-dark/50 border border-cpr-lime text-cpr-lime p-4 mb-8 uppercase text-xs tracking-widest">
+        <div class="bg-cpr-teal-dark/50 border border-cpr-teal text-cpr-teal p-4 mb-8 uppercase text-xs tracking-widest">
             {{ session('success') }}
         </div>
     @endif
@@ -28,17 +28,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Global App Configuration -->
         <div class="space-y-6">
-            <h3 class="text-xl font-bold text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">
+            <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">
                 Core System Settings
             </h3>
             <form action="{{ route('config.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <div>
                     <div class="flex items-center gap-2">
-                        <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-cpr-pink" />
+                        <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-cpr-teal" />
                         <div class="group relative flex items-center">
-                            <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-pink cursor-help transition-colors"></i>
-                            <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-pink text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                            <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
+                            <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
                                 Must be the same key added to your Foundry ThreeHats module.
                             </div>
                         </div>
@@ -51,10 +51,10 @@
 {{--                </div>--}}
                 <div>
                     <div class="flex items-center gap-2">
-                        <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-cpr-pink" />
+                        <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-cpr-teal" />
                         <div class="group relative flex items-center">
-                            <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-pink cursor-help transition-colors"></i>
-                            <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-pink text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                            <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
+                            <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
                                 The full URL of your Foundry VTT instance.
                             </div>
                         </div>
@@ -63,14 +63,14 @@
                 </div>
 
 {{--                <div>--}}
-{{--                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-pink" />--}}
+{{--                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-teal" />--}}
 {{--                    <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">--}}
 {{--                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>--}}
 {{--                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (Chill)</option>--}}
 {{--                    </select>--}}
 {{--                </div>--}}
 
-                <button type="submit" class="cyber-button bg-cpr-pink-dark border-cpr-pink text-black w-full uppercase font-bold py-2">
+                <button type="submit" class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black w-full uppercase font-bold py-2">
                     Update Core Settings
                 </button>
             </form>
@@ -98,7 +98,7 @@
                     <!-- Client ID -->
                     <div>
                         <div class="flex items-center gap-2">
-                            <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-cpr-yellow" />
+                            <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-cpr-muted" />
                             <div class="group relative flex items-center">
                                 <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
                                 <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
@@ -120,7 +120,7 @@
                     <!-- Default Actor ID -->
                     <div>
                         <div class="flex items-center gap-2">
-                            <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-cpr-yellow" />
+                            <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-cpr-muted" />
                             <div class="group relative flex items-center">
                                 <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
                                 <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
@@ -142,7 +142,7 @@
                     </div>
 
 
-                    <button type="submit" class="cyber-button bg-cpr-yellow-dark border-cpr-yellow w-full uppercase font-bold py-2 text-black">
+                    <button type="submit" class="cyber-button bg-cpr-teal-dark border-cpr-teal w-full uppercase font-bold py-2 text-black">
                         Commit Sync
                     </button>
                 </form>
@@ -152,7 +152,7 @@
 
     <!-- Account Management -->
     <div class="mt-12 pt-8 border-t-2 border-cpr-border">
-        <h3 class="text-2xl font-bold text-cpr-cyan uppercase tracking-tighter mb-8">
+        <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
             Account Control & Security
         </h3>
 
@@ -167,18 +167,18 @@
                     @method('patch')
 
                     <div>
-                        <x-input-label for="name" :value="__('User Handle')" class="text-xs uppercase text-cpr-cyan" />
+                        <x-input-label for="name" :value="__('User Handle')" class="text-xs uppercase text-cpr-teal" />
                         <x-text-input id="name" name="name" type="text" class="cyber-input-field mt-1 w-full" :value="old('name', $user->name)" required autocomplete="name" />
                         <x-input-error class="mt-1 text-cpr-red text-[10px] uppercase" :messages="$errors->get('name')" />
                     </div>
 
                     <div>
-                        <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-cyan" />
+                        <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-teal" />
                         <x-text-input id="email" name="email" type="email" class="cyber-input-field mt-1 w-full" :value="old('email', $user->email)" required autocomplete="username" />
                         <x-input-error class="mt-1 text-cpr-red text-[10px] uppercase" :messages="$errors->get('email')" />
                     </div>
 
-                    <button type="submit" class="cyber-button bg-cpr-cyan-dark border-cpr-cyan-dark w-full uppercase font-bold py-2 hover:bg-cpr-cyan">
+                    <button type="submit" class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark w-full uppercase font-bold py-2 hover:bg-cpr-teal text-black">
                         Update Profile
                     </button>
                 </form>
@@ -194,24 +194,24 @@
                     @method('put')
 
                     <div>
-                        <x-input-label for="update_password_current_password" :value="__('Current Password')" class="text-xs uppercase text-cpr-cyan" />
+                        <x-input-label for="update_password_current_password" :value="__('Current Password')" class="text-xs uppercase text-cpr-teal" />
                         <x-text-input id="update_password_current_password" name="current_password" type="password" class="cyber-input-field mt-1 w-full" autocomplete="current-password" />
                         <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-1 text-cpr-red text-[10px] uppercase" />
                     </div>
 
                     <div>
-                        <x-input-label for="update_password_password" :value="__('New Password')" class="text-xs uppercase text-cpr-cyan" />
+                        <x-input-label for="update_password_password" :value="__('New Password')" class="text-xs uppercase text-cpr-teal" />
                         <x-text-input id="update_password_password" name="password" type="password" class="cyber-input-field mt-1 w-full" autocomplete="new-password" />
                         <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-1 text-cpr-red text-[10px] uppercase" />
                     </div>
 
                     <div>
-                        <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" class="text-xs uppercase text-cpr-cyan" />
+                        <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')" class="text-xs uppercase text-cpr-teal" />
                         <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="cyber-input-field mt-1 w-full" autocomplete="new-password" />
                         <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-1 text-cpr-red text-[10px] uppercase" />
                     </div>
 
-                    <button type="submit" class="cyber-button bg-cpr-cyan-dark border-cpr-cyan-dark w-full uppercase font-bold py-2 hover:bg-cpr-cyan">
+                    <button type="submit" class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark w-full uppercase font-bold py-2 hover:bg-cpr-teal text-black">
                         Update
                     </button>
                 </form>

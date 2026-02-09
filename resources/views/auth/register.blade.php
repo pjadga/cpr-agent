@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="w-full mb-6">
-        <h3 class="text-xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Bio-ID Registration</h3>
+        <h3 class="text-xl font-bold mb-2 text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">Bio-ID Registration</h3>
         <p class="text-[10px] text-cpr-yellow/80 uppercase italic">
             Note: Use the same credentials as your Foundry VTT account to enable biometric synchronization.
         </p>
@@ -53,7 +53,7 @@
                             Authorize Connection
                         </button>
 
-                        <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-pink uppercase transition-colors" href="{{ route('login') }}">
+                        <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-yellow uppercase transition-colors" href="{{ route('login') }}">
                             {{ __('Already registered? Login here') }}
                         </a>
                     </div>

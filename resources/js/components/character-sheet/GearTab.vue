@@ -2,19 +2,19 @@
     <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
         <div>
-            <h3 @click="$emit('toggle-category', 'cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-cyan-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="zap" class="w-4 h-4 text-cpr-cyan group-hover:text-cpr-cyan"></i> <span class="group-hover:text-cpr-cyan transition-colors">Cyberware</span>
+                    <i v-icon data-lucide="zap" class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i> <span class="group-hover:text-cpr-teal transition-colors">Cyberware</span>
                 </div>
                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
                     <i v-icon data-lucide="chevron-down"
-                       class="w-4 h-4 text-cpr-cyan group-hover:text-cpr-cyan"></i>
+                       class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i>
                 </div>
             </h3>
             <transition name="fade-from-black">
                 <div v-show="!collapsedCategories['cyberware']" class="space-y-2">
                     <div v-for="(group, type) in groupedCyberware" :key="type">
-                        <h4 class="text-[10px] font-bold text-cpr-cyan uppercase mb-2 mt-4 tracking-widest border-b border-cpr-cyan-dark/30 pb-1">
+                        <h4 class="text-[10px] font-bold text-cpr-teal uppercase mb-2 mt-4 tracking-widest border-b border-cpr-teal-dark/30 pb-1">
                             {{ type }}
                         </h4>
                         <div class="space-y-2">
@@ -26,7 +26,7 @@
                                     @click="$emit('item-click', cw)">
                                 </item-row>
                                 <div v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
-                                     class="ml-6 mt-1 space-y-1 border-l border-cpr-cyan-dark/50 pl-2">
+                                     class="ml-6 mt-1 space-y-1 border-l border-cpr-teal-dark/50 pl-2">
                                     <div v-for="childId in cw.system.installedItems.list" :key="childId">
                                         <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" category="cyberware" :all-items="charData.data.items" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))"></item-row>
                                     </div>
@@ -39,13 +39,13 @@
         </div>
 
         <div>
-            <h3 @click="$emit('toggle-category', 'gear')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-cyan-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'gear')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="package" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-cyan"></i> <span class="group-hover:text-cpr-cyan transition-colors">Gear & Equipment</span>
+                    <i v-icon data-lucide="package" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i> <span class="group-hover:text-cpr-teal transition-colors">Gear & Equipment</span>
                 </div>
                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['gear'] }">
                     <i v-icon data-lucide="chevron-down"
-                       class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-cyan"></i>
+                       class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i>
                 </div>
             </h3>
             <transition name="fade-from-black">

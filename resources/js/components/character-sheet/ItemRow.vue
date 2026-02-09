@@ -2,10 +2,10 @@
     <div class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group overflow-hidden"
          :class="{
             'border-cpr-red': category === 'weapon',
-            'border-cpr-cyan-dark': category === 'armor',
+            'border-cpr-teal-dark': category === 'armor',
             'border-cpr-yellow-dark': category === 'ammo',
             'border-cpr-border-muted': category === 'gear',
-            'border-cpr-cyan': category === 'cyberware'
+            'border-cpr-teal': category === 'cyberware'
          }">
 
         <div v-if="statusLine" class="absolute top-0 left-0 h-[3px] transition-all duration-500 z-10"
@@ -20,14 +20,14 @@
             <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
                 <div class="flex justify-between items-start pr-2">
                     <div class="flex flex-col">
-                    <span class="text-sm font-bold text-cpr-text-main group-hover:text-cpr-cyan transition-colors">
+                    <span class="text-sm font-bold text-cpr-text-main group-hover:text-cpr-teal transition-colors">
                         {{ item.name }}
                     </span>
 
                         <div class="flex flex-wrap gap-2 mt-1">
                             <template v-if="category === 'armor' && armorDisplay">
                                 <div v-for="stat in armorDisplay" :key="stat.label" class="flex items-center gap-1 mr-2">
-                                    <i v-icon :data-lucide="stat.icon" class="w-3 h-3 text-cpr-cyan"></i>
+                                    <i v-icon :data-lucide="stat.icon" class="w-3 h-3 text-cpr-teal"></i>
                                     <span class="text-[10px] font-mono text-cpr-text-muted">
                                         <span class="text-[8px] uppercase text-cpr-text-dim mr-0.5">{{ stat.label }}:</span>
                                         {{ stat.value }}
@@ -43,7 +43,7 @@
                                         <span v-if="ammoName" class="ml-1 text-cpr-yellow">[{{ ammoName }}]</span>
                                     </template>
                                     <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-cpr-red font-bold">{{ item.system.damage }}</span>
-                                    <span v-if="item.system.rof > 0" class="ml-2 text-cpr-orange">ROF:{{ item.system.rof }}</span>
+                                    <span v-if="item.system.rof > 0" class="ml-2 text-cpr-yellow">ROF:{{ item.system.rof }}</span>
                                 </span>
                             </div>
 
@@ -62,8 +62,8 @@
                             </div>
 
                             <div v-if="category === 'cyberware'" class="flex items-center gap-1">
-                                <i v-icon data-lucide="cpu" class="w-3 h-3 text-cpr-cyan"></i>
-                                <span class="text-[10px] font-mono text-cpr-cyan">
+                                <i v-icon data-lucide="cpu" class="w-3 h-3 text-cpr-teal"></i>
+                                <span class="text-[10px] font-mono text-cpr-teal">
                                 {{ item.system.installedItems.usedSlots }} / {{ item.system.installedItems.slots }}
                             </span>
                             </div>
@@ -78,11 +78,11 @@
 
             <button
                 @click.stop="toggle"
-                class="w-12 shrink-0 flex items-center justify-center bg-cpr-black-deep/30 border-l border-white/5 active:bg-cpr-cyan-dark/20 transition-colors hover:bg-cpr-cyan-dark/40 cursor-pointer">
+                class="w-12 shrink-0 flex items-center justify-center bg-cpr-black-deep/30 border-l border-white/5 active:bg-cpr-teal-dark/20 transition-colors hover:bg-cpr-teal-dark/40 cursor-pointer">
                 <div class="transition-transform duration-300 flex items-center justify-center"
                      :class="{ 'rotate-180': expanded }">
                     <i v-icon data-lucide="chevron-down"
-                       class="w-5 h-5 text-cpr-text-dim group-hover:text-cpr-cyan">
+                       class="w-5 h-5 text-cpr-text-dim group-hover:text-cpr-teal">
                     </i>
                 </div>
             </button>
@@ -104,9 +104,9 @@
                         </span>
                     </div>
                     <div v-if="item.system.concealable" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 flex justify-between items-center"
-                         :class="item.system.concealable.concealable ? 'border-green-600' : 'border-cpr-red'">
+                         :class="item.system.concealable.concealable ? 'border-cpr-teal' : 'border-cpr-red'">
                         <span>Concealable</span>
-                        <span :class="item.system.concealable.concealable ? 'text-cpr-lime' : 'text-cpr-red'">
+                        <span :class="item.system.concealable.concealable ? 'text-cpr-teal' : 'text-cpr-red'">
                             {{ (item.system.concealable.concealable ? "Yes" : "No" ) }}
                         </span>
                     </div>

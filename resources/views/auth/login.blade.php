@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="w-full mb-6">
-        <h3 class="text-2xl font-bold mb-2 text-cpr-pink uppercase tracking-widest border-b border-cpr-pink/30 pb-2">Authentication Required</h3>
+        <h3 class="text-2xl font-bold mb-2 text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">Authentication Required</h3>
         <div class="flex justify-between items-center">
             <p class="text-[12px] text-cpr-yellow/80 uppercase italic">
                 Note: Ensure your credentials match your Foundry VTT login for seamless synchronization.
@@ -52,7 +52,7 @@
                         </button>
 
                         @if (Route::has('password.request'))
-                            <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-pink uppercase transition-colors" href="{{ route('password.request') }}">
+                            <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-yellow uppercase transition-colors" href="{{ route('password.request') }}">
                                 {{ __('Forgot access code?') }}
                             </a>
                         @endif
