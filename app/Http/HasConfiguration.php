@@ -13,7 +13,7 @@ trait HasConfiguration
         return $config?->api_key;
     }
 
-    public function getFoundryBaseUrl(): ?string
+    public function getRelayUrl(): ?string
     {
         $config = auth()->user()->config;
         return $config->base_url ?? config('services.foundry.base_url');
@@ -25,7 +25,7 @@ trait HasConfiguration
     public function getFoundryClient(): FoundryClient
     {
         $apiKey = $this->getApiKey();
-        $baseUrl = $this->getFoundryBaseUrl();
+        $baseUrl = $this->getRelayUrl();
 
         if (!$apiKey || !$baseUrl) {
             throw new \Exception("Missing Foundry API Key or Base URL configuration.");

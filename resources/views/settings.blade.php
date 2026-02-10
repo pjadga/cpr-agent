@@ -45,10 +45,18 @@
                     </div>
                     <x-text-input type="text" name="api_key" id="api_key" value="{{ old('api_key', $config->api_key) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
-{{--                <div>--}}
-{{--                    <x-input-label for="base_url" :value="__('Relay Base URL')" class="text-xs uppercase text-cpr-text-muted" />--}}
-{{--                    <x-text-input type="text" name="base_url" id="base_url" value="{{ old('base_url', $config->base_url ?? config('services.foundry.base_url')) }}" class="cyber-input-field mt-1 w-full" />--}}
-{{--                </div>--}}
+                <div>
+                    <div class="flex items-center gap-2">
+                        <x-input-label for="base_url" :value="__('Relay URL')" class="text-xs uppercase text-cpr-teal" />
+                        <div class="group relative flex items-center">
+                            <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
+                            <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                The URL of your relay server.
+                            </div>
+                        </div>
+                    </div>
+                    <x-text-input type="text" name="base_url" id="base_url" value="{{ old('base_url', $config->base_url ?? config('services.foundry.base_url')) }}" class="cyber-input-field mt-1 w-full" />
+                </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-cpr-teal" />

@@ -36,7 +36,7 @@ class ConfigController
         return redirect()->route('settings')->with('success', 'Configuration updated successfully.');
     }
 
-    public function getFoundryBaseUrl(Request $request)
+    public function getRelayUrl(Request $request)
     {
         return $request->user()->config->base_url ?? config('services.foundry.base_url');
     }

@@ -21,7 +21,7 @@
                 <input type="text" name="api_key" class="form-label w-100" id="api_key" value="{{ old('api_key', $config->api_key) }}">
             </div>
             <div class="mb-3">
-                <label for="base_url" class="form-label">Base URL</label>
+                <label for="base_url" class="form-label">Relay URL</label>
                 <input type="text" name="base_url" class="form-label w-100" id="base_url" value="{{ old('base_url', $config->base_url ?? config('services.foundry.base_url')) }}">
             </div>
             <div class="mb-3">

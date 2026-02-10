@@ -54,7 +54,7 @@ export function useCharacterData() {
             const response = await window.axios.get("/getbaseurl");
             const url = response.data.replace(/\/$/, ''); // Remove trailing slash if any
             baseUrl.value = url;
-            localStorage.setItem('cpr_base_url', url);
+            localStorage.setItem('cpr_base_url', baseUrl.value);
         } catch (err) {
             console.error("Error fetching base URL:", err);
         }
