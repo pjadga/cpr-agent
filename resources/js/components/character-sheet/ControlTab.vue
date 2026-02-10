@@ -85,7 +85,7 @@
                                             <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{ getAmmoName(weapon) }}]</span>
                                         </template>
                                         <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-cpr-red font-bold">{{ weapon.system.damage }}</span>
-                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-yellow">ROF:{{ weapon.system.rof }}</span>
+                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:{{ weapon.system.rof }}</span>
                                     </span>
                                 </div>
                             </div>

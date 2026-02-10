@@ -130,10 +130,9 @@
                     </span>
                     </div>
 
-                    <div v-if="category === 'weapon'" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 border-cpr-border-muted flex justify-between items-center">
+                    <div v-if="category === 'weapon' && ammoName" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 border-cpr-border-muted flex justify-between items-center">
                         <span>Ammo Type</span>
-                        <span class="text-cpr-text-main normal-case max-w-[100px] text-right">{{ ammoName }}
-                                </span>
+                        <span class="text-cpr-text-main normal-case max-w-[100px] text-right">{{ ammoName }}</span>
                     </div>
                 </div>
             </div>
