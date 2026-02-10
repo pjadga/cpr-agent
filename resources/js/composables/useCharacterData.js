@@ -49,7 +49,7 @@ export function useCharacterData() {
      * Fetch base URL for images
      */
     const fetchBaseUrl = async () => {
-        if (baseUrl.value) return; // Use cached value if available
+//        if (baseUrl.value) return; // Use cached value if available
         try {
             const response = await window.axios.get("/getbaseurl");
             const url = response.data.replace(/\/$/, ''); // Remove trailing slash if any
