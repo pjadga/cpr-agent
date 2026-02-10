@@ -288,11 +288,19 @@
 <script @cspNonce>
     const actorSelection = document.getElementById('actor_selection');
     if (actorSelection) {
-        actorSelection.addEventListener('change', function() {
-            const [actorId, tokenId] = this.value.split('|');
-            document.getElementById('default_actor_id').value = actorId;
-            document.getElementById('default_token_id').value = tokenId;
-        });
+        const syncIds = () => {
+            const val = actorSelection.value;
+            if (val && val.includes('|')) {
+                const [actorId, tokenId] = val.split('|');
+                document.getElementById('default_actor_id').value = actorId;
+                document.getElementById('default_token_id').value = tokenId;
+            }
+        };
+
+        actorSelection.addEventListener('change', syncIds);
+
+        // Initialize on load
+        syncIds();
     }
 </script>
 @endsection
