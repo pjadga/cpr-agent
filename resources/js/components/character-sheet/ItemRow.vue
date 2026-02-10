@@ -25,7 +25,7 @@
 
         <div class="flex items-stretch min-h-[3.5rem]">
             <div class="flex items-center pl-3 py-2 shrink-0">
-                <img :src="getImageUrl(item.img)" class="w-10 h-10 object-cover border border-cpr-border bg-cpr-black/50" />
+                <img v-cpr-img="getImageUrl(item.img)" class="w-10 h-10 object-cover border border-cpr-border bg-cpr-black/50" />
             </div>
             <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
                 <div class="flex justify-between items-start pr-2">
@@ -89,6 +89,28 @@
                 </div>
             </div>
 
+            <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role'" class="flex items-center gap-1 shrink-0 relative mr-1">
+                <button
+                    @click.stop="toggleEquipPopup"
+                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center"
+                    :title="'Status: ' + equipStateLabel"
+                >
+                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5"></i>
+                </button>
+
+                <!-- Equip Popup -->
+                <div v-if="showEquipPopup"
+                     class="absolute bottom-full right-0 mb-2 z-50 bg-cpr-black-deep border border-cpr-border shadow-2xl p-1 flex gap-1 animate-in fade-in zoom-in duration-100"
+                     @click.stop>
+                    <button v-for="state in [0, 1, 2]" :key="state"
+                            @click="updateEquipState(state)"
+                            class="p-2 border transition-all hover:bg-cpr-teal-dark/20"
+                            :class="item.system.equipped === state ? 'border-cpr-teal text-cpr-teal' : 'border-cpr-border text-cpr-text-dim'">
+                        <i v-icon :data-lucide="getEquipIconForState(state)" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
             <button
                 @click.stop="toggle"
                 class="w-12 shrink-0 flex items-center justify-center bg-cpr-black-deep/30 border-l border-white/5 active:bg-cpr-teal-dark/20 transition-colors hover:bg-cpr-teal-dark/40 cursor-pointer">
@@ -130,10 +152,35 @@
                     </span>
                     </div>
 
-                    <div v-if="category === 'weapon' && ammoName" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 border-cpr-border-muted flex justify-between items-center">
+                <div v-if="category === 'weapon' && item.system.ammoVariety" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-border-muted flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
                         <span>Ammo Type</span>
                         <span class="text-cpr-text-main normal-case max-w-[100px] text-right">{{ ammoName }}</span>
                     </div>
+
+                    <button @click="showReloadPopup = !showReloadPopup"
+                            class="w-full py-2 border border-cpr-black/50 text-cpr-teal font-black uppercase text-[10px] tracking-widest hover:bg-cpr-teal hover:text-black transition-all flex items-center justify-center gap-2">
+                        <i v-icon data-lucide="rotate-cw" class="w-3 h-3"></i> Change Ammo
+                    </button>
+
+                    <div v-if="showReloadPopup" class="mt-2 space-y-2 border-t border-cpr-border-muted pt-2">
+                        <div v-if="availableAmmoItems.length === 0" class="text-[10px] italic text-cpr-text-dim text-center py-2">
+                            No matching ammo in inventory.
+                        </div>
+                        <div v-else class="grid grid-cols-1 gap-1">
+                            <button v-for="ammoItem in availableAmmoItems" :key="ammoItem._id"
+                                    @click="reloadWithAmmo(ammoItem._id)"
+                                    class="text-left px-2 py-1 bg-cpr-black border border-cpr-border hover:border-cpr-yellow text-[10px] flex justify-between items-center transition-all">
+                                <span class="text-cpr-text-main truncate pr-2">{{ ammoItem.name }}</span>
+                                <span class="text-cpr-yellow shrink-0">x{{ ammoItem.system.amount || ammoItem.system.count || 0 }}</span>
+                            </button>
+                        </div>
+                        <button @click="showReloadPopup = false"
+                                class="w-full py-1 mt-1 bg-cpr-black-elevated text-cpr-text-main text-[8px] uppercase font-bold tracking-tighter">
+                            Change Ammo
+                        </button>
+                    </div>
+                </div>
                 </div>
             </div>
         </transition>
@@ -152,10 +199,72 @@ export default {
     directives: { icon: vIcon },
     emits: ['click'],
     setup(props) {
-        const { getImageUrl } = useCharacterData();
+        const { getImageUrl, fetchCharacterData } = useCharacterData();
         const expanded = ref(false);
+        const showEquipPopup = ref(false);
+        const showReloadPopup = ref(false);
+
         const toggle = () => {
             expanded.value = !expanded.value;
+        };
+
+        const toggleEquipPopup = () => {
+            showEquipPopup.value = !showEquipPopup.value;
+        };
+
+        const updateEquipState = async (state) => {
+            try {
+                await window.axios.post('/item-equip', {
+                    itemId: props.item._id,
+                    state: state
+                });
+                showEquipPopup.value = false;
+                await fetchCharacterData();
+            } catch (err) {
+                console.error("Error updating equip state:", err);
+            }
+        };
+
+        const reloadWithAmmo = async (ammoId) => {
+            try {
+                // The /reloadweapon expects controlState which includes selectedWeapon
+                // But we want to reload THIS weapon.
+                // Looking at ReloadWeapon.php, it uses selectedWeapon._id
+                await window.axios.post("/reloadweapon", {
+                    selectedWeapon: { _id: props.item._id },
+                    ammoId: ammoId // Passing ammoId as well
+                });
+                showReloadPopup.value = false;
+                setTimeout(fetchCharacterData, 1000);
+            } catch (err) {
+                console.error("Error reloading weapon:", err);
+            }
+        };
+
+        const availableAmmoItems = computed(() => {
+            if (props.category !== 'weapon' || !props.item.system.ammoVariety || !props.allItems) return [];
+            return props.allItems.filter(i =>
+                i.type === 'ammo' &&
+                props.item.system.ammoVariety.includes(i.system.variety)
+            );
+        });
+
+        const equipIcon = computed(() => getEquipIconForState(props.item.system.equipped));
+
+        const equipStateLabel = computed(() => {
+            switch (props.item.system.equipped) {
+                case 2: return 'Equipped';
+                case 1: return 'Carried';
+                default: return 'Owned';
+            }
+        });
+
+        const getEquipIconForState = (state) => {
+            switch (state) {
+                case 2: return 'hand';
+                case 1: return 'briefcase';
+                default: return 'circle';
+            }
         };
 
         const formatType = formatCategoryName;
@@ -279,7 +388,27 @@ export default {
             };
         });
 
-        return { expanded, toggle, formatType, findItem, ammoName, ammoTotal, isMeleeOrUnarmed, armorDisplay, statusLine, getImageUrl };
+        return {
+            expanded,
+            toggle,
+            formatType,
+            findItem,
+            ammoName,
+            ammoTotal,
+            isMeleeOrUnarmed,
+            armorDisplay,
+            statusLine,
+            getImageUrl,
+            showEquipPopup,
+            showReloadPopup,
+            toggleEquipPopup,
+            updateEquipState,
+            reloadWithAmmo,
+            availableAmmoItems,
+            equipIcon,
+            equipStateLabel,
+            getEquipIconForState
+        };
     }
 };
 </script>

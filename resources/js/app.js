@@ -16,6 +16,7 @@ import GearTab from "./components/character-sheet/GearTab.vue";
 import ItemRow from "./components/character-sheet/ItemRow.vue";
 import SkillsTab from "./components/character-sheet/SkillsTab.vue";
 import NavBtn from "./components/character-sheet/NavBtn.vue";
+import { vCprImg } from "./directives/cpr-img";
 
 window.Alpine = Alpine;
 Alpine.start();
@@ -36,4 +37,5 @@ app.component('gear-tab', GearTab);
 app.component('item-row', ItemRow);
 app.component('skills-tab', SkillsTab);
 app.component('nav-btn', NavBtn);
+app.directive('cpr-img', vCprImg);
 app.mount('#app');

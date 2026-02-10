@@ -34,15 +34,21 @@ export function useCharacterData() {
             cleanPath = path.replace('systems/cyberpunk-red-core/', '/systems/cyberpunk-red-core/');
         }
 
+        let fullUrl = cleanPath;
         if (cleanPath.startsWith('/')) {
             if (baseUrl.value) {
-                return baseUrl.value + cleanPath;
+                fullUrl = baseUrl.value + cleanPath;
             }
-            return cleanPath;
+        } else if (baseUrl.value && !cleanPath.includes('://')) {
+            fullUrl = baseUrl.value + "/" + cleanPath;
         }
 
-        if (baseUrl.value) return baseUrl.value + "/" + cleanPath;
-        return cleanPath;
+        // If it's an external URL (e.g. pointing to Ngrok), proxy it
+        if (fullUrl.includes('ngrok-free.dev') || fullUrl.includes('ngrok.dev')) {
+            return `/proxy-image?url=${encodeURIComponent(fullUrl)}`;
+        }
+
+        return fullUrl;
     };
 
     /**
