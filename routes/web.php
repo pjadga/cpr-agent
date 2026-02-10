@@ -5,6 +5,7 @@ use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Data\ItemEquip;
 use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Rolls\AttackRoll;
 use App\Http\Controllers\Rolls\DamageRoll;
@@ -97,10 +98,12 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/deathsave", [DeathSave::class, "getDeathSave"]);
     Route::post("/facedown", [FaceDown::class, "getFaceDown"]);
     Route::post("/initiativeroll", [InitiativeRoll::class, "rollInitiative"]);
+    Route::post("/item-equip", [ItemEquip::class, "updateState"]);
     Route::post("/installprogram", [InstallProgram::class, "installProgram"]);
     Route::post("/uninstallprogram", [RemoveProgram::class, "removeProgram"]);
     Route::post("/toggleprogramrez", [ToggleRez::class, "toggleRez"]);
     Route::post("/programroll", [ProgramRoll::class, "programRoll"]);
+    Route::get("/proxy-image", [\App\Http\Controllers\Data\ImageProxy::class, "proxy"])->name('proxy-image');
 });
 
 require __DIR__.'/auth.php';
