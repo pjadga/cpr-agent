@@ -16,19 +16,37 @@ class ReloadWeapon extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'selectedWeapon' => 'required|array|max:255'
+            'selectedWeapon' => 'required|array',
+            'ammoId' => 'nullable|string'
         ]);
 
-        $weaponId = $validatedData['selectedWeapon']["_id"];
+        $weaponId = $validatedData["selectedWeapon"]["_id"];
+        $ammoId = $validatedData["ammoId"] ?? null;
         $client = $this->getFoundryClient();
         $user = auth()->user();
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
+        //language=js
         $js = "
         const actor = game.actors.get('$actorId');
-        const weapon = actor.items.get('$weaponId')
-        weapon.reload();
+        const weapon = actor.items.get('$weaponId');
+        const selectedAmmo = " . ($ammoId ? "actor.items.get('$ammoId')" : "null") . ";
+        if (selectedAmmo) {
+            let currentAmmo = weapon.getInstalledItems('ammo');
+            if (currentAmmo && currentAmmo.length > 0) {
+                weapon.uninstallItems(currentAmmo);
+            }
+            setTimeout(function(){
+                weapon.installItems([selectedAmmo]);
+            },500)
+
+            setTimeout(function(){
+                weapon.reload();
+            },1500)
+        } else {
+            weapon.reload();
+        }
         ";
 
         $return = $client->utilities->executeJs($clientId, $js);

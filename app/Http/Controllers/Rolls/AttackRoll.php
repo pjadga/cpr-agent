@@ -88,8 +88,6 @@ class AttackRoll extends FormRequest
                         await actor.setFlag(scope, flagKey, flagValue);
                     }
 
-                    console.log('Set ' + flagKey + ' to: ' + (flagValue || 'Single'));
-
                     // 4. Create the Fake Button for the System Logic
                     const dummyBtn = document.createElement('a');
                     dummyBtn.dataset.rollType = 'attack';
