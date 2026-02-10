@@ -22,16 +22,16 @@
                                 <button v-for="mode in availableFireModes" :key="mode.id"
                                         @click="$emit('update:fireMode', mode.id)"
                                         class="px-4 py-3 text-xs font-black uppercase border transition-all flex items-center justify-center gap-2 rounded-sm"
-                                        :class="fireMode === mode.id ? 'bg-cpr-orange border-cpr-orange text-black' : 'border-cpr-border text-cpr-text-muted hover:text-cpr-text-main hover:border-cpr-border-muted'">
+                                        :class="fireMode === mode.id ? 'bg-cpr-yellow-dark border-cpr-black-deep text-black' : 'border-cpr-border text-cpr-text-muted hover:text-cpr-text-main hover:border-cpr-border-muted'">
                                     <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i> {{ mode.label }}
                                 </button>
                             </div>
                         </div>
                         <div class="text-right pl-4 border-l border-cpr-border ml-4">
                             <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-1">Target DV</div>
-                            <div v-if="dvLoading" class="text-cpr-orange animate-pulse font-mono font-bold">CALC...</div>
+                            <div v-if="dvLoading" class="text-cpr-yellow-dark animate-pulse font-mono font-bold">CALC...</div>
                             <div v-else-if="dvError" class="text-cpr-red font-mono text-xs">ERR</div>
-                            <div v-else class="text-3xl font-black text-white font-mono leading-none">{{ dvInfo || '--' }}</div>
+                            <div v-else class="text-3xl font-black text-cpr-yellow font-mono leading-none">{{ dvInfo || '--' }}</div>
                         </div>
                     </div>
 
@@ -39,19 +39,19 @@
                     <div class="grid grid-cols-2 gap-3">
                         <button @click="$emit('roll-hit')"
                                 :disabled="reloadRequired"
-                                class="py-5 bg-cpr-red text-black font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-cpr-red transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed rounded-sm">
-                            <span class="text-2xl">Execute Attack</span>
+                                class="py-4 bg-cpr-red text-black font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-cpr-red transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed rounded-sm">
+                            <span class="text-l">Execute Attack</span>
                             <span v-if="reloadRequired" class="text-[10px] animate-pulse mt-1">Out of Ammo!</span>
                         </button>
                         <button @click="$emit('roll-damage')"
-                                class="py-5 border-2 border-cpr-red text-cpr-red font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-cpr-red hover:text-black transition-all active:scale-95 rounded-sm">
-                            <span class="text-2xl">Roll Damage</span>
+                                class="py-4 border-2 border-cpr-red text-cpr-red font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-cpr-red hover:text-black transition-all active:scale-95 rounded-sm">
+                            <span class="text-l">Roll Damage</span>
                         </button>
                     </div>
 
                     <button v-if="selectedWeapon.system.magazine"
                             @click="$emit('reload')"
-                            class="w-full py-3 bg-cpr-black-deep border border-cpr-border text-cpr-text-muted font-bold uppercase text-xs tracking-[0.2em] hover:bg-cpr-black-elevated hover:text-white transition-all rounded-sm flex items-center justify-center gap-2">
+                            class="w-full py-3 bg-cpr-black-deep border border-cpr-teal-dark text-cpr-text-muted font-bold uppercase text-xs tracking-[0.2em] hover:bg-cpr-black-elevated hover:text-white transition-all rounded-sm flex items-center justify-center gap-2">
                         <i v-icon data-lucide="rotate-cw" class="w-4 h-4"></i> Reload Systems
                     </button>
                 </div>

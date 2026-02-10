@@ -38,38 +38,39 @@
                             <template v-if="category === 'armor' && armorDisplay">
                                 <div v-for="stat in armorDisplay" :key="stat.label" class="flex items-center gap-1 mr-2">
                                     <i v-icon :data-lucide="stat.icon" class="w-3 h-3 text-cpr-teal"></i>
-                                    <span class="text-[10px] font-mono text-cpr-text-muted">
-                                        <span class="text-[8px] uppercase text-cpr-text-dim mr-0.5">{{ stat.label }}:</span>
+                                    <span class="text-[10px] font-mono text-cpr-teal">
+                                        <span class="text-[8px] uppercase text-cpr-teal-dark mr-0.5">{{ stat.label }}:</span>
                                         {{ stat.value }}
                                     </span>
                                 </div>
                             </template>
+
+                            <div v-else-if="category === 'ammo'" class="flex items-center gap-1">
+                                <i v-icon data-lucide="hash" class="w-3 h-3 text-cpr-yellow"></i>
+                                <span class="text-md font-black font-mono text-cpr-yellow">
+                                    {{ item.system.amount || item.system.count || 0 }}
+                                </span>
+                            </div>
+
 
                             <div v-if="category === 'weapon'" class="flex items-center gap-1">
                                 <i v-icon data-lucide="logs" class="w-3 h-3 text-cpr-text-dim" v-if="!isMeleeOrUnarmed"></i>
                                 <span class="text-[10px] font-mono text-cpr-text-muted">
                                     <template v-if="!isMeleeOrUnarmed && item.system.magazine">
                                         {{ item.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ ammoTotal }}
-                                        <span v-if="ammoName" class="ml-1 text-cpr-yellow">[{{ ammoName }}]</span>
                                     </template>
                                     <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-cpr-red font-bold">{{ item.system.damage }}</span>
-                                    <span v-if="item.system.rof > 0" class="ml-2 text-cpr-yellow">ROF:{{ item.system.rof }}</span>
+                                    <span v-if="item.system.rof > 0" class="ml-2 text-cpr-teal">ROF:{{ item.system.rof }}</span>
                                 </span>
                             </div>
 
-                            <div v-else-if="category === 'ammo'" class="flex items-center gap-1">
-                                <i v-icon data-lucide="hash" class="w-3 h-3 text-cpr-yellow"></i>
-                                <span class="text-lg font-black font-mono text-cpr-yellow">
-                                    {{ item.system.amount || item.system.count || 0 }}
-                                </span>
-                            </div>
 
-                            <div v-else-if="(item.system.amount || item.system.count) && category !== 'armor'" class="flex items-center gap-1">
-                                <i v-icon data-lucide="hash" class="w-3 h-3 text-cpr-text-dim"></i>
-                                <span class="text-[10px] font-mono text-cpr-text-muted">
-                                    x{{ item.system.amount || item.system.count }}
-                                </span>
-                            </div>
+<!--                            <div v-else-if="(item.system.amount || item.system.count) && category !== 'armor'" class="flex items-center gap-1">-->
+<!--                                <i v-icon data-lucide="hash" class="w-3 h-3 text-cpr-text-dim"></i>-->
+<!--                                <span class="text-[10px] font-mono text-cpr-text-muted">-->
+<!--                                    x{{ item.system.amount || item.system.count }}-->
+<!--                                </span>-->
+<!--                            </div>-->
 
                             <div v-if="category === 'cyberware'" class="flex items-center gap-1">
                                 <i v-icon data-lucide="cpu" class="w-3 h-3 text-cpr-teal"></i>
@@ -78,9 +79,11 @@
                             </span>
                             </div>
 
-                            <span v-if="item.system.installLocation" class="text-[9px] text-cpr-text-dim uppercase">
-                            [{{ item.system.installLocation }}]
-                        </span>
+<!--                            <span v-if="item.system.installLocation" class="text-[9px] text-cpr-text-dim uppercase">-->
+<!--                            [{{ item.system.installLocation }}]-->
+<!--                            </span>-->
+
+
                         </div>
                     </div>
                 </div>
@@ -125,6 +128,12 @@
                         <span class="text-cpr-text-main normal-case truncate max-w-[100px] text-right">
                         {{ typeof item.system.source === 'object' ? item.system.source.book + ' p.' + item.system.source.page : item.system.source }}
                     </span>
+                    </div>
+
+                    <div v-if="category === 'weapon'" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 border-cpr-border-muted flex justify-between items-center">
+                        <span>Ammo Type</span>
+                        <span class="text-cpr-text-main normal-case max-w-[100px] text-right">{{ ammoName }}
+                                </span>
                     </div>
                 </div>
             </div>
