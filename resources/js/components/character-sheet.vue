@@ -163,12 +163,15 @@
                         :active-tab="activeTab"
                         :role-item="roleItem"
                         :expanded-role-items="expandedRoleItems"
+                        :expanded-skills="expandedSkills"
                         :grouped-skills="groupedSkills"
                         :collapsed-categories="collapsedCategories"
                         :calculate-base="calculateBase"
+                        :skills-descriptions="skillsDescriptions"
                         @role-request="sendRoleRequest"
                         @role-ability-request="sendRoleAbilityRequest"
                         @toggle-role="toggleRoleExpansion"
+                        @toggle-skill="toggleSkillExpansion"
                         @toggle-category="toggleCategory"
                         @skill-request="sendSkillRequest"
                     ></skills-tab>
@@ -283,7 +286,7 @@ import GearTab from './character-sheet/GearTab.vue';
 import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
-import StatsTab from './character-sheet/StatsTab.vue';
+import skillsDescriptions from '../../../skills.json';
 
 // --- COMPOSABLES ---
 import { useCharacterData } from '../composables/useCharacterData';
@@ -298,7 +301,7 @@ import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
 
 export default {
     name: 'CharacterSheet',
-    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, ResourceModal, RollModifierPanel, SkillsTab, StatsTab },
+    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, ResourceModal, RollModifierPanel, SkillsTab },
     directives: { icon: vIcon },
     setup() {
         // --- COMPOSABLES ---
@@ -459,6 +462,12 @@ export default {
 
         const collapsedCategories = ref({});
         const expandedRoleItems = ref({});
+        const expandedSkills = ref({});
+
+        const toggleSkillExpansion = (skillId) => {
+            expandedSkills.value[skillId] = !expandedSkills.value[skillId];
+            setTimeout(refreshIcons, 50);
+        };
 
         const logout = () => {
             window.axios.post('/logout').then(() => {
@@ -700,8 +709,8 @@ export default {
             expandedPrograms, toggleProgramDetails,
 
             // UI Helpers
-            calculateBase, findItem, formatCategory, getImageUrl,
-            showPopup, showImagePopup, showCombatPanel, popupMessage, collapsedCategories, toggleCategory, toggleRoleExpansion, expandedRoleItems,
+            calculateBase, findItem, formatCategory, getImageUrl, skillsDescriptions,
+            showPopup, showImagePopup, showCombatPanel, popupMessage, collapsedCategories, toggleCategory, toggleRoleExpansion, toggleSkillExpansion, expandedRoleItems, expandedSkills,
             handleItemClick,
 
             // Actions

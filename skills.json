@@ -1,0 +1,254 @@
+{
+    "Basic Tech": {
+        "key": "Maintaining and repairing simple electronics and other devices not covered by other skills",
+        "text": "Maintaining and repairing simple electronics and other devices not covered by other skills"
+    },
+    "Melee Weapon": {
+        "key": "Hitting things with other things up close.",
+        "text": "Hitting things with other things up close."
+    },
+    "Athletics": {
+        "key": "Feats of strength, stamina, and poise; things you may do in competive sports and activities",
+        "text": "Feats of strength, stamina, and poise; things you may do in competive sports and activities"
+    },
+    "Trading": {
+        "key": "Ability to discern an item's value, and land a good deal when making a trade",
+        "text": "Ability to discern an item's value, and land a good deal when making a trade"
+    },
+    "Electronics/Security Tech": {
+        "key": "Maintaining and repairing complex electronic devices e.g. computers, agents, and cyberdecks",
+        "text": "Maintaining and repairing complex electronic devices e.g. computers, agents, and cyberdecks"
+    },
+    "Animal Handling": {
+        "key": "Approaching, supporting, training, and caring for animals. Also includes maintaining their trust.",
+        "text": "Approaching, supporting, training, and caring for animals. Also includes maintaining their trust."
+    },
+    "Resist Torture/Drugs": {
+        "key": "Maintaining control through pain and discomfort, whether that be torture, drugs, or interrogations",
+        "text": "Maintaining control through pain and discomfort, whether that be torture, drugs, or interrogations"
+    },
+    "First Aid": {
+        "key": "Treating common critical injuries and applying treatments to wounded individuals",
+        "text": "Treating common critical injuries and applying treatments to wounded individuals"
+    },
+    "Paint/Draw/Sculpt": {
+        "key": "Capability to produce an impactful artistic work",
+        "text": "Capability to produce an impactful artistic work"
+    },
+    "Bureaucracy": {
+        "key": "Understanding an impersonal and complex system of rules to get what you need i.e. cutting through red tape, applying it, or wrapping someone else in it",
+        "text": "Understanding an impersonal and complex system of rules to get what you need i.e. cutting through red tape, applying it, or wrapping someone else in it"
+    },
+    "Riding": {
+        "key": "Working with a living animal trained to provide transportation",
+        "text": "Working with a living animal trained to provide transportation"
+    },
+    "Gamble": {
+        "key": "Being good at math and logic in games of chance to improve your odds",
+        "text": "Being good at math and logic in games of chance to improve your odds"
+    },
+    "Evasion": {
+        "key": "Dodging out of the way of an attack",
+        "text": "Dodging out of the way of an attack"
+    },
+    "Conversation": {
+        "key": "The ability to effectively direct a speech topic to get the information you need from someone",
+        "text": "The ability to effectively direct a speech topic to get the information you need from someone"
+    },
+    "Local Expert (Your Home)": {
+        "key": "Local Expert (Your Home)",
+        "text": "Local Expert (Your Home)"
+    },
+    "Land Vehicle Tech": {
+        "key": "Maintaining and repairing vehicles that travel over land without flight",
+        "text": "Maintaining and repairing vehicles that travel over land without flight"
+    },
+    "Streetwise": {
+        "key": "Wisdom on the street. Knowing how to get goods you shouldn't, and get out of dodge",
+        "text": "Wisdom on the street. Knowing how to get goods you shouldn't, and get out of dodge"
+    },
+    "Contortionist": {
+        "key": "Twisting and pivoting your body to get out of bindings like cuffs or ropes",
+        "text": "Twisting and pivoting your body to get out of bindings like cuffs or ropes"
+    },
+    "Human Perception": {
+        "key": "Reading others' reactions and disposition to glean lies, truths, and mental state",
+        "text": "Reading others' reactions and disposition to glean lies, truths, and mental state"
+    },
+    "Criminology": {
+        "key": "Investigative skill related to finding evidence, clues, forensic analysis, and reviewing police records",
+        "text": "Investigative skill related to finding evidence, clues, forensic analysis, and reviewing police records"
+    },
+    "Composition": {
+        "key": "Artistic skill related to composing songs and written works",
+        "text": "Artistic skill related to composing songs and written works"
+    },
+    "Cybertech": {
+        "key": "Maintaining and repairing cybertech",
+        "text": "Maintaining and repairing cybertech"
+    },
+    "Language (Streetslang)": {
+        "key": "Capability to use popular slang and colloquialisms that locals vibe with",
+        "text": "Capability to use popular slang and colloquialisms that locals vibe with"
+    },
+    "Photography/Film": {
+        "key": "Capability to get the perfect shot with a camera, video recorder, or braindance record",
+        "text": "Capability to get the perfect shot with a camera, video recorder, or braindance record"
+    },
+    "Accounting": {
+        "key": "Managing the economic and financial affairs of a business, which can mean maintaining the books, identifying cooked books, or cooking them yourself",
+        "text": "Managing the economic and financial affairs of a business, which can mean maintaining the books, identifying cooked books, or cooking them yourself"
+    },
+    "Sea Vehicle Tech": {
+        "key": "Maintaining and repairing sea-faring vehicles",
+        "text": "Maintaining and repairing sea-faring vehicles"
+    },
+    "Wardrobe & Style": {
+        "key": "Knowing the right ensemble to pull off the perfect look, and nailing it.",
+        "text": "Knowing the right ensemble to pull off the perfect look, and nailing it."
+    },
+    "Cryptography": {
+        "key": "Encoding and/or decoding communications",
+        "text": "Encoding and/or decoding communications"
+    },
+    "Deduction": {
+        "key": "Lateral thinking where you consider several disparate data points and counterintuitively hone an accurate conclusion",
+        "text": "Lateral thinking where you consider several disparate data points and counterintuitively hone an accurate conclusion"
+    },
+    "Pilot Sea Vehicle": {
+        "key": "Manuever a boat, skiff, tanker, or other floating vessel",
+        "text": "Manuever a boat, skiff, tanker, or other floating vessel"
+    },
+    "Heavy Weapons": {
+        "key": "Your accuracy and precision with much bigger 2-handed weapons",
+        "text": "Your accuracy and precision with much bigger 2-handed weapons"
+    },
+    "Drive Land Vehicle": {
+        "key": "Manuever a car, bus, truck, 4x4, bike, APC, tank... you get the idea",
+        "text": "Manuever a car, bus, truck, 4x4, bike, APC, tank... you get the idea"
+    },
+    "Shoulder Arms": {
+        "key": "Your accuracy and precision with weapons that are normally braced against a shoulder",
+        "text": "Your accuracy and precision with weapons that are normally braced against a shoulder"
+    },
+    "Autofire": {
+        "key": "Your capability to stay trained on a target while shooting on full-auto",
+        "text": "Your capability to stay trained on a target while shooting on full-auto"
+    },
+    "Weaponstech": {
+        "key": "Maintaining and repairing any weapon",
+        "text": "Maintaining and repairing any weapon"
+    },
+    "Interrogation": {
+        "key": "Employing techniques to force others to give up knowledge they want to keep i.e. secrets",
+        "text": "Employing techniques to force others to give up knowledge they want to keep i.e. secrets"
+    },
+    "Tracking": {
+        "key": "Following where something went based on clues or other evidence",
+        "text": "Following where something went based on clues or other evidence"
+    },
+    "Library Search": {
+        "key": "Digging up information at libraries, data pools, and other resources",
+        "text": "Digging up information at libraries, data pools, and other resources"
+    },
+    "Pick Pocket": {
+        "key": "Lifting small items from others or from stores without detection",
+        "text": "Lifting small items from others or from stores without detection"
+    },
+    "Persuasion": {
+        "key": "Appearing genuine enough to convince or influence others with words",
+        "text": "Appearing genuine enough to convince or influence others with words"
+    },
+    "Archery": {
+        "key": "How good you are at shooting things with bows and bow-like weapons",
+        "text": "How good you are at shooting things with bows and bow-like weapons"
+    },
+    "Endurance": {
+        "key": "Getting through a harsh condition in the environment, or persevering through starvation, dehydration, asphyxia, or other physiological condition",
+        "text": "Getting through a harsh condition in the environment, or persevering through starvation, dehydration, asphyxia, or other physiological condition"
+    },
+    "Concentration": {
+        "key": "Staying focused, maintaining control, and performing other mental efforts while under stress",
+        "text": "Staying focused, maintaining control, and performing other mental efforts while under stress"
+    },
+    "Personal Grooming": {
+        "key": "Taking your physical form to the next level and maximizing the benefits when you do.",
+        "text": "Taking your physical form to the next level and maximizing the benefits when you do."
+    },
+    "Brawling": {
+        "key": "Know-how for wrestling and pugilism",
+        "text": "Know-how for wrestling and pugilism"
+    },
+    "Demolitions": {
+        "key": "Applying the right amount of explosives to achieve a goal, or discerning how to prevent explosives from doing that",
+        "text": "Applying the right amount of explosives to achieve a goal, or discerning how to prevent explosives from doing that"
+    },
+    "Business": {
+        "key": "Understanding of how to run a business: best practices, legality, organization, and other matters",
+        "text": "Understanding of how to run a business: best practices, legality, organization, and other matters"
+    },
+    "Wilderness Survival": {
+        "key": "Knowing how to last in the great outdoors: foraging, sheltering, and surviving",
+        "text": "Knowing how to last in the great outdoors: foraging, sheltering, and surviving"
+    },
+    "Handgun": {
+        "key": "Your accuracy and precision with hand-held weapons like pistols",
+        "text": "Your accuracy and precision with hand-held weapons like pistols"
+    },
+    "Education": {
+        "key": "General knowledge and understanding of school subjects",
+        "text": "General knowledge and understanding of school subjects"
+    },
+    "Perception": {
+        "key": "Awareness of things going on around you, spotting clues, or noticing something out of place",
+        "text": "Awareness of things going on around you, spotting clues, or noticing something out of place"
+    },
+    "Lip Reading": {
+        "key": "Observing lip and mouth movements to interpret speech without hearing it",
+        "text": "Observing lip and mouth movements to interpret speech without hearing it"
+    },
+    "Bribery": {
+        "key": "Discerning how to bribe someone and what the bribe should be",
+        "text": "Discerning how to bribe someone and what the bribe should be"
+    },
+    "Pick Lock": {
+        "key": "Ability to unlock non-electronic locks when you do not have the key",
+        "text": "Ability to unlock non-electronic locks when you do not have the key"
+    },
+    "Conceal/Reveal Object": {
+        "key": "Hiding and finding hidden objects like concealed weapons",
+        "text": "Hiding and finding hidden objects like concealed weapons"
+    },
+    "Acting": {
+        "key": "Projecting emotions, moods, and pretending to be something or someone else",
+        "text": "Projecting emotions, moods, and pretending to be something or someone else"
+    },
+    "Air Vehicle Tech": {
+        "key": "Maintaining and repairing flight vehicles",
+        "text": "Maintaining and repairing flight vehicles"
+    },
+    "Pilot Air Vehicle": {
+        "key": "Fly a plane, heli, jet, or other piloted vehicle",
+        "text": "Fly a plane, heli, jet, or other piloted vehicle"
+    },
+    "Forgery": {
+        "key": "Verifying the authenticity of a work, or, knowing how to fool others about yours",
+        "text": "Verifying the authenticity of a work, or, knowing how to fool others about yours"
+    },
+    "Tactics": {
+        "key": "Effectively directing your resources in battle, and predicting how the enemy will react",
+        "text": "Effectively directing your resources in battle, and predicting how the enemy will react"
+    },
+    "Stealth": {
+        "key": "Do something or getting somewhere without being noticed, typically while trespassing",
+        "text": "Do something or getting somewhere without being noticed, typically while trespassing"
+    },
+    "Paramedic": {
+        "key": "As first aid, but can treat more severe critical injuries",
+        "text": "As first aid, but can treat more severe critical injuries"
+    },
+    "Dance": {
+        "key": "Moving your body in a rhythmic way to express an idea, emotion, or simply to enjoy yourself",
+        "text": "Moving your body in a rhythmic way to express an idea, emotion, or simply to enjoy yourself"
+    }
+}

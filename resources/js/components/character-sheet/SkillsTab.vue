@@ -67,28 +67,45 @@
                 </div>
             </div>
             <div v-show="!collapsedCategories[categoryKey]" class="grid grid-cols-1 gap-px bg-cpr-black-elevated border border-cpr-border">
-                <div v-for="(skill, index) in group" :key="skill.name"
-                     @click="$emit('skill-request', skill.name)"
-                     class="flex justify-between items-center bg-cpr-black p-2 hover:bg-cpr-teal-dark/20 cursor-pointer group transition-colors gap-3">
-                    <div class="flex items-center gap-3 flex-1">
-                        <div class="flex flex-col">
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-sm font-medium text-cpr-text-main group-hover:text-cpr-teal transition-colors">{{ skill.name }}</span>
-                                <span class="text-[10px] text-cpr-red font-black uppercase tracking-wider">({{
-                                        skill.system.stat
-                                    }})</span>
+                <div v-for="(skill, index) in group" :key="skill._id"
+                     class="flex flex-col bg-cpr-black border-b border-white/5 last:border-0">
+                    <div class="flex justify-between items-center p-2 hover:bg-cpr-teal-dark/20 cursor-pointer group transition-colors gap-3"
+                         @click="$emit('skill-request', skill.name)">
+                        <div class="flex items-center gap-3 flex-1">
+                            <div class="flex flex-col">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-sm font-medium text-cpr-text-main group-hover:text-cpr-teal transition-colors">{{ skill.name }}</span>
+                                    <span class="text-[10px] text-cpr-red font-black uppercase tracking-wider">({{
+                                            skill.system.stat
+                                        }})</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="text-[9px] text-cpr-text-dim uppercase font-mono">Lvl {{
-                                skill.system.level
-                            }}</span>
-                        <div
-                            class="w-8 h-8 flex items-center justify-center bg-[var(--cpr-black-elevated)] border border-cpr-border text-cpr-red font-bold font-mono text-sm rounded-sm">
-                            {{ calculateBase(skill) }}
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] text-cpr-text-dim uppercase font-mono mr-1">Lvl {{
+                                    skill.system.level
+                                }}</span>
+                            <div
+                                class="w-8 h-8 flex items-center justify-center bg-[var(--cpr-black-elevated)] border border-cpr-border text-cpr-red font-bold font-mono text-sm rounded-sm">
+                                {{ calculateBase(skill) }}
+                            </div>
+                            <button
+                                @click.stop="$emit('toggle-skill', skill._id)"
+                                class="ml-1 p-1 hover:text-cpr-teal transition-colors"
+                                v-if="skillsDescriptions[skill.name]">
+                                <i v-icon data-lucide="chevron-down"
+                                   class="w-4 h-4 text-cpr-text-dim transition-transform duration-300"
+                                   :class="{ 'rotate-180': expandedSkills[skill._id] }"></i>
+                            </button>
                         </div>
                     </div>
+
+                    <transition name="expand">
+                        <div v-if="expandedSkills[skill._id] && skillsDescriptions[skill.name]"
+                             class="px-3 py-2 bg-cpr-black-deep/40 text-[11px] text-cpr-text-muted border-t border-white/5">
+                            {{ skillsDescriptions[skill.name].text }}
+                        </div>
+                    </transition>
                 </div>
             </div>
         </div>
@@ -101,11 +118,28 @@ import { formatCategoryName } from '../../utils/helpers';
 
 export default {
     name: 'SkillsTab',
-    props: ['activeTab', 'roleItem', 'expandedRoleItems', 'groupedSkills', 'collapsedCategories', 'calculateBase'],
+    props: ['activeTab', 'roleItem', 'expandedRoleItems', 'expandedSkills', 'groupedSkills', 'collapsedCategories', 'calculateBase', 'skillsDescriptions'],
     directives: { icon: vIcon },
-    emits: ['role-request', 'role-ability-request', 'toggle-role', 'toggle-category', 'skill-request'],
+    emits: ['role-request', 'role-ability-request', 'toggle-role', 'toggle-skill', 'toggle-category', 'skill-request'],
     setup() {
         return { formatCategory: formatCategoryName };
     }
 }
 </script>
+
+<style scoped>
+.expand-enter-active,
+.expand-leave-active {
+    transition: all 0.3s ease-in-out;
+    max-height: 200px;
+    overflow: hidden;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+</style>
