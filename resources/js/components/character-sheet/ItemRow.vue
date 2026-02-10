@@ -1,5 +1,5 @@
 <template>
-    <div class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group overflow-hidden"
+    <div class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group overflow-hidden border-gray-800"
          :class="{
             'border-cpr-red': category === 'weapon',
             'border-cpr-teal-dark': category === 'armor',
@@ -7,6 +7,16 @@
             'border-cpr-border-muted': category === 'gear',
             'border-cpr-teal': category === 'cyberware'
          }">
+
+        <div class="cpr-corner-square"
+             :class="{
+                'text-cpr-red': category === 'weapon',
+                'text-cpr-teal-dark': category === 'armor',
+                'text-cpr-yellow-dark': category === 'ammo',
+                'text-cpr-border-muted': category === 'gear',
+                'text-cpr-teal': category === 'cyberware'
+             }">
+        </div>
 
         <div v-if="statusLine" class="absolute top-0 left-0 h-[3px] transition-all duration-500 z-10"
              :class="statusLine.color"

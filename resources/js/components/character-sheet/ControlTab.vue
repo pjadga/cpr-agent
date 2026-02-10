@@ -71,6 +71,9 @@
                              :style="{ width: getStatusLine(weapon).width }">
                         </div>
 
+                        <div class="cpr-corner-square text-cpr-red">
+                        </div>
+
                         <div class="flex items-center gap-3">
                             <img :src="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-cpr-border">
                             <div>

@@ -91,8 +91,18 @@ body {
     transition: color 0.2s;
 }
 
-.cpr-stat-box { border-bottom: 2px solid var(--cpr-red); }
-.cpr-equipped-box { border-left: 3px solid var(--cpr-red); }
+.cpr-panel.cpr-stat-box { border-bottom: 2px solid var(--cpr-red) !important; }
+.cpr-panel.cpr-equipped-box { border-left: 3px solid var(--cpr-red) !important; }
+
+.cpr-corner-square {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: currentColor;
+    clip-path: polygon(100% 0, 0 100%, 100% 100%);
+}
 
 .fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }

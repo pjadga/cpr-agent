@@ -20,7 +20,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="https://unpkg.com/lucide@latest" @cspNonce></script>
     </head>
-    <body class="bg-cpr-black text-cpr-text-main font-sans antialiased nativephp-safe-area {{ (Auth::user()?->config?->theme ?? 'night') === 'day' ? 'theme-day' : '' }}">
+    <body class="bg-cpr-black-deep text-cpr-text-main font-sans antialiased nativephp-safe-area {{ (Auth::user()?->config?->theme ?? 'night') === 'day' ? 'theme-day' : '' }}">
         @yield('content')
 
         <script @cspNonce>
