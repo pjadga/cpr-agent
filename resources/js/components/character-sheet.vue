@@ -429,7 +429,8 @@ export default {
                 });
                 showEquipModal.value = false;
                 editingItem.value = null;
-                fetchCharacterData();
+                debouncedFetchCharacterData();
+                refreshIcons();
             } catch (err) {
                 console.error("Error updating equip state:", err);
             }

@@ -223,7 +223,9 @@ export default {
             );
         });
 
-        const equipIcon = computed(() => getEquipIconForState(props.item.system.equipped));
+        const equipIcon = computed(() =>
+            getEquipIconForState(props.item.system.equipped)
+        );
 
         const equipStateLabel = computed(() => {
             switch (props.item.system.equipped) {
@@ -239,6 +241,7 @@ export default {
                 case 'carried': return 'briefcase';
                 case 'owned': return 'circle';
             }
+
         };
 
         const formatType = formatCategoryName;
@@ -254,7 +257,6 @@ export default {
             if (props.category !== 'weapon' || !props.allItems) return null;
             if (isMeleeOrUnarmed.value) return null;
 
-            // First, try to find the installed ammo
             if (props.item.system.installedItems && props.item.system.installedItems.list) {
                 const ammoId = props.item.system.installedItems.list[0];
                 if (ammoId) {
