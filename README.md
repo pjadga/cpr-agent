@@ -25,9 +25,10 @@ In the ThreeHats module settings within Foundry VTT, add the following as the re
 *This relay is self-hosted through IONOS on a VPS. Call frequency is monitored to improve the app and manage costs.*
 
 ## 5. Connecting Characters
-1. Once the GM account is up and running, refresh the **Config** page.
-2. A **Foundry Client** should now appear in the dropdown menu.
-3. Selecting that client will load the **Playable Characters** and **Player Owned characters** currently in the session.
+1. Create a player account within Foundry and assign a Token to it. The Agent works by looking for owned tokens.
+2. Once the GM account is up and running, refresh the **Config** page.
+3. A **Foundry Client** should now appear in the dropdown menu.
+4. Selecting that client will load the **Playable Characters** and **Player Owned characters** currently in the session.
 
 ## Workarounds
 * The Modifiers window opens in Foundry whenever I roll.
