@@ -56,23 +56,23 @@ class ActorSheet extends FormRequest
             'isOffline' => $isOffline,
 
             // Pass through IDs
-            'type'      => $characterData['type'] ?? 'character',
-            'uuid'      => $characterData['uuid'] ?? '',
+            'type' => $characterData['type'] ?? 'character',
+            'uuid' => $characterData['uuid'] ?? '',
 
             // The core data object your Vue app expects
-            'data'      => [
+            'data' => [
                 'name' => $characterData['name'] ?? 'Unknown Character',
-                'img'  => $characterData['img'] ?? '',
+                'img' => $characterData['img'] ?? '',
 
                 'system' => [
-                    'stats'             => $characterData['system']['stats'] ?? [],
-                    'derivedStats'      => $characterData['system']['derivedStats'] ?? [],
-                    'reputation'        => $characterData['system']['reputation'] ?? ['value' => 0],
-                    'wealth'            => $characterData['system']['wealth'] ?? ['value' => 0],
+                    'stats' => $characterData['system']['stats'] ?? [],
+                    'derivedStats' => $characterData['system']['derivedStats'] ?? [],
+                    'reputation' => $characterData['system']['reputation'] ?? ['value' => 0],
+                    'wealth' => $characterData['system']['wealth'] ?? ['value' => 0],
                     'improvementPoints' => $characterData['system']['improvementPoints'] ?? ['value' => 0],
-                    'roleInfo'          => $characterData['system']['roleInfo'] ?? [],
+                    'roleInfo' => $characterData['system']['roleInfo'] ?? [],
                     // Crucial for the "Equipped" section in your Vue app
-                    'externalData'      => $characterData['system']['externalData'] ?? [],
+                    'externalData' => $characterData['system']['externalData'] ?? [],
                 ],
 
                 // Process and clean the items array
@@ -97,10 +97,10 @@ class ActorSheet extends FormRequest
         $sys = $item['system'] ?? [];
 
         return [
-            '_id'    => $item['_id'] ?? null,
-            'name'   => $item['name'] ?? 'Unknown Item',
-            'type'   => $item['type'] ?? 'misc',
-            'img'    => $item['img'] ?? '',
+            '_id' => $item['_id'] ?? null,
+            'name' => $item['name'] ?? 'Unknown Item',
+            'type' => $item['type'] ?? 'misc',
+            'img' => $item['img'] ?? '',
 
             'system' => [
                 // Text & Econ
@@ -115,29 +115,30 @@ class ActorSheet extends FormRequest
                 'concealable' => $sys['concealable'] ?? false,
 
                 // Skill Specifics
-                'level'     => $sys['level'] ?? 0,
-                'stat'      => $sys['stat'] ?? '',
-                'category'  => $sys['category'] ?? '', // Important for your new grouping logic
+                'level' => $sys['level'] ?? 0,
+                'stat' => $sys['stat'] ?? '',
+                'category' => $sys['category'] ?? '', // Important for your new grouping logic
                 'skillType' => $sys['skillType'] ?? '',
                 'abilities' => $sys['abilities'] ?? [],
 
 
                 // Combat / Weapon Specifics
-                'damage'      => $sys['damage'] ?? '',
+                'damage' => $sys['damage'] ?? '',
                 'weaponSkill' => $sys['weaponSkill'] ?? '',
-                'weaponType'  => $sys['weaponType'] ?? '',
-                'rof'         => $sys['rof'] ?? 0,
-                'magazine'         => $sys['magazine'] ?? 0,
+                'weaponType' => $sys['weaponType'] ?? '',
+                'rof' => $sys['rof'] ?? 0,
+                'magazine' => $sys['magazine'] ?? 0,
                 'ammoVariety' => $sys['ammoVariety'] ?? [],
                 'variety' => $sys['variety'] ?? '',
                 'ammoType' => $sys['ammoType'] ?? '',
-                'equipped' => $sys['equipped'] ?? 0,
+                'equipped' => $sys['equipped'] ?? '',
                 'isWeapon' => $sys['isWeapon'] ?? false,
                 'fireModes' => $sys['fireModes'] ?? [],
 
+
                 // Cyberware Specifics
                 'installLocation' => $sys['installLocation'] ?? '',
-                'installedItems'  => $sys['installedItems'] ?? [], // Keeps slot data
+                'installedItems' => $sys['installedItems'] ?? [], // Keeps slot data
                 'cyberwareType' => $sys['type'] ?? '',
                 'class' => $sys['class'] ?? '',
                 'isRezzed' => $sys['isRezzed'] ?? false,
@@ -150,15 +151,15 @@ class ActorSheet extends FormRequest
                 // Armor Specifics
                 'armor-head' => $sys['headLocation'] ?? [],
                 'armor-body' => $sys['bodyLocation'] ?? [],
-                'isShield'=> $sys['isShield'] ?? false,
-                'shieldHitPoints'=> $sys['shieldHitPoints'] ?? [],
+                'isShield' => $sys['isShield'] ?? false,
+                'shieldHitPoints' => $sys['shieldHitPoints'] ?? [],
 
 
                 // Role Specifics
-                'rank'            => $sys['rank'] ?? 0,
+                'rank' => $sys['rank'] ?? 0,
                 'mainRoleAbility' => $sys['mainRoleAbility'] ?? '',
 
-                'usage'           => $sys['usage'] ?? '',
+                'usage' => $sys['usage'] ?? '',
             ]
         ];
     }

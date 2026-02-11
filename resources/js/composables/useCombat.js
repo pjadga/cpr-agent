@@ -158,20 +158,24 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     /**
      * Reload the selected weapon
      */
-    const reloadWeapon = () => {
+    const reloadWeapon = (refreshAll) => {
         if (controlState.value.selectedWeapon) {
             const payload = {
                 selectedWeapon: { _id: controlState.value.selectedWeapon}
             };
             window.axios.post("/reloadweapon", payload).then(() => {
-                // Refresh character data and combat data after a second
+                // Refresh character data and combat data after 2 seconds
                 setTimeout(() => {
-                    fetchCharacterData();
-                    getVisibleTokens();
-                    if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
-                        fetchDVForSelectedWeapon();
+                    if (refreshAll) {
+                        refreshAll();
+                    } else {
+                        fetchCharacterData();
+                        getVisibleTokens();
+                        if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
+                            fetchDVForSelectedWeapon();
+                        }
                     }
-                }, 1000);
+                }, 2000);
             });
         }
     };

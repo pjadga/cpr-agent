@@ -19,7 +19,7 @@ class ItemEquip extends Controller
     {
         $validatedData = $request->validate([
             'itemId' => 'required|string',
-            'state' => 'required|integer|in:0,1,2',
+            'state' => 'required|string|in:owned,carried,equipped',
         ]);
 
         $user = auth()->user();
@@ -29,14 +29,26 @@ class ItemEquip extends Controller
         try {
             $client = $this->getFoundryClient();
             $itemId = $validatedData['itemId'];
-            $state = $validatedData['state'];
+            $stateString = $validatedData['state'];
+
+            // Map strings directly for Foundry VTT CP Red system
+            switch ($stateString) {
+                case 'owned':
+                case 'carried':
+                case 'equipped':
+                    $state = $stateString;
+                    break;
+                default:
+                    $state = 'owned';
+            };
+
 
             $js = "
                 const actor = game.actors.get('$actorId');
                 if (actor) {
                     const item = actor.items.get('$itemId');
                     if (item) {
-                        await item.update({'system.equipped': $state});
+                        await item.update({'system.equipped': '$state'});
                         return true;
                     }
                 }

@@ -202,15 +202,17 @@ import { ref, computed } from 'vue';
 import { vIcon } from '../../directives/icon';
 import { useCharacterData } from '../../composables/useCharacterData';
 import ProgramRow from './ProgramRow.vue';
+import ItemRow from './ItemRow.vue';
+
 
 export default {
     name: 'ControlTab',
     props: [
         'activeTab', 'controlState', 'mockEnemies', 'groupedEquipped',
         'availableFireModes', 'dvLoading', 'dvError', 'dvInfo',
-        'activeCyberdeck', 'programCategories', 'expandedPrograms'
+        'activeCyberdeck', 'programCategories', 'expandedPrograms', 'refreshAll'
     ],
-    components: { ProgramRow },
+    components: { ProgramRow, ItemRow },
     directives: { icon: vIcon },
     emits: [
         'roll-hit', 'roll-damage', 'reload', 'move',

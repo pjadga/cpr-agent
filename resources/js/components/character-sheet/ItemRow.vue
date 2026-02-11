@@ -1,11 +1,12 @@
 <template>
-    <div class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group overflow-hidden border-gray-800"
+    <div class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group border-gray-800"
          :class="{
             'border-cpr-red': category === 'weapon',
             'border-cpr-teal-dark': category === 'armor',
             'border-cpr-yellow-dark': category === 'ammo',
             'border-cpr-border-muted': category === 'gear',
-            'border-cpr-teal': category === 'cyberware'
+            'border-cpr-teal': category === 'cyberware',
+            'z-20': showEquipPopup
          }">
 
         <div class="cpr-corner-square"
@@ -27,7 +28,7 @@
             <div class="flex items-center pl-3 py-2 shrink-0">
                 <img v-cpr-img="getImageUrl(item.img)" class="w-10 h-10 object-cover border border-cpr-border bg-cpr-black/50" />
             </div>
-            <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="$emit('click', item)">
+            <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="console.log('Row clicked:', item.name); $emit('click', item)">
                 <div class="flex justify-between items-start pr-2">
                     <div class="flex flex-col">
                     <span class="text-sm font-bold text-cpr-text-main group-hover:text-cpr-teal transition-colors">
@@ -46,9 +47,8 @@
                             </template>
 
                             <div v-else-if="category === 'ammo'" class="flex items-center gap-1">
-                                <i v-icon data-lucide="hash" class="w-3 h-3 text-cpr-yellow"></i>
                                 <span class="text-md font-black font-mono text-cpr-yellow">
-                                    {{ item.system.amount || item.system.count || 0 }}
+                                    x{{ item.system.amount || item.system.count || 0 }}
                                 </span>
                             </div>
 
@@ -57,7 +57,7 @@
                                 <i v-icon data-lucide="logs" class="w-3 h-3 text-cpr-text-dim" v-if="!isMeleeOrUnarmed"></i>
                                 <span class="text-[10px] font-mono text-cpr-text-muted">
                                     <template v-if="!isMeleeOrUnarmed && item.system.magazine">
-                                        {{ item.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ ammoTotal }}
+                                        {{ item.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ item.system.magazine.max }}
                                     </template>
                                     <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-cpr-red font-bold">{{ item.system.damage }}</span>
                                     <span v-if="item.system.rof > 0" class="ml-2 text-cpr-teal">ROF:{{ item.system.rof }}</span>
@@ -91,24 +91,12 @@
 
             <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role'" class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
-                    @click.stop="toggleEquipPopup"
-                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center"
+                    @click.stop="$emit('equip-click', item)"
+                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
                     :title="'Status: ' + equipStateLabel"
                 >
-                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5"></i>
+                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
                 </button>
-
-                <!-- Equip Popup -->
-                <div v-if="showEquipPopup"
-                     class="absolute bottom-full right-0 mb-2 z-50 bg-cpr-black-deep border border-cpr-border shadow-2xl p-1 flex gap-1 animate-in fade-in zoom-in duration-100"
-                     @click.stop>
-                    <button v-for="state in [0, 1, 2]" :key="state"
-                            @click="updateEquipState(state)"
-                            class="p-2 border transition-all hover:bg-cpr-teal-dark/20"
-                            :class="item.system.equipped === state ? 'border-cpr-teal text-cpr-teal' : 'border-cpr-border text-cpr-text-dim'">
-                        <i v-icon :data-lucide="getEquipIconForState(state)" class="w-5 h-5"></i>
-                    </button>
-                </div>
             </div>
 
             <button
@@ -195,34 +183,17 @@ import { findItemInList, formatCategoryName } from '../../utils/helpers';
 
 export default {
     name: 'ItemRow',
-    props: ['item', 'category', 'allItems'],
+    props: ['item', 'category', 'allItems', 'activeTab', 'refreshAll'],
     directives: { icon: vIcon },
-    emits: ['click'],
-    setup(props) {
+    emits: ['click', 'equip-click'],
+    setup(props, { emit }) {
+        console.log(`ItemRow setup: ${props.item.name} (${props.category})`);
         const { getImageUrl, fetchCharacterData } = useCharacterData();
         const expanded = ref(false);
-        const showEquipPopup = ref(false);
         const showReloadPopup = ref(false);
 
         const toggle = () => {
             expanded.value = !expanded.value;
-        };
-
-        const toggleEquipPopup = () => {
-            showEquipPopup.value = !showEquipPopup.value;
-        };
-
-        const updateEquipState = async (state) => {
-            try {
-                await window.axios.post('/item-equip', {
-                    itemId: props.item._id,
-                    state: state
-                });
-                showEquipPopup.value = false;
-                await fetchCharacterData();
-            } catch (err) {
-                console.error("Error updating equip state:", err);
-            }
         };
 
         const reloadWithAmmo = async (ammoId) => {
@@ -235,7 +206,10 @@ export default {
                     ammoId: ammoId // Passing ammoId as well
                 });
                 showReloadPopup.value = false;
-                setTimeout(fetchCharacterData, 1000);
+
+                // Use standard refresh if available, otherwise fallback to fetchCharacterData
+                const refresh = props.refreshAll || fetchCharacterData;
+                setTimeout(refresh, 2000);
             } catch (err) {
                 console.error("Error reloading weapon:", err);
             }
@@ -253,17 +227,17 @@ export default {
 
         const equipStateLabel = computed(() => {
             switch (props.item.system.equipped) {
-                case 2: return 'Equipped';
-                case 1: return 'Carried';
-                default: return 'Owned';
+                case 'equipped': return 'Equipped';
+                case 'carried': return 'Carried';
+                case 'owned': return 'Owned';
             }
         });
 
         const getEquipIconForState = (state) => {
             switch (state) {
-                case 2: return 'hand';
-                case 1: return 'briefcase';
-                default: return 'circle';
+                case 'equipped': return 'hand';
+                case 'carried': return 'briefcase';
+                case 'owned': return 'circle';
             }
         };
 
@@ -399,10 +373,7 @@ export default {
             armorDisplay,
             statusLine,
             getImageUrl,
-            showEquipPopup,
             showReloadPopup,
-            toggleEquipPopup,
-            updateEquipState,
             reloadWithAmmo,
             availableAmmoItems,
             equipIcon,

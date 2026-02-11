@@ -156,6 +156,7 @@
                         @facedown="sendFaceDown"
                         @deathsave="sendDeathSave"
                         @item-click="handleItemClick"
+                        @equip-click="openEquipModal"
                     ></stats-tab>
 
                     <skills-tab
@@ -183,8 +184,10 @@
                         :grouped-cyberware="groupedCyberware"
                         :grouped-gear="groupedGear"
                         :char-data="charData"
+                        :refresh-all="refreshAll"
                         @toggle-category="toggleCategory"
                         @item-click="handleItemClick"
+                        @equip-click="openEquipModal"
                     ></gear-tab>
 
                     <control-tab
@@ -200,9 +203,10 @@
                         :active-cyberdeck="activeCyberdeck"
                         :program-categories="programCategories"
                         :expanded-programs="expandedPrograms"
+                        :refresh-all="refreshAll"
                         @roll-hit="rollHit"
                         @roll-damage="rollDamage"
-                        @reload="reloadWeapon"
+                        @reload="reloadWeapon(refreshAll)"
                         @move="moveToken"
                         @open-cyberdeck-config="showCyberdeckConfig = true"
                         @open-combat-panel="showCombatPanel = true"
@@ -264,6 +268,40 @@
                 </div>
             </div>
 
+            <!-- Item Equip Modal -->
+            <div v-if="showEquipModal"
+                 class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
+                 @click="showEquipModal = false">
+                <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-teal shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+                     @click.stop>
+                    <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-teal-dark/30 bg-cpr-teal-dark/10">
+                        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-teal">Update Equipment State</span>
+                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showEquipModal = false">
+                            <i v-icon data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 text-center space-y-4">
+                        <div v-if="editingItem" class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
+                            {{ editingItem.name }}
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button v-for="state in ['owned', 'carried', 'equipped']" :key="state"
+                                    @click="updateEquipState(state)"
+                                    class="w-full py-3 border transition-all flex items-center justify-center gap-3 uppercase font-bold tracking-widest text-xs"
+                                    :class="editingItem?.system.equipped === state ? 'bg-cpr-teal text-black border-cpr-teal' : 'bg-cpr-black-deep border-cpr-border text-cpr-text-dim hover:text-white hover:border-cpr-teal-dark'">
+                                <i v-icon :data-lucide="getEquipIconForState(state)" class="w-5 h-5 pointer-events-none"></i>
+                                {{ state }}
+                            </button>
+                        </div>
+                        <button
+                            class="w-full py-2 mt-4 bg-cpr-black-elevated border border-cpr-border text-cpr-text-muted text-[10px] font-bold uppercase tracking-widest hover:text-white transition-all"
+                            @click="showEquipModal = false">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </template>
@@ -316,6 +354,8 @@ export default {
 
         const activeTab = ref('stats');
         const showPopup = ref(false);
+        const showEquipModal = ref(false);
+        const editingItem = ref(null);
         const showImagePopup = ref(false);
         const showCombatPanel = ref(false);
         const popupMessage = ref('');
@@ -364,6 +404,35 @@ export default {
                 }
             }
             sendRequest({ label: stat, value: numericValue }, "/updatestat");
+        };
+
+        const openEquipModal = (item) => {
+            editingItem.value = item;
+            showEquipModal.value = true;
+        };
+
+        const getEquipIconForState = (state) => {
+            switch (state) {
+                case 'equipped': return 'hand';
+                case 'carried': return 'briefcase';
+                case 'owned': return 'circle';
+                default: return 'help-circle';
+            }
+        };
+
+        const updateEquipState = async (state) => {
+            if (!editingItem.value) return;
+            try {
+                await window.axios.post('/item-equip', {
+                    itemId: editingItem.value._id,
+                    state: state
+                });
+                showEquipModal.value = false;
+                editingItem.value = null;
+                fetchCharacterData();
+            } catch (err) {
+                console.error("Error updating equip state:", err);
+            }
         };
 
         const rollInitiative = () => {
@@ -560,7 +629,7 @@ export default {
             const groups = { weapon: [], armor: [], ammo: [], gear: [], installedPrograms: [] };
 
             const items = allItems.filter(i => {
-                const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'owned' || i.system.equipped === 'carried';
+                const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
                 const isProgram = i.type === 'program';
                 const isCyberdeck = i.type === 'cyberdeck';
@@ -690,6 +759,16 @@ export default {
             }
         }, { deep: true });
 
+        const refreshAll = () => {
+            fetchCharacterData();
+            if (activeTab.value === 'control') {
+                getVisibleTokens();
+                if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
+                    fetchDVForSelectedWeapon();
+                }
+            }
+        };
+
         const handleItemClick = (item) => {
             if (item.system.isWeapon || item.type === 'weapon') {
                 controlState.value.selectedWeapon = item;
@@ -719,12 +798,13 @@ export default {
 
             // Combat
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,
-            dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon,
+            dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon, refreshAll,
 
             // Modals
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
-            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue
+            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
+            showEquipModal, editingItem, openEquipModal, updateEquipState, getEquipIconForState
         };
     }
 };
