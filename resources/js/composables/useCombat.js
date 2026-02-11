@@ -161,7 +161,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const reloadWeapon = (refreshAll) => {
         if (controlState.value.selectedWeapon) {
             const payload = {
-                selectedWeapon: { _id: controlState.value.selectedWeapon}
+                selectedWeapon: controlState.value.selectedWeapon
             };
             window.axios.post("/reloadweapon", payload).then(() => {
                 // Refresh character data and combat data after 2 seconds
