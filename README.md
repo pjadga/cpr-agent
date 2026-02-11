@@ -34,6 +34,13 @@ In the ThreeHats module settings within Foundry VTT, add the following as the re
 * The Modifiers window opens in Foundry whenever I roll.
   * Head over to the Settings in Foundry - Cyberpunk RED - CORE, and toggle the "Invert Function of CTRL".
 
+## A few notes on NGROK & Images not showing up
+As the Agent app is hosted on a live VPS, images from a local Foundry setup will generally not work, unless the session is running on the same computer. 
+
+The quickest (currently) way round this is to install Ngrok and using `ngrok http 30000` in a command line; host your local Foundry. This will provide a long URL that you can plug into the Agents Foundry URL in config.
+
+Ngrok is specifically supported - I've added certain headers in the call to allow images through without triggering their splash page (and CORS responses). I'll be adding more in the future to try and get around the intial pain with setting up.
+
 
 # Cyberpunk Red Companion App
 
@@ -42,14 +49,14 @@ A hostable companion app for Cyberpunk Red, designed to bridge the gap between p
 ## State
 Currently functioning but actively being worked on. 
 ### Known issues/upcoming features
-* Weapon equip/conceal - The Control section shows all weapons whether they are 'equipped' or not. I'm not sure if this has any impact further than RP.
 * Ping targets not working yet.
 * Colour themes
 * Long goal - Originally I had the Agent idea where there's more of a 'phone' aspect. I think for RP purposes the GM could upload scream sheets, stories, add phone numbers of fixers/contacts etc. Getting a text mid gig from a fixer telling em to gtfo would be pretty ace. I'm imagining it working with notes + handouts. Though I feel this is on my way to making a Foundry module of my own...
 
 ## Features
 * **Character Management**: Displays relevant character stats, skills, and roles, all rollable from the app.
-* **Gear & Cyberware**: Displays equipped gear, ammo count, costs, damage, and descriptions in an easy-to-read format.
+* **Gear & Cyberware**: Displays equipped gear, ammo count, costs, damage, and descriptions in an easy-to-read format. Equipped states & ammo types are now changeable.
+* **ER Mission Kit rolls**: Currently supports Quickhack (un-named, will update as they are supported within the CPR Module), Jack in + Breach.
 * **Token Control**: Directional control of tokens via an on-screen D-pad.
 * **Combat Support**: 
     * Listed tokens on map with relative positions.
@@ -69,8 +76,6 @@ Currently functioning but actively being worked on.
 ### Availability
 The app is available through several methods (details below on DDEV):
 * **Self-Hosting**: Using DDEV (recommended for local/shared development).
-* **Desktop Executables**: EXE (Windows) and Deb/Linux executables are available - [Dropbox Link](https://www.dropbox.com/scl/fo/qn6pnahxe4vrl2dmxjl9y/APmV2t0u0Et--HFbER7Prpc?rlkey=lag3gxox4hq805elce1d7gxzg&st=ryb211m1&dl=0). The Win EXE will throw an unsigned window at you, click More Info and Run Anyway
-* **Mobile**: iOS and Android App Store versions are coming later.
 
 ### Self-Hosting with DDEV
 For the best experience while self-hosting and sharing with your players:
