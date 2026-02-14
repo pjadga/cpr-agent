@@ -81,6 +81,7 @@
                                 <div class="flex items-center gap-2 mt-0.5">
                                     <span class="text-[10px] font-mono text-cpr-text-muted">
                                         <template v-if="!isMeleeOrUnarmed(weapon) && weapon.system.magazine">
+
                                             {{ weapon.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ weapon.system.magazine.max }}
                                             <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{ getAmmoName(weapon) }}]</span>
                                         </template>
