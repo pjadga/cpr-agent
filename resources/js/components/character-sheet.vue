@@ -183,6 +183,7 @@
                         :collapsed-categories="collapsedCategories"
                         :grouped-cyberware="groupedCyberware"
                         :grouped-gear="groupedGear"
+                        :grouped-injuries="groupedInjuries"
                         :char-data="charData"
                         :refresh-all="refreshAll"
                         @toggle-category="toggleCategory"
@@ -430,7 +431,6 @@ export default {
                 showEquipModal.value = false;
                 editingItem.value = null;
                 debouncedFetchCharacterData();
-                refreshIcons();
             } catch (err) {
                 console.error("Error updating equip state:", err);
             }
@@ -610,6 +610,18 @@ export default {
             return groups;
         });
 
+        const groupedInjuries = computed(() => {
+            if (!charData.value) return { head: [], body: [] };
+            const injuries = charData.value.data.items.filter(i => i.type === 'criticalInjury');
+            const groups = { head: [], body: [] };
+            injuries.forEach(injury => {
+                const location = injury.system.location || 'body';
+                if (groups[location]) groups[location].push(injury);
+                else groups.body.push(injury);
+            });
+            return groups;
+        });
+
         const groupedGear = computed(() => {
             if (!charData.value) return {};
             const groups = { weapon: [], armor: [], ammo: [], gear: [] };
@@ -781,7 +793,7 @@ export default {
             // State
             charData, loading, error, activeTab,
             stats, luck, emp, roleItem,
-            groupedSkills, groupedCyberware, groupedGear, groupedEquipped,
+            groupedSkills, groupedCyberware, groupedGear, groupedInjuries, groupedEquipped,
 
             // Netrunner specific
             activeCyberdeck, availablePrograms, programCategories, showCyberdeckConfig,

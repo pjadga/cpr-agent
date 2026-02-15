@@ -69,16 +69,33 @@ class GetRollModifiers extends FormRequest
             });
         }
 
-        //Crit Injury addition - heuristic based on text
+        //Crit Injury addition
         const critInjuries = actor.items.filter(i => i.type === 'criticalInjury');
         critInjuries.forEach(injury => {
             const title = injury.name || 'Injury';
             const description = (injury.system.description?.value || '').replace(/<[^>]*>/g, '');
 
             let injuryPenalty = 0;
-            const lowerTitle = String(title).toLowerCase();
-            if (description.includes('-2') || lowerTitle.includes('arm') || lowerTitle.includes('eye')) {
-                injuryPenalty = -2;
+            // Try to find penalty from effects
+            if (injury.effects && injury.effects.length > 0) {
+                injury.effects.forEach(eff => {
+                    if (!eff.disabled && eff.changes) {
+                        eff.changes.forEach(change => {
+                            const val = parseInt(change.value);
+                            if (!isNaN(val)) {
+                                injuryPenalty += val;
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Fallback to heuristic if no penalty found in effects
+            if (injuryPenalty === 0) {
+                const lowerTitle = String(title).toLowerCase();
+                if (description.includes('-2') || lowerTitle.includes('arm') || lowerTitle.includes('eye')) {
+                    injuryPenalty = -2;
+                }
             }
 
             totalPenalty += injuryPenalty;

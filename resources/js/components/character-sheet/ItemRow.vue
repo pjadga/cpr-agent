@@ -6,6 +6,7 @@
             'border-cpr-yellow-dark': category === 'ammo',
             'border-cpr-border-muted': category === 'gear',
             'border-cpr-teal': category === 'cyberware',
+            'border-cpr-red border-dashed': category === 'criticalInjury',
             'z-20': showEquipPopup
          }">
 
@@ -15,7 +16,8 @@
                 'text-cpr-teal-dark': category === 'armor',
                 'text-cpr-yellow-dark': category === 'ammo',
                 'text-cpr-border-muted': category === 'gear',
-                'text-cpr-teal': category === 'cyberware'
+                'text-cpr-teal': category === 'cyberware',
+                'text-cpr-red': category === 'criticalInjury'
              }">
         </div>
 
@@ -79,6 +81,13 @@
                             </span>
                             </div>
 
+                            <div v-if="category === 'criticalInjury'" class="flex items-center gap-1">
+                                <i v-icon data-lucide="activity" class="w-3 h-3 text-cpr-red"></i>
+                                <span class="text-[10px] font-mono text-cpr-red font-bold uppercase">
+                                    {{ injuryModifier }}
+                                </span>
+                            </div>
+
 <!--                            <span v-if="item.system.installLocation" class="text-[9px] text-cpr-text-dim uppercase">-->
 <!--                            [{{ item.system.installLocation }}]-->
 <!--                            </span>-->
@@ -89,7 +98,7 @@
                 </div>
             </div>
 
-            <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role'" class="flex items-center gap-1 shrink-0 relative mr-1">
+            <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'" class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"
                     class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
@@ -119,6 +128,23 @@
                 </div>
                 <div v-else class="text-cpr-text-dim text-xs italic mb-3">No description available.</div>
 
+                <div v-if="category === 'criticalInjury'" class="grid grid-cols-2 gap-2 mb-3">
+                    <div v-if="item.system.quickFix" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-teal flex flex-col gap-1">
+                        <span class="text-[9px] text-cpr-teal uppercase font-bold">Quick Fix</span>
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="text-cpr-text-dim capitalize">{{ item.system.quickFix.type }}</span>
+                            <span class="text-white font-mono">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
+                        </div>
+                    </div>
+                    <div v-if="item.system.treatment" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-red flex flex-col gap-1">
+                        <span class="text-[9px] text-cpr-red uppercase font-bold">Treatment</span>
+                        <div class="flex justify-between items-center text-[10px]">
+                            <span class="text-cpr-text-dim capitalize">{{ item.system.treatment.type }}</span>
+                            <span class="text-white font-mono">DV{{ item.system.treatment.dvParamedic || item.system.treatment.dvSurgery }}</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 gap-2 text-[10px] uppercase font-bold text-cpr-text-dim">
                     <div v-if="item.system.price" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 border-cpr-yellow-dark flex justify-between items-center">
                         <span>Cost</span>
@@ -139,8 +165,9 @@
                         {{ typeof item.system.source === 'object' ? item.system.source.book + ' p.' + item.system.source.page : item.system.source }}
                     </span>
                     </div>
+                </div>
 
-                <div v-if="category === 'weapon' && item.system.ammoVariety" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-border-muted flex flex-col gap-2">
+                <div v-if="category === 'weapon' && item.system.ammoVariety" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-border-muted flex flex-col gap-2 mt-2">
                     <div class="flex justify-between items-center">
                         <span>Ammo Type</span>
                         <span class="text-cpr-text-main normal-case max-w-[100px] text-right">{{ ammoName }}</span>
@@ -168,7 +195,6 @@
                             Change Ammo
                         </button>
                     </div>
-                </div>
                 </div>
             </div>
         </transition>
@@ -240,11 +266,19 @@ export default {
                 case 'equipped': return 'hand';
                 case 'carried': return 'briefcase';
                 case 'owned': return 'circle';
+                default: return 'circle';
             }
 
         };
 
         const formatType = formatCategoryName;
+
+        const injuryModifier = computed(() => {
+            if (props.category !== 'criticalInjury' || !props.item.effects || !props.item.effects[0]) return '';
+            const change = props.item.effects[0].changes[0];
+            if (!change) return '';
+            return change.value;
+        });
 
         const findItem = (id) => findItemInList(id, props.allItems);
 
@@ -373,6 +407,7 @@ export default {
             ammoTotal,
             isMeleeOrUnarmed,
             armorDisplay,
+            injuryModifier,
             statusLine,
             getImageUrl,
             showReloadPopup,

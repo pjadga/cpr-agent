@@ -1,6 +1,56 @@
 <template>
     <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
+        <div v-if="groupedInjuries.head.length > 0 || groupedInjuries.body.length > 0">
+            <h3 @click="$emit('toggle-category', 'criticalInjury')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
+                <div class="flex items-center gap-2">
+                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i> <span class="group-hover:text-cpr-red transition-colors">Critical Injuries</span>
+                </div>
+                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['criticalInjury'] }">
+                    <i v-icon data-lucide="chevron-down"
+                       class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i>
+                </div>
+            </h3>
+            <transition name="fade-from-black">
+                <div v-show="!collapsedCategories['criticalInjury']" class="space-y-4">
+                    <div v-if="groupedInjuries.head.length > 0">
+                        <h4 class="text-[10px] font-bold text-cpr-red uppercase mb-2 mt-2 tracking-widest border-b border-cpr-red-dark/30 pb-1">
+                            Head Injuries
+                        </h4>
+                        <div class="space-y-2">
+                            <item-row
+                                v-for="injury in groupedInjuries.head"
+                                :key="injury._id"
+                                :item="injury"
+                                category="criticalInjury"
+                                :all-items="charData.data.items"
+                                :active-tab="activeTab"
+                                :refresh-all="refreshAll"
+                                @click="$emit('item-click', injury)">
+                            </item-row>
+                        </div>
+                    </div>
+                    <div v-if="groupedInjuries.body.length > 0">
+                        <h4 class="text-[10px] font-bold text-cpr-red uppercase mb-2 mt-4 tracking-widest border-b border-cpr-red-dark/30 pb-1">
+                            Body Injuries
+                        </h4>
+                        <div class="space-y-2">
+                            <item-row
+                                v-for="injury in groupedInjuries.body"
+                                :key="injury._id"
+                                :item="injury"
+                                category="criticalInjury"
+                                :all-items="charData.data.items"
+                                :active-tab="activeTab"
+                                :refresh-all="refreshAll"
+                                @click="$emit('item-click', injury)">
+                            </item-row>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </div>
+
         <div>
             <h3 @click="$emit('toggle-category', 'cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
@@ -92,7 +142,7 @@ import { formatCategoryName } from '../../utils/helpers';
 
 export default {
     name: 'GearTab',
-    props: ['activeTab', 'collapsedCategories', 'groupedCyberware', 'groupedGear', 'charData', 'refreshAll'],
+    props: ['activeTab', 'collapsedCategories', 'groupedCyberware', 'groupedGear', 'groupedInjuries', 'charData', 'refreshAll'],
     components: { ItemRow },
     directives: { icon: vIcon },
     emits: ['toggle-category', 'item-click', 'equip-click'],
