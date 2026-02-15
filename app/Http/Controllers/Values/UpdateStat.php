@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Values;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -37,13 +38,17 @@ class UpdateStat extends FormRequest
         $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
         $actorId = str_replace("Actor.", "", $actorId);
 
-        $return = $client->utilities->executeJs($clientId,
-            "let updateStat = game.actors.get('$actorId');
-            updateStat.update({'system.$label': $value})");
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'UPDATE_STAT',
+            'actorId' => $actorId,
+            'label' => $label,
+            'value' => $value,
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

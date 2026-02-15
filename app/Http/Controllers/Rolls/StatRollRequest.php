@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,20 +29,16 @@ class StatRollRequest extends FormRequest
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
 
-        $return = $client->utilities->executeJs($clientId,
-        "let statRoll = game.actors.get('$actorId');
-        statRoll.sheet._onRoll(
-        {'data-roll-type': 'stat',
-        'data-roll-title': '$label',
-        type: 'click',
-        currentTarget: {'data-roll-type': 'stat', 'data-roll-title': '$label'}})");
-        // Save the data (example)
-        // Message::create($validatedData);
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'STAT_ROLL',
+            'actorId' => $actorId,
+            'label' => $label,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

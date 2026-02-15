@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Data;
 
 use App\Http\HasConfiguration;
+use App\Events\CyberpunkAgentChannel;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -43,23 +44,16 @@ class ItemEquip extends Controller
             };
 
 
-            $js = "
-                const actor = game.actors.get('$actorId');
-                if (actor) {
-                    const item = actor.items.get('$itemId');
-                    if (item) {
-                        await item.update({'system.equipped': '$state'});
-                        return true;
-                    }
-                }
-                return false;
-            ";
-
-            $result = $client->utilities->executeJs($clientId, $js);
+            CyberpunkAgentChannel::dispatch([
+                'type' => 'ITEM_EQUIP',
+                'actorId' => $actorId,
+                'itemId' => $itemId,
+                'state' => $state,
+            ]);
 
             return response()->json([
                 'success' => true,
-                'result' => $result
+                'result' => true
             ]);
         } catch (\Exception $e) {
             return response()->json([

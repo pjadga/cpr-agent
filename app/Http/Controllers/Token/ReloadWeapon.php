@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Token;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,34 +28,17 @@ class ReloadWeapon extends FormRequest
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
-        //language=js
-        $js = "
-        const actor = game.actors.get('$actorId');
-        const weapon = actor.items.get('$weaponId');
-        const selectedAmmo = " . ($ammoId ? "actor.items.get('$ammoId')" : "null") . ";
-        if (selectedAmmo) {
-            let currentAmmo = weapon.getInstalledItems('ammo');
-            if (currentAmmo && currentAmmo.length > 0) {
-                weapon.uninstallItems(currentAmmo);
-            }
-            setTimeout(function(){
-                weapon.installItems([selectedAmmo]);
-            },500)
-
-            setTimeout(function(){
-                weapon.reload();
-            },1500)
-        } else {
-            weapon.reload();
-        }
-        ";
-
-        $return = $client->utilities->executeJs($clientId, $js);
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'RELOAD_WEAPON',
+            'actorId' => $actorId,
+            'weaponId' => $weaponId,
+            'ammoId' => $ammoId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

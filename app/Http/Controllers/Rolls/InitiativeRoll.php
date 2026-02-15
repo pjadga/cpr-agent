@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -18,13 +19,15 @@ class InitiativeRoll extends FormRequest
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
-        $return = $client->utilities->executeJs($clientId,
-        "let skillRoll = game.actors.get('$actorId').rollInitiative();");
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'INITIATIVE_ROLL',
+            'actorId' => $actorId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Initiative rolled successfully!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

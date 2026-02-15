@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use App\Models\Config;
 use Illuminate\Http\Request;
@@ -32,17 +33,9 @@ class ProfileSetupController extends Controller
                         $clientId => "Foundry Client Available"
                     ];
 
-                    $getActors = $client->utilities->executeJs($clientId, "let tokens=canvas.tokens.placeables.filter(t=>t.actor&&t.actor.hasPlayerOwner).map(t=>({name:t.name,actorID:t.actor.id,tokenID:t.id}));return tokens");
-
-                    if (isset($getActors["result"])) {
-                        foreach ($getActors["result"] as $actor) {
-                            $actors[] = [
-                                "name" => $actor["name"],
-                                "actorId" => $actor["actorID"],
-                                "tokenId" => $actor["tokenID"]
-                            ];
-                        }
-                    }
+                    CyberpunkAgentChannel::dispatch([
+                        'type' => 'GET_ACTORS',
+                    ]);
                 }
             } catch (\Exception $e) {
                 // Handle case where API is down or config is wrong

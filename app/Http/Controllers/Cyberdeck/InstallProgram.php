@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cyberdeck;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -29,45 +30,17 @@ class InstallProgram extends FormRequest
         $clientId = $user->client_id;
         $actorId = $user->default_actor_id;
 
-        //language=js
-        $js = "
-            const actor = game.actors.get('$actorId');
-            if (!actor) return { error: 'Actor not found' };
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'INSTALL_PROGRAM',
+            'actorId' => $actorId,
+            'programId' => $programId,
+            'cyberdeckId' => $deckId,
+        ]);
 
-            const deck = actor.items.get('$deckId');
-            const program = actor.items.get('$programId');
-
-            if (!deck || !program) return { error: 'Item not found' };
-
-            // Check capacity
-            const currentSlots = deck.system.installedItems.usedSlots || 0;
-            const maxSlots = deck.system.installedItems.slots || 0;
-            const progSize = program.system.size || 1;
-
-            if (currentSlots + progSize > maxSlots) {
-                return { error: 'Not enough memory slots' };
-            }
-
-            // Update the list
-            const currentList = deck.system.installedItems.list || [];
-            // Prevent duplicate install of same item instance ID
-            if (currentList.includes('$programId')) return { success: true };
-
-            const newList = [...currentList, '$programId'];
-
-            await deck.update({
-                'system.installedItems.list': newList,
-                'system.installedItems.usedSlots': currentSlots + progSize
-            });
-
-            return { success: true };
-        ";
-
-        $return = $client->utilities->executeJs($clientId, $js);
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

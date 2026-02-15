@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -109,18 +110,18 @@ class AttackRoll extends FormRequest
 
 
 
-        $return = $client->utilities->executeJs($clientId, $js);
-
-        $diceTotal = null;
-        if (isset($return["success"]) && $return["success"]) {
-            //Attack has rolled, get the dice number
-            $diceTotal = $client->roll->getLastRoll($clientId);
-        }
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'ATTACK_ROLL',
+            'actorId' => $actorId,
+            'weaponId' => $weaponId,
+            'fireMode' => $fireMode,
+            'targetId' => $targetId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $diceTotal
+            'data' => null
         ], 201);
     }
 }

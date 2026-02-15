@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -43,28 +44,20 @@ class ProgramRoll extends FormRequest
 
 
 
-        $js = "
-        let skillRoll = game.actors.get('$actorId');
-
-        const dummyBtn = document.createElement('a');
-        dummyBtn.dataset.rollType = '$rollType'
-        dummyBtn.dataset.cyberdeckId = '$cyberdeckId';
-        dummyBtn.dataset.rollTitle = '$programName';
-        dummyBtn.dataset.interfaceAbility = '$programName';
-        dummyBtn.dataset.itemId = '$cyberdeckId';
-        dummyBtn.dataset.programId = '$programId';
-        dummyBtn.dataset.executionType = '$executionType';
-
-        skillRoll.sheet._onRoll( {
-        type: 'click',
-        currentTarget: dummyBtn
-        })";
-        $return = $client->utilities->executeJs($clientId, $js);
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'PROGRAM_ROLL',
+            'actorId' => $actorId,
+            'rollType' => $rollType,
+            'cyberdeckId' => $cyberdeckId,
+            'programName' => $programName,
+            'programId' => $programId,
+            'executionType' => $executionType,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return
+            'data' => null
         ], 201);
     }
 }

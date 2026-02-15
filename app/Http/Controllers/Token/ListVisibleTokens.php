@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Token;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -13,9 +14,7 @@ class ListVisibleTokens extends FormRequest
 
     public function listVisibleTokens(): JsonResponse
     {
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $tokenId = $user->getTokenId();
 
         //language=JS
@@ -57,17 +56,15 @@ class ListVisibleTokens extends FormRequest
         }
         ";
 
-        // Short cache to reduce repeated polling when opening/refreshing UI
-        $cacheKey = sprintf('visibletokens:%s:%s', $clientId, $tokenId);
-        $ttl = now()->addSeconds(2);
-        $result = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
-            return $client->utilities->executeJs($clientId, $js);
-        });
+        $nearbyTokens = CyberpunkAgentChannel::dispatch([
+            'type' => 'LIST_VISIBLE_TOKENS',
+            'tokenId' => $tokenId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Visible tokens fetched successfully',
-            'data' => $result
+            'data' => $nearbyTokens
         ], 201);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,47 +33,18 @@ class RoleRollRequest extends FormRequest
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
 
-        if ($validatedData['isAbility']) {
-            $js = "let skillRoll = game.actors.get('$actorId');
-        let id = skillRoll.items.getName('$role')._id;
-        let roll = skillRoll.sheet._onRoll(
-        {
-        'data-roll-type': 'roleAbility',
-        'data-roll-subtype': 'subRoleAbility',
-        'data-roll-title': '$label',
-        'data-role-name': '$label',
-        'data-item-id': id,
-        'data-item-subtype': '$label',
-        type: 'click',
-        currentTarget: {
-        'data-roll-type': 'roleAbility',
-        'data-roll-subtype': 'subRoleAbility',
-         'data-roll-title': '$label',
-        'data-item-id': id,
-        'data-role-name': '$label',
-        'data-item-subtype': '$label'
-        }});return skillRoll";
-        } else {
-            $js = "let skillRoll = game.actors.get('$actorId');
-        let id = skillRoll.items.getName('$label')._id;
-        skillRoll.sheet._onRoll(
-        {'data-roll-type': 'roleAbility',
-        'data-roll-title': '$label',
-        'data-item-id': id,
-        'data-item-subtype': '$label',
-        type: 'click',
-        currentTarget: {'data-roll-type': 'roleAbility', 'data-roll-title': '$label',
-        'data-item-id': id, 'data-item-subtype': '$label' }});return skillRoll";
-        }
-
-
-
-        $return = $client->utilities->executeJs($clientId, $js);
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'ROLE_ROLL',
+            'actorId' => $actorId,
+            'itemName' => ($validatedData['isAbility'] ? $role : $label),
+            'label' => $label,
+            'isAbility' => $validatedData['isAbility'],
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return
+            'data' => null
         ], 201);
     }
 }

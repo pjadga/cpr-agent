@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,21 +29,16 @@ class SkillRollRequest extends FormRequest
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
-        $return = $client->utilities->executeJs($clientId,
-
-        "let skillRoll = game.actors.get('$actorId');
-        let id = skillRoll.items.getName('$label')._id;
-        skillRoll.sheet._onRoll(
-        {'data-roll-type': 'skill',
-        'data-roll-title': '$label',
-        'data-item-id': id,
-        type: 'click',
-        currentTarget: {'data-roll-type': 'skill', 'data-roll-title': '$label', 'data-item-id': id}})");
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'SKILL_ROLL',
+            'actorId' => $actorId,
+            'label' => $label,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

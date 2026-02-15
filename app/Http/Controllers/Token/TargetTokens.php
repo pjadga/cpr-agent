@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Token;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,20 +24,15 @@ class TargetTokens extends FormRequest
         $user = auth()->user();
         $clientId = $user->getClientId();
         $token = $validatedData["token"];
-        $js = "const enemyTokenId = '$token';
-                const targetToken = canvas.tokens.get(enemyTokenId);
-                if (targetToken) {
-                    targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
-                    return true;
-                } else {
-                    return false;
-                }";
-        $return = $client->utilities->executeJs($clientId, $js);
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'TARGET_TOKEN',
+            'tokenId' => $token,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return
+            'data' => null
         ], 201);
     }
 }
