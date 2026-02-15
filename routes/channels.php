@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('cpr-agent', function ($user) {
+    // Return true if the user is allowed to listen.
+    // In the future, check $user->id or specific permissions here.
+    return !is_null($user);
 });

@@ -25,6 +25,28 @@
         </div>
     @endif
 
+    <div class="p-6 bg-gray-900 text-white border border-neon-blue rounded-lg">
+        <h3 class="text-xl font-bold mb-4">Foundry VTT Link</h3>
+
+        @if (session('flash_token'))
+            <div class="bg-green-800 p-4 mb-4 rounded">
+                <p class="font-mono text-sm break-all select-all">
+                    {{ session('flash_token') }}
+                </p>
+                <p class="text-xs mt-2 text-green-300">
+                    ⚠️ Copy this now. You won't see it again.
+                </p>
+            </div>
+        @endif
+
+        <form action="{{ route('token.create') }}" method="POST">
+            @csrf
+            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded">
+                Generate New Connection Key
+            </button>
+        </form>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Global App Configuration -->
         <div class="space-y-6">
