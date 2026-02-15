@@ -18,12 +18,7 @@ export function useRollModifiers(controlState) {
         rollModsLoading.value = true;
 
         try {
-            if (!controlState.value.selectedWeapon) {
-                rollModsError.value = 'No weapon selected. Choose a weapon in Control > Select Weapon.';
-                rollModsData.value = null;
-                return;
-            }
-
+            // We don't block if no weapon is selected anymore, we want to see penalties
             const response = await cachedPost('/getrollmodifiers', {
                 selectedWeapon: controlState.value.selectedWeapon
             }, 2500);

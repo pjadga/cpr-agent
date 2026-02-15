@@ -71,6 +71,56 @@
             </div>
         </div>
 
+        <div v-if="groupedInjuries && (groupedInjuries.head.length > 0 || groupedInjuries.body.length > 0)">
+            <h3 @click="$emit('toggle-category', 'criticalInjury')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
+                <div class="flex items-center gap-2">
+                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i> <span class="group-hover:text-cpr-red transition-colors">Critical Injuries</span>
+                </div>
+                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['criticalInjury'] }">
+                    <i v-icon data-lucide="chevron-down"
+                       class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i>
+                </div>
+            </h3>
+            <transition name="fade-from-black">
+                <div v-show="!collapsedCategories['criticalInjury']" class="space-y-4">
+                    <div v-if="groupedInjuries.head.length > 0">
+                        <h4 class="text-[10px] font-bold text-cpr-red uppercase mb-2 mt-2 tracking-widest border-b border-cpr-red-dark/30 pb-1">
+                            Head Injuries
+                        </h4>
+                        <div class="space-y-2">
+                            <item-row
+                                v-for="injury in groupedInjuries.head"
+                                :key="injury._id"
+                                :item="injury"
+                                category="criticalInjury"
+                                :all-items="charData.data.items"
+                                :active-tab="activeTab"
+                                :refresh-all="refreshAll"
+                                @click="$emit('item-click', injury)">
+                            </item-row>
+                        </div>
+                    </div>
+                    <div v-if="groupedInjuries.body.length > 0">
+                        <h4 class="text-[10px] font-bold text-cpr-red uppercase mb-2 mt-4 tracking-widest border-b border-cpr-red-dark/30 pb-1">
+                            Body Injuries
+                        </h4>
+                        <div class="space-y-2">
+                            <item-row
+                                v-for="injury in groupedInjuries.body"
+                                :key="injury._id"
+                                :item="injury"
+                                category="criticalInjury"
+                                :all-items="charData.data.items"
+                                :active-tab="activeTab"
+                                :refresh-all="refreshAll"
+                                @click="$emit('item-click', injury)">
+                            </item-row>
+                        </div>
+                    </div>
+                </div>
+            </transition>
+        </div>
+
         <div>
             <h3 class="text-sm font-bold text-white uppercase mb-4 border-b border-cpr-red-dark pb-1 flex items-center gap-2">
                 <i v-icon data-lucide="crosshair" class="w-4 h-4 text-cpr-red"></i> Currently Equipped
@@ -115,10 +165,10 @@ import { formatCategoryName } from '../../utils/helpers';
 
 export default {
     name: 'StatsTab',
-    props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped'],
+    props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll'],
     components: { ResourceCounter, SimpleStat, AdjustableStat, ItemRow },
     directives: { icon: vIcon },
-    emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click'],
+    emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'toggle-category'],
     setup() {
         return { formatCategory: formatCategoryName };
     }

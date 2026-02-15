@@ -75,13 +75,13 @@
                     </div>
                 </div>
 
-                <div v-else-if="data" class="space-y-4">
+                <div v-if="data" class="space-y-4">
                     <div class="bg-cpr-black-deep border border-cpr-border p-3">
                         <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Actor</div>
                         <div class="text-white font-bold">{{ data.actorName }}</div>
                     </div>
 
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
+                    <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-3">
                         <div class="flex items-center justify-between">
                             <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Base Bonus</div>
                             <div class="text-cpr-lime font-mono font-bold">+{{ data.baseBonus }}</div>
@@ -90,20 +90,6 @@
                             <div class="flex justify-between"><span>{{ (data.breakdown.statName || 'STAT').toUpperCase() }}</span><span>+{{ data.breakdown.statValue }}</span></div>
                             <div class="flex justify-between"><span>{{ data.breakdown.skillName }}</span><span>+{{ data.breakdown.skillLevel }}</span></div>
                             <div class="flex justify-between"><span>Weapon Acc</span><span>+{{ data.breakdown.weaponAcc }}</span></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
-                        <div class="flex items-center justify-between">
-                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
-                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-mono font-bold">{{ data.totalPenalty }}</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
-                        <div class="flex items-center justify-between">
-                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Final Roll Modifier</div>
-                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-mono font-bold">{{ data.finalModifier }}</div>
                         </div>
                     </div>
 
@@ -120,9 +106,23 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
+                        <div class="flex items-center justify-between">
+                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
+                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-mono font-bold">{{ data.totalPenalty }}</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
+                        <div class="flex items-center justify-between">
+                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Final Roll Modifier</div>
+                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-mono font-bold">{{ data.finalModifier }}</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div v-else class="text-xs text-cpr-text-muted">No data available.</div>
+                <div v-if="!data" class="text-xs text-cpr-text-muted">No data available.</div>
             </div>
         </aside>
     </transition>

@@ -19,33 +19,40 @@ class GetRollModifiers extends FormRequest
         $user = auth()->user();
 
         $validatedData = $request->validate([
-            'selectedWeapon' => 'required|array|max:255',
+            'selectedWeapon' => 'nullable|array|max:255',
         ]);
 
         // Use user's client_id if available, otherwise fallback to a default or dummy for testing
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
-        $weaponId = $validatedData['selectedWeapon']["_id"];
+        $weaponId = isset($validatedData['selectedWeapon']['_id']) ? $validatedData['selectedWeapon']['_id'] : null;
 
         //language=JS
         $js = "
         const actorId = '$actorId';
-        const weaponId = '$weaponId';
+        const weaponId = " . ($weaponId ? "'$weaponId'" : "null") . ";
 
         const actor = game.actors.get(actorId);
-        const weapon = actor?.items?.get(weaponId);
-
-        if (!actor || !weapon) {
-            return { error: 'Actor or weapon not found' };
+        if (!actor) {
+            return { error: 'Actor not found' };
         }
+        const weapon = weaponId ? actor.items.get(weaponId) : null;
 
         // Get stats, skills and mods
-        const weaponSkillName = weapon.system.weaponSkill;
-        const skillItem = actor.items.find(i => i.type === 'skill' && i.name === weaponSkillName);
-        const skillLevel = skillItem ? (Number(skillItem.system.level)||0) : 0;
-        const statName = skillItem ? (skillItem.system.stat || 'ref') : 'ref';
-        const statValue = Number(actor.system.stats[statName]?.value) || 0;
-        const weaponAcc = Number(weapon.system.attackmod) || 0;
+        let weaponSkillName = 'None';
+        let skillLevel = 0;
+        let statName = 'None';
+        let statValue = 0;
+        let weaponAcc = 0;
+
+        if (weapon) {
+            weaponSkillName = weapon.system.weaponSkill;
+            const skillItem = actor.items.find(i => i.type === 'skill' && i.name === weaponSkillName);
+            skillLevel = skillItem ? (Number(skillItem.system.level)||0) : 0;
+            statName = skillItem ? (skillItem.system.stat || 'ref') : 'ref';
+            statValue = Number(actor.system.stats[statName]?.value) || 0;
+            weaponAcc = Number(weapon.system.attackmod) || 0;
+        }
 
         let totalPenalty = 0;
         const effectList = [];
@@ -122,7 +129,7 @@ class GetRollModifiers extends FormRequest
         ";
 
         // Cache for a very short time (character states can change frequently)
-        $cacheKey = sprintf('rollmods:%s:%s:%s', $clientId, $actorId, $weaponId);
+        $cacheKey = sprintf('rollmods:%s:%s:%s', $clientId, $actorId, $weaponId ?: 'none');
         $ttl = now()->addSeconds(3);
         $return = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
             return $client->utilities->executeJs($clientId, $js);

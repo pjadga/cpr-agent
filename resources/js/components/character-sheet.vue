@@ -150,6 +150,9 @@
                         :luck="luck"
                         :emp="emp"
                         :grouped-equipped="groupedEquipped"
+                        :grouped-injuries="groupedInjuries"
+                        :collapsed-categories="collapsedCategories"
+                        :refresh-all="refreshAll"
                         @open-resource="openResourceModal"
                         @stat-request="sendStatRequest"
                         @update-stat="updateStat"
@@ -157,6 +160,7 @@
                         @deathsave="sendDeathSave"
                         @item-click="handleItemClick"
                         @equip-click="openEquipModal"
+                        @toggle-category="toggleCategory"
                     ></stats-tab>
 
                     <skills-tab
@@ -183,7 +187,6 @@
                         :collapsed-categories="collapsedCategories"
                         :grouped-cyberware="groupedCyberware"
                         :grouped-gear="groupedGear"
-                        :grouped-injuries="groupedInjuries"
                         :char-data="charData"
                         :refresh-all="refreshAll"
                         @toggle-category="toggleCategory"
