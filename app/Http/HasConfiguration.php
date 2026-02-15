@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use App\Models\Config;
 use FoundryClient\FoundryClient;
 
 trait HasConfiguration

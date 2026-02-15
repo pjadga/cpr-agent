@@ -26,7 +26,7 @@ use App\Http\Controllers\Values\UpdateStat;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSetupController;
 use App\Http\Controllers\Views\ConfigController;
-use App\Events\CyberpunkMessage;
+use App\Events\CyberpunkAgentChannel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -121,7 +121,7 @@ Route::middleware('auth')->post('/settings/api-token', function (Request $reques
 
 Route::get('/test-cyberpunk', function () {
     // Fire the event!
-    CyberpunkMessage::dispatch([
+    CyberpunkAgentChannel::dispatch([
         'type' => 'TEST_PING',
         'message' => 'Wake up, Samurai.',
         'timestamp' => now()->toDateTimeString()
@@ -139,7 +139,7 @@ Route::get('/debug-fire-damage', function () {
     $newHp = rand(1, 40);
 
     // 3. Fire the Event directly (bypassing the Controller)
-    CyberpunkMessage::dispatch([
+    CyberpunkAgentChannel::dispatch([
         'type' => 'UPDATE_ACTOR',
         'actorId' => $targetActorId,
         'changes' => [

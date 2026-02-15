@@ -3,11 +3,9 @@
 namespace App\Support\Csp;
 
 use App\Models\Config;
-use App\Models\User;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
 use Spatie\Csp\Preset;
-use function Symfony\Component\String\s;
 
 class Policy implements Preset
 {
