@@ -4,6 +4,7 @@
             'border-cpr-red': category === 'weapon',
             'border-cpr-teal-dark': category === 'armor',
             'border-cpr-yellow-dark': category === 'ammo',
+            'border-cpr-yellow': category === 'drug',
             'border-cpr-border-muted': category === 'gear',
             'border-cpr-teal': category === 'cyberware',
             'border-cpr-red border-dashed': category === 'criticalInjury',
@@ -15,6 +16,7 @@
                 'text-cpr-red': category === 'weapon',
                 'text-cpr-teal-dark': category === 'armor',
                 'text-cpr-yellow-dark': category === 'ammo',
+                'border-cpr-yellow-dark': category === 'drug',
                 'text-cpr-border-muted': category === 'gear',
                 'text-cpr-teal': category === 'cyberware',
                 'text-cpr-red': category === 'criticalInjury'
@@ -98,13 +100,23 @@
                 </div>
             </div>
 
-            <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'" class="flex items-center gap-1 shrink-0 relative mr-1">
+            <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug'" class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"
                     class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
                     :title="'Status: ' + equipStateLabel"
                 >
                     <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
+                </button>
+            </div>
+
+            <div v-if="category === 'drug'" class="flex items-center gap-1 shrink-0 relative mr-1">
+                <button
+                    @click.stop="$emit('equip-click', item)"
+                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
+                    :title="'Status: ' + equipStateLabel"
+                >
+                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i> NOM
                 </button>
             </div>
 

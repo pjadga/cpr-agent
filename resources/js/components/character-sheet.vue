@@ -627,9 +627,9 @@ export default {
 
         const groupedGear = computed(() => {
             if (!charData.value) return {};
-            const groups = { weapon: [], armor: [], ammo: [], gear: [] };
+            const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [] };
             const items = charData.value.data.items.filter(i =>
-                ['weapon', 'armor', 'gear', 'ammo'].includes(i.type) &&
+                ['weapon', 'armor', 'gear', 'ammo', 'drug'].includes(i.type) &&
                 !installedIds.value.has(i._id)
             );
             items.forEach(item => {
@@ -642,7 +642,7 @@ export default {
         const groupedEquipped = computed(() => {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
-            const groups = { weapon: [], armor: [], ammo: [], gear: [], installedPrograms: [] };
+            const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [], installedPrograms: [] };
 
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'carried';
