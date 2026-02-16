@@ -15,20 +15,23 @@ class DeathSave extends FormRequest
 
     public function getDeathSave(Request $request): JsonResponse
     {
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
+        $requestId = uniqid();
+
         CyberpunkAgentChannel::dispatch([
             'type' => 'DEATH_SAVE',
             'actorId' => $actorId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ], 201);
     }
 }

@@ -19,7 +19,6 @@ class DiceRoller extends Controller
             'createChatMessage' => 'nullable|boolean',
         ]);
 
-        $client = $this->getFoundryClient();
         $user = auth()->user();
 
         if (!$user || !$user->getClientId()) {
@@ -29,20 +28,24 @@ class DiceRoller extends Controller
             ], 401);
         }
 
-        $clientId = $user->getClientId();
+        $requestId = uniqid();
 
         $payload = [
+            'type' => 'DICE_ROLL',
             'formula' => $validatedData['formula'],
             'flavor' => $validatedData['flavor'] ?? 'Manual Roll',
             'createChatMessage' => $validatedData['createChatMessage'] ?? true,
             'speaker' => 'Actor.' . $user->getActorId(),
+            'requestId' => $requestId,
         ];
 
-        $result = $client->roll->makeRoll($clientId, $payload);
+        \App\Events\CyberpunkAgentChannel::dispatch($payload);
 
         return response()->json([
             'success' => true,
-            'data' => $result,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ]);
     }
 

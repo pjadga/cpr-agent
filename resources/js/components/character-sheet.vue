@@ -79,6 +79,8 @@
                 @save="commitResourceValue">
             </resource-modal>
 
+            <roll-result-popup></roll-result-popup>
+
             <combat-panel
                 :show="showCombatPanel"
                 :selected-weapon="controlState.selectedWeapon"

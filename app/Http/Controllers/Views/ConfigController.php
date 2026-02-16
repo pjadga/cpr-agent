@@ -16,7 +16,6 @@ class ConfigController
     {
         $validated = $request->validate([
             'api_key' => 'nullable|string',
-            'base_url' => 'nullable|string',
             'foundry_url' => 'nullable|string',
             'theme' => 'nullable|string|in:night,day',
         ]);
@@ -34,11 +33,6 @@ class ConfigController
         $config->save();
 
         return redirect()->route('settings')->with('success', 'Configuration updated successfully.');
-    }
-
-    public function getRelayUrl(Request $request)
-    {
-        return $request->user()->config->base_url ?? config('services.foundry.base_url');
     }
 
     public function getFoundryUrl(Request $request)

@@ -16,17 +16,23 @@ class FoundryController extends Controller
         // 1. Validate the incoming data
         // We expect at least a 'type' (e.g., ACTORS_DATA, CONFIRMATION)
         $validated = $request->validate([
+            'requestId' => 'nullable|string',
             'type' => 'required|string',
             'action' => 'nullable|string',
             'actorId' => 'nullable|string',
             'success' => 'nullable|boolean',
-            'result' => 'nullable|array', // For complex data like Roll Modifiers
+            'result' => 'nullable', // For complex data like Roll Modifiers
             'actors' => 'nullable|array', // For GET_ACTORS
             'tokens' => 'nullable|array', // For VISIBLE_TOKENS
         ]);
 
         // 2. Log it (Optional, good for debugging)
         // \Log::info('Foundry Callback:', $validated);
+
+        // If requestId is present, store in cache for polling
+        if (!empty($validated['requestId'])) {
+            \Illuminate\Support\Facades\Cache::put('foundry_response_' . $validated['requestId'], $validated, 10);
+        }
 
         // 3. Broadcast to the Web Client
         // This pushes the data via Reverb to the browser

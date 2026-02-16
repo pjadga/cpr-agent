@@ -20,25 +20,26 @@ class StatRollRequest extends FormRequest
             'label' => 'required|string|max:255'
         ]);
 
-        //Need to get the actors either ID or Name -
-        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $label = strtolower($validatedData['label']);
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
+
+        $requestId = uniqid();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'STAT_ROLL',
             'actorId' => $actorId,
             'label' => $label,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ], 201);
     }
 }

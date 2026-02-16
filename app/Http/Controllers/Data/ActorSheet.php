@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Data;
 
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -23,23 +22,8 @@ class ActorSheet extends FormRequest
         ]);
 
         $user = auth()->user();
-        $characterData = null;
-        $isOffline = false;
-
-        try {
-            $client = $this->getFoundryClient();
-            $clientId = $user->getClientId();
-            $data = $client->entity->getActorSheetAsJson($clientId, $validatedData["actorUuid"]);
-            $characterData = $data['data'] ?? [];
-
-            if (!empty($characterData)) {
-                // Save for offline use
-                $user->update(['character_data' => $characterData]);
-            }
-        } catch (\Exception $e) {
-            $isOffline = true;
-            $characterData = $user->character_data;
-        }
+        $characterData = $user->character_data;
+        $isOffline = true; // Defaulting to true as we are not fetching live data here anymore
 
         if (empty($characterData)) {
             return response()->json([

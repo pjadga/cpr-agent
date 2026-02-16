@@ -28,25 +28,27 @@ class DamageRoll extends FormRequest
         $targetId = $validatedData['selectedTarget']["id"];
         $fireMode = $validatedData['fireMode'];
 
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
         //TODO Aimed, damage types
+
+        $requestId = uniqid();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'DAMAGE_ROLL',
             'actorId' => $actorId,
             'weaponId' => $weaponId,
             'targetId' => $targetId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ], 201);
     }
 }

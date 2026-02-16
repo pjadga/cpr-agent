@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Data;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+
+use Illuminate\Support\Str;
 
 class GetActors extends FormRequest
 {
@@ -16,27 +18,48 @@ class GetActors extends FormRequest
     public function getActors(Request $request)
     {
         $user = auth()->user();
-        $actorId = $user->getActorId();
-
-        try {
-            $client = $this->getFoundryClient();
-            $clientId = $user->getClientId();
-            // Cache actor data briefly to reduce repeated calls when the sheet opens/rerenders
-            $cacheKey = sprintf('actors:%s:%s', $clientId, $actorId);
-            $ttl = now()->addSeconds(30);
-            $character = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $actorId) {
-                return $client->entity->getEntity($clientId, $client->entity::UUID, "Actor.$actorId");
-            });
-
-            // Simplified for now, just returning the character data
-            $character['uuid'] = "Actor.$actorId";
-            return response()->json($character, 200);
-        } catch (\Exception $e) {
-            // If offline, return a dummy response with the actorUuid so the frontend can still call /actorsheet
+        $actorId = $user->api_key ?? null;
+        if (is_null($actorId)) {
             return response()->json([
-                'uuid' => "Actor." . ($actorId ?: 'demo'),
+                'actors' =>  [],
                 'isOffline' => true
             ], 200);
         }
+
+        // 1. Generate a unique ID for this specific transaction
+        $requestId = (string) Str::uuid();
+
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'GET_ACTORS',
+            'requestId' => $requestId,
+        ]);
+
+        // 2. Wait for the response (The Polling Loop)
+        $startTime = microtime(true);
+        $timeout = 3.0; // Seconds to wait
+        $foundryData = null;
+
+        while ((microtime(true) - $startTime) < $timeout) {
+            $key = 'foundry_response_' . $requestId;
+
+            if (Cache::has($key)) {
+                $foundryData = Cache::pull($key);
+                break;
+            }
+
+            usleep(100000); // 100ms
+        }
+
+        if ($foundryData === null) {
+            return response()->json([
+                'message' => 'Foundry VTT did not respond in time.',
+                'isOffline' => true
+            ], 504);
+        }
+
+        return response()->json([
+            'actors' => $foundryData['actors'] ?? [],
+            'isOffline' => false
+        ], 200);
     }
 }

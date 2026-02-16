@@ -23,26 +23,17 @@ class ProgramRoll extends FormRequest
             'cyberdeckId' => 'string|max:255'
         ]);
 
-        //Need to get the actors either ID or Name -
-        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $programName = lcfirst($validatedData['programName'])  ?? null;
         $programId = $validatedData['programId']  ?? null;
         $cyberdeckId = $validatedData['cyberdeckId']  ?? null;
         $executionType = $validatedData['executionType']  ?? null;
         $type = $validatedData['type']  ?? null;
 
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $rollType = ($executionType ? 'cyberdeckProgram' : 'interfaceAbility');
 
-        //This JS may cause issues with targeting if there are many people trying to target.
-        //The targeting from the dropdown is now removed.
-        //language=js
-
-
+        $requestId = uniqid();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'PROGRAM_ROLL',
@@ -52,12 +43,15 @@ class ProgramRoll extends FormRequest
             'programName' => $programName,
             'programId' => $programId,
             'executionType' => $executionType,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null
+            'data' => [
+                'requestId' => $requestId
+            ]
         ], 201);
     }
 }

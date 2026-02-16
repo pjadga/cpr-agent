@@ -7,6 +7,8 @@ use App\Http\HasConfiguration;
 use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ProfileSetupController extends Controller
 {
@@ -17,29 +19,39 @@ class ProfileSetupController extends Controller
         $user = Auth::user();
         $config = $user->config ?? new Config();
 
-        $clientIds = [
-            'foundry-xECODN3n8rO4E5Cj' => 'No Client Available'
-        ];
-
+        $clientIds = [];
         $actors = [];
 
-        if ($config->api_key && ($config->base_url || config('services.foundry.base_url'))) {
-            try {
-                $client = $this->getFoundryClient();
-                $clientId = $client->api->getClientId();
+        if ($config->base_url || config('services.foundry.base_url')) {
+            $requestId = (string) Str::uuid();
 
-                if ($clientId !== null) {
-                    $clientIds = [
-                        $clientId => "Foundry Client Available"
-                    ];
+            CyberpunkAgentChannel::dispatch([
+                'type' => 'GET_ACTORS',
+                'requestId' => $requestId,
+            ]);
 
-                    CyberpunkAgentChannel::dispatch([
-                        'type' => 'GET_ACTORS',
-                    ]);
+            // 2. Wait for the response (The Polling Loop)
+            $startTime = microtime(true);
+            $timeout = 3.0; // Seconds to wait
+            $foundryData = null;
+
+            while ((microtime(true) - $startTime) < $timeout) {
+                $key = 'foundry_response_' . $requestId;
+
+                if (Cache::has($key)) {
+                    $foundryData = Cache::pull($key);
+                    break;
                 }
-            } catch (\Exception $e) {
-                // Handle case where API is down or config is wrong
+
+                usleep(100000); // 100ms
             }
+
+            return view('settings', [
+                'clientIds' => $clientIds,
+                'actors' => $foundryData['actors'] ?? [],
+                'user' => Auth::user(),
+                'config' => $config,
+            ]);
         }
 
         return view('settings', [
@@ -53,7 +65,7 @@ class ProfileSetupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'required|string',
+            'client_id' => 'nullable|string',
             'default_actor_id' => 'required|string',
             'default_token_id' => 'required|string',
         ]);

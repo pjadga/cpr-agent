@@ -28,11 +28,10 @@ class AttackRoll extends FormRequest
         $targetId = $validatedData['selectedTarget']["id"];
         $fireMode = $validatedData['fireMode'];
 
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
+
+        $requestId = uniqid();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'ATTACK_ROLL',
@@ -40,12 +39,15 @@ class AttackRoll extends FormRequest
             'weaponId' => $weaponId,
             'fireMode' => $fireMode,
             'targetId' => $targetId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Attack roll request sent to Foundry',
-            'data' => null
+            'data' => [
+                'requestId' => $requestId
+            ]
         ], 201);
     }
 }

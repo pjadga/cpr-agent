@@ -10,6 +10,59 @@ class CyberpunkBridge {
     constructor() {
         this.echo = null;
         this.isConnected = false;
+        this.activeRequests = new Map();
+        this.setupHooks();
+    }
+
+    setupHooks() {
+        Hooks.on("createChatMessage", (message) => {
+            if (!this.isConnected) return;
+
+            // Check if this message has a roll
+            if (!message.rolls || message.rolls.length === 0) return;
+
+            const roll = message.rolls[0];
+            const actorId = message.speaker.actor;
+            const userId = message.author.id;
+
+            // Only care about rolls from the current user
+            if (userId !== game.user.id) return;
+
+            // Try to find a matching active request
+            let requestId = null;
+            for (let [id, request] of this.activeRequests) {
+                if (request.actorId === actorId && (Date.now() - request.timestamp) < 5000) {
+                    requestId = id;
+                    this.activeRequests.delete(id);
+                    break;
+                }
+            }
+
+            if (requestId) {
+                this.sendRollResponse(requestId, roll, message);
+            }
+        });
+    }
+
+    async sendRollResponse(requestId, roll, message) {
+        const result = {
+            type: 'ROLL_RESULT',
+            requestId: requestId,
+            result: roll.total,
+            formula: roll.formula,
+            flavor: message.flavor || '',
+            isCriticalSuccess: roll.isCritical || false,
+            isCriticalFailure: roll.isFumble || false,
+            details: '', // CPR specific details could be extracted here
+        };
+
+        // Try to find CPR specific data if available
+        if (roll.options?.cpr) {
+            // This depends on how the CPR system stores its roll data
+            // Usually there's a breakdown of base + skill + roll
+        }
+
+        await this.sendResponse(result);
     }
 
     /**
@@ -203,6 +256,7 @@ class CyberpunkBridge {
         const type = data.type;
         const actorId = data.actorId;
         const tokenId = data.tokenId;
+        const requestId = data.requestId;
 
         switch (type) {
             case 'UPDATE_ACTOR': {
@@ -213,7 +267,7 @@ class CyberpunkBridge {
                 }
                 await actor.update(data.changes);
                 ui.notifications.info(`💾 Sync: ${actor.name} updated.`);
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 break;
             }
 
@@ -223,7 +277,7 @@ class CyberpunkBridge {
                     const item = actor.items.get(data.itemId);
                     if (item) {
                         await item.update({'system.equipped': data.state});
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, itemId: data.itemId, success: true });
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, itemId: data.itemId, success: true, requestId });
                     }
                 }
                 break;
@@ -255,7 +309,7 @@ class CyberpunkBridge {
                     'system.installedItems.list': newList,
                     'system.installedItems.usedSlots': currentSlots + progSize
                 });
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 break;
             }
 
@@ -283,7 +337,7 @@ class CyberpunkBridge {
                 if (program && program.system.isRezzed) {
                     await program.update({ 'system.isRezzed': false });
                 }
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 break;
             }
 
@@ -293,7 +347,7 @@ class CyberpunkBridge {
                     const program = actor.items.get(data.programId);
                     if (program) {
                         await program.update({'system.isRezzed': data.targetState});
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, programId: data.programId, success: true });
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, programId: data.programId, success: true, requestId });
                     }
                 }
                 break;
@@ -303,6 +357,7 @@ class CyberpunkBridge {
                 const targetToken = canvas.tokens.get(data.targetId);
                 const actor = game.actors.get(actorId);
                 if (targetToken && actor) {
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                     targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
                     const weaponId = data.weaponId;
                     const weapon = actor.items.get(weaponId);
@@ -318,7 +373,7 @@ class CyberpunkBridge {
                         }
                     });
                     targetToken.setTarget(false);
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
                 break;
             }
@@ -326,6 +381,7 @@ class CyberpunkBridge {
             case 'DEATH_SAVE': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                     await actor.sheet._onRoll({
                         'data-roll-type': 'deathsave',
                         'data-roll-title': 'Death Save',
@@ -335,7 +391,7 @@ class CyberpunkBridge {
                             'data-roll-title': 'Death Save'
                         }
                     });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
                 break;
             }
@@ -343,6 +399,7 @@ class CyberpunkBridge {
             case 'FACEDOWN_ROLL': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                     await actor.sheet._onRoll({
                         'data-roll-type': 'facedown',
                         'data-roll-title': 'Face Down',
@@ -352,7 +409,7 @@ class CyberpunkBridge {
                             'data-roll-title': 'Face Down'
                         }
                     });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
                 break;
             }
@@ -360,8 +417,9 @@ class CyberpunkBridge {
             case 'INITIATIVE_ROLL': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                     await actor.rollInitiative();
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
                 break;
             }
@@ -369,6 +427,7 @@ class CyberpunkBridge {
             case 'PROGRAM_ROLL': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                     const dummyBtn = document.createElement('a');
                     dummyBtn.dataset.rollType = data.rollType;
                     dummyBtn.dataset.cyberdeckId = data.cyberdeckId;
@@ -382,7 +441,7 @@ class CyberpunkBridge {
                         type: 'click',
                         currentTarget: dummyBtn
                     });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
                 break;
             }
@@ -392,6 +451,7 @@ class CyberpunkBridge {
                 if (actor) {
                     const item = actor.items.getName(data.itemName);
                     if (item) {
+                        if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                         const rollData = {
                             'data-roll-type': 'roleAbility',
                             'data-roll-title': data.label,
@@ -412,7 +472,7 @@ class CyberpunkBridge {
                             rollData.currentTarget['data-role-name'] = data.label;
                         }
                         await actor.sheet._onRoll(rollData);
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                     }
                 }
                 break;
@@ -423,6 +483,7 @@ class CyberpunkBridge {
                 if (actor) {
                     const item = actor.items.getName(data.label);
                     if (item) {
+                        if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                         await actor.sheet._onRoll({
                             'data-roll-type': 'skill',
                             'data-roll-title': data.label,
@@ -434,7 +495,7 @@ class CyberpunkBridge {
                                 'data-item-id': item.id
                             }
                         });
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                     }
                 }
                 break;
@@ -443,6 +504,7 @@ class CyberpunkBridge {
             case 'STAT_ROLL': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                     await actor.sheet._onRoll({
                         'data-roll-type': 'stat',
                         'data-roll-title': data.label,
@@ -452,8 +514,20 @@ class CyberpunkBridge {
                             'data-roll-title': data.label
                         }
                     });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
+                break;
+            }
+
+            case 'DICE_ROLL': {
+                if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
+                const roll = new Roll(data.formula);
+                await roll.evaluate();
+                await roll.toMessage({
+                    speaker: ChatMessage.getSpeaker({actor: game.actors.get(actorId)}),
+                    flavor: data.flavor
+                });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 break;
             }
 
@@ -555,7 +629,8 @@ class CyberpunkBridge {
                         currentTarget: dummyBtn,
                         type: 'click'
                     }, { showDialog: false });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
                 }
                 break;
             }
@@ -712,7 +787,7 @@ class CyberpunkBridge {
                         dv: targetDV === 99 ? 'Out of Range' : targetDV
                     };
                     console.log("GET_DV_INFO result:", result);
-                    await this.sendResponse({ type: 'DV_INFO_DATA', result });
+                    await this.sendResponse({ type: 'DV_INFO_DATA', result, requestId });
                 }
                 break;
             }
@@ -747,8 +822,22 @@ class CyberpunkBridge {
                         })
                         .sort((a, b) => a.distanceM - b.distanceM);
                     console.log("LIST_VISIBLE_TOKENS result:", nearbyTokens);
-                    await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', tokens: nearbyTokens });
+                    await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', tokens: nearbyTokens, requestId });
                 }
+                break;
+            }
+
+            case 'GET_ACTOR': {
+                let actorId = data.actorId;
+                if (actorId !== null) {
+                    const actor = game.actors.get(actorId);
+                    if (actor) {
+                        console.log("GET_ACTOR result:", actor);
+                        await this.sendResponse({ type: 'ACTOR_DATA', actor: actor, requestId });
+                        break;
+                    }
+                }
+                await this.sendResponse({ type: 'ACTOR_DATA', actor: false, requestId });
                 break;
             }
 
@@ -757,11 +846,11 @@ class CyberpunkBridge {
                     .filter(t => t.actor && t.actor.hasPlayerOwner)
                     .map(t => ({
                         name: t.name,
-                        actorID: t.actor.id,
-                        tokenID: t.id
+                        actorId: t.actor.id,
+                        tokenId: t.id
                     }));
                 console.log("GET_ACTORS result:", tokens);
-                await this.sendResponse({ type: 'ACTORS_DATA', actors: tokens });
+                await this.sendResponse({ type: 'ACTORS_DATA', actors: tokens, requestId });
                 break;
             }
 
