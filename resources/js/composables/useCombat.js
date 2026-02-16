@@ -1,4 +1,4 @@
-import { ref, watch, onUnmounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { debounce } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
 /**
@@ -21,15 +21,12 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
         try {
             dvLoading.value = true;
-            const response = await cachedPost('/getvisibletokens', {
+            await window.axios.post('/getvisibletokens', {
                 selectedWeapon: controlState.value.selectedWeapon
-            }, 1000);
-            // Handle both potential response formats
-            dvInfo.value = response?.data?.data?.dv || response?.data?.data?.result?.dv;
+            });
         } catch (e) {
             console.error('Error fetching DV', e);
             dvError.value = 'Unable to fetch DV.';
-        } finally {
             dvLoading.value = false;
         }
     };
@@ -40,9 +37,18 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      * Get list of visible tokens (enemies) from the server
      */
     const getVisibleTokens = () => {
-        cachedPost("/listvisibletokens", {}, 1500).then(response => {
-            const listData = response?.data?.data?.result || response?.data?.data || [];
-            const list = Array.isArray(listData) ? listData : [];
+        window.axios.post("/listvisibletokens", {}).catch(err => console.error('Error fetching visible tokens', err));
+    };
+
+    const handleFoundryResponse = (e) => {
+        const payload = e.payload || e;
+        console.log('useCombat: Received FoundryResponse', payload);
+
+        if (payload.type === 'DV_INFO_DATA') {
+            dvInfo.value = payload.result?.dv;
+            dvLoading.value = false;
+        } else if (payload.type === 'VISIBLE_TOKENS_DATA') {
+            const list = payload.tokens || [];
 
             // Update existing list to prevent complete re-render if possible
             const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
@@ -69,8 +75,15 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
                 debouncedFetchDV();
             }
-        }).catch(err => console.error('Error fetching visible tokens', err));
+        }
     };
+
+    onMounted(() => {
+        if (window.Echo) {
+            window.Echo.private('cpr-agent')
+                .listen('.FoundryResponse', handleFoundryResponse);
+        }
+    });
 
     const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
@@ -189,6 +202,10 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
     onUnmounted(() => {
         if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
+        if (window.Echo) {
+            window.Echo.private('cpr-agent')
+                .stopListening('.FoundryResponse', handleFoundryResponse);
+        }
     });
 
     return {

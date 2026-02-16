@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { debounce, isDeepEqual } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
 /**
@@ -19,29 +19,42 @@ export function useRollModifiers(controlState) {
 
         try {
             // We don't block if no weapon is selected anymore, we want to see penalties
-            const response = await cachedPost('/getrollmodifiers', {
+            await window.axios.post('/getrollmodifiers', {
                 selectedWeapon: controlState.value.selectedWeapon
-            }, 2500);
-
-            const data = response?.data?.data;
-            const payload = data?.result ? data.result : data;
-
-            // Only update if the payload actually changed
-            if (!isDeepEqual(rollModsData.value || {}, payload || {})) {
-                rollModsData.value = payload;
-            }
-
-            if (rollModsData.value?.error) {
-                rollModsError.value = rollModsData.value.error;
-                rollModsData.value = null;
-            }
+            });
+            // Result will come back via Echo FoundryResponse
         } catch (e) {
             console.error('Error fetching roll modifiers', e);
             rollModsError.value = 'Unable to fetch roll modifiers.';
-        } finally {
             rollModsLoading.value = false;
         }
     };
+
+    const handleFoundryResponse = (e) => {
+        const payload = e.payload || e;
+        console.log('useRollModifiers: Received FoundryResponse', payload);
+        if (payload.type === 'ROLL_MODIFIERS_DATA') {
+            const result = payload.result;
+            if (!isDeepEqual(rollModsData.value || {}, result || {})) {
+                rollModsData.value = result;
+            }
+            rollModsLoading.value = false;
+        }
+    };
+
+    onMounted(() => {
+        if (window.Echo) {
+            window.Echo.private('cpr-agent')
+                .listen('.FoundryResponse', handleFoundryResponse);
+        }
+    });
+
+    onUnmounted(() => {
+        if (window.Echo) {
+            window.Echo.private('cpr-agent')
+                .stopListening('.FoundryResponse', handleFoundryResponse);
+        }
+    });
 
     const debouncedFetchRollModifiers = debounce(fetchRollModifiers, 250);
 

@@ -34,82 +34,6 @@ class AttackRoll extends FormRequest
         $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
-        //This JS may cause issues with targeting if there are many people trying to target.
-        //The targeting from the dropdown is now removed.
-
-        $js = "
-            // --- CONFIGURATION ---
-            const actorId = '$actorId';
-            const weaponId = '$weaponId';
-            const fireMode = '$fireMode'; // 'Single', 'Aim', 'Auto', 'Suppress'
-                        const enemyTokenId = '$targetId';
-                        const targetToken = canvas.tokens.get(enemyTokenId);
-
-            // --- LOGIC ---
-            const actor = game.actors.get(actorId);
-
-            if (actor) {
-                (async () => {
-                    // 1. Construct the specific flag key for this weapon
-                    const flagKey = 'firetype-' + weaponId;
-                    const scope = 'cyberpunk-red-core';
-
-                    let flagValue = ''; // Default is empty (Single shot)
-
-                    // 2. Map your app's mode to the System's flag values
-                    switch (fireMode) {
-                        case 'Auto':
-                            flagValue = 'autofire';
-                            break;
-                        case 'Suppress':
-                            flagValue = 'suppressive';
-                            break;
-                        case 'Aimed':
-                            flagValue = 'aimed';
-                            // If aiming, we also ensure the location is set to head (default called shot)
-                            await actor.setFlag(scope, 'aimedLocation', 'head');
-                            break;
-                        case 'Single':
-                        default:
-                            flagValue = ''; // Clear the flag for normal shooting
-                            break;
-                    }
-
-                    targetToken.setTarget(true, {
-                        releaseOthers: true,
-                        groupSelection: true
-                    });
-
-                    // 3. Update the Actor's Flag
-                    if (flagValue === '') {
-                        // If Single, we unset the flag to clean up
-                        await actor.unsetFlag(scope, flagKey);
-                    } else {
-                        // Otherwise set the mode
-                        await actor.setFlag(scope, flagKey, flagValue);
-                    }
-
-                    // 4. Create the Fake Button for the System Logic
-                    const dummyBtn = document.createElement('a');
-                    dummyBtn.dataset.rollType = 'attack';
-                    dummyBtn.dataset.itemId = weaponId;
-                    dummyBtn.dataset.rollTitle = fireMode + ' Attack';
-
-                    // 5. Execute the Roll
-                    await actor.sheet._onRoll({
-                        preventDefault: () => {},
-                        currentTarget: dummyBtn,
-                        type: 'click'
-                    }, {
-                        showDialog: false
-                    });
-
-                })();
-            }
-        ";
-
-
-
         CyberpunkAgentChannel::dispatch([
             'type' => 'ATTACK_ROLL',
             'actorId' => $actorId,
@@ -120,7 +44,7 @@ class AttackRoll extends FormRequest
 
         return response()->json([
             'success' => true,
-            'message' => 'Data successfully submitted!',
+            'message' => 'Attack roll request sent to Foundry',
             'data' => null
         ], 201);
     }

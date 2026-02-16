@@ -18,11 +18,41 @@ class CyberpunkBridge {
     registerSettings() {
         game.settings.register(MODULE_ID, 'apiUrl', {
             name: 'Relay Controller URL',
-            hint: 'The base URL of your Agent (e.g., https://my-cyberpunk-agent.com)',
+            hint: 'The base URL of your Agent (e.g., http://cyberpunk.ddev.site). Do NOT include port 8080 here.',
             scope: 'world',
             config: true,
             type: String,
             default: 'http://localhost',
+            onChange: () => this.reconnect()
+        });
+
+        game.settings.register(MODULE_ID, 'reverbPort', {
+            name: 'Reverb Port',
+            hint: 'The port your Reverb server is running on (default: 8080). If using DDEV with SSL, try 8081.',
+            scope: 'world',
+            config: true,
+            type: Number,
+            default: 8080,
+            onChange: () => this.reconnect()
+        });
+
+        game.settings.register(MODULE_ID, 'reverbUseSSL', {
+            name: 'Reverb Use SSL',
+            hint: 'Enable if using https/wss for Reverb.',
+            scope: 'world',
+            config: true,
+            type: Boolean,
+            default: false,
+            onChange: () => this.reconnect()
+        });
+
+        game.settings.register(MODULE_ID, 'reverbKey', {
+            name: 'Reverb App Key',
+            hint: 'The App Key from your .env file.',
+            scope: 'world',
+            config: true,
+            type: String,
+            default: 'itdsiqtx8cpskowawl1p',
             onChange: () => this.reconnect()
         });
 
@@ -53,6 +83,8 @@ class CyberpunkBridge {
         const apiUrl = game.settings.get(MODULE_ID, 'apiUrl');
         const token = game.settings.get(MODULE_ID, 'apiKey');
         const debug = game.settings.get(MODULE_ID, 'debugMode');
+        const reverbPort = game.settings.get(MODULE_ID, 'reverbPort') || 8080;
+        const useSSL = game.settings.get(MODULE_ID, 'reverbUseSSL') || false;
 
         if (!token || !apiUrl) {
             ui.notifications.warn("Cyberpunk Bridge: Missing API URL or Key.");
@@ -65,7 +97,6 @@ class CyberpunkBridge {
         }
 
         // Parse host from URL for Reverb config
-        // Assuming your Reverb runs on the same domain as the API
         let hostUrl;
         try {
             hostUrl = new URL(apiUrl);
@@ -74,30 +105,22 @@ class CyberpunkBridge {
             return;
         }
 
-        console.log(`🔌 Connecting to Cyberpunk Agent Relay at ${hostUrl.hostname}...`);
+        console.log(`🔌 Connecting to Cyberpunk Agent Relay at ${hostUrl.hostname}:${reverbPort}...`);
 
         this.echo = new Echo({
             broadcaster: 'reverb',
-            key: 'itdsiqtx8cpskowawl1p', // Use the VITE_REVERB_APP_KEY
-            wsHost: 'cyberpunk.ddev.site', // Hardcode this for a second to test
-            wsPort: 8080,
-            wssPort: 8080, // Point both to the non-SSL port
-            forceTLS: false, // <--- CRITICAL: Disable SSL
-            enabledTransports: ['ws'], // <--- CRITICAL: Only allow unencrypted WS
+            key: game.settings.get(MODULE_ID, 'reverbKey') || 'itdsiqtx8cpskowawl1p',
+            wsHost: hostUrl.hostname,
+            wsPort: reverbPort,
+            wssPort: reverbPort,
+            forceTLS: useSSL,
+            enabledTransports: useSSL ? ['ws', 'wss'] : ['ws'],
             disableStats: true,
-            // broadcaster: 'reverb',
-            // key: 'app-key', // Use the VITE_REVERB_APP_KEY from your Laravel .env (public facing is fine)
-            // wsHost: hostUrl.hostname,
-            // wsPort: hostUrl.port || 80,
-            // wssPort: hostUrl.port || 443,
-            // forceTLS: hostUrl.protocol === 'https:',
-            // enabledTransports: ['ws', 'wss'],
-            // Authentication endpoint for Private Channels
-            authEndpoint: 'http://cyberpunk.ddev.site/api/broadcasting/auth',
+            authEndpoint: `${apiUrl.replace(/\/$/, '')}/api/broadcasting/auth`,
 
             auth: {
                 headers: {
-                    'Authorization': 'Bearer ' + game.settings.get("cpr-agent", "apiKey"),
+                    'Authorization': 'Bearer ' + token,
                     'Accept': 'application/json'
                 }
             }
@@ -137,6 +160,39 @@ class CyberpunkBridge {
     }
 
     /**
+     * Send results back to Laravel
+     */
+    async sendResponse(data) {
+        let apiUrl = game.settings.get(MODULE_ID, 'apiUrl');
+        const token = game.settings.get(MODULE_ID, 'apiKey');
+
+        if (!apiUrl || !token) return;
+
+        // Ensure no trailing slash
+        if (apiUrl.endsWith('/')) {
+            apiUrl = apiUrl.slice(0, -1);
+        }
+
+        try {
+            const response = await fetch(`${apiUrl}/api/foundry/callback`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                console.error("Cyberpunk Bridge: Callback failed", response.statusText);
+            }
+        } catch (e) {
+            console.error("Cyberpunk Bridge: Error sending callback", e);
+        }
+    }
+
+    /**
      * Handle Logic (The Tunnel Output)
      */
     async handleIncomingData(payload) {
@@ -157,6 +213,7 @@ class CyberpunkBridge {
                 }
                 await actor.update(data.changes);
                 ui.notifications.info(`💾 Sync: ${actor.name} updated.`);
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 break;
             }
 
@@ -166,6 +223,7 @@ class CyberpunkBridge {
                     const item = actor.items.get(data.itemId);
                     if (item) {
                         await item.update({'system.equipped': data.state});
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, itemId: data.itemId, success: true });
                     }
                 }
                 break;
@@ -197,6 +255,7 @@ class CyberpunkBridge {
                     'system.installedItems.list': newList,
                     'system.installedItems.usedSlots': currentSlots + progSize
                 });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 break;
             }
 
@@ -224,6 +283,7 @@ class CyberpunkBridge {
                 if (program && program.system.isRezzed) {
                     await program.update({ 'system.isRezzed': false });
                 }
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 break;
             }
 
@@ -233,6 +293,7 @@ class CyberpunkBridge {
                     const program = actor.items.get(data.programId);
                     if (program) {
                         await program.update({'system.isRezzed': data.targetState});
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, programId: data.programId, success: true });
                     }
                 }
                 break;
@@ -257,6 +318,7 @@ class CyberpunkBridge {
                         }
                     });
                     targetToken.setTarget(false);
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -264,7 +326,7 @@ class CyberpunkBridge {
             case 'DEATH_SAVE': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
-                    actor.sheet._onRoll({
+                    await actor.sheet._onRoll({
                         'data-roll-type': 'deathsave',
                         'data-roll-title': 'Death Save',
                         type: 'click',
@@ -273,6 +335,7 @@ class CyberpunkBridge {
                             'data-roll-title': 'Death Save'
                         }
                     });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -280,7 +343,7 @@ class CyberpunkBridge {
             case 'FACEDOWN_ROLL': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
-                    actor.sheet._onRoll({
+                    await actor.sheet._onRoll({
                         'data-roll-type': 'facedown',
                         'data-roll-title': 'Face Down',
                         type: 'click',
@@ -289,6 +352,7 @@ class CyberpunkBridge {
                             'data-roll-title': 'Face Down'
                         }
                     });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -297,6 +361,7 @@ class CyberpunkBridge {
                 const actor = game.actors.get(actorId);
                 if (actor) {
                     await actor.rollInitiative();
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -313,10 +378,11 @@ class CyberpunkBridge {
                     dummyBtn.dataset.programId = data.programId;
                     dummyBtn.dataset.executionType = data.executionType;
 
-                    actor.sheet._onRoll({
+                    await actor.sheet._onRoll({
                         type: 'click',
                         currentTarget: dummyBtn
                     });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -345,7 +411,8 @@ class CyberpunkBridge {
                             rollData.currentTarget['data-roll-subtype'] = 'subRoleAbility';
                             rollData.currentTarget['data-role-name'] = data.label;
                         }
-                        actor.sheet._onRoll(rollData);
+                        await actor.sheet._onRoll(rollData);
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                     }
                 }
                 break;
@@ -356,7 +423,7 @@ class CyberpunkBridge {
                 if (actor) {
                     const item = actor.items.getName(data.label);
                     if (item) {
-                        actor.sheet._onRoll({
+                        await actor.sheet._onRoll({
                             'data-roll-type': 'skill',
                             'data-roll-title': data.label,
                             'data-item-id': item.id,
@@ -367,6 +434,7 @@ class CyberpunkBridge {
                                 'data-item-id': item.id
                             }
                         });
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                     }
                 }
                 break;
@@ -375,7 +443,7 @@ class CyberpunkBridge {
             case 'STAT_ROLL': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
-                    actor.sheet._onRoll({
+                    await actor.sheet._onRoll({
                         'data-roll-type': 'stat',
                         'data-roll-title': data.label,
                         type: 'click',
@@ -384,6 +452,7 @@ class CyberpunkBridge {
                             'data-roll-title': data.label
                         }
                     });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -397,6 +466,7 @@ class CyberpunkBridge {
                     else if (data.direction === "left") newPos.x = token.document.x - canvas.grid.size;
                     else if (data.direction === "right") newPos.x = token.document.x + canvas.grid.size;
                     await token.document.update(newPos);
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: true });
                 }
                 break;
             }
@@ -414,11 +484,13 @@ class CyberpunkBridge {
                         setTimeout(function(){
                             weapon.installItems([selectedAmmo]);
                         }, 500);
-                        setTimeout(function(){
-                            weapon.reload();
+                        setTimeout(async () => {
+                            await weapon.reload();
+                            await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                         }, 1500);
                     } else {
-                        weapon.reload();
+                        await weapon.reload();
+                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                     }
                 }
                 break;
@@ -428,6 +500,7 @@ class CyberpunkBridge {
                 const token = canvas.tokens.get(data.tokenId);
                 if (token) {
                     token.setTarget(true, { releaseOthers: true, groupSelection: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId: data.tokenId, success: true });
                 }
                 break;
             }
@@ -436,6 +509,7 @@ class CyberpunkBridge {
                 const actor = game.actors.get(actorId);
                 if (actor) {
                     await actor.update({[`system.${data.label}`]: data.value});
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -481,6 +555,7 @@ class CyberpunkBridge {
                         currentTarget: dummyBtn,
                         type: 'click'
                     }, { showDialog: false });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
             }
@@ -572,7 +647,7 @@ class CyberpunkBridge {
                     injuries: effectList
                 };
                 console.log("GET_ROLL_MODIFIERS result:", result);
-                // TODO: Broadcast this back to Laravel if needed
+                await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', result });
                 break;
             }
 
@@ -637,7 +712,7 @@ class CyberpunkBridge {
                         dv: targetDV === 99 ? 'Out of Range' : targetDV
                     };
                     console.log("GET_DV_INFO result:", result);
-                    // TODO: Broadcast this back to Laravel if needed
+                    await this.sendResponse({ type: 'DV_INFO_DATA', result });
                 }
                 break;
             }
@@ -672,7 +747,7 @@ class CyberpunkBridge {
                         })
                         .sort((a, b) => a.distanceM - b.distanceM);
                     console.log("LIST_VISIBLE_TOKENS result:", nearbyTokens);
-                    // TODO: Broadcast this back to Laravel if needed
+                    await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', tokens: nearbyTokens });
                 }
                 break;
             }
@@ -686,7 +761,7 @@ class CyberpunkBridge {
                         tokenID: t.id
                     }));
                 console.log("GET_ACTORS result:", tokens);
-                // TODO: Broadcast this back to Laravel if needed
+                await this.sendResponse({ type: 'ACTORS_DATA', actors: tokens });
                 break;
             }
 

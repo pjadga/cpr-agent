@@ -34,7 +34,7 @@ class GetVisibleTokens extends FormRequest
             ], 422);
         }
 
-        $dvInfo = CyberpunkAgentChannel::dispatch([
+        CyberpunkAgentChannel::dispatch([
             'type' => 'GET_DV_INFO',
             'tokenId' => $tokenId,
             'weaponId' => $weaponId,
@@ -42,8 +42,8 @@ class GetVisibleTokens extends FormRequest
 
         return response()->json([
             'success' => true,
-            'message' => 'Data successfully submitted!',
-            'data' => $dvInfo,
+            'message' => 'DV info request sent to Foundry',
+            'data' => null,
         ], 201);
     }
 }

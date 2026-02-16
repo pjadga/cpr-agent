@@ -317,7 +317,7 @@
  * Handles character data fetching, stat updates, skills, gear, and combat controls.
  */
 
-import { computed, ref, triggerRef, watch } from "vue";
+import { computed, ref, triggerRef, watch, onMounted, onUnmounted } from "vue";
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
@@ -451,6 +451,30 @@ export default {
             selectedProgram: null,
             fireMode: 'Single',
             reloadRequired: false
+        });
+
+        // Listen for responses from Foundry
+        const handleFoundryResponse = (e) => {
+            const payload = e.payload || e;
+            console.log('CharacterSheet: Received FoundryResponse', payload);
+            if (payload.type === 'CONFIRMATION') {
+                // Refresh data when an action is confirmed
+                debouncedFetchCharacterData();
+            }
+        };
+
+        onMounted(() => {
+            if (window.Echo) {
+                window.Echo.private('cpr-agent')
+                    .listen('.FoundryResponse', handleFoundryResponse);
+            }
+        });
+
+        onUnmounted(() => {
+            if (window.Echo) {
+                window.Echo.private('cpr-agent')
+                    .stopListening('.FoundryResponse', handleFoundryResponse);
+            }
         });
 
         watch(() => charData.value?.data.flags?.['cyberpunk-red-core']?.fightState, (newVal) => {
