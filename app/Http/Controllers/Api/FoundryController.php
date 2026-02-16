@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Data;
+namespace App\Http\Controllers\Api;
 
 use App\Events\FoundryResponse;
 use Illuminate\Http\Request;

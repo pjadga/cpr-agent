@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Data\FoundryController;
+use App\Http\Controllers\Api\FoundryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Broadcast;
@@ -21,4 +21,7 @@ Route::post('/foundry/callback', [FoundryController::class, 'handle'])
 Route::post('/foundry/update', [FoundryController::class, 'update'])
     ->middleware('auth:sanctum');
 
-Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
+Broadcast::routes(['middleware' => [
+    'web',              // 1. Run 'web' middleware to Start Session & Read Cookies
+    'auth:sanctum,web'  // 2. Allow EITHER Sanctum Token OR Web Session
+]]);
