@@ -24,10 +24,22 @@ class FoundryController extends Controller
             'result' => 'nullable', // For complex data like Roll Modifiers
             'actors' => 'nullable|array', // For GET_ACTORS
             'tokens' => 'nullable|array', // For VISIBLE_TOKENS
+            'data' => 'nullable|array',
+            'total' => 'nullable',
+            'isCriticalSuccess' => 'nullable|boolean',
+            'isCriticalFailure' => 'nullable|boolean',
+            'label' => 'nullable|string',
+            'rawRoll' => 'nullable|array'
         ]);
 
         // 2. Log it (Optional, good for debugging)
-        // \Log::info('Foundry Callback:', $validated);
+        \Log::info('Foundry Callback Received:', [
+            'type' => $request->input('type'),
+            'requestId' => $request->input('requestId'),
+            'has_total' => $request->has('total'),
+            'has_rawRoll' => $request->has('rawRoll'),
+            'all_data' => $request->all()
+        ]);
 
         // If requestId is present, store in cache for polling
         if (!empty($validated['requestId'])) {
@@ -36,6 +48,7 @@ class FoundryController extends Controller
 
         // 3. Broadcast to the Web Client
         // This pushes the data via Reverb to the browser
+        \Log::info('Foundry Callback Dispatching Event:', ['payload' => $validated]);
         \App\Events\FoundryResponse::dispatch($validated);
 
         return response()->json(['status' => 'acknowledged']);

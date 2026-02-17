@@ -459,6 +459,20 @@ export default {
         const handleFoundryResponse = (e) => {
             const payload = e.payload || e;
             console.log('CharacterSheet: Received FoundryResponse', payload);
+
+            if (payload.type === 'ROLL_RESULT') {
+                window.emitter.emit('show-roll-result', {
+                    title: payload.label || payload.rawRoll?.rollTitle || 'Roll Result',
+                    result: payload.total,
+                    formula: payload.rawRoll?._roll?.formula || payload.rawRoll?.formula || '',
+                    flavor: payload.rawRoll?.statName || payload.rawRoll?.rollTitle || '',
+                    isCriticalSuccess: payload.isCriticalSuccess,
+                    isCriticalFailure: payload.isCriticalFailure,
+                    raw: payload.rawRoll
+                });
+                debouncedFetchCharacterData();
+            }
+
             if (payload.type === 'CONFIRMATION') {
                 // Refresh data when an action is confirmed
                 debouncedFetchCharacterData();

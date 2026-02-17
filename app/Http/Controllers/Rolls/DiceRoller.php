@@ -51,7 +51,7 @@ class DiceRoller extends Controller
 
     public function getRolls(): JsonResponse
     {
-        $client = $this->getFoundryClient();
+
         $user = auth()->user();
 
         if (!$user || !$user->getClientId()) {
@@ -61,14 +61,8 @@ class DiceRoller extends Controller
             ], 401);
         }
 
-        $clientId = $user->getClientId();
-        $rolls = $client->roll->getRolls($clientId, 10);
-
-        \Log::info('DiceRoller::getRolls response', ['rolls' => $rolls]);
-
         return response()->json([
-            'success' => true,
-            'data' => $rolls,
+            'success' => true
         ]);
     }
 }
