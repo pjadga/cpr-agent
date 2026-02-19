@@ -71,39 +71,72 @@ export function useCharacterData() {
      */
     const fetchCharacterData = async (isInitial = false) => {
         try {
+            let payload = { "actorUuid": actorUuid };
+
             if (isInitial) {
-                const getActors = await window.axios.post("/getactors");
-                const serverUuid = getActors.data.uuid;
-
-                if (serverUuid && serverUuid !== actorUuid) {
-                    actorUuid = serverUuid;
-                    localStorage.setItem('cpr_actor_uuid', actorUuid);
-                    // If UUID changed, clear old data to force full reload
-                    charData.value = null;
+                // Initial check: if we don't have actor data saved, we need to fetch it from Foundry
+                // First, ensure we have a UUID (should be in localStorage or we'll need to fetch it)
+                if (!actorUuid) {
+                    const getActors = await window.axios.post("/getactors");
+                    if (getActors.data.uuid) {
+                        actorUuid = getActors.data.uuid;
+                        localStorage.setItem('cpr_actor_uuid', actorUuid);
+                    }
                 }
+
+                // If we still don't have a UUID, we can't proceed
+                if (!actorUuid) {
+                    error.value = "No character UUID found. Please check your settings.";
+                    loading.value = false;
+                    return;
+                }
+
+                // Call /actorsheet to see if we already have saved data
+                try {
+                    const checkResponse = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
+                    charData.value = checkResponse.data;
+                    loading.value = false;
+                } catch (err) {
+                    // If /actorsheet fails (e.g. 400 because no character_data in DB),
+                    // then we fetch from /getactor and save it
+                    console.log("No saved character data, fetching from Foundry...");
+                    const getActorResponse = await window.axios.post("/getactor", { "actorId": actorUuid });
+
+                    if (getActorResponse.data.actor) {
+                        // Save the fetched actor data to the DB via /actorsheet
+                        const saveResponse = await window.axios.post("/actorsheet", {
+                            "actorUuid": actorUuid,
+                            "actorData": getActorResponse.data.actor
+                        });
+                        charData.value = saveResponse.data;
+                    } else {
+                        throw new Error("Could not fetch actor from Foundry");
+                    }
+                }
+            } else {
+                // For regular polling, just get from DB
+                const response = await window.axios.post("/actorsheet", payload);
+
+                // Only update if data has actually changed
+                if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
+                    if (charData.value.requestId !== response.data.requestId) {
+                        charData.value.requestId = response.data.requestId;
+                    }
+                    return;
+                }
+
+                charData.value = response.data;
             }
 
-            if (!actorUuid) return;
-
-            const response = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
-
-            // Only update if data has actually changed
-            if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
-                if (charData.value.requestId !== response.data.requestId) {
-                    charData.value.requestId = response.data.requestId;
-                }
-                return;
-            }
-
-            charData.value = response.data;
             if (isInitial) loading.value = false;
-
             setTimeout(refreshIcons, 50);
         } catch (err) {
             console.error("Fetch Error:", err);
             if (isInitial) {
-                if (err.response) {
+                if (err.response && err.response.data.error) {
                     error.value = err.response.data.error;
+                } else {
+                    error.value = err.message || "An error occurred while fetching character data.";
                 }
                 loading.value = false;
             }

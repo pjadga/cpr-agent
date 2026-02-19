@@ -1,6 +1,7 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref } from 'vue';
 import { debounce, isDeepEqual } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
+import { useEchoListener } from '../utils/listener';
 /**
  * Composable for fetching and managing die rolls and modifiers
  */
@@ -42,19 +43,7 @@ export function useRollModifiers(controlState) {
         }
     };
 
-    onMounted(() => {
-        if (window.Echo) {
-            window.Echo.private('cpr-agent')
-                .listen('.FoundryResponse', handleFoundryResponse);
-        }
-    });
-
-    onUnmounted(() => {
-        if (window.Echo) {
-            window.Echo.private('cpr-agent')
-                .stopListening('.FoundryResponse', handleFoundryResponse);
-        }
-    });
+    useEchoListener(handleFoundryResponse);
 
     const debouncedFetchRollModifiers = debounce(fetchRollModifiers, 250);
 

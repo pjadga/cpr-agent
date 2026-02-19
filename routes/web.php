@@ -86,6 +86,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
     Route::post("/updatestat", [UpdateStat::class, "updateStat"]);
     Route::post("/actorsheet", [ActorSheet::class, "getCleanData"]);
+    Route::post("/getactor", [GetActor::class, "getActor"]);
     Route::post("/getactors", [GetActors::class, "getActors"]);
     Route::post("/movetoken", [MoveToken::class, "moveToken"]);
     Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);

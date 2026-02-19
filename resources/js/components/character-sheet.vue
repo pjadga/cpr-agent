@@ -319,7 +319,7 @@
  * Handles character data fetching, stat updates, skills, gear, and combat controls.
  */
 
-import { computed, ref, triggerRef, watch, onMounted, onUnmounted } from "vue";
+import { computed, ref, triggerRef, watch } from "vue";
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
@@ -338,6 +338,7 @@ import { useCombat } from '../composables/useCombat';
 import { useRollModifiers } from '../composables/useRollModifiers';
 import { useResources } from '../composables/useResources';
 import { useNetrunner } from '../composables/useNetrunner';
+import { useEchoListener } from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
 import { vIcon } from '../directives/icon';
@@ -461,6 +462,15 @@ export default {
             console.log('CharacterSheet: Received FoundryResponse', payload);
 
             if (payload.type === 'ROLL_RESULT') {
+                const isDamage = /\(Damage\)/i.test(payload.label || '');
+                let details = '';
+                if ((payload.label || '').includes('Attack')) {
+                    if (typeof payload.dv !== 'undefined') {
+                        const dvText = typeof payload.dv === 'number' ? payload.dv : String(payload.dv);
+                        const outcome = payload.outcome || '';
+                        details = `DV ${dvText} — ${outcome}`.trim();
+                    }
+                }
                 window.emitter.emit('show-roll-result', {
                     title: payload.label || payload.rawRoll?.rollTitle || 'Roll Result',
                     result: payload.total,
@@ -468,7 +478,9 @@ export default {
                     flavor: payload.rawRoll?.statName || payload.rawRoll?.rollTitle || '',
                     isCriticalSuccess: payload.isCriticalSuccess,
                     isCriticalFailure: payload.isCriticalFailure,
-                    raw: payload.rawRoll
+                    raw: payload.rawRoll,
+                    details,
+                    type: isDamage ? 'damage' : 'default'
                 });
                 debouncedFetchCharacterData();
             }
@@ -479,19 +491,8 @@ export default {
             }
         };
 
-        onMounted(() => {
-            if (window.Echo) {
-                window.Echo.private('cpr-agent')
-                    .listen('.FoundryResponse', handleFoundryResponse);
-            }
-        });
+        useEchoListener(handleFoundryResponse);
 
-        onUnmounted(() => {
-            if (window.Echo) {
-                window.Echo.private('cpr-agent')
-                    .stopListening('.FoundryResponse', handleFoundryResponse);
-            }
-        });
 
         watch(() => charData.value?.data.flags?.['cyberpunk-red-core']?.fightState, (newVal) => {
             if (newVal === 'Netspace') {

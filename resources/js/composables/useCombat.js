@@ -1,6 +1,7 @@
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onUnmounted } from 'vue';
 import { debounce } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
+import { useEchoListener } from '../utils/listener';
 /**
  * Composable for combat-related logic (movement, target selection, rolls)
  */
@@ -78,12 +79,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         }
     };
 
-    onMounted(() => {
-        if (window.Echo) {
-            window.Echo.private('cpr-agent')
-                .listen('.FoundryResponse', handleFoundryResponse);
-        }
-    });
+    useEchoListener(handleFoundryResponse);
 
     const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
@@ -202,10 +198,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
     onUnmounted(() => {
         if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
-        if (window.Echo) {
-            window.Echo.private('cpr-agent')
-                .stopListening('.FoundryResponse', handleFoundryResponse);
-        }
     });
 
     return {
