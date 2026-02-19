@@ -186,7 +186,7 @@ class CyberpunkBridge {
             return;
         }
 
-        console.log(`🔌 Connecting to Cyberpunk Agent Relay at ${hostUrl.hostname}:${reverbPort}...`);
+        console.log(`Connecting to Cyberpunk Agent Relay at ${hostUrl.hostname}:${reverbPort}...`);
 
         this.echo = new Echo({
             broadcaster: 'reverb',
@@ -213,13 +213,13 @@ class CyberpunkBridge {
         // Monitor Connection State
         this.echo.connector.pusher.connection.bind('connected', () => {
             this.isConnected = true;
-            ui.notifications.info("Cyberpunk Bridge: Online 🟢");
+            ui.notifications.info("Cyberpunk Bridge: Online");
             if(debug) console.log("Cyberpunk Bridge: Connection Established");
         });
 
         this.echo.connector.pusher.connection.bind('disconnected', () => {
             this.isConnected = false;
-            if(debug) console.warn("Cyberpunk Bridge: Disconnected 🔴");
+            if(debug) console.warn("Cyberpunk Bridge: Disconnected");
         });
 
         this.listen();
@@ -235,7 +235,7 @@ class CyberpunkBridge {
         // You might want to use the API Key to determine the channel name in a real app
         this.echo.private(`cpr-agent`)
             .listen('.GameUpdate', (e) => {
-                console.log("⚡ Incoming Data:", e);
+                console.log("Incoming Data:", e);
                 this.handleIncomingData(e);
             });
     }
@@ -279,7 +279,7 @@ class CyberpunkBridge {
     async handleIncomingData(payload) {
         // 1. Unwrap the data (Laravel sometimes wraps it in a 'payload' property)
         const data = payload.payload || payload;
-        console.log("📥 Received Order:", data);
+        console.log("Received Order:", data);
 
         const type = data.type;
         const actorId = data.actorId;
@@ -671,7 +671,6 @@ class CyberpunkBridge {
             }
 
             case 'DICE_ROLL': {
-                console.log("[Bridge] 🎲 Generic Dice Roll:", data.formula);
                 if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
                 const roll = new Roll(data.formula);
                 await roll.evaluate();
@@ -679,8 +678,7 @@ class CyberpunkBridge {
                     speaker: ChatMessage.getSpeaker({actor: game.actors.get(actorId)}),
                     flavor: data.flavor
                 });
-
-                const responsePayload = {
+                await this.sendResponse({
                     type: 'ROLL_RESULT',
                     requestId,
                     actorId,
@@ -695,9 +693,7 @@ class CyberpunkBridge {
                         resultTotal: roll.total
                     },
                     success: true
-                };
-                console.log("[Bridge] 📤 Sending Roll Result:", responsePayload);
-                await this.sendResponse(responsePayload);
+                });
                 break;
             }
 
@@ -752,7 +748,22 @@ class CyberpunkBridge {
             case 'UPDATE_STAT': {
                 const actor = game.actors.get(actorId);
                 if (actor) {
-                    await actor.update({[`system.${data.label}`]: data.value});
+                    const path = `system.${data.label}`;
+                    let newValue;
+                    if (data.operation === 'inc') {
+                        // Resolve current value from nested path and add delta
+                        const parts = path.split('.');
+                        let cur = actor;
+                        for (let i = 0; i < parts.length; i++) {
+                            cur = (i === 0 ? cur[parts[i]] : cur?.[parts[i]]);
+                        }
+                        const currentVal = Number(cur) || 0;
+                        const delta = Number(data.delta) || 0;
+                        newValue = currentVal + delta;
+                    } else {
+                        newValue = Number(data.value) || 0;
+                    }
+                    await actor.update({ [path]: newValue });
                     await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
                 }
                 break;
@@ -802,9 +813,68 @@ class CyberpunkBridge {
                         }, { showDialog: false });
                     };
 
+                    // Compute DV against current target if available
+                    let computedDV = null;
+                    if (targetToken) {
+                        const shooter = actor.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
+                        if (shooter) {
+                            const RANGE_DV_TABLE = {
+                                'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
+                                'SMG':              [15, 13, 15, 20, 25, 25, 30, 99],
+                                'Shotgun (Slug)':   [13, 15, 20, 25, 30, 35, 99, 99],
+                                'Assault Rifle':    [17, 16, 15, 13, 15, 20, 25, 30],
+                                'Sniper Rifle':     [30, 25, 25, 20, 15, 16, 17, 20],
+                                'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
+                                'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
+                                'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
+                                'Martial Arts': ['VS'],
+                                'Unarmed': ['VS'],
+                                'Light Melee Weapon' : ['VS'],
+                                'Medium Melee Weapon' : ['VS'],
+                                'Heavy Melee Weapon' : ['VS'],
+                                'Very Heavy Melee Weapon' : ['VS']
+                            };
+                            const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
+                            const distX = targetToken.center.x - shooter.center.x;
+                            const distY = targetToken.center.y - shooter.center.y;
+                            const distancePx = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2));
+                            const distanceM = Math.ceil(distancePx / (canvas.grid?.size || 128));
+
+                            const weaponData = actor.items.get(weaponId);
+                            const typeMap = {
+                                'heavyPistol': 'Pistol',
+                                'assaultRifle': 'Assault Rifle',
+                                'smg': 'SMG',
+                                'shotgun': 'Shotgun (Slug)',
+                                'sniperRifle': 'Sniper Rifle',
+                                'unarmed' : 'Unarmed',
+                                'martialArts' : 'Martial Arts',
+                                'grenade' : 'Grenade Launcher',
+                                'thrownWeapon': 'Grenade Launcher',
+                                'lightMelee' : 'Light Melee Weapon',
+                                'mediumMelee' : 'Medium Melee Weapon',
+                                'heavyMelee' : 'Heavy Melee Weapon',
+                                'vHeavyMelee' : 'Very Heavy Melee Weapon'
+                            };
+                            const category = (typeMap[weaponData?.system?.weaponType] || typeMap[weaponData?.system?.variety]) || 'Pistol';
+                            const bracketIndex = DISTANCE_BRACKETS.findIndex(limit => distanceM <= limit);
+                            let targetDV = bracketIndex !== -1 ? RANGE_DV_TABLE[category][bracketIndex] : 99;
+                            if (Array.isArray(RANGE_DV_TABLE[category]) && typeof RANGE_DV_TABLE[category][0] === 'string') {
+                                targetDV = RANGE_DV_TABLE[category][Math.min(bracketIndex !== -1 ? bracketIndex : 0, RANGE_DV_TABLE[category].length - 1)];
+                            }
+                            computedDV = (targetDV === 99 ? 'Out of Range' : targetDV);
+                        }
+                    }
+
                     const result = await this.rollAndCapture(actorId, trigger);
 
                     if (result.success) {
+                        let outcome = null;
+                        if (typeof computedDV === 'number') {
+                            outcome = result.total >= computedDV ? 'Hit' : 'Miss';
+                        } else if (computedDV === 'Out of Range') {
+                            outcome = 'Miss';
+                        }
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             requestId,
@@ -814,6 +884,8 @@ class CyberpunkBridge {
                             isCriticalFailure: result.isCriticalFailure,
                             label: fireMode + ' Attack',
                             rawRoll: result.rawRoll,
+                            dv: computedDV,
+                            outcome,
                             success: true
                         });
                     }

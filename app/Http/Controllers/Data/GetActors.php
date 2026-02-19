@@ -18,7 +18,7 @@ class GetActors extends FormRequest
     public function getActors(Request $request)
     {
         $user = auth()->user();
-        $actorId = $user->api_key ?? null;
+        $actorId = $user->default_actor_id ?? null;
         if (is_null($actorId)) {
             return response()->json([
                 'actors' =>  [],
@@ -59,6 +59,7 @@ class GetActors extends FormRequest
 
         return response()->json([
             'actors' => $foundryData['actors'] ?? [],
+            'uuid' => $actorId,
             'isOffline' => false
         ], 200);
     }

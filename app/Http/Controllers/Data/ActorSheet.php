@@ -16,12 +16,16 @@ class ActorSheet extends FormRequest
      */
     public function getCleanData(Request $request)
     {
-        // Validate incoming request
-        $validatedData = $request->validate([
-            'actorUuid' => 'required|string|max:255'
-        ]);
-
         $user = auth()->user();
+
+        // If character JSON data is provided in the request, save it
+        if ($request->has('actorData')) {
+            $user->update([
+                'character_data' => $request->get('actorData')
+            ]);
+            $user->refresh();
+        }
+
         $characterData = $user->character_data;
         $isOffline = true; // Defaulting to true as we are not fetching live data here anymore
 

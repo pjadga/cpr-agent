@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Values;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,32 +17,55 @@ class UpdateStat extends FormRequest
         // Validate incoming request
         $validatedData = $request->validate([
             'label' => 'required|string|max:255',
-            'value' => 'required|int|max:255'
+            // When operation is 'set', expect 'value'; when 'inc', expect 'delta'
+            'operation' => 'nullable|in:set,inc',
+            'value' => 'nullable|int|max:255',
+            'delta' => 'nullable|int|max:255',
         ]);
 
-        //Need to get the actors either ID or Name -
-        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
-        $label = strtolower($validatedData['label']);
-        $value = $validatedData['value'];
-        $client = $this->getFoundryClient();
+        $operation = $validatedData['operation'] ?? 'set';
 
-        if ($label === "hit points" || $label === "humanity") {
-            $label = "derivedStats" . ($label === "hit points" ? ".hp" : ".humanity") . ".value";
+        if ($operation === 'set' && !isset($validatedData['value'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Value is required for set operation',
+            ], 422);
+        }
+        if ($operation === 'inc' && !isset($validatedData['delta'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Delta is required for inc operation',
+            ], 422);
+        }
+
+        // Map label to system path
+        $label = strtolower($validatedData['label']);
+        if ($label === 'hit points' || $label === 'hp') {
+            $label = 'derivedStats.hp.value';
+        } elseif ($label === 'humanity') {
+            $label = 'derivedStats.humanity.value';
         } else {
-            $label = "stats." . $label . ".value";
+            // luck, emp, and other stats
+            $label = 'stats.' . $label . '.value';
         }
 
         $user = auth()->user();
-        $clientId = $user->client_id ?? "foundry-xECODN3n8rO4E5Cj";
-        $actorId = $user->default_actor_id ?? "Actor.BehNGodGRTaG7ClI";
-        $actorId = str_replace("Actor.", "", $actorId);
+        $actorId = $user->getActorId();
 
-        CyberpunkAgentChannel::dispatch([
+        $payload = [
             'type' => 'UPDATE_STAT',
             'actorId' => $actorId,
             'label' => $label,
-            'value' => $value,
-        ]);
+            'operation' => $operation,
+        ];
+
+        if ($operation === 'set') {
+            $payload['value'] = (int)$validatedData['value'];
+        } else {
+            $payload['delta'] = (int)$validatedData['delta'];
+        }
+
+        CyberpunkAgentChannel::dispatch($payload);
 
         return response()->json([
             'success' => true,
