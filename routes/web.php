@@ -5,6 +5,7 @@ use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Data\GetActor;
 use App\Http\Controllers\Data\ItemEquip;
 use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Rolls\AttackRoll;

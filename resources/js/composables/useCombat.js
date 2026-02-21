@@ -89,16 +89,9 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      * Move character token
      */
     const moveToken = (direction) => {
-        window.axios.post("/movetoken", { direction }).then(() => {
-            debouncedFetchCharacterData();
-        });
-        if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
-        moveRefreshTimer = setTimeout(() => {
-            getVisibleTokens();
-            if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
-                debouncedFetchDV();
-            }
-        }, 4000);
+        const weaponId = controlState.value.selectedWeapon?._id;
+        window.axios.post("/movetoken", { direction, weaponId });
+        // Handled immediately by Foundry pushing SHEET_DELTA/VISIBLE_TOKENS_DATA
     };
 
     /**
@@ -170,22 +163,10 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const reloadWeapon = (refreshAll) => {
         if (controlState.value.selectedWeapon) {
             const payload = {
-                selectedWeapon: controlState.value.selectedWeapon
+                weaponId: controlState.value.selectedWeapon._id
             };
-            window.axios.post("/reloadweapon", payload).then(() => {
-                // Refresh character data and combat data after 2 seconds
-                setTimeout(() => {
-                    if (refreshAll) {
-                        refreshAll();
-                    } else {
-                        fetchCharacterData();
-                        getVisibleTokens();
-                        if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
-                            fetchDVForSelectedWeapon();
-                        }
-                    }
-                }, 2000);
-            });
+            window.axios.post("/reloadweapon", payload);
+            // Handled by SHEET_DELTA from Foundry
         }
     };
 

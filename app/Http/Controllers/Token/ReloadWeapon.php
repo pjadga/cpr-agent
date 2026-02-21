@@ -17,11 +17,11 @@ class ReloadWeapon extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'selectedWeapon' => 'required|array',
+            'weaponId' => 'required|string',
             'ammoId' => 'nullable|string'
         ]);
 
-        $weaponId = $validatedData["selectedWeapon"]["_id"];
+        $weaponId = $validatedData["weaponId"];
         $ammoId = $validatedData["ammoId"] ?? null;
         $client = $this->getFoundryClient();
         $user = auth()->user();

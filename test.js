@@ -238,6 +238,86 @@ class CyberpunkBridge {
                 console.log("Incoming Data:", e);
                 this.handleIncomingData(e);
             });
+
+        // REGISTER GLOBAL HOOKS to detect manual changes in Foundry
+        this.registerGlobalHooks();
+    }
+
+    registerGlobalHooks() {
+        // Debounce map for batching updates if needed, though SHEET_DELTA is usually fine per-event
+        const syncUpdate = async (actor, delta) => {
+            if (!this.isConnected) return;
+            // We only sync if the actor is a character or mook and has owners
+            if (!actor || !['character', 'mook'].includes(actor.type)) return;
+
+            console.log(`%c[Bridge] 🔄 Syncing change for ${actor.name}`, "color: #ffaa00;", delta);
+            await this.sendResponse({
+                type: 'SHEET_DELTA',
+                actorId: actor.id,
+                delta: delta,
+                success: true
+            });
+        };
+
+        // 1. Hook into Actor updates (stats, derived stats, etc.)
+        this.hookIds.updateActor = Hooks.on('updateActor', (actor, changes, options, userId) => {
+            // Ignore updates triggered by the Agent itself to avoid loops (though Agent updates usually go through API)
+            // But we should check if 'changes.system' exists
+            if (changes.system) {
+                // Flatten the changes.system to dot notation for SHEET_DELTA
+                const delta = {};
+                const flatten = (obj, prefix = 'system.') => {
+                    for (let key in obj) {
+                        const val = obj[key];
+                        if (val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof foundry.utils.Color)) {
+                            flatten(val, `${prefix}${key}.`);
+                        } else {
+                            delta[`${prefix}${key}`] = val;
+                        }
+                    }
+                };
+                flatten(changes.system);
+                syncUpdate(actor, delta);
+            }
+        });
+
+        // 2. Hook into Item updates (inventory, weapons, etc.)
+        this.hookIds.updateItem = Hooks.on('updateItem', (item, changes, options, userId) => {
+            const actor = item.parent;
+            if (actor instanceof Actor) {
+                // If it's an item on an actor, we send the whole item delta or specific system change
+                const delta = {
+                    [`items.${item.id}`]: item.toObject() // Simplest is to send the whole item object for the Vue cleaner to handle
+                };
+                syncUpdate(actor, delta);
+            }
+        });
+
+        this.hookIds.createItem = Hooks.on('createItem', (item, options, userId) => {
+            const actor = item.parent;
+            if (actor instanceof Actor) {
+                const delta = {
+                    [`items.${item.id}`]: item.toObject()
+                };
+                syncUpdate(actor, delta);
+            }
+        });
+
+        this.hookIds.deleteItem = Hooks.on('deleteItem', (item, options, userId) => {
+            const actor = item.parent;
+            if (actor instanceof Actor) {
+                // For deletion, we might need a special way to tell the Agent to remove it.
+                // Our applyDelta currently just sets values.
+                // Let's send a full items refresh or a null value if our applyDelta handles it.
+                // Given ActorSheet.php processItems, it might be better to trigger a partial refresh of 'items'
+                // But for now, let's try sending the items array again if it's not too big, or a signal.
+                // Actually, let's just send the updated items list from the actor.
+                const delta = {
+                    'items': actor.items.map(i => i.toObject())
+                };
+                syncUpdate(actor, delta);
+            }
+        });
     }
 
     /**
@@ -304,8 +384,9 @@ class CyberpunkBridge {
                 if (actor) {
                     const item = actor.items.get(data.itemId);
                     if (item) {
+                        const path = `items.${data.itemId}.system.equipped`;
                         await item.update({'system.equipped': data.state});
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, itemId: data.itemId, success: true, requestId });
+                        await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { [path]: data.state }, success: true, requestId });
                     }
                 }
                 break;
@@ -332,12 +413,23 @@ class CyberpunkBridge {
                 if (currentList.includes(data.programId)) return;
 
                 const newList = [...currentList, data.programId];
+                const newUsedSlots = currentSlots + progSize;
 
                 await deck.update({
                     'system.installedItems.list': newList,
-                    'system.installedItems.usedSlots': currentSlots + progSize
+                    'system.installedItems.usedSlots': newUsedSlots
                 });
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
+
+                await this.sendResponse({
+                    type: 'SHEET_DELTA',
+                    actorId,
+                    delta: {
+                        [`items.${data.cyberdeckId}.system.installedItems.list`]: newList,
+                        [`items.${data.cyberdeckId}.system.installedItems.usedSlots`]: newUsedSlots
+                    },
+                    success: true,
+                    requestId
+                });
                 break;
             }
 
@@ -362,10 +454,17 @@ class CyberpunkBridge {
                     'system.installedItems.usedSlots': newSlots
                 });
 
+                const delta = {
+                    [`items.${data.cyberdeckId}.system.installedItems.list`]: newList,
+                    [`items.${data.cyberdeckId}.system.installedItems.usedSlots`]: newSlots
+                };
+
                 if (program && program.system.isRezzed) {
                     await program.update({ 'system.isRezzed': false });
+                    delta[`items.${data.programId}.system.isRezzed`] = false;
                 }
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
+
+                await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta, success: true, requestId });
                 break;
             }
 
@@ -375,7 +474,13 @@ class CyberpunkBridge {
                     const program = actor.items.get(data.programId);
                     if (program) {
                         await program.update({'system.isRezzed': data.targetState});
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, programId: data.programId, success: true, requestId });
+                        await this.sendResponse({
+                            type: 'SHEET_DELTA',
+                            actorId,
+                            delta: { [`items.${data.programId}.system.isRezzed`]: data.targetState },
+                            success: true,
+                            requestId
+                        });
                     }
                 }
                 break;
@@ -435,6 +540,9 @@ class CyberpunkBridge {
                     const result = await this.rollAndCapture(actorId, trigger);
 
                     if (result.success) {
+                        // After roll, sync the updated death saves counter
+                        const deathSaves = actor.system.derivedStats.deathsave || {};
+
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             requestId: requestId,
@@ -444,6 +552,15 @@ class CyberpunkBridge {
                             isCriticalFailure: result.isCriticalFailure,
                             label: 'Death Save',
                             rawRoll: result.rawRoll,
+                            success: true
+                        });
+
+                        // Also send a delta for the death save counter
+                        await this.sendResponse({
+                            type: 'SHEET_DELTA',
+                            actorId,
+                            delta: { 'system.derivedStats.deathsave': deathSaves },
+                            tab: 'stats',
                             success: true
                         });
                     }
@@ -706,7 +823,21 @@ class CyberpunkBridge {
                     else if (data.direction === "left") newPos.x = token.document.x - canvas.grid.size;
                     else if (data.direction === "right") newPos.x = token.document.x + canvas.grid.size;
                     await token.document.update(newPos);
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: true });
+
+                    // After movement, immediately push new proximity and DV info
+                    // This avoids waiting for Agent-side timers
+                    setTimeout(async () => {
+                        // Re-trigger visible tokens and DV logic (mimics the cases below)
+                        const dummyRequest = { tokenId, requestId: (requestId || 'move-refresh') };
+                        await this.handleIncomingData({ type: 'LIST_VISIBLE_TOKENS', ...dummyRequest });
+
+                        const target = Array.from(game.user.targets)[0];
+                        if (target && data.weaponId) {
+                            await this.handleIncomingData({ type: 'GET_DV_INFO', ...dummyRequest, weaponId: data.weaponId });
+                        }
+                    }, 200);
+
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: true, requestId });
                 }
                 break;
             }
@@ -716,6 +847,23 @@ class CyberpunkBridge {
                 if (actor) {
                     const weapon = actor.items.get(data.weaponId);
                     const selectedAmmo = data.ammoId ? actor.items.get(data.ammoId) : null;
+
+                    const performReload = async () => {
+                        await weapon.reload();
+
+                        // Send delta for weapon and potentially ammo
+                        const delta = {
+                            [`items.${data.weaponId}.system.magazine`]: weapon.system.magazine
+                        };
+
+                        // If we have specific ammo being tracked, update it too
+                        if (selectedAmmo) {
+                            delta[`items.${selectedAmmo.id}.system.amount`] = selectedAmmo.system.amount;
+                        }
+
+                        await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta, success: true, requestId });
+                    };
+
                     if (selectedAmmo) {
                         let currentAmmo = weapon.getInstalledItems('ammo');
                         if (currentAmmo && currentAmmo.length > 0) {
@@ -725,12 +873,10 @@ class CyberpunkBridge {
                             weapon.installItems([selectedAmmo]);
                         }, 500);
                         setTimeout(async () => {
-                            await weapon.reload();
-                            await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                            await performReload();
                         }, 1500);
                     } else {
-                        await weapon.reload();
-                        await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                        await performReload();
                     }
                 }
                 break;
@@ -764,7 +910,8 @@ class CyberpunkBridge {
                         newValue = Number(data.value) || 0;
                     }
                     await actor.update({ [path]: newValue });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true });
+                    // Send a focused sheet delta back to Agent and persist via API
+                    await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { [path]: newValue }, tab: 'stats', success: true });
                 }
                 break;
             }
