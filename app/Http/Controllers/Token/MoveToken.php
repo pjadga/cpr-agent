@@ -17,21 +17,22 @@ class MoveToken extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'direction' => 'required|string|max:255'
+            'direction' => 'required|string|max:255',
+            'weaponId' => 'nullable|string|max:255'
         ]);
 
         //Need to get the actors either ID or Name -
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $direction = $validatedData['direction'];
-        $client = $this->getFoundryClient();
+        $weaponId = $validatedData['weaponId'] ?? null;
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $tokenId = $user->getTokenId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'MOVE_TOKEN',
             'tokenId' => $tokenId,
             'direction' => $direction,
+            'weaponId' => $weaponId,
         ]);
 
         return response()->json([

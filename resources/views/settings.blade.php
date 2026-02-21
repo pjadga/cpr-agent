@@ -305,7 +305,10 @@
         const syncIds = () => {
             const val = actorSelection.value;
             if (val && val.includes('|')) {
-                const [actorId, tokenId] = val.split('|');
+                let [actorId, tokenId] = val.split('|');
+                if (actorId.startsWith('Actor.')) {
+                    actorId = actorId.replace('Actor.', '');
+                }
                 document.getElementById('default_actor_id').value = actorId;
                 document.getElementById('default_token_id').value = tokenId;
             }

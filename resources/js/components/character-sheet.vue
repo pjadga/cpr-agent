@@ -127,6 +127,9 @@
                             }}</span>
                     </div>
                     <div class="shrink-0 flex items-center gap-2">
+                        <button @click="() => refreshSheet({ force: true })" class="p-2 border border-cpr-border text-cpr-text-muted hover:text-white hover:border-cpr-yellow transition-colors" title="Refresh Sheet">
+                            <i v-icon data-lucide="refresh-ccw" class="w-5 h-5"></i>
+                        </button>
                         <button @click="rollInitiative" class="group relative flex items-center gap-2 px-3 py-2 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]" title="Initiative Roll">
                             <i v-icon data-lucide="swords" class="w-5 h-5 animate-pulse group-hover:animate-none"></i>
                             <span class="text-xs font-black uppercase tracking-widest hidden sm:inline">Initiative</span>
@@ -356,7 +359,9 @@ export default {
             error: dataError,
             getImageUrl,
             fetchCharacterData,
-            refreshIcons
+            refreshIcons,
+            applyDelta,
+            refreshSheet
         } = useCharacterData();
 
         const activeTab = ref('stats');
@@ -461,7 +466,15 @@ export default {
             const payload = e.payload || e;
             console.log('CharacterSheet: Received FoundryResponse', payload);
 
-            if (payload.type === 'ROLL_RESULT') {
+            if (payload.type === 'SHEET_DELTA' && payload.delta) {
+                // Apply focused delta from Foundry/Backend without full refresh
+                try {
+                    applyDelta(payload.delta, { tab: payload.tab });
+                } catch (e) {
+                    console.warn('Delta apply failed, fallback to refresh', e);
+                    debouncedFetchCharacterData();
+                }
+            } else if (payload.type === 'ROLL_RESULT') {
                 const isDamage = /\(Damage\)/i.test(payload.label || '');
                 let details = '';
                 if ((payload.label || '').includes('Attack')) {
@@ -806,12 +819,23 @@ export default {
             }
         }, { deep: true });
 
-        watch(() => charData.value, (newData) => {
+        watch(() => charData.value, (newData, oldData) => {
             if (newData && controlState.value.selectedWeapon) {
                 const updatedWeapon = newData.data.items.find(i => i._id === controlState.value.selectedWeapon._id);
                 if (updatedWeapon) {
                     controlState.value.selectedWeapon = updatedWeapon;
                     checkReloadRequired();
+                }
+            }
+            // Refresh roll modifiers if HP or critical injuries change
+            if (newData && oldData) {
+                const oldHp = oldData.data.system.derivedStats?.hp?.value;
+                const newHp = newData.data.system.derivedStats?.hp?.value;
+                const oldInjuries = (oldData.data.items || []).filter(i => i.type === 'criticalInjury').length;
+                const newInjuries = (newData.data.items || []).filter(i => i.type === 'criticalInjury').length;
+
+                if (oldHp !== newHp || oldInjuries !== newInjuries) {
+                    fetchRollModifiers();
                 }
             }
         }, { deep: true });
@@ -851,7 +875,7 @@ export default {
 
             // Actions
             sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, rollInitiative,
-            sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings,
+            sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings, refreshSheet,
 
             // Combat
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,

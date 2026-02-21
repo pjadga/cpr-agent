@@ -18,7 +18,7 @@ class EnsureAppIsConfigured
         $user = $request->user();
         $config = $user?->config;
 
-        if (!$user?->character_data && (!$config || !$config->api_key || (!$config->base_url && !config('services.foundry.base_url'))) && !$request->routeIs('config.*') && !$request->routeIs('settings*')) {
+        if ((!$config || !$config->api_key || (!$config->base_url && !config('services.foundry.base_url'))) && !$request->routeIs('config.*') && !$request->routeIs('settings*')) {
             return redirect()->route('config.index');
         }
 

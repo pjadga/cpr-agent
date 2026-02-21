@@ -17,15 +17,13 @@ class GetActor extends FormRequest
 
     public function getActor(Request $request)
     {
-        $user = auth()->user();
-
         // 1. Generate a unique ID for this specific transaction
         $requestId = (string) Str::uuid();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
-            'actorId' => $request->get('actorId'),
+            'actorId' => str_replace("Actor.", "", $request->get('actorId'))
         ]);
 
         // 2. Wait for the response (The Polling Loop)

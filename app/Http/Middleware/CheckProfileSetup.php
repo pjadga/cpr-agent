@@ -16,9 +16,9 @@ class CheckProfileSetup
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && !Auth::user()->api_key && !Auth::user()->character_data && !$request->routeIs('settings*') && !$request->routeIs('profile-setup*')) {
-            return redirect()->route('settings');
-        }
+//        if (Auth::check() && !Auth::user()->api_key && !Auth::user()->foundry_url && !$request->routeIs('settings*') && !$request->routeIs('profile-setup*')) {
+//            return redirect()->route('settings');
+//        }
 
         return $next($request);
     }

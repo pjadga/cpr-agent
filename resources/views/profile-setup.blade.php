@@ -44,7 +44,10 @@
 
             <script @cspNonce>
                 document.getElementById('actor_selection').addEventListener('change', function() {
-                    const [actorId, tokenId] = this.value.split('|');
+                    let [actorId, tokenId] = this.value.split('|');
+                    if (actorId.startsWith('Actor.')) {
+                        actorId = actorId.replace('Actor.', '');
+                    }
                     document.getElementById('default_actor_id').value = actorId;
                     document.getElementById('default_token_id').value = tokenId;
                 });

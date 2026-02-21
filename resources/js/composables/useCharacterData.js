@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted, shallowRef, nextTick } from 'vue';
+import { ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef } from 'vue';
 import { isDeepEqual } from '../utils/helpers';
 
 // Shared state to prevent multiple fetches/intervals
@@ -67,6 +67,84 @@ export function useCharacterData() {
     };
 
     /**
+     * Apply a focused delta update to the local cached sheet (no network).
+     * Incoming paths are assumed to be Foundry-like (e.g., 'system.derivedStats.hp.value' or 'items')
+     * We map them under our Vue mirror which nests under 'data'.
+     */
+    const applyDelta = (delta = {}, { tab } = {}) => {
+        if (!charData.value || !delta) return;
+
+        const deepSet = (obj, path, value) => {
+            const keys = path.split('.');
+            let target = obj;
+            for (let i = 0; i < keys.length - 1; i++) {
+                const k = keys[i];
+                if (typeof target[k] !== 'object' || target[k] === null) {
+                    target[k] = {};
+                }
+                target = target[k];
+            }
+            target[keys[keys.length - 1]] = value;
+        };
+
+        Object.entries(delta).forEach(([path, value]) => {
+            let mapped = path.startsWith('data.') ? path : (path.startsWith('system') || path.startsWith('items') ? `data.${path}` : path);
+
+            // Special handling for 'items' to ensure it remains an array
+            if (path === 'items') {
+                const valueArray = Array.isArray(value) ? value : Object.values(value || {});
+                deepSet(charData.value, 'data.items', valueArray);
+                return;
+            }
+
+            // If updating a specific item by index (e.g., items.0.name)
+            if (path.startsWith('items.')) {
+                deepSet(charData.value, mapped, value);
+                // After setting, ensure data.items is still an array (in case deepSet made it an object)
+                if (charData.value.data.items && !Array.isArray(charData.value.data.items)) {
+                    charData.value.data.items = Object.values(charData.value.data.items);
+                }
+                return;
+            }
+
+            deepSet(charData.value, mapped, value);
+        });
+
+        triggerRef(charData);
+        setTimeout(refreshIcons, 50);
+    };
+
+    /**
+     * Unified refresh orchestrator. If 'paths' provided, does a targeted fetch and merge.
+     * If 'force' is true or no delta can be resolved, falls back to full fetch.
+     */
+    const refreshSheet = async ({ paths = null, tab = null, force = false } = {}) => {
+        if (force || !paths) {
+            await fetchCharacterData();
+            return;
+        }
+        // Minimal targeted refresh: ask server for current mirror and only merge requested paths
+        try {
+            const response = await window.axios.post('/actorsheet', { actorUuid });
+            const latest = response.data;
+            if (!latest || !latest.data) return;
+            const extract = (obj, path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
+            const deltas = {};
+            paths.forEach((p) => {
+                const foundryRooted = p.startsWith('system') || p.startsWith('items') ? `data.${p}` : p;
+                const newVal = extract(latest, foundryRooted);
+                if (typeof newVal !== 'undefined') {
+                    deltas[p] = newVal; // keep incoming key form (Foundry-like)
+                }
+            });
+            applyDelta(deltas, { tab });
+        } catch (e) {
+            console.error('refreshSheet targeted fetch failed, falling back to full fetch', e);
+            await fetchCharacterData();
+        }
+    };
+
+    /**
      * Fetch character data from the server
      */
     const fetchCharacterData = async (isInitial = false) => {
@@ -80,6 +158,9 @@ export function useCharacterData() {
                     const getActors = await window.axios.post("/getactors");
                     if (getActors.data.uuid) {
                         actorUuid = getActors.data.uuid;
+                        if (actorUuid.startsWith('Actor.')) {
+                            actorUuid = actorUuid.replace('Actor.', '');
+                        }
                         localStorage.setItem('cpr_actor_uuid', actorUuid);
                     }
                 }
@@ -102,6 +183,8 @@ export function useCharacterData() {
                     console.log("No saved character data, fetching from Foundry...");
                     const getActorResponse = await window.axios.post("/getactor", { "actorId": actorUuid });
 
+                    console.log(getActorResponse)
+
                     if (getActorResponse.data.actor) {
                         // Save the fetched actor data to the DB via /actorsheet
                         const saveResponse = await window.axios.post("/actorsheet", {
@@ -110,6 +193,7 @@ export function useCharacterData() {
                         });
                         charData.value = saveResponse.data;
                     } else {
+
                         throw new Error("Could not fetch actor from Foundry");
                     }
                 }
@@ -167,6 +251,8 @@ export function useCharacterData() {
         error,
         getImageUrl,
         fetchCharacterData,
-        refreshIcons
+        refreshIcons,
+        applyDelta,
+        refreshSheet
     };
 }
