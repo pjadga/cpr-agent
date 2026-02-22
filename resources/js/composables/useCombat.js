@@ -22,9 +22,15 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
         try {
             dvLoading.value = true;
-            await window.axios.post('/getvisibletokens', {
-                selectedWeapon: controlState.value.selectedWeapon
+            const response = await window.axios.post('/getvisibletokens', {
+                selectedWeapon: controlState.value.selectedWeapon,
+                selectedTarget: controlState.value.selectedTarget
             });
+
+            if (response.data && response.data.success && response.data.data) {
+                dvInfo.value = response.data.data.dv;
+                dvLoading.value = false;
+            }
         } catch (e) {
             console.error('Error fetching DV', e);
             dvError.value = 'Unable to fetch DV.';
@@ -112,7 +118,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
 
         window.axios.post("/attackroll", controlState.value).then((response) => {
-            debouncedFetchCharacterData();
+            // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo updates to avoid race conditions with stale DB data
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
                 // Handle list of rolls from getRolls(limit: 5)
@@ -131,7 +137,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const rollDamage = () => {
         window.axios.post("/damageroll", controlState.value).then((response) => {
-            debouncedFetchCharacterData();
+            // debouncedFetchCharacterData();
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
                 // Handle list of rolls from getRolls(limit: 5)

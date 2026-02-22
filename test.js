@@ -534,7 +534,14 @@ class CyberpunkBridge {
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
                             label: `${weapon.name} (Damage)`,
-                            rawRoll: result.rawRoll,
+                            rawRoll: {
+                                total: result.total,
+                                isCriticalSuccess: result.isCriticalSuccess,
+                                isCriticalFailure: result.isCriticalFailure,
+                                label: result.label,
+                                resultTotal: result.rawRoll?.resultTotal,
+                                rollTitle: result.rawRoll?.rollTitle
+                            },
                             success: true
                         });
                     }
@@ -571,7 +578,14 @@ class CyberpunkBridge {
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
                             label: 'Death Save',
-                            rawRoll: result.rawRoll,
+                            rawRoll: {
+                                total: result.total,
+                                isCriticalSuccess: result.isCriticalSuccess,
+                                isCriticalFailure: result.isCriticalFailure,
+                                label: result.label,
+                                resultTotal: result.rawRoll?.resultTotal,
+                                rollTitle: result.rawRoll?.rollTitle
+                            },
                             success: true
                         });
 
@@ -615,7 +629,14 @@ class CyberpunkBridge {
                         total: result.total,
                         isCriticalSuccess: result.isCriticalSuccess,
                         isCriticalFailure: result.isCriticalFailure,
-                        rawRoll: result.rawRoll,
+                        rawRoll: {
+                            total: result.total,
+                            isCriticalSuccess: result.isCriticalSuccess,
+                            isCriticalFailure: result.isCriticalFailure,
+                            label: result.label,
+                            resultTotal: result.rawRoll?.resultTotal,
+                            rollTitle: result.rawRoll?.rollTitle
+                        },
                         success: true
                     });
                 }
@@ -640,7 +661,14 @@ class CyberpunkBridge {
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
                             label: 'Initiative',
-                            rawRoll: result.rawRoll,
+                            rawRoll: {
+                                total: result.total,
+                                isCriticalSuccess: result.isCriticalSuccess,
+                                isCriticalFailure: result.isCriticalFailure,
+                                label: result.label,
+                                resultTotal: result.rawRoll?.resultTotal,
+                                rollTitle: result.rawRoll?.rollTitle
+                            },
                             success: true
                         });
                     }
@@ -678,7 +706,14 @@ class CyberpunkBridge {
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
                             label: data.programName,
-                            rawRoll: result.rawRoll,
+                            rawRoll: {
+                                total: result.total,
+                                isCriticalSuccess: result.isCriticalSuccess,
+                                isCriticalFailure: result.isCriticalFailure,
+                                label: result.label,
+                                resultTotal: result.rawRoll?.resultTotal,
+                                rollTitle: result.rawRoll?.rollTitle
+                            },
                             success: true
                         });
                     }
@@ -725,7 +760,14 @@ class CyberpunkBridge {
                                 isCriticalSuccess: result.isCriticalSuccess,
                                 isCriticalFailure: result.isCriticalFailure,
                                 label: data.label,
-                                rawRoll: result.rawRoll,
+                                rawRoll: {
+                                    total: result.total,
+                                    isCriticalSuccess: result.isCriticalSuccess,
+                                    isCriticalFailure: result.isCriticalFailure,
+                                    label: result.label,
+                                    resultTotal: result.rawRoll?.resultTotal,
+                                    rollTitle: result.rawRoll?.rollTitle
+                                },
                                 success: true
                             });
                         }
@@ -764,7 +806,14 @@ class CyberpunkBridge {
                                 isCriticalSuccess: result.isCriticalSuccess,
                                 isCriticalFailure: result.isCriticalFailure,
                                 label: data.label,
-                                rawRoll: result.rawRoll,
+                                rawRoll: {
+                                    total: result.total,
+                                    isCriticalSuccess: result.isCriticalSuccess,
+                                    isCriticalFailure: result.isCriticalFailure,
+                                    label: result.label,
+                                    resultTotal: result.rawRoll?.resultTotal,
+                                    rollTitle: result.rawRoll?.rollTitle
+                                },
                                 success: true
                             });
                         }
@@ -799,7 +848,14 @@ class CyberpunkBridge {
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
                             label: data.label,
-                            rawRoll: result.rawRoll,
+                            rawRoll: {
+                                total: result.total,
+                                isCriticalSuccess: result.isCriticalSuccess,
+                                isCriticalFailure: result.isCriticalFailure,
+                                label: result.label,
+                                resultTotal: result.rawRoll?.resultTotal,
+                                rollTitle: result.rawRoll?.rollTitle
+                            },
                             success: true
                         });
                     }
@@ -873,13 +929,32 @@ class CyberpunkBridge {
 
                         // Send delta for weapon and potentially ammo
                         const delta = {
-                            [`items.${data.weaponId}.system.magazine`]: weapon.system.magazine
+                            [`items.${data.weaponId}.system.magazine`]: {
+                                value: weapon.system.magazine.value,
+                                max: weapon.system.magazine.max
+                            },
+                            [`items.${data.weaponId}.system.installedItems`]: {
+                                list: [...weapon.system.installedItems.list],
+                                slots: weapon.system.installedItems.slots,
+                                usedSlots: weapon.system.installedItems.usedSlots
+                            }
                         };
 
                         // If we have specific ammo being tracked, update it too
                         if (selectedAmmo) {
                             delta[`items.${selectedAmmo.id}.system.amount`] = selectedAmmo.system.amount;
                         }
+
+                        // Get current ammo list to ensure any uninstalled ammo is also updated
+                        const actorItems = actor.items;
+                        actorItems.filter(i => i.type === 'ammo').forEach(i => {
+                            delta[`items.${i.id}.system.amount`] = i.system.amount;
+                        });
+
+                        // Also update any other ammo that might have been changed/uninstalled
+                        // Since we don't know which one was uninstalled easily without more logic,
+                        // we can either refresh all items or just let standard delta handle it.
+                        // But for now, ensuring weapon.magazine and weapon.installedItems is a good start.
 
                         await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta, success: true, requestId });
                     };
@@ -927,7 +1002,8 @@ class CyberpunkBridge {
                         const delta = Number(data.delta) || 0;
                         newValue = currentVal + delta;
                     } else {
-                        newValue = Number(data.value) || 0;
+                        // Check if value is a string or number
+                        newValue = (typeof data.value === 'string') ? data.value : (Number(data.value) || 0);
                     }
                     await actor.update({ [path]: newValue });
                     // Send a focused sheet delta back to Agent and persist via API
@@ -977,7 +1053,7 @@ class CyberpunkBridge {
                             preventDefault: () => {},
                             currentTarget: dummyBtn,
                             type: 'click'
-                        }, { showDialog: false });
+                        }, { showDialog: true });
                     };
 
                     // Compute DV against current target if available
@@ -1049,9 +1125,16 @@ class CyberpunkBridge {
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
-                            label: fireMode + ' Attack',
-                            rawRoll: result.rawRoll,
-                            dv: computedDV,
+                        label: fireMode + ' Attack',
+                        rawRoll: {
+                            total: result.total,
+                            isCriticalSuccess: result.isCriticalSuccess,
+                            isCriticalFailure: result.isCriticalFailure,
+                            label: result.label,
+                            resultTotal: result.rawRoll?.resultTotal,
+                            rollTitle: result.rawRoll?.rollTitle
+                        },
+                        dv: computedDV,
                             outcome,
                             success: true
                         });
@@ -1152,8 +1235,9 @@ class CyberpunkBridge {
             }
 
             case 'GET_DV_INFO': {
-                const jim = canvas.tokens.get(tokenId);
-                const target = Array.from(game.user.targets)[0];
+                const jim = canvas.tokens.get(data.tokenId);
+                const targetId = data.targetTokenId || Array.from(game.user.targets)[0]?.id;
+                const target = canvas.tokens.get(targetId);
                 const weaponId = data.weaponId;
 
                 if (jim && target) {

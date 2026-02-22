@@ -24,6 +24,7 @@ use App\Http\Controllers\Token\ListVisibleTokens;
 use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
+use App\Http\Controllers\Values\UpdateNotes;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSetupController;
 use App\Http\Controllers\Views\ConfigController;
@@ -86,6 +87,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
     Route::post("/updatestat", [UpdateStat::class, "updateStat"]);
+    Route::post("/updatenotes", [UpdateNotes::class, "updateNotes"]);
     Route::post("/actorsheet", [ActorSheet::class, "getCleanData"]);
     Route::post("/getactor", [GetActor::class, "getActor"]);
     Route::post("/getactors", [GetActors::class, "getActors"]);

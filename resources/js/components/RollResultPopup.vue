@@ -26,12 +26,12 @@
                 </div>
 
                 <!-- Apply Damage Button (for damage rolls) -->
-                <div v-if="type==='damage'" class="flex justify-center mb-2">
-                    <button @click="applyDamage" class="flex items-center gap-2 px-4 py-2 border-2 border-cpr-red text-cpr-red hover:bg-cpr-red hover:text-black transition-all font-black uppercase text-xs tracking-[0.2em]">
-                        <i v-icon data-lucide="droplet" class="w-5 h-5"></i>
-                        Apply Damage
-                    </button>
-                </div>
+<!--                <div v-if="type==='damage'" class="flex justify-center mb-2">-->
+<!--                    <button @click="applyDamage" class="flex items-center gap-2 px-4 py-2 border-2 border-cpr-red text-cpr-red hover:bg-cpr-red hover:text-black transition-all font-black uppercase text-xs tracking-[0.2em]">-->
+<!--                        <i v-icon data-lucide="droplet" class="w-5 h-5"></i>-->
+<!--                        Apply Damage-->
+<!--                    </button>-->
+<!--                </div>-->
 
                 <!-- Dice Breakdown -->
                 <div v-if="diceResults.length" class="flex justify-center gap-2">
