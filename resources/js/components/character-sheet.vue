@@ -199,6 +199,13 @@
                         @equip-click="openEquipModal"
                     ></gear-tab>
 
+                    <lifepath-tab
+                        v-else-if="activeTab === 'lifepath'"
+                        :active-tab="activeTab"
+                        :char-data="charData"
+                        @update-notes="updateNotes"
+                    ></lifepath-tab>
+
                     <control-tab
                         v-else-if="activeTab === 'control'"
                         :active-tab="activeTab"
@@ -235,6 +242,8 @@
                          @click="activeTab = 'skills'"></nav-btn>
                 <nav-btn icon="shield" label="Gear" :active="activeTab === 'gear'"
                          @click="activeTab = 'gear'"></nav-btn>
+                <nav-btn icon="users" label="LP" :active="activeTab === 'lifepath'"
+                         @click="activeTab = 'lifepath'"></nav-btn>
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
                 <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
@@ -330,6 +339,7 @@ import CyberdeckConfig from './character-sheet/CyberdeckConfig.vue';
 import CombatPanel from './character-sheet/CombatPanel.vue';
 import ControlTab from './character-sheet/ControlTab.vue';
 import GearTab from './character-sheet/GearTab.vue';
+import LifepathTab from './character-sheet/LifepathTab.vue';
 import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
@@ -349,7 +359,7 @@ import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
 
 export default {
     name: 'CharacterSheet',
-    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, ResourceModal, RollModifierPanel, SkillsTab },
+    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, LifepathTab, ResourceModal, RollModifierPanel, SkillsTab },
     directives: { icon: vIcon },
     setup() {
         // --- COMPOSABLES ---
@@ -451,6 +461,16 @@ export default {
             sendRequest({}, "/initiativeroll");
         };
 
+        const updateNotes = (notes) => {
+            if (charData.value) {
+                if (!charData.value.data.system.information) {
+                    charData.value.data.system.information = {};
+                }
+                charData.value.data.system.information.notes = notes;
+            }
+            sendRequest({ notes: notes }, "/updatenotes");
+        };
+
         // --- CONTROL PANEL STATE ---
         const controlState = ref({
             spaceMode: 'meatspace',
@@ -495,7 +515,7 @@ export default {
                     details,
                     type: isDamage ? 'damage' : 'default'
                 });
-                debouncedFetchCharacterData();
+                // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo/stat updates
             }
 
             if (payload.type === 'CONFIRMATION') {
@@ -874,7 +894,7 @@ export default {
             handleItemClick,
 
             // Actions
-            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, rollInitiative,
+            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, updateNotes, rollInitiative,
             sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings, refreshSheet,
 
             // Combat

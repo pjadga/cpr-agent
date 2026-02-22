@@ -27,7 +27,7 @@ class ActorSheet extends FormRequest
         }
 
         $characterData = $user->character_data;
-        $isOffline = !$request->has('actorData'); // Defaulting to true as we are not fetching live data here anymore
+        $isOffline = $request->has('actorData'); // Defaulting to true as we are not fetching live data here anymore
 
         if (empty($characterData)) {
             return response()->json([
@@ -59,6 +59,8 @@ class ActorSheet extends FormRequest
                     'wealth' => $characterData['system']['wealth'] ?? ['value' => 0],
                     'improvementPoints' => $characterData['system']['improvementPoints'] ?? ['value' => 0],
                     'roleInfo' => $characterData['system']['roleInfo'] ?? [],
+                    'lifepath' => $characterData['system']['lifepath'] ?? [],
+                    'information' => $characterData['system']['information'] ?? ['notes' => ''],
                     // Crucial for the "Equipped" section in your Vue app
                     'externalData' => $characterData['system']['externalData'] ?? [],
                 ],
@@ -146,8 +148,11 @@ class ActorSheet extends FormRequest
                 // Role Specifics
                 'rank' => $sys['rank'] ?? 0,
                 'mainRoleAbility' => $sys['mainRoleAbility'] ?? '',
-
                 'usage' => $sys['usage'] ?? '',
+
+                // Critical Injury Specifics
+                'quickFix' => $sys['quickFix'] ?? null,
+                'treatment' => $sys['treatment'] ?? null,
             ]
         ];
     }

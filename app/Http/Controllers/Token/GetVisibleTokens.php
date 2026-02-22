@@ -21,13 +21,15 @@ class GetVisibleTokens extends FormRequest
 
         // Validate incoming request
         $validatedData = $request->validate([
-            'selectedWeapon' => 'required|array|max:255'
+            'selectedWeapon' => 'required|array|max:255',
+            'selectedTarget' => 'nullable|array|max:255'
         ]);
 
         $user = auth()->user();
         $tokenId = $user->getTokenId();
         // Expect full weapon object and extract the ID for Foundry lookup
         $weaponId = $validatedData['selectedWeapon']["_id"] ?? null;
+        $targetTokenId = $validatedData['selectedTarget']["id"] ?? null;
         if (!$weaponId) {
             return response()->json([
                 'success' => false,
@@ -42,6 +44,7 @@ class GetVisibleTokens extends FormRequest
             'type' => 'GET_DV_INFO',
             'tokenId' => $tokenId,
             'weaponId' => $weaponId,
+            'targetTokenId' => $targetTokenId,
             'requestId' => $requestId,
         ]);
 

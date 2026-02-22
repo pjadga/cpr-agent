@@ -23,9 +23,7 @@ class ReloadWeapon extends FormRequest
 
         $weaponId = $validatedData["weaponId"];
         $ammoId = $validatedData["ammoId"] ?? null;
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
         CyberpunkAgentChannel::dispatch([

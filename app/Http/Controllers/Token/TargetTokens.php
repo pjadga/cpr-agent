@@ -20,9 +20,6 @@ class TargetTokens extends FormRequest
             'token' => 'required|string|max:255'
         ]);
 
-        $client = $this->getFoundryClient();
-        $user = auth()->user();
-        $clientId = $user->getClientId();
         $token = $validatedData["token"];
         CyberpunkAgentChannel::dispatch([
             'type' => 'TARGET_TOKEN',
