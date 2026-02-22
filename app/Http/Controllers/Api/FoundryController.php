@@ -79,14 +79,90 @@ class FoundryController extends Controller
      */
     protected function arraySetDot(array &$array, string $path, $value): void
     {
+        // Special case for items: if path is "items.+ID", we append the item to the items array
+        if (str_starts_with($path, 'items.+')) {
+            if (!isset($array['items']) || !is_array($array['items'])) {
+                $array['items'] = [];
+            }
+
+            // Avoid duplicates by ID
+            $id = substr($path, 7);
+            $found = false;
+            foreach ($array['items'] as $index => $item) {
+                if (isset($item['_id']) && $item['_id'] === $id) {
+                    $array['items'][$index] = $value;
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $array['items'][] = $value;
+            }
+            return;
+        }
+
         $keys = explode('.', $path);
         $ref =& $array;
-        foreach ($keys as $key) {
-            if (!isset($ref[$key]) || !is_array($ref[$key])) {
-                $ref[$key] = [];
+        foreach ($keys as $i => $key) {
+            if ($i === count($keys) - 1) {
+                if ($value === null) {
+                    // Deletion: items.ID
+                    if ($i === 1 && $keys[0] === 'items') {
+                        foreach ($ref as $index => $item) {
+                            if (isset($item['_id']) && $item['_id'] === $key) {
+                                unset($ref[$index]);
+                                $ref = array_values($ref); // Re-index array
+                                return;
+                            }
+                        }
+                    }
+                    unset($ref[$key]);
+                } else {
+                    // Addition/Replacement: items.ID
+                    if ($i === 1 && $keys[0] === 'items') {
+                        $found = false;
+                        foreach ($ref as $index => $item) {
+                            if (isset($item['_id']) && $item['_id'] === $key) {
+                                $ref[$index] = $value;
+                                $found = true;
+                                break;
+                            }
+                        }
+                        if (!$found) {
+                            $ref[] = $value;
+                        }
+                        return;
+                    }
+                    $ref[$key] = $value;
+                }
+            } else {
+                if (!isset($ref[$key]) || !is_array($ref[$key])) {
+                    $ref[$key] = [];
+                }
+
+                // If we are updating an item by ID: items.ID.field
+                if ($key === 'items' && $i === 0 && count($keys) > 1) {
+                    $itemId = $keys[$i+1];
+                    $found = false;
+                    foreach ($ref[$key] as $index => &$item) {
+                        if (isset($item['_id']) && $item['_id'] === $itemId) {
+                            $ref =& $item;
+                            $found = true;
+                            // Skip the ID key in the next iteration
+                            $i++;
+                            break;
+                        }
+                    }
+                    if (!$found) {
+                        // If item not found, we can't update it, so we stop
+                        return;
+                    }
+                    continue;
+                }
+
+                $ref =& $ref[$key];
             }
-            $ref =& $ref[$key];
         }
-        $ref = $value;
     }
 }

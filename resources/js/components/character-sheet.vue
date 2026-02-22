@@ -697,7 +697,7 @@ export default {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
             const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [], installedPrograms: [] };
-
+            console.log(allItems)
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';

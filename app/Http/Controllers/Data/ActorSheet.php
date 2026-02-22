@@ -27,7 +27,7 @@ class ActorSheet extends FormRequest
         }
 
         $characterData = $user->character_data;
-        $isOffline = true; // Defaulting to true as we are not fetching live data here anymore
+        $isOffline = !$request->has('actorData'); // Defaulting to true as we are not fetching live data here anymore
 
         if (empty($characterData)) {
             return response()->json([

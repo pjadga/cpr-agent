@@ -75,6 +75,63 @@ export function useCharacterData() {
         if (!charData.value || !delta) return;
 
         const deepSet = (obj, path, value) => {
+            // Special case for items.+ID (addition)
+            if (path.startsWith('data.items.+')) {
+                const itemId = path.replace('data.items.+', '');
+                if (!Array.isArray(obj.data.items)) obj.data.items = [];
+                const existingIndex = obj.data.items.findIndex(i => i._id === itemId);
+                if (existingIndex > -1) {
+                    obj.data.items[existingIndex] = value;
+                } else {
+                    obj.data.items.push(value);
+                }
+                return;
+            }
+
+            // Special case for items.ID (deletion or update)
+            if (path.startsWith('data.items.')) {
+                const parts = path.split('.');
+                const itemId = parts[2];
+                if (!Array.isArray(obj.data.items)) obj.data.items = [];
+
+                const existingIndex = obj.data.items.findIndex(i => i._id === itemId);
+
+                if (parts.length === 3) {
+                    // Deletion: data.items.ID
+                    if (value === null) {
+                        if (existingIndex > -1) obj.data.items.splice(existingIndex, 1);
+                    } else {
+                        // Addition/Replacement: data.items.ID
+                        if (existingIndex > -1) {
+                            obj.data.items[existingIndex] = value;
+                        } else {
+                            obj.data.items.push(value);
+                        }
+                    }
+                } else {
+                    // Deep update: data.items.ID.field...
+                    if (existingIndex === -1) return; // Cannot deep update non-existent item
+
+                    const subPath = parts.slice(3).join('.');
+                    const targetItem = obj.data.items[existingIndex];
+
+                    const setNested = (o, p, v) => {
+                        const ks = p.split('.');
+                        let t = o;
+                        for (let i = 0; i < ks.length - 1; i++) {
+                            const k = ks[i];
+                            if (typeof t[k] !== 'object' || t[k] === null) t[k] = {};
+                            t = t[k];
+                        }
+                        const lastK = ks[ks.length - 1];
+                        if (v === null) delete t[lastK];
+                        else t[lastK] = v;
+                    };
+                    setNested(targetItem, subPath, value);
+                }
+                return;
+            }
+
             const keys = path.split('.');
             let target = obj;
             for (let i = 0; i < keys.length - 1; i++) {
@@ -84,26 +141,22 @@ export function useCharacterData() {
                 }
                 target = target[k];
             }
-            target[keys[keys.length - 1]] = value;
+
+            const lastKey = keys[keys.length - 1];
+            if (value === null) {
+                delete target[lastKey];
+            } else {
+                target[lastKey] = value;
+            }
         };
 
         Object.entries(delta).forEach(([path, value]) => {
             let mapped = path.startsWith('data.') ? path : (path.startsWith('system') || path.startsWith('items') ? `data.${path}` : path);
 
-            // Special handling for 'items' to ensure it remains an array
+            // Special handling for 'items' to ensure it remains an array (if the whole array is sent)
             if (path === 'items') {
                 const valueArray = Array.isArray(value) ? value : Object.values(value || {});
-                deepSet(charData.value, 'data.items', valueArray);
-                return;
-            }
-
-            // If updating a specific item by index (e.g., items.0.name)
-            if (path.startsWith('items.')) {
-                deepSet(charData.value, mapped, value);
-                // After setting, ensure data.items is still an array (in case deepSet made it an object)
-                if (charData.value.data.items && !Array.isArray(charData.value.data.items)) {
-                    charData.value.data.items = Object.values(charData.value.data.items);
-                }
+                charData.value.data.items = valueArray;
                 return;
             }
 
@@ -120,7 +173,7 @@ export function useCharacterData() {
      */
     const refreshSheet = async ({ paths = null, tab = null, force = false } = {}) => {
         if (force || !paths) {
-            await fetchCharacterData();
+            await fetchCharacterData(false, force);
             return;
         }
         // Minimal targeted refresh: ask server for current mirror and only merge requested paths
@@ -140,20 +193,19 @@ export function useCharacterData() {
             applyDelta(deltas, { tab });
         } catch (e) {
             console.error('refreshSheet targeted fetch failed, falling back to full fetch', e);
-            await fetchCharacterData();
+            await fetchCharacterData(false, force);
         }
     };
 
     /**
      * Fetch character data from the server
      */
-    const fetchCharacterData = async (isInitial = false) => {
+    const fetchCharacterData = async (isInitial = false, forceFresh = false) => {
         try {
             let payload = { "actorUuid": actorUuid };
 
-            if (isInitial) {
-                // Initial check: if we don't have actor data saved, we need to fetch it from Foundry
-                // First, ensure we have a UUID (should be in localStorage or we'll need to fetch it)
+            if (isInitial || forceFresh) {
+                // If we don't have a UUID, we can't proceed
                 if (!actorUuid) {
                     const getActors = await window.axios.post("/getactors");
                     if (getActors.data.uuid) {
@@ -165,36 +217,47 @@ export function useCharacterData() {
                     }
                 }
 
-                // If we still don't have a UUID, we can't proceed
                 if (!actorUuid) {
                     error.value = "No character UUID found. Please check your settings.";
                     loading.value = false;
                     return;
                 }
 
-                // Call /actorsheet to see if we already have saved data
-                try {
-                    const checkResponse = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
-                    charData.value = checkResponse.data;
-                    loading.value = false;
-                } catch (err) {
-                    // If /actorsheet fails (e.g. 400 because no character_data in DB),
-                    // then we fetch from /getactor and save it
-                    console.log("No saved character data, fetching from Foundry...");
+                // Call /getactor to fetch live data from Foundry, then save it to DB
+                if (forceFresh) {
+                    console.log("Forcing fresh fetch from Foundry...");
                     const getActorResponse = await window.axios.post("/getactor", { "actorId": actorUuid });
-
-                    console.log(getActorResponse)
-
                     if (getActorResponse.data.actor) {
-                        // Save the fetched actor data to the DB via /actorsheet
                         const saveResponse = await window.axios.post("/actorsheet", {
                             "actorUuid": actorUuid,
                             "actorData": getActorResponse.data.actor
                         });
                         charData.value = saveResponse.data;
                     } else {
-
                         throw new Error("Could not fetch actor from Foundry");
+                    }
+                } else {
+                    // Call /actorsheet to see if we already have saved data (for initial load)
+                    try {
+                        const checkResponse = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
+                        charData.value = checkResponse.data;
+                        loading.value = false;
+                    } catch (err) {
+                        // If /actorsheet fails (e.g. 400 because no character_data in DB),
+                        // then we fetch from /getactor and save it
+                        console.log("No saved character data, fetching from Foundry...");
+                        const getActorResponse = await window.axios.post("/getactor", { "actorId": actorUuid });
+
+                        if (getActorResponse.data.actor) {
+                            // Save the fetched actor data to the DB via /actorsheet
+                            const saveResponse = await window.axios.post("/actorsheet", {
+                                "actorUuid": actorUuid,
+                                "actorData": getActorResponse.data.actor
+                            });
+                            charData.value = saveResponse.data;
+                        } else {
+                            throw new Error("Could not fetch actor from Foundry");
+                        }
                     }
                 }
             } else {

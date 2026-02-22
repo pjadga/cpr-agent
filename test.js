@@ -285,19 +285,44 @@ class CyberpunkBridge {
         this.hookIds.updateItem = Hooks.on('updateItem', (item, changes, options, userId) => {
             const actor = item.parent;
             if (actor instanceof Actor) {
-                // If it's an item on an actor, we send the whole item delta or specific system change
-                const delta = {
-                    [`items.${item.id}`]: item.toObject() // Simplest is to send the whole item object for the Vue cleaner to handle
-                };
-                syncUpdate(actor, delta);
+                // Flatten changes.system if it exists, similar to updateActor
+                const delta = {};
+                const prefix = `items.${item.id}.`;
+
+                if (changes.system) {
+                    const flatten = (obj, p = `${prefix}system.`) => {
+                        for (let key in obj) {
+                            const val = obj[key];
+                            if (val !== null && typeof val === 'object' && !Array.isArray(val) && !(val instanceof foundry.utils.Color)) {
+                                flatten(val, `${p}${key}.`);
+                            } else {
+                                delta[`${p}${key}`] = val;
+                            }
+                        }
+                    };
+                    flatten(changes.system);
+                }
+
+                // Handle top-level item changes like name, img, etc.
+                for (let key in changes) {
+                    if (key !== 'system' && key !== '_id') {
+                        delta[`${prefix}${key}`] = changes[key];
+                    }
+                }
+
+                if (Object.keys(delta).length > 0) {
+                    syncUpdate(actor, delta);
+                }
             }
         });
 
         this.hookIds.createItem = Hooks.on('createItem', (item, options, userId) => {
             const actor = item.parent;
             if (actor instanceof Actor) {
+                // When creating, we send the whole object so the Agent knows all its initial stats
+                // Use a special key 'items.+' to signal an append operation
                 const delta = {
-                    [`items.${item.id}`]: item.toObject()
+                    [`items.+${item.id}`]: item.toObject()
                 };
                 syncUpdate(actor, delta);
             }
@@ -306,14 +331,9 @@ class CyberpunkBridge {
         this.hookIds.deleteItem = Hooks.on('deleteItem', (item, options, userId) => {
             const actor = item.parent;
             if (actor instanceof Actor) {
-                // For deletion, we might need a special way to tell the Agent to remove it.
-                // Our applyDelta currently just sets values.
-                // Let's send a full items refresh or a null value if our applyDelta handles it.
-                // Given ActorSheet.php processItems, it might be better to trigger a partial refresh of 'items'
-                // But for now, let's try sending the items array again if it's not too big, or a signal.
-                // Actually, let's just send the updated items list from the actor.
+                // Send a null value for this item ID to signal deletion
                 const delta = {
-                    'items': actor.items.map(i => i.toObject())
+                    [`items.${item.id}`]: null
                 };
                 syncUpdate(actor, delta);
             }
