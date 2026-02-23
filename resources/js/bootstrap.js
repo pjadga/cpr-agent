@@ -13,15 +13,16 @@ window.Echo = new Echo({
     key: import.meta.env.VITE_REVERB_APP_KEY,
     wsHost: import.meta.env.VITE_REVERB_HOST,
 
-    // 2. THE DDEV FIX:
-    // If Secure (https), use port 8081.
-    // If Insecure (http), use port 8080.
-    wsPort: isSecure ? 8081 : 8080,
-    wssPort: isSecure ? 8081 : 8080,
+    // Uncomment for DDEV
+    // wsPort: isSecure ? 8081 : 8080,
+    // wssPort: isSecure ? 8081 : 8080,
 
-    // 3. Force TLS if we are on https
-    forceTLS: isSecure,
+    //Production ports
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
 
+    // Let the .env file dictate the protocol (http vs https)
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
     // Standard Config
     enabledTransports: ['ws', 'wss'],
     disableStats: true,
@@ -29,7 +30,8 @@ window.Echo = new Echo({
     auth: {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+            'Accept': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
         }
     }
 });
