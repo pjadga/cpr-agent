@@ -13,8 +13,9 @@ class FoundryController extends Controller
      */
     public function handle(Request $request)
     {
+        $start = microtime(true);
+
         // 1. Validate the incoming data
-        // We expect at least a 'type' (e.g., ACTORS_DATA, CONFIRMATION)
         $validated = $request->validate([
             'requestId' => 'nullable|string',
             'type' => 'required|string',
@@ -23,6 +24,7 @@ class FoundryController extends Controller
             'success' => 'nullable|boolean',
             'result' => 'nullable', // For complex data like Roll Modifiers
             'actors' => 'nullable|array', // For GET_ACTORS
+            'actor' => 'nullable|array',  // For GET_ACTOR
             'tokens' => 'nullable|array', // For VISIBLE_TOKENS
             'data' => 'nullable|array',
             'total' => 'nullable',
@@ -34,44 +36,43 @@ class FoundryController extends Controller
             'tab' => 'nullable|string'   // Optional hint for which tab was affected
         ]);
 
-        // 2. Log it (Optional, good for debugging)
-        \Log::info('Foundry Callback Received:', [
-            'type' => $request->input('type'),
-            'requestId' => $request->input('requestId'),
-            'has_total' => $request->has('total'),
-            'has_rawRoll' => $request->has('rawRoll'),
-            'all_data' => $request->all()
-        ]);
+        $type = $validated['type'] ?? null;
 
-        // If requestId is present, store in cache for polling
-        if (!empty($validated['requestId'])) {
-            // We store the whole request data because GetActor/GetActors expect nested data like 'actor' or 'actors'
-            \Illuminate\Support\Facades\Cache::put('foundry_response_' . $validated['requestId'], $request->all(), 10);
-        }
-
-        // 3. If this is a sheet delta, persist it in the user's cached mirror before broadcasting
-        if (($validated['type'] ?? null) === 'SHEET_DELTA' && !empty($validated['delta'])) {
+        // 2. PERSISTENCE: If this is full actor data or a delta, save to the user's mirror
+        if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA'])) {
             $user = $request->user();
             if ($user) {
                 $current = $user->character_data ?? [];
-                if (!is_array($current)) {
-                    $current = [];
+                if (!is_array($current)) $current = [];
+
+                if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
+                    $current = $validated['actor'];
+                } elseif ($type === 'SHEET_DELTA' && !empty($validated['delta'])) {
+                    // Apply dot-path updates
+                    foreach ($validated['delta'] as $path => $value) {
+                        $this->arraySetDot($current, $path, $value);
+                    }
                 }
-                // Apply dot-path updates
-                foreach ($validated['delta'] as $path => $value) {
-                    $this->arraySetDot($current, $path, $value);
-                }
+
                 $user->character_data = $current;
                 $user->save();
             }
         }
 
-        // 4. Broadcast to the Web Client
-        // This pushes the data via Reverb to the browser
-        \Log::info('Foundry Callback Dispatching Event:', ['payload' => $validated]);
+        // 3. BROADCAST to the Web Client
         \App\Events\FoundryResponse::dispatch($validated);
 
-        return response()->json(['status' => 'acknowledged']);
+        // 4. Legacy Cache support (Phase 1)
+        if (!empty($validated['requestId'])) {
+            \Illuminate\Support\Facades\Cache::put('foundry_response_' . $validated['requestId'], $request->all(), 10);
+        }
+
+        $duration = round((microtime(true) - $start) * 1000, 2);
+        \Log::info("Foundry Callback [{$type}] processed in {$duration}ms", [
+            'requestId' => $validated['requestId'] ?? 'N/A'
+        ]);
+
+        return response()->json(['status' => 'acknowledged', 'processing_ms' => $duration]);
     }
 
     /**

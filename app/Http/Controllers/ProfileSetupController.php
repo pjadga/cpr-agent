@@ -32,7 +32,7 @@ class ProfileSetupController extends Controller
 
             // 2. Wait for the response (The Polling Loop)
             $startTime = microtime(true);
-            $timeout = 3.0; // Seconds to wait
+            $timeout = 2.0; // Reduced timeout
             $foundryData = null;
 
             while ((microtime(true) - $startTime) < $timeout) {

@@ -24,11 +24,9 @@ class ItemEquip extends Controller
         ]);
 
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
         try {
-            $client = $this->getFoundryClient();
             $itemId = $validatedData['itemId'];
             $stateString = $validatedData['state'];
 

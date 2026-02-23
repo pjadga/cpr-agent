@@ -24,10 +24,8 @@ class InstallProgram extends FormRequest
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $programId = $validatedData['programId'];
         $deckId = $validatedData['deckId'];
-        $client = $this->getFoundryClient();
 
         $user = auth()->user();
-        $clientId = $user->client_id;
         $actorId = $user->default_actor_id;
 
         CyberpunkAgentChannel::dispatch([

@@ -26,32 +26,12 @@ class GetActor extends FormRequest
             'actorId' => str_replace("Actor.", "", $request->get('actorId'))
         ]);
 
-        // 2. Wait for the response (The Polling Loop)
-        $startTime = microtime(true);
-        $timeout = 3.0; // Seconds to wait
-        $foundryData = null;
-
-        while ((microtime(true) - $startTime) < $timeout) {
-            $key = 'foundry_response_' . $requestId;
-
-            if (Cache::has($key)) {
-                $foundryData = Cache::pull($key);
-                break;
-            }
-
-            usleep(20000); // 20ms
-        }
-
-        if ($foundryData === null) {
-            return response()->json([
-                'message' => 'Foundry VTT did not respond in time.',
-                'isOffline' => true
-            ], 504);
-        }
-
+        // 2. Return immediately (Asynchronous)
+        // The frontend will receive the update via Echo/Pusher
         return response()->json([
-            'actor' => $foundryData['actor'] ?? null,
-            'isOffline' => false
-        ], 200);
+            'requestId' => $requestId,
+            'status' => 'pending',
+            'message' => 'Request dispatched to Foundry VTT.'
+        ], 202);
     }
 }

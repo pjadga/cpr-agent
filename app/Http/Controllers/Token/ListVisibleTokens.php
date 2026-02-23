@@ -29,7 +29,7 @@ class ListVisibleTokens extends FormRequest
 
         // Polling loop
         $startTime = microtime(true);
-        $timeout = 3.0;
+        $timeout = 2.0; // Reduced timeout
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {

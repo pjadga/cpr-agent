@@ -200,105 +200,56 @@ export function useCharacterData() {
 
     /**
      * Fetch character data from the server
+     *
+     * NEW STRATEGY (Phase 2):
+     * 1. Load from local DB (/actorsheet) instantly to provide immediate UI feedback.
+     * 2. In parallel (or background), trigger a refresh from Foundry (/getactor).
+     * 3. UI updates when Echo receives the Foundry response.
      */
     const fetchCharacterData = async (isInitial = false, forceFresh = false) => {
         try {
-            let payload = { "actorUuid": actorUuid };
-
-            if (isInitial || forceFresh) {
-                // If we don't have a UUID, we can't proceed
-                {
-                    const getActors = await window.axios.post("/getactors");
-                    if (getActors.data && getActors.data.uuid) {
-                        let incomingUuid = getActors.data.uuid;
-                        if (typeof incomingUuid === 'string' && incomingUuid.startsWith('Actor.')) {
-                            incomingUuid = incomingUuid.replace('Actor.', '');
-                        }
-                        if (!actorUuid || actorUuid !== incomingUuid) {
-                            actorUuid = incomingUuid;
-                            // Update cached value to avoid stale UUID
-                            localStorage.setItem('cpr_actor_uuid', actorUuid);
-                        }
-                    }
+            if (!actorUuid) {
+                // If we don't have a UUID, fetch it once from the backend
+                const getActors = await window.axios.post("/getactors");
+                if (getActors.data && getActors.data.uuid) {
+                    actorUuid = String(getActors.data.uuid).replace(/^Actor\./, '');
+                    localStorage.setItem('cpr_actor_uuid', actorUuid);
                 }
-
-                if (!actorUuid) {
-                    error.value = "No character UUID found. Please check your settings.";
-                    loading.value = false;
-                    return;
-                }
-
-                // Call /getactor to fetch live data from Foundry, then save it to DB
-                if (forceFresh) {
-                    console.log("Forcing fresh fetch from Foundry...");
-                    const getActorResponse = await window.axios.post("/getactor", { "actorId": actorUuid });
-                    if (getActorResponse.data.actor) {
-                        const saveResponse = await window.axios.post("/actorsheet", {
-                            "actorUuid": actorUuid,
-                            "actorData": getActorResponse.data.actor
-                        });
-                        charData.value = saveResponse.data;
-                    } else {
-                        throw new Error("Could not fetch actor from Foundry");
-                    }
-                } else {
-                    // Call /actorsheet to see if we already have saved data (for initial load)
-                    try {
-                        const checkResponse = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
-                        charData.value = checkResponse.data;
-                        loading.value = false;
-                    } catch (err) {
-                        // If /actorsheet fails (e.g. 400 because no character_data in DB),
-                        // then we fetch from /getactor and save it
-                        console.log("No saved character data, fetching from Foundry...");
-                        const getActorResponse = await window.axios.post("/getactor", { "actorId": actorUuid });
-
-                        if (getActorResponse.data.actor) {
-                            // Save the fetched actor data to the DB via /actorsheet
-                            const saveResponse = await window.axios.post("/actorsheet", {
-                                "actorUuid": actorUuid,
-                                "actorData": getActorResponse.data.actor
-                            });
-                            charData.value = saveResponse.data;
-                        } else {
-                            throw new Error("Could not fetch actor from Foundry");
-                        }
-                    }
-                }
-            } else {
-                // For regular polling, just get from DB
-                const response = await window.axios.post("/actorsheet", payload);
-
-                // If backend reports a different UUID (e.g., a new actor was saved), update cache
-                if (response.data && response.data.uuid) {
-                    const backendUuid = String(response.data.uuid).replace(/^Actor\./, '');
-                    if (!actorUuid || actorUuid !== backendUuid) {
-                        actorUuid = backendUuid;
-                        localStorage.setItem('cpr_actor_uuid', actorUuid);
-                    }
-                }
-
-                // Only update if data has actually changed
-                if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
-                    if (charData.value.requestId !== response.data.requestId) {
-                        charData.value.requestId = response.data.requestId;
-                    }
-                    return;
-                }
-
-                charData.value = response.data;
             }
 
-            if (isInitial) loading.value = false;
-            setTimeout(refreshIcons, 50);
+            if (!actorUuid) {
+                error.value = "No character UUID found. Please check your settings.";
+                loading.value = false;
+                return;
+            }
+
+            // 1. STEP ONE: Database-First Load (Instant)
+            // Always try to load what we have in the DB first for zero-latency initial paint
+            try {
+                const dbResponse = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
+                if (dbResponse.data && dbResponse.data.data) {
+                    charData.value = dbResponse.data;
+                    if (isInitial) loading.value = false;
+                    setTimeout(refreshIcons, 50);
+                }
+            } catch (dbErr) {
+                console.warn("Local DB fetch failed or empty:", dbErr);
+                // If it's the very first time (no DB entry), we MUST force a fresh fetch
+                if (isInitial) forceFresh = true;
+            }
+
+            // 2. STEP TWO: Background Refresh from Foundry
+            // Only trigger if specifically requested, or if it's initial load (to ensure we're not stale)
+            if (forceFresh || isInitial) {
+                console.log("Triggering background refresh from Foundry...");
+                // Note: This endpoint is now async and returns 202 immediately
+                await window.axios.post("/getactor", { "actorId": actorUuid });
+            }
+
         } catch (err) {
             console.error("Fetch Error:", err);
-            if (isInitial) {
-                if (err.response && err.response.data.error) {
-                    error.value = err.response.data.error;
-                } else {
-                    error.value = err.message || "An error occurred while fetching character data.";
-                }
+            if (isInitial && !charData.value) {
+                error.value = err.response?.data?.error || err.message || "An error occurred.";
                 loading.value = false;
             }
         }

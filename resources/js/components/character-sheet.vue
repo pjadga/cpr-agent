@@ -495,6 +495,15 @@ export default {
                     console.warn('Delta apply failed, fallback to refresh', e);
                     debouncedFetchCharacterData();
                 }
+            } else if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                // Background refresh finished: update our local state with the full fresh actor object
+                // We wrap it in a structure that matches our Vue expectations (top-level 'data' usually)
+                charData.value = {
+                    ...charData.value,
+                    data: payload.actor,
+                    requestId: payload.requestId
+                };
+                setTimeout(refreshIcons, 50);
             } else if (payload.type === 'ROLL_RESULT') {
                 const isDamage = /\(Damage\)/i.test(payload.label || '');
                 let details = '';
@@ -718,7 +727,6 @@ export default {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
             const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [], installedPrograms: [] };
-            console.log(allItems)
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';

@@ -18,7 +18,6 @@ class GetVisibleTokens extends FormRequest
 
     public function getVisibleTokens(Request $request): JsonResponse
     {
-
         // Validate incoming request
         $validatedData = $request->validate([
             'selectedWeapon' => 'required|array|max:255',
@@ -27,14 +26,13 @@ class GetVisibleTokens extends FormRequest
 
         $user = auth()->user();
         $tokenId = $user->getTokenId();
-        // Expect full weapon object and extract the ID for Foundry lookup
         $weaponId = $validatedData['selectedWeapon']["_id"] ?? null;
         $targetTokenId = $validatedData['selectedTarget']["id"] ?? null;
+
         if (!$weaponId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Weapon ID not provided',
-                'data' => null,
             ], 422);
         }
 
@@ -50,7 +48,7 @@ class GetVisibleTokens extends FormRequest
 
         // Polling loop
         $startTime = microtime(true);
-        $timeout = 3.0;
+        $timeout = 2.0; // Reduced timeout
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {
