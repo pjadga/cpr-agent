@@ -4,6 +4,7 @@ import { isDeepEqual } from '../utils/helpers';
 // Shared state to prevent multiple fetches/intervals
 const charData = shallowRef(null);
 const loading = ref(true);
+const isWssConnected = ref(true); // Default to true as initial state
 const error = ref(null);
 const baseUrl = ref(localStorage.getItem('cpr_base_url') || '');
 let refreshInterval = null;
@@ -206,14 +207,18 @@ export function useCharacterData() {
 
             if (isInitial || forceFresh) {
                 // If we don't have a UUID, we can't proceed
-                if (!actorUuid) {
+                {
                     const getActors = await window.axios.post("/getactors");
-                    if (getActors.data.uuid) {
-                        actorUuid = getActors.data.uuid;
-                        if (actorUuid.startsWith('Actor.')) {
-                            actorUuid = actorUuid.replace('Actor.', '');
+                    if (getActors.data && getActors.data.uuid) {
+                        let incomingUuid = getActors.data.uuid;
+                        if (typeof incomingUuid === 'string' && incomingUuid.startsWith('Actor.')) {
+                            incomingUuid = incomingUuid.replace('Actor.', '');
                         }
-                        localStorage.setItem('cpr_actor_uuid', actorUuid);
+                        if (!actorUuid || actorUuid !== incomingUuid) {
+                            actorUuid = incomingUuid;
+                            // Update cached value to avoid stale UUID
+                            localStorage.setItem('cpr_actor_uuid', actorUuid);
+                        }
                     }
                 }
 
@@ -264,6 +269,15 @@ export function useCharacterData() {
                 // For regular polling, just get from DB
                 const response = await window.axios.post("/actorsheet", payload);
 
+                // If backend reports a different UUID (e.g., a new actor was saved), update cache
+                if (response.data && response.data.uuid) {
+                    const backendUuid = String(response.data.uuid).replace(/^Actor\./, '');
+                    if (!actorUuid || actorUuid !== backendUuid) {
+                        actorUuid = backendUuid;
+                        localStorage.setItem('cpr_actor_uuid', actorUuid);
+                    }
+                }
+
                 // Only update if data has actually changed
                 if (charData.value && isDeepEqual(charData.value.data, response.data.data)) {
                     if (charData.value.requestId !== response.data.requestId) {
@@ -311,6 +325,7 @@ export function useCharacterData() {
     return {
         charData,
         loading,
+        isWssConnected,
         error,
         getImageUrl,
         fetchCharacterData,

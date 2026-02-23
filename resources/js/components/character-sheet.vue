@@ -56,7 +56,7 @@
                         <h2 class="text-white font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
                         </h2>
-                        <div v-if="charData.isOffline" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
+                        <div v-if="!isWssConnected" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
                             Offline Mode - Agent Synced via Local Cache
                         </div>
                     </div>
@@ -112,7 +112,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 v-if="charData.isOffline" class="text-xl font-bold uppercase truncate leading-none text-white">
+                            <h1 v-if="!isWssConnected" class="text-xl font-bold uppercase truncate leading-none text-white">
                                 <span class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
                                     Offline
                                 </span>
@@ -366,6 +366,7 @@ export default {
         const {
             charData,
             loading,
+            isWssConnected,
             error: dataError,
             getImageUrl,
             fetchCharacterData,
@@ -896,6 +897,7 @@ export default {
             // Actions
             sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, updateNotes, rollInitiative,
             sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings, refreshSheet,
+            isWssConnected,
 
             // Combat
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,
