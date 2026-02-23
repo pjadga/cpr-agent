@@ -47,7 +47,7 @@ class GetActors extends FormRequest
                 break;
             }
 
-            usleep(100000); // 100ms
+            usleep(20000); // 20ms
         }
 
         if ($foundryData === null) {

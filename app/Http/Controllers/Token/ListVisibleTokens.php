@@ -38,7 +38,7 @@ class ListVisibleTokens extends FormRequest
                 $foundryData = Cache::pull($key);
                 break;
             }
-            usleep(100000);
+            usleep(20000); // 20ms
         }
 
         if ($foundryData === null) {

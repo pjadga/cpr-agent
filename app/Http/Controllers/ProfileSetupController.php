@@ -43,7 +43,7 @@ class ProfileSetupController extends Controller
                     break;
                 }
 
-                usleep(100000); // 100ms
+                usleep(20000); // 20ms
             }
 
             return view('settings', [
