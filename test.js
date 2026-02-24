@@ -18,7 +18,7 @@ class CyberpunkBridge {
      * INTERCEPTOR: Wraps renderTemplate to steal the CPRRoll object before it vanishes.
      */
     async rollAndCapture(actorId, triggerFunction) {
-        console.log(`%c[Bridge] 🕵️‍♂️ Starting Render Interceptor for Actor ${actorId}`, "color: #00ffff; font-weight: bold;");
+        console.log(`%c[Bridge] ‍Starting Render Interceptor for Actor ${actorId}`, "color: #00ffff; font-weight: bold;");
 
         return new Promise(async (resolve, reject) => {
             let rollFound = false;
@@ -30,7 +30,7 @@ class CyberpunkBridge {
             const spyRender = function(path, data) {
                 // Check if this is a CPR Roll Card
                 if (path && typeof path === 'string' && path.includes('rollcard')) {
-                    console.log(`%c[Bridge] 🎯 Intercepted Render: ${path}`, "color: #00ff00;", data);
+                    console.log(`%c[Bridge] Intercepted Render: ${path}`, "color: #00ff00;", data);
 
                     // Verify it belongs to our actor (optional, but good safety)
                     // Most CPR roll objects have an 'actor' or 'alias' property, or we assume timing is correct
@@ -99,31 +99,41 @@ class CyberpunkBridge {
     registerSettings() {
         game.settings.register(MODULE_ID, 'apiUrl', {
             name: 'Relay Controller URL',
-            hint: 'The base URL of your Agent (e.g., http://cyberpunk.ddev.site). Do NOT include port 8080 here.',
+            hint: 'The base URL of your Agent (e.g., https://agent.surrealdisco.co.uk). Do NOT include port 8080 here.',
+            scope: 'client',
+            config: true,
+            type: String,
+            default: 'https://agent.surrealdisco.co.uk',
+            onChange: () => this.reconnect()
+        });
+
+        game.settings.register(MODULE_ID, 'reverbHost', {
+            name: 'Reverb Host (override)',
+            hint: 'Optional. Override the WebSocket host used for Reverb (e.g., my-tunnel.ngrok-free.dev). Leave blank to derive from Foundry URL.',
             scope: 'world',
             config: true,
             type: String,
-            default: 'http://localhost',
+            default: '',
             onChange: () => this.reconnect()
         });
 
         game.settings.register(MODULE_ID, 'reverbPort', {
             name: 'Reverb Port',
-            hint: 'The port your Reverb server is running on (default: 8080). If using DDEV with SSL, try 8081.',
+            hint: 'Optional. If blank, auto-detects: 443 for https/wss, 80 for http/ws, or use your custom value.',
             scope: 'world',
             config: true,
             type: Number,
-            default: 8080,
+            default: 0,
             onChange: () => this.reconnect()
         });
 
         game.settings.register(MODULE_ID, 'reverbUseSSL', {
-            name: 'Reverb Use SSL',
-            hint: 'Enable if using https/wss for Reverb.',
+            name: 'Reverb Use SSL (wss)',
+            hint: 'If enabled, uses secure WebSockets (wss). If left off, auto-detects from Relay URL protocol.',
             scope: 'world',
             config: true,
             type: Boolean,
-            default: false,
+            default: true,
             onChange: () => this.reconnect()
         });
 
@@ -164,8 +174,9 @@ class CyberpunkBridge {
         const apiUrl = game.settings.get(MODULE_ID, 'apiUrl');
         const token = game.settings.get(MODULE_ID, 'apiKey');
         const debug = game.settings.get(MODULE_ID, 'debugMode');
-        const reverbPort = game.settings.get(MODULE_ID, 'reverbPort') || 8080;
-        const useSSL = game.settings.get(MODULE_ID, 'reverbUseSSL') || false;
+        const reverbPortSetting = Number(game.settings.get(MODULE_ID, 'reverbPort') || 0) || 0;
+        const useSSLSetting = game.settings.get(MODULE_ID, 'reverbUseSSL');
+        const reverbHostOverride = (game.settings.get(MODULE_ID, 'reverbHost') || '').trim();
 
         if (!token || !apiUrl) {
             ui.notifications.warn("Cyberpunk Bridge: Missing API URL or Key.");
@@ -177,25 +188,37 @@ class CyberpunkBridge {
             this.echo.disconnect();
         }
 
-        // Parse host from URL for Reverb config
-        let hostUrl;
+        // Parse host from URL for Reverb config and infer ports/TLS for ngrok/cloudflared
+        let baseUrl;
         try {
-            hostUrl = new URL(apiUrl);
+            baseUrl = new URL(apiUrl);
         } catch (e) {
-            console.error("Invalid URL", e);
+            console.error("Invalid Relay URL", e);
             return;
         }
 
-        console.log(`Connecting to Cyberpunk Agent Relay at ${hostUrl.hostname}:${reverbPort}...`);
+        // Determine host used for websocket
+        const wsHost = reverbHostOverride || baseUrl.hostname;
+
+        // Auto-detect TLS from apiUrl protocol when not explicitly set
+        const inferredSecure = baseUrl.protocol === 'https:';
+        const forceTLS = (typeof useSSLSetting === 'boolean' ? useSSLSetting : undefined);
+        const useTLS = (forceTLS !== undefined && forceTLS !== null) ? forceTLS : inferredSecure;
+
+        // Auto ports: if user provided non-zero, use it; else default 443 for secure, 80 for insecure
+        const defaultPort = useTLS ? 443 : 80;
+        const wsPort = reverbPortSetting > 0 ? reverbPortSetting : defaultPort;
+
+        console.log(`[Bridge] Connecting to Agent Relay via Reverb host=${wsHost} port=${wsPort} secure=${useTLS}`);
 
         this.echo = new Echo({
             broadcaster: 'reverb',
             key: game.settings.get(MODULE_ID, 'reverbKey') || 'itdsiqtx8cpskowawl1p',
-            wsHost: hostUrl.hostname,
-            wsPort: reverbPort,
-            wssPort: reverbPort,
-            forceTLS: useSSL,
-            enabledTransports: useSSL ? ['ws', 'wss'] : ['ws'],
+            wsHost: wsHost,
+            wsPort: wsPort,
+            wssPort: wsPort,
+            forceTLS: useTLS,
+            enabledTransports: ['ws', 'wss'],
             disableStats: true,
             authEndpoint: `${apiUrl.replace(/\/$/, '')}/api/broadcasting/auth`,
 
@@ -1125,16 +1148,16 @@ class CyberpunkBridge {
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
-                        label: fireMode + ' Attack',
-                        rawRoll: {
-                            total: result.total,
-                            isCriticalSuccess: result.isCriticalSuccess,
-                            isCriticalFailure: result.isCriticalFailure,
-                            label: result.label,
-                            resultTotal: result.rawRoll?.resultTotal,
-                            rollTitle: result.rawRoll?.rollTitle
-                        },
-                        dv: computedDV,
+                            label: fireMode + ' Attack',
+                            rawRoll: {
+                                total: result.total,
+                                isCriticalSuccess: result.isCriticalSuccess,
+                                isCriticalFailure: result.isCriticalFailure,
+                                label: result.label,
+                                resultTotal: result.rawRoll?.resultTotal,
+                                rollTitle: result.rawRoll?.rollTitle
+                            },
+                            dv: computedDV,
                             outcome,
                             success: true
                         });
@@ -1341,8 +1364,23 @@ class CyberpunkBridge {
                 if (actorId !== null) {
                     const actor = game.actors.get(actorId);
                     if (actor) {
-                        console.log("GET_ACTOR result:", actor);
-                        await this.sendResponse({ type: 'ACTOR_DATA', actor: actor, requestId });
+                        const obj = actor.toObject();
+                        const slim = {
+                            _id: actor.id,
+                            name: actor.name,
+                            type: actor.type,
+                            img: obj.img,
+                            system: obj.system,
+                            items: (obj.items || []).map(i => ({
+                                _id: i._id,
+                                name: i.name,
+                                type: i.type,
+                                img: i.img,
+                                system: i.system
+                            })),
+                            flags: obj.flags && obj.flags['cyberpunk-red-core'] ? { 'cyberpunk-red-core': obj.flags['cyberpunk-red-core'] } : {}
+                        };
+                        await this.sendResponse({ type: 'ACTOR_DATA', actor: slim, requestId });
                         break;
                     }
                 }
