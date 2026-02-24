@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Data;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,7 +16,6 @@ class GetRollModifiers extends FormRequest
 
     public function getRollModifiers(Request $request)
     {
-        $client = $this->getFoundryClient();
         $user = auth()->user();
 
         $validatedData = $request->validate([
@@ -23,122 +23,19 @@ class GetRollModifiers extends FormRequest
         ]);
 
         // Use user's client_id if available, otherwise fallback to a default or dummy for testing
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $weaponId = isset($validatedData['selectedWeapon']['_id']) ? $validatedData['selectedWeapon']['_id'] : null;
 
-        //language=JS
-        $js = "
-        const actorId = '$actorId';
-        const weaponId = " . ($weaponId ? "'$weaponId'" : "null") . ";
-
-        const actor = game.actors.get(actorId);
-        if (!actor) {
-            return { error: 'Actor not found' };
-        }
-        const weapon = weaponId ? actor.items.get(weaponId) : null;
-
-        // Get stats, skills and mods
-        let weaponSkillName = 'None';
-        let skillLevel = 0;
-        let statName = 'None';
-        let statValue = 0;
-        let weaponAcc = 0;
-
-        if (weapon) {
-            weaponSkillName = weapon.system.weaponSkill;
-            const skillItem = actor.items.find(i => i.type === 'skill' && i.name === weaponSkillName);
-            skillLevel = skillItem ? (Number(skillItem.system.level)||0) : 0;
-            statName = skillItem ? (skillItem.system.stat || 'ref') : 'ref';
-            statValue = Number(actor.system.stats[statName]?.value) || 0;
-            weaponAcc = Number(weapon.system.attackmod) || 0;
-        }
-
-        let totalPenalty = 0;
-        const effectList = [];
-
-        // Get HP and work out wounded states. Take into account stims
-        const hp = Number(actor.system.derivedStats.hp.value) || 0;
-        const seriouslyThreshold = Number(actor.system.derivedStats.seriouslyWounded) || 0;
-        const stim = actor.items.find(i => i.name === 'Stim' && i.type === 'drug');
-        const stimEnabled = stim && stim.effects.some(e => e.disabled === false);
-
-        if (hp <= 0) {
-            totalPenalty -= 4;
-            effectList.push({ title: 'Mortally Wounded', penalty: -4, description: 'All actions at -4.' });
-        } else if (hp <= seriouslyThreshold) {
-            const penaltyValue = stimEnabled ? 0 : -2;
-            totalPenalty += penaltyValue;
-            effectList.push({
-                title: stimEnabled ? 'Seriously Wounded (Stim Active)' : 'Seriously Wounded',
-                penalty: penaltyValue,
-                description: stimEnabled ? 'Ignoring penalty due to Stim drug.' : 'All actions at -2.'
-            });
-        }
-
-        //Crit Injury addition
-        const critInjuries = actor.items.filter(i => i.type === 'criticalInjury');
-        critInjuries.forEach(injury => {
-            const title = injury.name || 'Injury';
-            const description = (injury.system.description?.value || '').replace(/<[^>]*>/g, '');
-
-            let injuryPenalty = 0;
-            // Try to find penalty from effects
-            if (injury.effects && injury.effects.length > 0) {
-                injury.effects.forEach(eff => {
-                    if (!eff.disabled && eff.changes) {
-                        eff.changes.forEach(change => {
-                            const val = parseInt(change.value);
-                            if (!isNaN(val)) {
-                                injuryPenalty += val;
-                            }
-                        });
-                    }
-                });
-            }
-
-            // Fallback to heuristic if no penalty found in effects
-            if (injuryPenalty === 0) {
-                const lowerTitle = String(title).toLowerCase();
-                if (description.includes('-2') || lowerTitle.includes('arm') || lowerTitle.includes('eye')) {
-                    injuryPenalty = -2;
-                }
-            }
-
-            totalPenalty += injuryPenalty;
-            effectList.push({ title, description, penalty: injuryPenalty });
-        });
-
-        // Final Object for App with breakdown
-        const result = {
-            actorName: actor.name,
-            baseBonus: statValue + skillLevel + weaponAcc,
-            breakdown: {
-                statName,
-                statValue,
-                skillName: weaponSkillName,
-                skillLevel,
-                weaponAcc
-            },
-            totalPenalty: totalPenalty,
-            finalModifier: statValue + skillLevel + weaponAcc + totalPenalty,
-            injuries: effectList
-        };
-
-        return result;
-        ";
-
-        // Cache for a very short time (character states can change frequently)
-        $cacheKey = sprintf('rollmods:%s:%s:%s', $clientId, $actorId, $weaponId ?: 'none');
-        $ttl = now()->addSeconds(3);
-        $return = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $js) {
-            return $client->utilities->executeJs($clientId, $js);
-        });
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'GET_ROLL_MODIFIERS',
+            'actorId' => $actorId,
+            'weaponId' => $weaponId,
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Data successfully submitted!',
-            'data' => $return
+            'message' => 'Roll modifiers request sent to Foundry',
+            'data' => null
         ], 201);
     }
 }

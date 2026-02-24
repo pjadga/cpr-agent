@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -14,24 +15,25 @@ class FaceDown extends FormRequest
 
     public function getFaceDown(Request $request): JsonResponse
     {
-        $client = $this->getFoundryClient();
+
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
-        $return = $client->utilities->executeJs($clientId,
 
-        "let skillRoll = game.actors.get('$actorId');
-        skillRoll.sheet._onRoll(
-        {'data-roll-type': 'facedown',
-        'data-roll-title': 'Face Down',
-        type: 'click',
-        currentTarget: {'data-roll-type': 'facedown', 'data-roll-title': 'Face Down'}})");
+        $requestId = uniqid();
+
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'FACEDOWN_ROLL',
+            'actorId' => $actorId,
+            'requestId' => $requestId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ], 201);
     }
 }

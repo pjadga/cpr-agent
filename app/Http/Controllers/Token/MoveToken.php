@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Token;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -16,31 +17,28 @@ class MoveToken extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'direction' => 'required|string|max:255'
+            'direction' => 'required|string|max:255',
+            'weaponId' => 'nullable|string|max:255'
         ]);
 
         //Need to get the actors either ID or Name -
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $direction = $validatedData['direction'];
-        $client = $this->getFoundryClient();
+        $weaponId = $validatedData['weaponId'] ?? null;
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $tokenId = $user->getTokenId();
 
-        $return = "fuck";
-        if ($direction == "up") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.y - canvas.grid.size; await token.document.update({ y: direction });");
-        } elseif ($direction == "down") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.y + canvas.grid.size; await token.document.update({ y: direction });");
-        } elseif ($direction == "left") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.x - canvas.grid.size; await token.document.update({ x: direction });");
-        } elseif ($direction == "right") {
-            $return = $client->utilities->executeJs($clientId,"const token = canvas.tokens.get('$tokenId'); const direction = token.document.x + canvas.grid.size; await token.document.update({ x: direction });");
-        }
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'MOVE_TOKEN',
+            'tokenId' => $tokenId,
+            'direction' => $direction,
+            'weaponId' => $weaponId,
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

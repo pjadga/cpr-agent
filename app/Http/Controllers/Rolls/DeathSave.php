@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -14,24 +15,23 @@ class DeathSave extends FormRequest
 
     public function getDeathSave(Request $request): JsonResponse
     {
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
-        $return = $client->utilities->executeJs($clientId,
+        $requestId = uniqid();
 
-        "let skillRoll = game.actors.get('$actorId');
-        skillRoll.sheet._onRoll(
-        {'data-roll-type': 'deathsave',
-        'data-roll-title': 'Death Save',
-        type: 'click',
-        currentTarget: {'data-roll-type': 'deathsave', 'data-roll-title': 'Death Save'}})");
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'DEATH_SAVE',
+            'actorId' => $actorId,
+            'requestId' => $requestId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ], 201);
     }
 }

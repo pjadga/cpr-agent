@@ -15,11 +15,15 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'broadcasting/auth'], // <--- Ensure broadcasting/auth is here
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'broadcasting/auth', 'api/broadcasting/auth', 'proxy-image'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'], // <--- Allow ALL origins (easiest for Dev)
+    'allowed_origins' => [
+        'http://localhost:30000', // Your Foundry URL
+        'http://localhost:30001', // Alternative Foundry port
+        '*'                       // OR use wildcard for dev (careful in prod)
+    ],
 
     'allowed_origins_patterns' => [],
 

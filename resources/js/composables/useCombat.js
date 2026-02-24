@@ -1,6 +1,7 @@
 import { ref, watch, onUnmounted } from 'vue';
 import { debounce } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
+import { useEchoListener } from '../utils/listener';
 /**
  * Composable for combat-related logic (movement, target selection, rolls)
  */
@@ -9,7 +10,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const dvInfo = ref(null);
     const dvLoading = ref(false);
     const dvError = ref(null);
-    let moveRefreshTimer = null;
 
     /**
      * Fetch Difficulty Value (DV) for the selected weapon and target
@@ -21,15 +21,18 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
         try {
             dvLoading.value = true;
-            const response = await cachedPost('/getvisibletokens', {
-                selectedWeapon: controlState.value.selectedWeapon
-            }, 1000);
-            // Handle both potential response formats
-            dvInfo.value = response?.data?.data?.dv || response?.data?.data?.result?.dv;
+            const response = await window.axios.post('/getvisibletokens', {
+                selectedWeapon: controlState.value.selectedWeapon,
+                selectedTarget: controlState.value.selectedTarget
+            });
+
+            if (response.data && response.data.success && response.data.data) {
+                dvInfo.value = response.data.data.dv;
+                dvLoading.value = false;
+            }
         } catch (e) {
             console.error('Error fetching DV', e);
             dvError.value = 'Unable to fetch DV.';
-        } finally {
             dvLoading.value = false;
         }
     };
@@ -40,9 +43,18 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      * Get list of visible tokens (enemies) from the server
      */
     const getVisibleTokens = () => {
-        cachedPost("/listvisibletokens", {}, 1500).then(response => {
-            const listData = response?.data?.data?.result || response?.data?.data || [];
-            const list = Array.isArray(listData) ? listData : [];
+        window.axios.post("/listvisibletokens", {}).catch(err => console.error('Error fetching visible tokens', err));
+    };
+
+    const handleFoundryResponse = (e) => {
+        const payload = e.payload || e;
+        console.log('useCombat: Received FoundryResponse', payload);
+
+        if (payload.type === 'DV_INFO_DATA') {
+            dvInfo.value = payload.result?.dv;
+            dvLoading.value = false;
+        } else if (payload.type === 'VISIBLE_TOKENS_DATA') {
+            const list = payload.tokens || [];
 
             // Update existing list to prevent complete re-render if possible
             const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
@@ -69,27 +81,43 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
                 debouncedFetchDV();
             }
-        }).catch(err => console.error('Error fetching visible tokens', err));
+        }
     };
+
+    useEchoListener(handleFoundryResponse);
 
     const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
     const debouncedFetchCharacterData = debounce(fetchCharacterData, 1000);
 
+    let moveThrottleTimer = null;
+    let lastMoveTime = 0;
+
     /**
      * Move character token
      */
     const moveToken = (direction) => {
-        window.axios.post("/movetoken", { direction }).then(() => {
-            debouncedFetchCharacterData();
-        });
-        if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
-        moveRefreshTimer = setTimeout(() => {
-            getVisibleTokens();
-            if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
-                debouncedFetchDV();
-            }
-        }, 4000);
+        const weaponId = controlState.value.selectedWeapon?._id;
+        const now = Date.now();
+
+        // Check if we are within the 1.5s throttle window
+        if (now - lastMoveTime < 1500) {
+            // If a timer is already set, clear it
+            if (moveThrottleTimer) clearTimeout(moveThrottleTimer);
+
+            // Set a new timer to execute after 1.5s of no movement
+            moveThrottleTimer = setTimeout(() => {
+                window.axios.post("/movetoken", { direction, weaponId });
+                lastMoveTime = Date.now();
+            }, 1500 - (now - lastMoveTime));
+
+            return;
+        }
+
+        // Immediate execution if outside throttle window
+        lastMoveTime = now;
+        window.axios.post("/movetoken", { direction, weaponId });
+        // Handled immediately by Foundry pushing SHEET_DELTA/VISIBLE_TOKENS_DATA
     };
 
     /**
@@ -110,7 +138,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
 
         window.axios.post("/attackroll", controlState.value).then((response) => {
-            debouncedFetchCharacterData();
+            // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo updates to avoid race conditions with stale DB data
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
                 // Handle list of rolls from getRolls(limit: 5)
@@ -129,7 +157,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const rollDamage = () => {
         window.axios.post("/damageroll", controlState.value).then((response) => {
-            debouncedFetchCharacterData();
+            // debouncedFetchCharacterData();
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
                 // Handle list of rolls from getRolls(limit: 5)
@@ -161,22 +189,10 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const reloadWeapon = (refreshAll) => {
         if (controlState.value.selectedWeapon) {
             const payload = {
-                selectedWeapon: controlState.value.selectedWeapon
+                weaponId: controlState.value.selectedWeapon._id
             };
-            window.axios.post("/reloadweapon", payload).then(() => {
-                // Refresh character data and combat data after 2 seconds
-                setTimeout(() => {
-                    if (refreshAll) {
-                        refreshAll();
-                    } else {
-                        fetchCharacterData();
-                        getVisibleTokens();
-                        if (controlState.value.selectedWeapon && controlState.value.selectedTarget) {
-                            fetchDVForSelectedWeapon();
-                        }
-                    }
-                }, 2000);
-            });
+            window.axios.post("/reloadweapon", payload);
+            // Handled by SHEET_DELTA from Foundry
         }
     };
 
@@ -188,7 +204,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     });
 
     onUnmounted(() => {
-        if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
+        if (moveThrottleTimer) clearTimeout(moveThrottleTimer);
     });
 
     return {

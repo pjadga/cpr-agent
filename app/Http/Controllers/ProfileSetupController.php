@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ProfileSetupController extends Controller
 {
@@ -16,37 +19,39 @@ class ProfileSetupController extends Controller
         $user = Auth::user();
         $config = $user->config ?? new Config();
 
-        $clientIds = [
-            'foundry-xECODN3n8rO4E5Cj' => 'No Client Available'
-        ];
-
+        $clientIds = [];
         $actors = [];
 
-        if ($config->api_key && ($config->base_url || config('services.foundry.base_url'))) {
-            try {
-                $client = $this->getFoundryClient();
-                $clientId = $client->api->getClientId();
+        if ($config->base_url || config('services.foundry.base_url')) {
+            $requestId = (string) Str::uuid();
 
-                if ($clientId !== null) {
-                    $clientIds = [
-                        $clientId => "Foundry Client Available"
-                    ];
+            CyberpunkAgentChannel::dispatch([
+                'type' => 'GET_ACTORS',
+                'requestId' => $requestId,
+            ]);
 
-                    $getActors = $client->utilities->executeJs($clientId, "let tokens=canvas.tokens.placeables.filter(t=>t.actor&&t.actor.hasPlayerOwner).map(t=>({name:t.name,actorID:t.actor.id,tokenID:t.id}));return tokens");
+            // 2. Wait for the response (The Polling Loop)
+            $startTime = microtime(true);
+            $timeout = 2.0; // Reduced timeout
+            $foundryData = null;
 
-                    if (isset($getActors["result"])) {
-                        foreach ($getActors["result"] as $actor) {
-                            $actors[] = [
-                                "name" => $actor["name"],
-                                "actorId" => $actor["actorID"],
-                                "tokenId" => $actor["tokenID"]
-                            ];
-                        }
-                    }
+            while ((microtime(true) - $startTime) < $timeout) {
+                $key = 'foundry_response_' . $requestId;
+
+                if (Cache::has($key)) {
+                    $foundryData = Cache::pull($key);
+                    break;
                 }
-            } catch (\Exception $e) {
-                // Handle case where API is down or config is wrong
+
+                usleep(20000); // 20ms
             }
+
+            return view('settings', [
+                'clientIds' => $clientIds,
+                'actors' => $foundryData['actors'] ?? [],
+                'user' => Auth::user(),
+                'config' => $config,
+            ]);
         }
 
         return view('settings', [
@@ -60,7 +65,7 @@ class ProfileSetupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'required|string',
+            'client_id' => 'nullable|string',
             'default_actor_id' => 'required|string',
             'default_token_id' => 'required|string',
         ]);
@@ -68,6 +73,43 @@ class ProfileSetupController extends Controller
         $user = Auth::user();
         $user->update($validated);
 
-        return redirect()->route('settings')->with('success', 'Profile synchronized successfully!');
+        $this->refreshCharacterData($user);
+
+        return redirect()->route('settings')->with('success', 'Profile synchronized and character data refreshed!');
+    }
+
+    public function refresh()
+    {
+        $user = Auth::user();
+        $this->refreshCharacterData($user);
+
+        return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
+    }
+
+    protected function refreshCharacterData($user)
+    {
+        // Wipe and replace character_data from Foundry
+        $requestId = (string) Str::uuid();
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'GET_ACTOR',
+            'requestId' => $requestId,
+            'actorId' => $user->getActorId(),
+        ]);
+
+        // Wait for the response to ensure character_data is populated
+        $startTime = microtime(true);
+        $timeout = 3.0;
+        while ((microtime(true) - $startTime) < $timeout) {
+            $key = 'foundry_response_' . $requestId;
+            if (Cache::has($key)) {
+                $foundryData = Cache::pull($key);
+                if (!empty($foundryData['actor'])) {
+                    $user->character_data = $foundryData['actor'];
+                    $user->save();
+                }
+                break;
+            }
+            usleep(50000);
+        }
     }
 }

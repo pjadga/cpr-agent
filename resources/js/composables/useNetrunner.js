@@ -95,7 +95,6 @@ export function useNetrunner(charData, sendRequest, throwError) {
 
     const rollProgram = (program, activeDeck, controlState) => {
         if (controlState) controlState.value.selectedProgram = program;
-        console.log(program);
         sendRequest({
             cyberdeckId: activeDeck._id,
             programId: program._id,

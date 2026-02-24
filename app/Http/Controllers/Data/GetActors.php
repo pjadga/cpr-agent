@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Data;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+
+use Illuminate\Support\Str;
 
 class GetActors extends FormRequest
 {
@@ -16,27 +18,40 @@ class GetActors extends FormRequest
     public function getActors(Request $request)
     {
         $user = auth()->user();
-        $actorId = $user->getActorId();
+        $actorId = $user->default_actor_id ?? null;
 
-        try {
-            $client = $this->getFoundryClient();
-            $clientId = $user->getClientId();
-            // Cache actor data briefly to reduce repeated calls when the sheet opens/rerenders
-            $cacheKey = sprintf('actors:%s:%s', $clientId, $actorId);
-            $ttl = now()->addSeconds(30);
-            $character = Cache::remember($cacheKey, $ttl, function () use ($client, $clientId, $actorId) {
-                return $client->entity->getEntity($clientId, $client->entity::UUID, "Actor.$actorId");
-            });
+        // 1. Dispatch background request to Foundry to refresh the list
+        $requestId = (string) Str::uuid();
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'GET_ACTORS',
+            'requestId' => $requestId,
+        ]);
 
-            // Simplified for now, just returning the character data
-            $character['uuid'] = "Actor.$actorId";
-            return response()->json($character, 200);
-        } catch (\Exception $e) {
-            // If offline, return a dummy response with the actorUuid so the frontend can still call /actorsheet
-            return response()->json([
-                'uuid' => "Actor." . ($actorId ?: 'demo'),
-                'isOffline' => true
-            ], 200);
+        // 2. Return current known state immediately (if any)
+        // Note: For simplicity in the initial settings screen, we could keep polling
+        // OR we return a list of previously cached actors.
+        // For now, let's keep GetActors synchronous but with the fast 20ms polling
+        // unless it's a major bottleneck. The instructions said "GetActor" specifically.
+        // However, for consistency let's look at the polling loop.
+
+        // Polling loop (already optimized to 20ms in Phase 1)
+        $startTime = microtime(true);
+        $timeout = 2.0; // Reduced timeout
+        $foundryData = null;
+
+        while ((microtime(true) - $startTime) < $timeout) {
+            $key = 'foundry_response_' . $requestId;
+            if (Cache::has($key)) {
+                $foundryData = Cache::pull($key);
+                break;
+            }
+            usleep(20000); // 20ms
         }
+
+        return response()->json([
+            'actors' => $foundryData['actors'] ?? [],
+            'uuid' => $actorId,
+            'isOffline' => ($foundryData === null)
+        ], 200);
     }
 }

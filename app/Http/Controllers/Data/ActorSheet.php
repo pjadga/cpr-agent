@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Data;
 
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,29 +16,18 @@ class ActorSheet extends FormRequest
      */
     public function getCleanData(Request $request)
     {
-        // Validate incoming request
-        $validatedData = $request->validate([
-            'actorUuid' => 'required|string|max:255'
-        ]);
-
         $user = auth()->user();
-        $characterData = null;
-        $isOffline = false;
 
-        try {
-            $client = $this->getFoundryClient();
-            $clientId = $user->getClientId();
-            $data = $client->entity->getActorSheetAsJson($clientId, $validatedData["actorUuid"]);
-            $characterData = $data['data'] ?? [];
-
-            if (!empty($characterData)) {
-                // Save for offline use
-                $user->update(['character_data' => $characterData]);
-            }
-        } catch (\Exception $e) {
-            $isOffline = true;
-            $characterData = $user->character_data;
+        // If character JSON data is provided in the request, save it
+        if ($request->has('actorData')) {
+            $user->update([
+                'character_data' => $request->get('actorData')
+            ]);
+            $user->refresh();
         }
+
+        $characterData = $user->character_data;
+        $isOffline = $request->has('actorData'); // Defaulting to true as we are not fetching live data here anymore
 
         if (empty($characterData)) {
             return response()->json([
@@ -71,6 +59,8 @@ class ActorSheet extends FormRequest
                     'wealth' => $characterData['system']['wealth'] ?? ['value' => 0],
                     'improvementPoints' => $characterData['system']['improvementPoints'] ?? ['value' => 0],
                     'roleInfo' => $characterData['system']['roleInfo'] ?? [],
+                    'lifepath' => $characterData['system']['lifepath'] ?? [],
+                    'information' => $characterData['system']['information'] ?? ['notes' => ''],
                     // Crucial for the "Equipped" section in your Vue app
                     'externalData' => $characterData['system']['externalData'] ?? [],
                 ],
@@ -158,8 +148,11 @@ class ActorSheet extends FormRequest
                 // Role Specifics
                 'rank' => $sys['rank'] ?? 0,
                 'mainRoleAbility' => $sys['mainRoleAbility'] ?? '',
-
                 'usage' => $sys['usage'] ?? '',
+
+                // Critical Injury Specifics
+                'quickFix' => $sys['quickFix'] ?? null,
+                'treatment' => $sys['treatment'] ?? null,
             ]
         ];
     }

@@ -56,7 +56,7 @@
                         <h2 class="text-white font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
                         </h2>
-                        <div v-if="charData.isOffline" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
+                        <div v-if="!isWssConnected" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
                             Offline Mode - Agent Synced via Local Cache
                         </div>
                     </div>
@@ -78,6 +78,8 @@
                 @applyBulk="applyBulkChange"
                 @save="commitResourceValue">
             </resource-modal>
+
+            <roll-result-popup></roll-result-popup>
 
             <combat-panel
                 :show="showCombatPanel"
@@ -110,7 +112,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 v-if="charData.isOffline" class="text-xl font-bold uppercase truncate leading-none text-white">
+                            <h1 v-if="!isWssConnected" class="text-xl font-bold uppercase truncate leading-none text-white">
                                 <span class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
                                     Offline
                                 </span>
@@ -125,7 +127,10 @@
                             }}</span>
                     </div>
                     <div class="shrink-0 flex items-center gap-2">
-                        <button @click="rollInitiative" class="group relative flex items-center gap-2 px-3 py-2 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]" title="Initiative Roll">
+                        <button @click="() => refreshSheet({ force: true })" class="p-2 border border-cpr-border text-cpr-text-muted hover:text-white hover:border-cpr-yellow transition-colors" title="Refresh Sheet">
+                            <i v-icon data-lucide="refresh-ccw" class="w-5 h-5 [margin-top:-3px]"></i>
+                        </button>
+                        <button @click="rollInitiative" class="group relative flex items-center gap-2 px-2.5 py-2.5 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]" title="Initiative Roll">
                             <i v-icon data-lucide="swords" class="w-5 h-5 animate-pulse group-hover:animate-none"></i>
                             <span class="text-xs font-black uppercase tracking-widest hidden sm:inline">Initiative</span>
                             <!-- Spooky Glow Overlay -->
@@ -133,7 +138,7 @@
                         </button>
 
                         <button @click="openRollPanel" class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors" title="Die Roller">
-                            <i v-icon data-lucide="dice-6" class="w-5 h-5"></i>
+                            <i v-icon data-lucide="dice-6" class="w-5 h-5 [margin-top:-3px]"></i>
                         </button>
                     </div>
                 </div>
@@ -194,6 +199,13 @@
                         @equip-click="openEquipModal"
                     ></gear-tab>
 
+                    <lifepath-tab
+                        v-else-if="activeTab === 'lifepath'"
+                        :active-tab="activeTab"
+                        :char-data="charData"
+                        @update-notes="updateNotes"
+                    ></lifepath-tab>
+
                     <control-tab
                         v-else-if="activeTab === 'control'"
                         :active-tab="activeTab"
@@ -230,6 +242,8 @@
                          @click="activeTab = 'skills'"></nav-btn>
                 <nav-btn icon="shield" label="Gear" :active="activeTab === 'gear'"
                          @click="activeTab = 'gear'"></nav-btn>
+                <nav-btn icon="users" label="LP" :active="activeTab === 'lifepath'"
+                         @click="activeTab = 'lifepath'"></nav-btn>
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
                 <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
@@ -325,6 +339,7 @@ import CyberdeckConfig from './character-sheet/CyberdeckConfig.vue';
 import CombatPanel from './character-sheet/CombatPanel.vue';
 import ControlTab from './character-sheet/ControlTab.vue';
 import GearTab from './character-sheet/GearTab.vue';
+import LifepathTab from './character-sheet/LifepathTab.vue';
 import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
@@ -336,6 +351,7 @@ import { useCombat } from '../composables/useCombat';
 import { useRollModifiers } from '../composables/useRollModifiers';
 import { useResources } from '../composables/useResources';
 import { useNetrunner } from '../composables/useNetrunner';
+import { useEchoListener } from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
 import { vIcon } from '../directives/icon';
@@ -343,17 +359,20 @@ import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
 
 export default {
     name: 'CharacterSheet',
-    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, ResourceModal, RollModifierPanel, SkillsTab },
+    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, LifepathTab, ResourceModal, RollModifierPanel, SkillsTab },
     directives: { icon: vIcon },
     setup() {
         // --- COMPOSABLES ---
         const {
             charData,
             loading,
+            isWssConnected,
             error: dataError,
             getImageUrl,
             fetchCharacterData,
-            refreshIcons
+            refreshIcons,
+            applyDelta,
+            refreshSheet
         } = useCharacterData();
 
         const activeTab = ref('stats');
@@ -443,6 +462,16 @@ export default {
             sendRequest({}, "/initiativeroll");
         };
 
+        const updateNotes = (notes) => {
+            if (charData.value) {
+                if (!charData.value.data.system.information) {
+                    charData.value.data.system.information = {};
+                }
+                charData.value.data.system.information.notes = notes;
+            }
+            sendRequest({ notes: notes }, "/updatenotes");
+        };
+
         // --- CONTROL PANEL STATE ---
         const controlState = ref({
             spaceMode: 'meatspace',
@@ -452,6 +481,61 @@ export default {
             fireMode: 'Single',
             reloadRequired: false
         });
+
+        // Listen for responses from Foundry
+        const handleFoundryResponse = (e) => {
+            const payload = e.payload || e;
+            console.log('CharacterSheet: Received FoundryResponse', payload);
+
+            if (payload.type === 'SHEET_DELTA' && payload.delta) {
+                // Apply focused delta from Foundry/Backend without full refresh
+                try {
+                    applyDelta(payload.delta, { tab: payload.tab });
+                } catch (e) {
+                    console.warn('Delta apply failed, fallback to refresh', e);
+                    debouncedFetchCharacterData();
+                }
+            } else if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                // Background refresh finished: update our local state with the full fresh actor object
+                // We wrap it in a structure that matches our Vue expectations (top-level 'data' usually)
+                charData.value = {
+                    ...charData.value,
+                    data: payload.actor,
+                    requestId: payload.requestId
+                };
+                setTimeout(refreshIcons, 50);
+            } else if (payload.type === 'ROLL_RESULT') {
+                const isDamage = /\(Damage\)/i.test(payload.label || '');
+                let details = '';
+                if ((payload.label || '').includes('Attack')) {
+                    if (typeof payload.dv !== 'undefined') {
+                        const dvText = typeof payload.dv === 'number' ? payload.dv : String(payload.dv);
+                        const outcome = payload.outcome || '';
+                        details = `DV ${dvText} — ${outcome}`.trim();
+                    }
+                }
+                window.emitter.emit('show-roll-result', {
+                    title: payload.label || payload.rawRoll?.rollTitle || 'Roll Result',
+                    result: payload.total,
+                    formula: payload.rawRoll?._roll?.formula || payload.rawRoll?.formula || '',
+                    flavor: payload.rawRoll?.statName || payload.rawRoll?.rollTitle || '',
+                    isCriticalSuccess: payload.isCriticalSuccess,
+                    isCriticalFailure: payload.isCriticalFailure,
+                    raw: payload.rawRoll,
+                    details,
+                    type: isDamage ? 'damage' : 'default'
+                });
+                // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo/stat updates
+            }
+
+            if (payload.type === 'CONFIRMATION') {
+                // Refresh data when an action is confirmed
+                debouncedFetchCharacterData();
+            }
+        };
+
+        useEchoListener(handleFoundryResponse);
+
 
         watch(() => charData.value?.data.flags?.['cyberpunk-red-core']?.fightState, (newVal) => {
             if (newVal === 'Netspace') {
@@ -643,7 +727,6 @@ export default {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
             const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [], installedPrograms: [] };
-
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
@@ -765,12 +848,23 @@ export default {
             }
         }, { deep: true });
 
-        watch(() => charData.value, (newData) => {
+        watch(() => charData.value, (newData, oldData) => {
             if (newData && controlState.value.selectedWeapon) {
                 const updatedWeapon = newData.data.items.find(i => i._id === controlState.value.selectedWeapon._id);
                 if (updatedWeapon) {
                     controlState.value.selectedWeapon = updatedWeapon;
                     checkReloadRequired();
+                }
+            }
+            // Refresh roll modifiers if HP or critical injuries change
+            if (newData && oldData) {
+                const oldHp = oldData.data.system.derivedStats?.hp?.value;
+                const newHp = newData.data.system.derivedStats?.hp?.value;
+                const oldInjuries = (oldData.data.items || []).filter(i => i.type === 'criticalInjury').length;
+                const newInjuries = (newData.data.items || []).filter(i => i.type === 'criticalInjury').length;
+
+                if (oldHp !== newHp || oldInjuries !== newInjuries) {
+                    fetchRollModifiers();
                 }
             }
         }, { deep: true });
@@ -809,8 +903,9 @@ export default {
             handleItemClick,
 
             // Actions
-            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, rollInitiative,
-            sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings,
+            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, updateNotes, rollInitiative,
+            sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings, refreshSheet,
+            isWssConnected,
 
             // Combat
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,

@@ -1,3 +1,5 @@
+# CPR Agent - [Connect](https://agent.surrealdisco.co.uk/)
+
 # How to Use
 * Save the page to your Homescreen if using a mobile or tablet. It will remove the address bar and it will have more of an 'app' feel.
 * On Safari, Hit the 3 dots in the bottom right -> Share -> Scroll Down -> Add to Home Screen.
@@ -6,29 +8,34 @@
 
 ## 1. Preparation
 * Ensure you have the [Cyberpunk Red module](https://foundryvtt.com/packages/cyberpunk-red-core) installed in Foundry VTT.
-* Install the [ThreeHats API module](https://foundryvtt.com/packages/foundry-rest-api) in your Foundry VTT instance.
+* Install the Cyberpunk Red Agent Bridge module using `https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge/-/raw/main/module.json`
 
 ## 2. Account Setup
 Sign up to this app. Your personal data is not used for any purposes other than authentication.
 *Note: Account deletion is accessible at any time through your account settings.*
 
 ## 3. Configuration
-1. Navigate to the **Config** page.
-2. Input your **Foundry URL**.
-3. Input your **API Key** (this must be the same one added to your Foundry ThreeHats module).
-4. Click **Save**.
+1. Navigate to the **Config** page if not directed to it after login.
+2. Generate an API key. This will be unique to your Agent and will be used within Foundry. 
+3. Input your **Foundry URL**, no trailing slash.
+4. Click **Update Core Settings** (very themed).
+5. Providing Foundry is running and configured as below, your Characters should have been populated in the Agent Sync section.
+6. Choose your character and **Commit Sync** to save.
 
 ## 4. Foundry Module Settings
-In the ThreeHats module settings within Foundry VTT, add the following as the relay link:
-`wss://agent-relay.surrealdisco.co.uk`
+1. Paste in your API key (AKA Sanctum Token). **Each Player will need to log in to their own Foundry account on your server to enter their API key in the same place - this way Foundry saves their individual data**. Once they have done this, all endpoints go through the GMs account.
 
-*This relay is self-hosted through IONOS on a VPS. Call frequency is monitored to improve the app and manage costs.*
 
-## 5. Connecting Characters
-1. Create a player account within Foundry and assign a Token to it. The Agent works by looking for owned tokens.
-2. Once the GM account is up and running, refresh the **Config** page.
-3. A **Foundry Client** should now appear in the dropdown menu.
-4. Selecting that client will load the **Playable Characters** and **Player Owned characters** currently in the session.
+The CPR Agent Bridge was built with my VPS in mind, so it will come configured out of the box. However for those wishing to
+self-host the agent app, here are the main ones to change:
+* Controller URL - point towards the Agent host
+* Host override - if you are hosting a separate Reverb proxy
+* Reverb Port - Blank for auto-detection between ports 443/80 (TLS/insecure). If self hosting, use 8080.
+* Reverb Use SSL - toggles 'wss' protocol vs 'ws'. Keep off if hosting without an SSL certificate.
+* Reverb App Key - Leave as is (it's the public facing key for my server) or make you're own if self-hosting.
+* API Key - This **has** to be generated via the Agent app (Laravel Sanctum). Saving a random string will not work.
+* Debug mode - sweet console logs showing pretty much everything.
+
 
 ## Workarounds
 * The Modifiers window opens in Foundry whenever I roll.
@@ -66,15 +73,16 @@ Currently functioning but actively being worked on.
 * **Netrunning Support**
   * Cyberdeck configuration - rez/de-rez and installation of programs.
   * Net actions and Programs rollable.
-## Setup & Installation
+*  **Local Caching within Foundry**
+*  **Dice Roll returns**
+*  **Lifepaths and Notes section available**
+*  **Item carry control (Carry, equip)_**
+*  **Critical Injuries list (ouch)**
+*  **Dice Roller + Dice Modifiers**
 
-### Quickest way
-* Download the relevant app to your desktop (dropbox links below for Windowws and Linux 64bit).
-* Use the [Threehats API](https://foundryvtt-rest-api-relay.fly.dev/), create an account and get the API key. Note that the limits will get hit very quickly as the app has to make a fair few calls to keep up with the requests. I've implemented a few caching techniques but it's still fairly hungry.
-* Plug that info into the app (see Configuration below), boot Foundry up (make sure you've got the [module](https://foundryvtt.com/packages/foundry-rest-api) installed) and see if it works!
 
 ### Availability
-The app is available through several methods (details below on DDEV):
+The app is available online at the link at the top, and via self-hosting on DDEV (details below on DDEV):
 * **Self-Hosting**: Using DDEV (recommended for local/shared development).
 
 ### Self-Hosting with DDEV
@@ -83,30 +91,9 @@ For the best experience while self-hosting and sharing with your players:
 2. Start the project: `ddev start`. This will give you a URL to visit.
 3. Install dependencies: `ddev composer install` and `ddev npm install`.
 4. Providing there's been no errors, run `ddev artisan migrate:fresh`, `ddev npm run build`. This will refresh the database and build the scripts and styles.
-5. To share the app with players over the internet:
-   * Use `ddev share`, check [here](https://docs.ddev.com/en/stable/users/topics/sharing/) for the documentation. 
-   * This utilizes **ngrok** to provide a public URL that your players can use to access the companion app.
-* Please note that this has been tested with live URLs, I will be doing more testing using local Foundry & relay envrionments and a share DDEV/NGROK instance.
+5. Sharing with players over the internet - **Originally this was done with NGROK, however, due to the necessity for ports to be opened, the best way to share would be a CloudFlared Tunnel. Once I've tested the setup I will post back.**
 
-## Relay Setup
-The app requires a live Foundry VTT session to link to, with the [ThreeHats Foundry API](https://github.com/ThreeHats/foundryvtt-rest-api) module installed.
-
-### Best Practices for Relay
-To ensure a stable connection between the app and your Foundry session, setting up a relay is highly recommended. 
-
-For a comprehensive guide on setting up a relay (using DuckDNS as an example), please refer to:
-**[Foundry VTT REST API Relay - DuckDNS Example](https://foundryvtt-rest-api-relay.fly.dev/docs/relay-app-duckdns-example)**
-
-### Configuration
-1. On the first run, create an account and you will be shown the configration screen. Fill in the relay API, relay URL, and the Foundry URL.
-2. Once the server fields are saved, they will be the same for all users logging on to the app (if hosted).
-3. If your Foundry session is up and running, and the relay key matches the Three Hats API module, when the server details are saved the Client and Character lists will populate.
-4. Select a character, and you should be ready to roll! Hit the Return to Interface button to go to the character sheet.
-5. You can return here at any time by clicking Profile in the bottom right.
 
 ## Technical Foundation
-This app is built with Laravel and [NativePHP](https://nativephp.com/). It uses a [PHP wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper) for the ThreeHats API to communicate with Foundry VTT.
-
-The setup I've been working with is the Relay & Foundry hosted on my home server (Unraid - using docker-compose), and running that through Swag + Cloudflare to obfuscate the SSL ports and provide DNS services. The relay and Foundry do not communicate locally, all calls are made online. 
-
-I tested the app on my VPS, and after cloning the repo + running a few scripts
+This Agent is built with Vue.js, PHP (Laravel along with Reverb + Sanctum), Tailwind CSS, and a ton of JS to make the Foundry Module. I used to use the [ThreeHats API](https://github.com/ThreeHats/foundryvtt-rest-api) and my own [PHP Wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper)
+to take care of the communication, however I wanted more control over returns and data storage! Please give them a look if a more system agnostic API is what you're looking for.

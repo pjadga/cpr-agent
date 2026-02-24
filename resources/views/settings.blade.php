@@ -1,6 +1,9 @@
 @extends('layouts.cyberpunk')
 
 @section('content')
+<form action="{{ route('token.create') }}" method="POST" id="token-create-form" class="hidden">
+    @csrf
+</form>
 <div class="max-w-4xl mx-auto p-8">
     <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
         <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
@@ -25,27 +28,7 @@
         </div>
     @endif
 
-    <div class="p-6 bg-gray-900 text-white border border-neon-blue rounded-lg">
-        <h3 class="text-xl font-bold mb-4">Foundry VTT Link</h3>
 
-        @if (session('flash_token'))
-            <div class="bg-green-800 p-4 mb-4 rounded">
-                <p class="font-mono text-sm break-all select-all">
-                    {{ session('flash_token') }}
-                </p>
-                <p class="text-xs mt-2 text-green-300">
-                    ⚠️ Copy this now. You won't see it again.
-                </p>
-            </div>
-        @endif
-
-        <form action="{{ route('token.create') }}" method="POST">
-            @csrf
-            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded">
-                Generate New Connection Key
-            </button>
-        </form>
-    </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Global App Configuration -->
@@ -55,30 +38,58 @@
             </h3>
             <form action="{{ route('config.store') }}" method="POST" class="space-y-4">
                 @csrf
+
+
                 <div>
                     <div class="flex items-center gap-2">
-                        <x-input-label for="api_key" :value="__('API Key')" class="text-xs uppercase text-cpr-teal" />
+                        <x-input-label readonly for="api_key" :value="__('API Key')" class="text-xs uppercase text-cpr-teal" />
                         <div class="group relative flex items-center">
                             <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
                             <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
-                                Must be the same key added to your Foundry ThreeHats module.
+                                Must be the same key added to the Cyberpunk Agent Bridge module
                             </div>
                         </div>
                     </div>
-                    <x-text-input type="text" name="api_key" id="api_key" value="{{ old('api_key', $config->api_key) }}" class="cyber-input-field mt-1 w-full" />
+                    <x-text-input type="text" name="api_key" id="api_key" value="{{ session('flash_token', old('api_key', $config->api_key)) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
+
                 <div>
-                    <div class="flex items-center gap-2">
-                        <x-input-label for="base_url" :value="__('Relay URL')" class="text-xs uppercase text-cpr-teal" />
-                        <div class="group relative flex items-center">
-                            <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
-                            <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
-                                The URL of your relay server.
-                            </div>
+                    @if ($config->api_key)
+                        <details class="group border border-cpr-teal/30 rounded-lg overflow-hidden bg-cpr-black-deep/40" {{ session('flash_token') ? 'open' : '' }}>
+                            <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-cpr-teal/10 transition-colors list-none">
+                                <h3 class="text-xl font-bold text-cpr-teal">API Key Generation</h3>
+                                <div class="transition-transform duration-300 group-open:rotate-180">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cpr-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </summary>
+                            <div class="p-4 border-t border-cpr-teal/20">
+                    @else
+                        <h3 class="text-xl font-bold mb-4">API Key Generation</h3>
+                    @endif
+
+                    @if (session('flash_token'))
+                        <div class="bg-green-800 p-4 mb-4 rounded">
+                            <p class="font-mono text-sm break-all select-all">
+                                {{ session('flash_token') }}
+                            </p>
+                            <p class="text-xs mt-2 text-green-300">
+                                ⚠️ Copy this now. You won't see it again.
+                            </p>
                         </div>
-                    </div>
-                    <x-text-input type="text" name="base_url" id="base_url" value="{{ old('base_url', $config->base_url ?? config('services.foundry.base_url')) }}" class="cyber-input-field mt-1 w-full" />
+                    @endif
+
+                    <button type="submit" form="token-create-form" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded">
+                        Generate New Connection Key
+                    </button>
+
+                    @if ($config->api_key)
+                            </div>
+                        </details>
+                    @endif
                 </div>
+
                 <div>
                     <div class="flex items-center gap-2">
                         <x-input-label for="foundry_url" :value="__('Foundry URL')" class="text-xs uppercase text-cpr-teal" />
@@ -112,41 +123,21 @@
                 <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest">
                     Agent Sync
                 </h3>
-                <a href="{{ route('settings') }}" class="text-cpr-yellow hover:text-cpr-yellow transition-colors" title="Refresh Sync">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </a>
+                <div class="flex gap-2">
+                    <a href="{{ route('settings.refresh') }}" class="text-cpr-yellow hover:text-cpr-yellow transition-colors" title="Refresh Sync">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </a>
+                </div>
             </div>
-            @if(!$config->api_key || (!$config->base_url && !config('services.foundry.base_url')))
+            @if(!$config->base_url && !config('services.foundry.base_url'))
                 <div class="bg-cpr-red-dark/30 border border-cpr-red-dark text-cpr-red p-4 text-xs italic">
                     SYSTEM OFFLINE: Configure Core System Settings to enable Agent synchronization.
                 </div>
             @else
                 <form method="POST" action="{{ route('profile-setup.store') }}" class="space-y-4">
                     @csrf
-                    <!-- Client ID -->
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-cpr-muted" />
-                            <div class="group relative flex items-center">
-                                <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
-                                <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
-                                    Appears once the GM account is connected and running in Foundry.
-                                </div>
-                            </div>
-                        </div>
-                        <select id="client_id" name="client_id" class="cyber-select-field mt-1 text-base">
-                            <option value="" disabled {{ !$user->client_id ? 'selected' : '' }}>Select Client ID</option>
-                            @foreach($clientIds as $id => $name)
-                                <option value="{{ $id }}" {{ $user->client_id == $id ? 'selected' : '' }} class="cyber-select-option">
-                                    {{ $name }} [{{ $id }}]
-                                </option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('client_id')" class="mt-1 text-cpr-red text-[10px] uppercase" />
-                    </div>
-
                     <!-- Default Actor ID -->
                     <div>
                         <div class="flex items-center gap-2">
@@ -166,6 +157,7 @@
                                 </option>
                             @endforeach
                         </select>
+                        <input type="hidden" name="client_id" id="client_id" value="{{ $user->client_id }}">
                         <input type="hidden" name="default_actor_id" id="default_actor_id" value="{{ $user->default_actor_id }}">
                         <input type="hidden" name="default_token_id" id="default_token_id" value="{{ $user->default_token_id }}">
                         <x-input-error :messages="$errors->get('default_actor_id')" class="mt-1 text-cpr-red text-[10px] uppercase" />
@@ -313,7 +305,10 @@
         const syncIds = () => {
             const val = actorSelection.value;
             if (val && val.includes('|')) {
-                const [actorId, tokenId] = val.split('|');
+                let [actorId, tokenId] = val.split('|');
+                if (actorId.startsWith('Actor.')) {
+                    actorId = actorId.replace('Actor.', '');
+                }
                 document.getElementById('default_actor_id').value = actorId;
                 document.getElementById('default_token_id').value = tokenId;
             }

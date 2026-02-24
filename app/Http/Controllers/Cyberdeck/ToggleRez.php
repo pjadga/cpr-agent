@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cyberdeck;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
@@ -23,37 +24,22 @@ class ToggleRez extends FormRequest
         //The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $programId = $validatedData['programId'];
         $targetState = $validatedData['isRezzed'];
-        $client = $this->getFoundryClient();
 
         $user = auth()->user();
-        $clientId = $user->client_id;
         $actorId = $user->default_actor_id;
         $targetState = $targetState ? 1 : 0;
 
-        //language=js
-        $js = "
-            const programId = '$programId';
-            const targetState = $targetState;
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'TOGGLE_REZ',
+            'actorId' => $actorId,
+            'programId' => $programId,
+            'targetState' => $targetState,
+        ]);
 
-            const actor = game.actors.get('$actorId');
-            if (!actor) return { error: 'Actor not found' };
-
-            const program = actor.items.get(programId);
-            if (!program) return { error: 'Program not found' };
-
-            // Update the isRezzed boolean in the system data
-            await program.update({
-                'system.isRezzed': targetState
-            });
-
-            return { success: true, isRezzed: targetState };
-        ";
-
-        $return = $client->utilities->executeJs($clientId, $js);
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => null,
         ], 201);
     }
 }

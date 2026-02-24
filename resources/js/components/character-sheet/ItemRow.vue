@@ -37,7 +37,13 @@
                     <div class="flex flex-col">
                     <span class="text-sm font-bold text-cpr-text-main group-hover:text-cpr-teal transition-colors">
                         {{ item.name }}
+                        <span v-if="category === 'weapon' && ammoName" class="text-cpr-yellow text-[10px] ml-2 font-normal">({{ ammoName }})</span>
                     </span>
+
+                        <div v-if="category === 'criticalInjury' && item.system.description && item.system.description.value"
+                             class="text-cpr-text-dim text-[11px] leading-tight font-sans mt-1"
+                             v-html="item.system.description.value">
+                        </div>
 
                         <div class="flex flex-wrap gap-2 mt-1">
                             <template v-if="category === 'armor' && armorDisplay">
@@ -62,6 +68,7 @@
                                 <span class="text-[10px] font-mono text-cpr-text-muted">
                                     <template v-if="!isMeleeOrUnarmed && item.system.magazine">
                                         {{ item.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ item.system.magazine.max }}
+                                        <span v-if="ammoTotal !== null" class="text-cpr-yellow ml-1">[{{ ammoTotal }}]</span>
                                     </template>
                                     <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-cpr-red font-bold">{{ item.system.damage }}</span>
                                     <span v-if="item.system.rof > 0" class="ml-2 text-cpr-teal">ROF:{{ item.system.rof }}</span>
@@ -134,21 +141,23 @@
 
         <transition name="expand">
             <div v-if="expanded" class="border-t border-white/5 bg-cpr-black/40 p-3 shadow-inner">
-                <div v-if="item.system.description && item.system.description.value"
-                     class="text-cpr-text-main text-xs leading-relaxed font-sans cpr-description mb-3"
-                     v-html="item.system.description.value">
-                </div>
-                <div v-else class="text-cpr-text-dim text-xs italic mb-3">No description available.</div>
+                <template v-if="category !== 'criticalInjury'">
+                    <div v-if="item.system.description && item.system.description.value"
+                         class="text-cpr-text-main text-xs leading-relaxed font-sans cpr-description mb-3"
+                         v-html="item.system.description.value">
+                    </div>
+                    <div v-else class="text-cpr-text-dim text-xs italic mb-3">No description available.</div>
+                </template>
 
                 <div v-if="category === 'criticalInjury'" class="grid grid-cols-2 gap-2 mb-3">
-                    <div v-if="item.system.quickFix" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-teal flex flex-col gap-1">
+                    <div v-if="item.system.quickFix && (item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic)" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-teal flex flex-col gap-1">
                         <span class="text-[9px] text-cpr-teal uppercase font-bold">Quick Fix</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.quickFix.type }}</span>
                             <span class="text-white font-mono">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
                         </div>
                     </div>
-                    <div v-if="item.system.treatment" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-red flex flex-col gap-1">
+                    <div v-if="item.system.treatment && (item.system.treatment.dvParamedic || item.system.treatment.dvSurgery)" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-red flex flex-col gap-1">
                         <span class="text-[9px] text-cpr-red uppercase font-bold">Treatment</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.treatment.type }}</span>
@@ -181,8 +190,13 @@
 
                 <div v-if="category === 'weapon' && item.system.ammoVariety" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-border-muted flex flex-col gap-2 mt-2">
                     <div class="flex justify-between items-center">
-                        <span>Ammo Type</span>
-                        <span class="text-cpr-text-main normal-case max-w-[100px] text-right">{{ ammoName }}</span>
+                        <span class="text-cpr-text-dim uppercase text-[9px] font-bold">Ammo Type</span>
+                        <span class="text-cpr-yellow font-bold normal-case max-w-[100px] text-right">{{ ammoName }}</span>
+                    </div>
+
+                    <div v-if="ammoTotal !== null" class="flex justify-between items-center text-[10px]">
+                        <span class="text-cpr-text-dim uppercase text-[9px] font-bold">In Inventory</span>
+                        <span class="text-cpr-yellow font-bold font-mono">{{ ammoTotal }}</span>
                     </div>
 
                     <button @click="showReloadPopup = !showReloadPopup"
@@ -240,14 +254,14 @@ export default {
                 // But we want to reload THIS weapon.
                 // Looking at ReloadWeapon.php, it uses selectedWeapon._id
                 await window.axios.post("/reloadweapon", {
-                    selectedWeapon: { _id: props.item._id },
+                    weaponId: props.item._id ,
                     ammoId: ammoId // Passing ammoId as well
                 });
                 showReloadPopup.value = false;
 
                 // Use standard refresh if available, otherwise fallback to fetchCharacterData
                 const refresh = props.refreshAll || fetchCharacterData;
-                setTimeout(refresh, 2000);
+                setTimeout(refresh, 1000);
             } catch (err) {
                 console.error("Error reloading weapon:", err);
             }

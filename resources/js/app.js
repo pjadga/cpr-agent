@@ -15,8 +15,13 @@ import RollModifierPanel from "./components/character-sheet/RollModifierPanel.vu
 import GearTab from "./components/character-sheet/GearTab.vue";
 import ItemRow from "./components/character-sheet/ItemRow.vue";
 import SkillsTab from "./components/character-sheet/SkillsTab.vue";
+import LifepathTab from "./components/character-sheet/LifepathTab.vue";
 import NavBtn from "./components/character-sheet/NavBtn.vue";
+import RollResultPopup from "./components/RollResultPopup.vue";
 import { vCprImg } from "./directives/cpr-img";
+import mitt from 'mitt';
+
+window.emitter = mitt();
 
 window.Alpine = Alpine;
 Alpine.start();
@@ -36,6 +41,8 @@ app.component('roll-modifier-panel', RollModifierPanel);
 app.component('gear-tab', GearTab);
 app.component('item-row', ItemRow);
 app.component('skills-tab', SkillsTab);
+app.component('lifepath-tab', LifepathTab);
 app.component('nav-btn', NavBtn);
+app.component('roll-result-popup', RollResultPopup);
 app.directive('cpr-img', vCprImg);
 app.mount('#app');

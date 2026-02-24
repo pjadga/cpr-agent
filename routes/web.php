@@ -5,6 +5,7 @@ use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Data\GetActor;
 use App\Http\Controllers\Data\ItemEquip;
 use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Rolls\AttackRoll;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Token\ListVisibleTokens;
 use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
+use App\Http\Controllers\Values\UpdateNotes;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProfileSetupController;
 use App\Http\Controllers\Views\ConfigController;
@@ -63,6 +65,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
 
 Route::middleware(['auth', 'app.configured'])->group(function () {
+    Route::get('/settings/refresh', [ProfileSetupController::class, 'refresh'])->name('settings.refresh');
     Route::get('/settings', [ProfileSetupController::class, 'show'])->name('settings');
     Route::get('/profile-setup', [ProfileSetupController::class, 'show'])->name('profile-setup.show');
     Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');
@@ -85,7 +88,9 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
     Route::post("/updatestat", [UpdateStat::class, "updateStat"]);
+    Route::post("/updatenotes", [UpdateNotes::class, "updateNotes"]);
     Route::post("/actorsheet", [ActorSheet::class, "getCleanData"]);
+    Route::post("/getactor", [GetActor::class, "getActor"]);
     Route::post("/getactors", [GetActors::class, "getActors"]);
     Route::post("/movetoken", [MoveToken::class, "moveToken"]);
     Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);
@@ -108,45 +113,20 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::get("/proxy-image", [\App\Http\Controllers\Data\ImageProxy::class, "proxy"])->name('proxy-image');
 });
 
-//Broadcasting tests + API Key registration
+//API Key registration
 
 Route::middleware('auth')->post('/settings/api-token', function (Request $request) {
     // Delete old tokens if you want them to only have one active connection
-    // $request->user()->tokens()->delete();
+    $request->user()->tokens()->delete();
 
     $token = $request->user()->createToken('FoundryClient')->plainTextToken;
+
+    // Save it to the users config
+    $config = $request->user()->config ?: new \App\Models\Config(['user_id' => $request->user()->id]);
+    $config->api_key = $token;
+    $config->save();
 
     return back()->with('flash_token', $token);
 })->name('token.create');
 
-Route::get('/test-cyberpunk', function () {
-    // Fire the event!
-    CyberpunkAgentChannel::dispatch([
-        'type' => 'TEST_PING',
-        'message' => 'Wake up, Samurai.',
-        'timestamp' => now()->toDateTimeString()
-    ]);
-
-    return 'Signal sent to the Net.';
-});
-
-Route::get('/debug-fire-damage', function () {
-    // 1. HARDCODE YOUR TEST ACTOR ID HERE
-    // (Right-click the character sheet header in Foundry -> Copy ID)
-    $targetActorId = 'Fo4jPiMXmoEaoY4K';
-
-    // 2. Generate random HP to prove it updates live
-    $newHp = rand(1, 40);
-
-    // 3. Fire the Event directly (bypassing the Controller)
-    CyberpunkAgentChannel::dispatch([
-        'type' => 'UPDATE_ACTOR',
-        'actorId' => $targetActorId,
-        'changes' => [
-            'system.derivedStats.hp.value' => $newHp
-        ]
-    ]);
-
-    return "💥 BOOM! Sent {$newHp} HP to Actor ID: {$targetActorId}";
-});
 require __DIR__.'/auth.php';

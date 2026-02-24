@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,42 +28,27 @@ class DamageRoll extends FormRequest
         $targetId = $validatedData['selectedTarget']["id"];
         $fireMode = $validatedData['fireMode'];
 
-        $client = $this->getFoundryClient();
         $user = auth()->user();
-
-        $clientId = $user->getClientId();
         $actorId = $user->getActorId();
 
         //TODO Aimed, damage types
 
-        $js = "const enemyTokenId = '$targetId';
-                const targetToken = canvas.tokens.get(enemyTokenId);
-                const actor = game.actors.get('$actorId');
-                const actorId = actor.id;
-                const weaponId = actor.items.get('$weaponId')._id
+        $requestId = uniqid();
 
-                if (targetToken && actor) {
-                    // 1. Set the target
-                    targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
-                    console.log('Successfully targeted: ' + targetToken.name);
-
-                    await actor.sheet._onRoll(
-                    {'data-roll-type': 'damage',
-                    'data-roll-title': 'Damage Roll',
-                    'data-item-id': weaponId,
-                    type: 'click',
-                    currentTarget: {'data-roll-type': 'damage', 'data-roll-title': 'Damage Roll', 'data-item-id': weaponId}}
-                    )
-
-                    targetToken.setTarget(false);
-                }";
-
-        $return = $client->utilities->executeJs($clientId, $js);
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'DAMAGE_ROLL',
+            'actorId' => $actorId,
+            'weaponId' => $weaponId,
+            'targetId' => $targetId,
+            'requestId' => $requestId,
+        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => $return,
+            'data' => [
+                'requestId' => $requestId
+            ],
         ], 201);
     }
 }
