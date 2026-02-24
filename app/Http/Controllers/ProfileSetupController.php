@@ -73,6 +73,43 @@ class ProfileSetupController extends Controller
         $user = Auth::user();
         $user->update($validated);
 
-        return redirect()->route('settings')->with('success', 'Profile synchronized successfully!');
+        $this->refreshCharacterData($user);
+
+        return redirect()->route('settings')->with('success', 'Profile synchronized and character data refreshed!');
+    }
+
+    public function refresh()
+    {
+        $user = Auth::user();
+        $this->refreshCharacterData($user);
+
+        return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
+    }
+
+    protected function refreshCharacterData($user)
+    {
+        // Wipe and replace character_data from Foundry
+        $requestId = (string) Str::uuid();
+        CyberpunkAgentChannel::dispatch([
+            'type' => 'GET_ACTOR',
+            'requestId' => $requestId,
+            'actorId' => $user->getActorId(),
+        ]);
+
+        // Wait for the response to ensure character_data is populated
+        $startTime = microtime(true);
+        $timeout = 3.0;
+        while ((microtime(true) - $startTime) < $timeout) {
+            $key = 'foundry_response_' . $requestId;
+            if (Cache::has($key)) {
+                $foundryData = Cache::pull($key);
+                if (!empty($foundryData['actor'])) {
+                    $user->character_data = $foundryData['actor'];
+                    $user->save();
+                }
+                break;
+            }
+            usleep(50000);
+        }
     }
 }

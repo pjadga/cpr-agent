@@ -1,10 +1,10 @@
 <template>
     <transition name="slide-right">
-        <aside v-if="show" class="fixed top-0 right-0 h-full w-[20rem] max-w-[85vw] z-[60] bg-cpr-black/95 border-l border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.35)] flex flex-col">
-            <div class="flex items-center justify-between p-3 pt-[calc(0.75rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">
+        <aside v-if="show" class="fixed top-0 right-0 h-full w-[18rem] max-w-[85vw] z-[60] bg-cpr-black/95 border-l border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.35)] flex flex-col">
+            <div class="flex items-center justify-between p-2 pt-[calc(0.5rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="dice-6" class="w-4 h-4 text-cpr-red"></i>
-                    <span class="text-xs font-black uppercase tracking-widest text-cpr-red">Dice Roller & Mods</span>
+                    <i v-icon data-lucide="dice-6" class="w-3 h-3 text-cpr-red"></i>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-cpr-red">Dice Roller & Mods</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button @click="$emit('refresh')" class="p-1 text-cpr-text-main hover:text-white">
@@ -15,52 +15,52 @@
                     </button>
                 </div>
             </div>
-            <div class="p-3 space-y-3 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.75rem+env(safe-area-inset-right))] relative">
+            <div class="p-2 space-y-2 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.5rem+env(safe-area-inset-right))] relative">
                 <!-- Roll Result Popup -->
                 <transition name="fade">
-                    <div v-if="showResultPopup" class="absolute inset-0 z-[70] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm">
-                        <div class="bg-cpr-black border-2 border-cpr-red shadow-[0_0_50px_rgba(220,38,38,0.5)] p-8 text-center relative overflow-hidden group">
+                    <div v-if="showResultPopup" class="absolute inset-0 z-[70] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-sm">
+                        <div class="bg-cpr-black border-2 border-cpr-red shadow-[0_0_50px_rgba(220,38,38,0.5)] p-4 text-center relative overflow-hidden group">
                             <!-- Background Glitch Effect -->
                             <div class="absolute inset-0 bg-cpr-red/5 animate-pulse"></div>
                             <div class="absolute -inset-full bg-gradient-to-r from-transparent via-cpr-red/10 to-transparent rotate-45 translate-x-[-100%] animate-[shimmer_2s_infinite]"></div>
 
                             <div class="relative z-10">
-                                <div class="text-[10px] text-cpr-red uppercase font-black tracking-[0.2em] mb-2 animate-bounce">Uplink Confirmed</div>
-                                <div class="text-6xl font-black text-white font-mono drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-4">{{ lastResult?.total }}</div>
-                                <div class="text-xs text-cpr-lime font-mono uppercase tracking-widest">{{ lastResult?.formula }}</div>
+                                <div class="text-[8px] text-cpr-red uppercase font-black tracking-[0.2em] mb-1 animate-bounce">Uplink Confirmed</div>
+                                <div class="text-4xl font-black text-white font-mono drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">{{ lastResult?.total }}</div>
+                                <div class="text-[10px] text-cpr-lime font-mono uppercase tracking-widest">{{ lastResult?.formula }}</div>
 
-                                <button @click="showResultPopup = false" class="mt-8 px-6 py-2 bg-cpr-red text-black text-xs font-black uppercase hover:bg-white transition-colors">Acknowledge</button>
+                                <button @click="showResultPopup = false" class="mt-4 px-4 py-1 bg-cpr-red text-black text-[10px] font-black uppercase hover:bg-white transition-colors">Acknowledge</button>
                             </div>
                         </div>
                     </div>
                 </transition>
 
                 <!-- Die Roller Section (Always Visible) -->
-                <div class="bg-cpr-black-deep border border-cpr-red/30 p-3 space-y-3 mb-4">
-                    <div class="text-[10px] text-cpr-red uppercase font-bold tracking-wider mb-2 flex items-center gap-2">
-                        <i v-icon data-lucide="dice-5" class="w-3 h-3"></i> Quick Dice
+                <div class="bg-cpr-black-deep border border-cpr-red/30 p-2 space-y-2 mb-2">
+                    <div class="text-[9px] text-cpr-red uppercase font-bold tracking-wider mb-1 flex items-center gap-2">
+                        <i v-icon data-lucide="dice-5" class="w-2 h-2"></i> Quick Dice
                     </div>
 
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-4 gap-1">
                         <button v-for="die in ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100']"
                                 :key="die"
                                 @click="addDie(die)"
-                                class="flex flex-col items-center justify-center p-2 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
-                            <span class="text-xs font-bold text-cpr-text-main group-hover:text-white uppercase">{{ die }}</span>
+                                class="flex flex-col items-center justify-center p-1.5 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
+                            <span class="text-[10px] font-bold text-cpr-text-main group-hover:text-white uppercase">{{ die }}</span>
                         </button>
                         <button @click="clearFormula"
-                                class="flex items-center justify-center p-2 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
-                            <i v-icon data-lucide="trash-2" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-red"></i>
+                                class="flex items-center justify-center p-1.5 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
+                            <i v-icon data-lucide="trash-2" class="w-3 h-3 text-cpr-text-dim group-hover:text-cpr-red"></i>
                         </button>
                     </div>
 
-                    <div v-if="formula" class="mt-3 space-y-2">
-                        <div class="bg-cpr-black p-2 border border-cpr-border-dark flex items-center justify-between">
-                            <span class="text-sm font-mono text-cpr-lime">{{ formula }}</span>
+                    <div v-if="formula" class="mt-2 space-y-1">
+                        <div class="bg-cpr-black p-1.5 border border-cpr-border-dark flex items-center justify-between">
+                            <span class="text-[11px] font-mono text-cpr-lime">{{ formula }}</span>
                             <button @click="rollFormula"
                                     :disabled="rolling"
-                                    class="bg-cpr-red text-black text-[10px] font-black uppercase px-3 py-1 hover:bg-cpr-red-light disabled:opacity-50 transition-colors">
-                                {{ rolling ? 'Rolling...' : 'Roll' }}
+                                    class="bg-cpr-red text-black text-[9px] font-black uppercase px-2 py-0.5 hover:bg-cpr-red-light disabled:opacity-50 transition-colors">
+                                {{ rolling ? '...' : 'Roll' }}
                             </button>
                         </div>
                     </div>
@@ -75,49 +75,48 @@
                     </div>
                 </div>
 
-                <div v-if="data" class="space-y-4">
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
-                        <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Actor</div>
-                        <div class="text-white font-bold">{{ data.actorName }}</div>
+                <div v-if="data" class="space-y-2">
+                    <div class="bg-cpr-black-deep border border-cpr-border p-2">
+                        <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Actor</div>
+                        <div class="text-white font-bold text-xs">{{ data.actorName }}</div>
                     </div>
 
-                    <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-3">
+                    <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
-                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Base Bonus</div>
-                            <div class="text-cpr-lime font-mono font-bold">+{{ data.baseBonus }}</div>
+                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Base Bonus</div>
+                            <div class="text-cpr-lime font-mono font-bold text-xs">+{{ data.baseBonus }}</div>
                         </div>
-                        <div v-if="data.breakdown" class="mt-2 text-[11px] text-cpr-text-main font-mono space-y-1">
+                        <div v-if="data.breakdown" class="mt-1 text-[10px] text-cpr-text-main font-mono space-y-0.5">
                             <div class="flex justify-between"><span>{{ (data.breakdown.statName || 'STAT').toUpperCase() }}</span><span>+{{ data.breakdown.statValue }}</span></div>
                             <div class="flex justify-between"><span>{{ data.breakdown.skillName }}</span><span>+{{ data.breakdown.skillLevel }}</span></div>
                             <div class="flex justify-between"><span>Weapon Acc</span><span>+{{ data.breakdown.weaponAcc }}</span></div>
                         </div>
                     </div>
 
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
-                        <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-2">Injuries & Effects</div>
-                        <div v-if="!data.injuries || data.injuries.length === 0" class="text-xs text-cpr-text-dim italic">No injuries affecting rolls.</div>
-                        <div v-else class="space-y-2">
-                            <div v-for="(inj, idx) in data.injuries" :key="idx" class="border border-cpr-border p-2 bg-cpr-black/40">
+                    <div class="bg-cpr-black-deep border border-cpr-border p-2">
+                        <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1">Injuries & Effects</div>
+                        <div v-if="!data.injuries || data.injuries.length === 0" class="text-[10px] text-cpr-text-dim italic">No injuries.</div>
+                        <div v-else class="space-y-1">
+                            <div v-for="(inj, idx) in data.injuries" :key="idx" class="border border-cpr-border p-1.5 bg-cpr-black/40">
                                 <div class="flex items-center justify-between">
-                                    <div class="text-xs font-bold text-white">{{ inj.title }}</div>
-                                    <div :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}" class="text-[11px] font-mono">{{ inj.penalty }}</div>
+                                    <div class="text-[10px] font-bold text-white">{{ inj.title }}</div>
+                                    <div :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}" class="text-[10px] font-mono">{{ inj.penalty }}</div>
                                 </div>
-                                <div v-if="inj.description" class="text-[11px] text-cpr-text-muted mt-1">{{ inj.description }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
+                    <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
-                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
-                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-mono font-bold">{{ data.totalPenalty }}</div>
+                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
+                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-mono font-bold text-xs">{{ data.totalPenalty }}</div>
                         </div>
                     </div>
 
-                    <div class="bg-cpr-black-deep border border-cpr-border p-3">
+                    <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
-                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Final Roll Modifier</div>
-                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-mono font-bold">{{ data.finalModifier }}</div>
+                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Final Modifier</div>
+                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-mono font-bold text-xs">{{ data.finalModifier }}</div>
                         </div>
                     </div>
                 </div>

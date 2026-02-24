@@ -65,6 +65,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
 
 Route::middleware(['auth', 'app.configured'])->group(function () {
+    Route::get('/settings/refresh', [ProfileSetupController::class, 'refresh'])->name('settings.refresh');
     Route::get('/settings', [ProfileSetupController::class, 'show'])->name('settings');
     Route::get('/profile-setup', [ProfileSetupController::class, 'show'])->name('profile-setup.show');
     Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');

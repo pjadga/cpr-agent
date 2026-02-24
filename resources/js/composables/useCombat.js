@@ -10,7 +10,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const dvInfo = ref(null);
     const dvLoading = ref(false);
     const dvError = ref(null);
-    let moveRefreshTimer = null;
 
     /**
      * Fetch Difficulty Value (DV) for the selected weapon and target
@@ -91,11 +90,32 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
     const debouncedFetchCharacterData = debounce(fetchCharacterData, 1000);
 
+    let moveThrottleTimer = null;
+    let lastMoveTime = 0;
+
     /**
      * Move character token
      */
     const moveToken = (direction) => {
         const weaponId = controlState.value.selectedWeapon?._id;
+        const now = Date.now();
+
+        // Check if we are within the 1.5s throttle window
+        if (now - lastMoveTime < 1500) {
+            // If a timer is already set, clear it
+            if (moveThrottleTimer) clearTimeout(moveThrottleTimer);
+
+            // Set a new timer to execute after 1.5s of no movement
+            moveThrottleTimer = setTimeout(() => {
+                window.axios.post("/movetoken", { direction, weaponId });
+                lastMoveTime = Date.now();
+            }, 1500 - (now - lastMoveTime));
+
+            return;
+        }
+
+        // Immediate execution if outside throttle window
+        lastMoveTime = now;
         window.axios.post("/movetoken", { direction, weaponId });
         // Handled immediately by Foundry pushing SHEET_DELTA/VISIBLE_TOKENS_DATA
     };
@@ -184,7 +204,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     });
 
     onUnmounted(() => {
-        if (moveRefreshTimer) clearTimeout(moveRefreshTimer);
+        if (moveThrottleTimer) clearTimeout(moveThrottleTimer);
     });
 
     return {
