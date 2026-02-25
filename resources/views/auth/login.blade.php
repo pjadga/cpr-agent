@@ -22,14 +22,14 @@
 
                     <!-- Email Address -->
                     <div>
-                        <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="email" :value="__('Email')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="email" class="cyber-input-field mt-1" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
                     <!-- Password -->
                     <div>
-                        <x-input-label for="password" :value="__('Access Code (Password)')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="password" :value="__('Password')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="password" class="cyber-input-field mt-1"
                                         type="password"
                                         name="password"
@@ -61,11 +61,11 @@
                         @endif
                     </div>
                 </form>
-<div class="text-center mt-4">
-                <a href="{{ route('how-to-use') }}" class="text-[12px] text-cpr-red hover:text-cpr-yellow uppercase font-bold transition-colors border-b border-cpr-red/300 pb-1">
-                    How to Use
-                </a>
-</div>
+                <div class="text-center mt-4">
+                    <a href="{{ route('how-to-use') }}" class="text-[12px] text-cpr-red hover:text-cpr-yellow uppercase font-bold transition-colors border-b border-cpr-red/300 pb-1">
+                        How to Use
+                    </a>
+                </div>
             </div>
         </div>
     </div>

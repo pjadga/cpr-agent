@@ -17,21 +17,21 @@
 
                     <!-- Name -->
                     <div>
-                        <x-input-label for="name" :value="__('Operator Name')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="name" :value="__('Edgerunner Name')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="name" class="cyber-input-field mt-1" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
 
                     <!-- Email Address -->
                     <div>
-                        <x-input-label for="email" :value="__('Agent ID (Email)')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="email" :value="__('Email')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="email" class="cyber-input-field mt-1" type="email" name="email" :value="old('email')" required autocomplete="username" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
                     <!-- Password -->
                     <div>
-                        <x-input-label for="password" :value="__('Access Code (Password)')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="password" :value="__('Password')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="password" class="cyber-input-field mt-1"
                                         type="password"
                                         name="password"
@@ -41,7 +41,7 @@
 
                     <!-- Confirm Password -->
                     <div>
-                        <x-input-label for="password_confirmation" :value="__('Verify Access Code')" class="text-xs uppercase text-cpr-text-muted" />
+                        <x-input-label for="password_confirmation" :value="__('Verify Password')" class="text-xs uppercase text-cpr-text-muted" />
                         <x-text-input id="password_confirmation" class="cyber-input-field mt-1"
                                         type="password"
                                         name="password_confirmation" required autocomplete="new-password" />
