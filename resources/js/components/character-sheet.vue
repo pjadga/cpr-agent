@@ -553,6 +553,7 @@ export default {
             dvError,
             debouncedFetchDV,
             getVisibleTokens,
+            debouncedGetVisibleTokens,
             moveToken,
             rollHit,
             rollDamage,
@@ -652,8 +653,6 @@ export default {
             applyBulkChange,
             commitResourceValue
         } = useResources(charData, updateStat);
-
-        const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
 
         // --- COMPUTED PROPERTIES ---
 

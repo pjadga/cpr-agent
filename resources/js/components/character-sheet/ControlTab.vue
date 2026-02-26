@@ -185,14 +185,26 @@
 
         <!-- Tactical Movement -->
         <div class="pt-4 border-t border-cpr-border/50">
-            <h3 class="text-[10px] font-black text-cpr-text-dim uppercase tracking-[0.3em] mb-4 text-center">Tactical Positioning</h3>
-            <div class="grid grid-cols-3 gap-3 max-w-[180px] mx-auto">
+            <div class="flex items-center justify-center gap-4 mb-3">
+                <div class="h-px bg-cpr-border/30 flex-1"></div>
+                <span class="text-[10px] font-black text-cpr-text-dim uppercase tracking-[0.3em]">Positioning</span>
+                <div class="h-px bg-cpr-border/30 flex-1"></div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-4">
                 <div></div>
-                <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-up" class="w-6 h-6"></i></button>
+                <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                    <i v-icon data-lucide="chevron-up" class="w-6 h-6 pointer-events-none"></i>
+                </button>
                 <div></div>
-                <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-left" class="w-6 h-6"></i></button>
-                <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-down" class="w-6 h-6"></i></button>
-                <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-black-elevated active:bg-cpr-red-dark/40 transition-colors rounded-sm shadow-lg"><i v-icon data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                    <i v-icon data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
+                </button>
+                <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                    <i v-icon data-lucide="chevron-down" class="w-6 h-6 pointer-events-none"></i>
+                </button>
+                <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                    <i v-icon data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i>
+                </button>
             </div>
         </div>
     </div>

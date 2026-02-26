@@ -25,6 +25,20 @@ export function debounce(fn, wait = 250) {
 }
 
 /**
+ * Throttle function to limit execution frequency
+ */
+export function throttle(fn, wait = 250) {
+    let lastCall = 0;
+    return (...args) => {
+        const now = Date.now();
+        if (now - lastCall >= wait) {
+            lastCall = now;
+            return fn(...args);
+        }
+    };
+}
+
+/**
  * Shallow array equality check
  */
 export function arraysEqualShallow(a, b) {

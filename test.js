@@ -1,10 +1,127 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
-// 1. Make Pusher available globally (required for Echo)
+// Make Pusher available globally (required for Echo)
 window.Pusher = Pusher;
 
 const MODULE_ID = 'cpr-agent';
+
+// ==================================================================
+// CUSTOM GM MENU: CHARACTER ASSIGNMENT
+// ==================================================================
+class CharacterAssignmentMenu extends FormApplication {
+    static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+            id: 'cpr-agent-assignment-menu',
+            title: 'Agent Character Assignment',
+            width: 500,
+            classes: ["form"]
+        });
+    }
+
+    async _renderInner(data) {
+        let html = `
+            <div>
+                <p>Assign playable characters to players who have linked their API keys.</p>
+                <table style="width: 100%; text-align: left; margin-bottom: 10px;">
+                    <tr>
+                        <th>Player</th>
+                        <th>API Status</th>
+                        <th>Assigned Character</th>
+                    </tr>`;
+
+        for (let u of data.users) {
+            html += `<tr><td style="padding: 5px 0;"><strong>${u.name}</strong></td>`;
+            if (u.hasKey) {
+                html += `<td style="color: #00ff00;">✔ Linked</td>
+                         <td><select class="character-select" data-userid="${u.id}" style="width: 100%;">
+                         <option value="">- None -</option>`;
+                for (let c of data.characters) {
+                    const selected = c.id === u.characterId ? 'selected' : '';
+                    html += `<option value="${c.id}" ${selected}>${c.name}</option>`;
+                }
+                html += `</select></td>`;
+            } else {
+                html += `<td style="color: #ff0000;">❌ Missing</td>
+                         <td><select disabled style="width: 100%;"><option>- Key Missing -</option></select></td>`;
+            }
+            html += `</tr>`;
+        }
+
+        html += `</table>
+                 <button type="button" id="save-agent-assignments"><i class="fas fa-save"></i> Save Assignments</button>
+                 </div>`;
+        return $(html);
+    }
+
+    getData() {
+        const users = game.users.filter(u => !u.isGM).map(u => ({
+            id: u.id,
+            name: u.name,
+            hasKey: !!u.getFlag('cpr-agent', 'hasApiKey'),
+            characterId: u.character?.id || ""
+        }));
+
+        const characters = game.actors.filter(a => a.type === 'character').map(a => ({
+            id: a.id,
+            name: a.name
+        }));
+
+        return { users, characters };
+    }
+
+    // This forces Foundry to listen to our specific button click
+    activateListeners(html) {
+        super.activateListeners(html);
+
+        html.find('#save-agent-assignments').click(async (event) => {
+            event.preventDefault(); // Stop any browser funny business
+
+            let updatedCount = 0;
+            const updates = [];
+
+            // Rip the values directly from the dropdowns
+            html.find('.character-select').each((index, element) => {
+                const userId = element.dataset.userid;
+                const actorId = element.value;
+                const user = game.users.get(userId);
+
+                if (user) {
+                    const newCharId = (actorId === "" || actorId === "null") ? null : actorId;
+                    const currentCharId = user.character?.id || null;
+
+                    if (currentCharId !== newCharId) {
+                        updates.push({ _id: user.id, character: newCharId });
+                        updatedCount++;
+                    }
+                }
+            });
+
+            // Save to DB and alert the GM
+            if (updates.length > 0) {
+                await User.updateDocuments(updates);
+                ui.notifications.info(`Cyberpunk Bridge: Updated ${updatedCount} player assignments!`);
+
+                // Sync each change to Laravel so it knows immediately
+                for (let update of updates) {
+                    await window.cyberpunkBridge.sendResponse({
+                        type: 'GM_LINK_PLAYER_CHARACTER',
+                        foundryUserId: update._id,
+                        character: update.character
+                    });
+                }
+
+                // Trigger a sync for the GM in case they updated themselves
+                window.cyberpunkBridge.syncPlayerLink();
+            } else {
+                ui.notifications.info(`Cyberpunk Bridge: No assignment changes made.`);
+            }
+
+            this.close(); // Close the window manually after saving
+        });
+    }
+}
+// ==================================================================
 
 class CyberpunkBridge {
     constructor() {
@@ -14,60 +131,41 @@ class CyberpunkBridge {
         this.hookIds = {};
     }
 
-    /**
-     * INTERCEPTOR: Wraps renderTemplate to steal the CPRRoll object before it vanishes.
-     */
     async rollAndCapture(actorId, triggerFunction) {
-        console.log(`%c[Bridge] ‍Starting Render Interceptor for Actor ${actorId}`, "color: #00ffff; font-weight: bold;");
+        console.log(`%c[Bridge] Starting Render Interceptor for Actor ${actorId}`, "color: #00ffff; font-weight: bold;");
 
         return new Promise(async (resolve, reject) => {
             let rollFound = false;
-
-            // 1. Save the original function
             const originalRender = renderTemplate;
 
-            // 2. Define our "Spy" function
             const spyRender = function(path, data) {
-                // Check if this is a CPR Roll Card
                 if (path && typeof path === 'string' && path.includes('rollcard')) {
-                    console.log(`%c[Bridge] Intercepted Render: ${path}`, "color: #00ff00;", data);
-
-                    // Verify it belongs to our actor (optional, but good safety)
-                    // Most CPR roll objects have an 'actor' or 'alias' property, or we assume timing is correct
-
+                    console.log(`%c[Bridge] 🎯 Intercepted Render: ${path}`, "color: #00ff00;", data);
                     rollFound = true;
-
-                    // RESTORE the original immediately so we don't break anything else
                     renderTemplate = originalRender;
 
-                    // RESOLVE with the stolen data
                     resolve({
                         success: true,
                         total: data.resultTotal,
                         isCriticalSuccess: data.wasCritSuccess ? data.wasCritSuccess() : (data.isCriticalSuccess || false),
                         isCriticalFailure: data.wasCritFail ? data.wasCritFail() : (data.isCriticalFailure || false),
                         label: data.rollTitle,
-                        rawRoll: data // <--- HERE IS YOUR FULL OBJECT
+                        rawRoll: data
                     });
                 }
-
-                // Pass execution back to the original function so the chat card actually appears
                 return originalRender.apply(this, arguments);
             };
 
-            // 3. Install the Spy
             renderTemplate = spyRender;
 
-            // 4. Safety Timeout (Restores original function if render never happens)
             setTimeout(() => {
                 if (!rollFound) {
                     renderTemplate = originalRender;
                     console.warn("[Bridge] ❌ Interceptor timed out. No rollcard rendered.");
                     resolve({ success: false, error: "Timed out waiting for render" });
                 }
-            }, 5000); // 5 seconds max wait
+            }, 5000);
 
-            // 5. Trigger the Roll
             try {
                 await triggerFunction();
             } catch (e) {
@@ -76,9 +174,7 @@ class CyberpunkBridge {
             }
         });
     }
-    /**
-     * Clean up before reloading
-     */
+
     destroy() {
         if (this.echo) {
             this.echo.disconnect();
@@ -86,30 +182,38 @@ class CyberpunkBridge {
         for (let [hookName, id] of Object.entries(this.hookIds)) {
             Hooks.off(hookName, id);
         }
-        // Restore original Roll.toMessage
         if (this._originalToMessage) {
             Roll.prototype.toMessage = this._originalToMessage;
         }
         console.log("Cyberpunk Bridge: Destroyed and hooks removed.");
     }
 
-    /**
-     * Initialize Settings
-     */
     registerSettings() {
+        // Register the GM Menu
+        game.settings.registerMenu(MODULE_ID, 'characterAssignment', {
+            name: 'Player Assignments',
+            label: 'Manage Characters',
+            hint: 'Assign playable characters to players who have linked their Agent API keys.',
+            icon: 'fas fa-users',
+            type: CharacterAssignmentMenu,
+            restricted: true // GM Only
+        });
+
         game.settings.register(MODULE_ID, 'apiUrl', {
-            name: 'Relay Controller URL',
-            hint: 'The base URL of your Agent (e.g., https://agent.surrealdisco.co.uk). Do NOT include port 8080 here.',
-            scope: 'client',
+            name: 'Agent URL',
+            hint: 'The base URL of your Agent (e.g., https://agent.surrealdisco.co.uk).',
+            scope: 'world', // URL is usually the same for everyone
             config: true,
             type: String,
             default: 'https://agent.surrealdisco.co.uk',
-            onChange: () => this.reconnect()
+            onChange: () => {
+                if (game.user.isGM) this.reconnect();
+                this.syncPlayerLink();
+            }
         });
 
         game.settings.register(MODULE_ID, 'reverbHost', {
             name: 'Reverb Host (override)',
-            hint: 'Optional. Override the WebSocket host used for Reverb (e.g., my-tunnel.ngrok-free.dev). Leave blank to derive from Foundry URL.',
             scope: 'world',
             config: true,
             type: String,
@@ -119,7 +223,6 @@ class CyberpunkBridge {
 
         game.settings.register(MODULE_ID, 'reverbPort', {
             name: 'Reverb Port',
-            hint: 'Optional. If blank, auto-detects: 443 for https/wss, 80 for http/ws, or use your custom value.',
             scope: 'world',
             config: true,
             type: Number,
@@ -129,7 +232,6 @@ class CyberpunkBridge {
 
         game.settings.register(MODULE_ID, 'reverbUseSSL', {
             name: 'Reverb Use SSL (wss)',
-            hint: 'If enabled, uses secure WebSockets (wss). If left off, auto-detects from Relay URL protocol.',
             scope: 'world',
             config: true,
             type: Boolean,
@@ -139,7 +241,6 @@ class CyberpunkBridge {
 
         game.settings.register(MODULE_ID, 'reverbKey', {
             name: 'Reverb App Key',
-            hint: 'The App Key from your .env file.',
             scope: 'world',
             config: true,
             type: String,
@@ -150,16 +251,20 @@ class CyberpunkBridge {
         game.settings.register(MODULE_ID, 'apiKey', {
             name: 'API Key (Sanctum Token)',
             hint: 'Generate this in your Cyberpunk Agent dashboard.',
-            scope: 'world', // or 'client' if each player has their own
+            scope: 'client', // Vital for player uniqueness
             config: true,
             type: String,
             default: '',
-            onChange: () => this.reconnect()
+            onChange: async (val) => {
+                // Update the public flag so the GM Menu instantly knows they added a key
+                await game.user.setFlag(MODULE_ID, 'hasApiKey', !!val);
+                if (game.user.isGM) this.reconnect();
+                this.syncPlayerLink();
+            }
         });
 
         game.settings.register(MODULE_ID, 'debugMode', {
             name: 'Debug Mode',
-            hint: 'Log all socket events to console',
             scope: 'client',
             config: true,
             type: Boolean,
@@ -167,9 +272,6 @@ class CyberpunkBridge {
         });
     }
 
-    /**
-     * Connect to Laravel Reverb
-     */
     connect() {
         const apiUrl = game.settings.get(MODULE_ID, 'apiUrl');
         const token = game.settings.get(MODULE_ID, 'apiKey');
@@ -178,38 +280,22 @@ class CyberpunkBridge {
         const useSSLSetting = game.settings.get(MODULE_ID, 'reverbUseSSL');
         const reverbHostOverride = (game.settings.get(MODULE_ID, 'reverbHost') || '').trim();
 
-        if (!token || !apiUrl) {
-            ui.notifications.warn("Cyberpunk Bridge: Missing API URL or Key.");
-            return;
-        }
+        if (!token || !apiUrl) return;
 
-        // Clean up old connection if exists
         if (this.echo) {
             this.echo.disconnect();
         }
 
-        // Parse host from URL for Reverb config and infer ports/TLS for ngrok/cloudflared
         let baseUrl;
-        try {
-            baseUrl = new URL(apiUrl);
-        } catch (e) {
-            console.error("Invalid Relay URL", e);
-            return;
-        }
+        try { baseUrl = new URL(apiUrl); }
+        catch (e) { return; }
 
-        // Determine host used for websocket
         const wsHost = reverbHostOverride || baseUrl.hostname;
-
-        // Auto-detect TLS from apiUrl protocol when not explicitly set
         const inferredSecure = baseUrl.protocol === 'https:';
         const forceTLS = (typeof useSSLSetting === 'boolean' ? useSSLSetting : undefined);
         const useTLS = (forceTLS !== undefined && forceTLS !== null) ? forceTLS : inferredSecure;
-
-        // Auto ports: if user provided non-zero, use it; else default 443 for secure, 80 for insecure
         const defaultPort = useTLS ? 443 : 80;
         const wsPort = reverbPortSetting > 0 ? reverbPortSetting : defaultPort;
-
-        console.log(`[Bridge] Connecting to Agent Relay via Reverb host=${wsHost} port=${wsPort} secure=${useTLS}`);
 
         this.echo = new Echo({
             broadcaster: 'reverb',
@@ -230,10 +316,8 @@ class CyberpunkBridge {
             }
         });
 
-        // Store instance for debugging
         window.CyberpunkSocket = this.echo;
 
-        // Monitor Connection State
         this.echo.connector.pusher.connection.bind('connected', () => {
             this.isConnected = true;
             ui.notifications.info("Cyberpunk Bridge: Online");
@@ -242,34 +326,66 @@ class CyberpunkBridge {
 
         this.echo.connector.pusher.connection.bind('disconnected', () => {
             this.isConnected = false;
-            if(debug) console.warn("Cyberpunk Bridge: Disconnected");
         });
 
         this.listen();
     }
 
-    /**
-     * Listen for Private Channel Events
-     */
     listen() {
-        const userId = game.user.id; // Or map this to a specific ID from your Laravel App
-
-        // We listen on a private channel named 'cyberpunk.{foundry_user_id}'
-        // You might want to use the API Key to determine the channel name in a real app
+        // Only the GM listens for World Updates
         this.echo.private(`cpr-agent`)
             .listen('.GameUpdate', (e) => {
-                console.log("Incoming Data:", e);
                 this.handleIncomingData(e);
             });
 
-        // REGISTER GLOBAL HOOKS to detect manual changes in Foundry
         this.registerGlobalHooks();
     }
 
+    /**
+     * Syncs the player's assigned character with the Agent.
+     * This allows the Agent to know which character the player is using in Foundry.
+     */
+    async syncPlayerLink() {
+        const token = game.settings.get(MODULE_ID, 'apiKey');
+
+        // Update the key status flag on the user for GM visibility
+        if (game.user.getFlag(MODULE_ID, 'hasApiKey') !== !!token) {
+            await game.user.setFlag(MODULE_ID, 'hasApiKey', !!token);
+        }
+
+        if (!token) return;
+
+        const broadcastToLaravel = async () => {
+            const char = game.user.character;
+            await this.sendResponse({
+                type: 'LINK_PLAYER_CHARACTER',
+                character: char ? char.id : null,
+                actorName: char ? char.name : null,
+                foundryUserId: game.user.id
+            });
+            console.log(`[Bridge] Player synced character assignment: ${char?.name || 'None'}`);
+        };
+
+        // Initial sync on load
+        await broadcastToLaravel();
+
+        // Listen for character assignment changes
+        if (!this.hookIds.updateUser) {
+            this.hookIds.updateUser = Hooks.on('updateUser', (user, changes) => {
+                if (user.id === game.user.id && changes.character !== undefined) {
+                    broadcastToLaravel();
+                }
+            });
+        }
+    }
+
     registerGlobalHooks() {
+        if (this.hookIds.updateActor) return;
+
         // Debounce map for batching updates if needed, though SHEET_DELTA is usually fine per-event
         const syncUpdate = async (actor, delta) => {
-            if (!this.isConnected) return;
+            const token = game.settings.get(MODULE_ID, 'apiKey');
+            if (!this.isConnected && !token) return;
             // We only sync if the actor is a character or mook and has owners
             if (!actor || !['character', 'mook'].includes(actor.type)) return;
 
@@ -282,7 +398,7 @@ class CyberpunkBridge {
             });
         };
 
-        // 1. Hook into Actor updates (stats, derived stats, etc.)
+        // Hook into Actor updates (stats, derived stats, etc.)
         this.hookIds.updateActor = Hooks.on('updateActor', (actor, changes, options, userId) => {
             // Ignore updates triggered by the Agent itself to avoid loops (though Agent updates usually go through API)
             // But we should check if 'changes.system' exists
@@ -304,7 +420,7 @@ class CyberpunkBridge {
             }
         });
 
-        // 2. Hook into Item updates (inventory, weapons, etc.)
+        // Hook into Item updates (inventory, weapons, etc.)
         this.hookIds.updateItem = Hooks.on('updateItem', (item, changes, options, userId) => {
             const actor = item.parent;
             if (actor instanceof Actor) {
@@ -361,6 +477,10 @@ class CyberpunkBridge {
                 syncUpdate(actor, delta);
             }
         });
+
+        this.hookIds.closeSettingsConfig = Hooks.on('closeSettingsConfig', (app, html) => {
+            this.syncPlayerLink();
+        });
     }
 
     /**
@@ -406,8 +526,16 @@ class CyberpunkBridge {
 
         const type = data.type;
         const actorId = data.actorId;
-        const tokenId = data.tokenId;
+        let tokenId = data.tokenId;
         const requestId = data.requestId;
+
+        // If no tokenId provided, but we have an actorId, try to find a token for that actor on the canvas
+        if (!tokenId && actorId) {
+            const token = canvas.tokens.placeables.find(t => t.actor?.id === actorId);
+            if (token) {
+                tokenId = token.id;
+            }
+        }
 
         switch (type) {
             case 'UPDATE_ACTOR': {
@@ -927,7 +1055,7 @@ class CyberpunkBridge {
                     // This avoids waiting for Agent-side timers
                     setTimeout(async () => {
                         // Re-trigger visible tokens and DV logic (mimics the cases below)
-                        const dummyRequest = { tokenId, requestId: (requestId || 'move-refresh') };
+                        const dummyRequest = { tokenId, actorId, requestId: (requestId || 'move-refresh') };
                         await this.handleIncomingData({ type: 'LIST_VISIBLE_TOKENS', ...dummyRequest });
 
                         const target = Array.from(game.user.targets)[0];
@@ -937,6 +1065,9 @@ class CyberpunkBridge {
                     }, 200);
 
                     await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: true, requestId });
+                } else {
+                    console.warn(`MOVE_TOKEN: Token ID ${tokenId} not found.`);
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: false, message: 'Token not found', requestId });
                 }
                 break;
             }
@@ -1001,10 +1132,10 @@ class CyberpunkBridge {
             }
 
             case 'TARGET_TOKEN': {
-                const token = canvas.tokens.get(data.tokenId);
+                const token = canvas.tokens.get(data.targetTokenId);
                 if (token) {
                     token.setTarget(true, { releaseOthers: true, groupSelection: true });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId: data.tokenId, success: true });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId: data.targetTokenId, success: true, requestId });
                 }
                 break;
             }
@@ -1030,7 +1161,7 @@ class CyberpunkBridge {
                     }
                     await actor.update({ [path]: newValue });
                     // Send a focused sheet delta back to Agent and persist via API
-                    await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { [path]: newValue }, tab: 'stats', success: true });
+                    await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { [path]: newValue }, tab: 'stats', success: true, requestId });
                 }
                 break;
             }
@@ -1082,7 +1213,7 @@ class CyberpunkBridge {
                     // Compute DV against current target if available
                     let computedDV = null;
                     if (targetToken) {
-                        const shooter = actor.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
+                        const shooter = canvas.tokens.get(tokenId) || actor.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
                         if (shooter) {
                             const RANGE_DV_TABLE = {
                                 'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
@@ -1253,12 +1384,12 @@ class CyberpunkBridge {
                     injuries: effectList
                 };
                 console.log("GET_ROLL_MODIFIERS result:", result);
-                await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', result });
+                await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', result, requestId });
                 break;
             }
 
             case 'GET_DV_INFO': {
-                const jim = canvas.tokens.get(data.tokenId);
+                const jim = canvas.tokens.get(tokenId);
                 const targetId = data.targetTokenId || Array.from(game.user.targets)[0]?.id;
                 const target = canvas.tokens.get(targetId);
                 const weaponId = data.weaponId;
@@ -1288,6 +1419,12 @@ class CyberpunkBridge {
                     const distanceM = Math.ceil(distancePx / 128);
 
                     const weaponData = jim.actor.items.get(weaponId);
+                    if (!weaponData) {
+                        console.warn(`GET_DV_INFO: Weapon ID ${weaponId} not found on actor ${jim.actor.name}.`);
+                        await this.sendResponse({ type: 'DV_INFO_DATA', result: null, requestId });
+                        break;
+                    }
+
                     const typeMap = {
                         'heavyPistol': 'Pistol',
                         'assaultRifle': 'Assault Rifle',
@@ -1320,19 +1457,23 @@ class CyberpunkBridge {
                     };
                     console.log("GET_DV_INFO result:", result);
                     await this.sendResponse({ type: 'DV_INFO_DATA', result, requestId });
+                } else {
+                    console.warn(`GET_DV_INFO: Token(s) not found. Jim: ${!!jim}, Target: ${!!target}`);
+                    await this.sendResponse({ type: 'DV_INFO_DATA', result: null, requestId });
                 }
                 break;
             }
 
             case 'LIST_VISIBLE_TOKENS': {
                 const jim = canvas.tokens.get(tokenId);
+                let nearbyTokens = [];
                 if (jim) {
                     const PIXELS_PER_METER = canvas.grid.size;
                     const d = canvas.dimensions;
                     const jimX = jim.center.x;
                     const jimY = jim.center.y;
 
-                    const nearbyTokens = canvas.tokens.placeables
+                    nearbyTokens = canvas.tokens.placeables
                         .filter(t => {
                             const isVisible = !t.document.hidden;
                             const isActorType = t.actor && (t.actor.type === 'character' || t.actor.type === 'mook');
@@ -1354,13 +1495,27 @@ class CyberpunkBridge {
                         })
                         .sort((a, b) => a.distanceM - b.distanceM);
                     console.log("LIST_VISIBLE_TOKENS result:", nearbyTokens);
-                    await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', tokens: nearbyTokens, requestId });
+                } else {
+                    console.warn(`LIST_VISIBLE_TOKENS: Token ID ${tokenId} not found.`);
                 }
+                await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', tokens: nearbyTokens, requestId });
                 break;
             }
 
             case 'GET_ACTOR': {
                 let actorId = data.actorId;
+                // If no actorId provided, try to get the assigned character for the user
+                if (!actorId) {
+                    let targetUser = game.user;
+                    if (data.foundryUserId) {
+                        targetUser = game.users.get(data.foundryUserId) || game.user;
+                    }
+                    const assignedChar = targetUser.character;
+                    if (assignedChar) {
+                        actorId = assignedChar.id;
+                    }
+                }
+
                 if (actorId !== null) {
                     const actor = game.actors.get(actorId);
                     if (actor) {
@@ -1389,15 +1544,72 @@ class CyberpunkBridge {
             }
 
             case 'GET_ACTORS': {
-                let tokens = canvas.tokens.placeables
-                    .filter(t => t.actor && t.actor.hasPlayerOwner)
-                    .map(t => ({
-                        name: t.name,
-                        actorId: t.actor.id,
-                        tokenId: t.id
-                    }));
-                console.log("GET_ACTORS result:", tokens);
-                await this.sendResponse({ type: 'ACTORS_DATA', actors: tokens, requestId });
+                let targetUser = game.user;
+                if (data.foundryUserId) {
+                    targetUser = game.users.get(data.foundryUserId) || game.user;
+                }
+
+                let actors = [];
+                // If the user IS Game Master, we always return ALL characters and mooks.
+                // We use game.user.isGM here because the current user running the bridge
+                // needs to have GM permissions to see all actors in the world.
+                if (game.user.isGM) {
+                    // GM sees ALL characters and mooks in the world
+                    actors = game.actors
+                        .filter(a => a.type === 'character' || a.type === 'mook')
+                        .map(a => {
+                            // Find the primary owner (player) if any
+                            const ownerId = Object.entries(a.ownership || {}).find(([id, level]) => {
+                                const u = game.users.get(id);
+                                return u && !u.isGM && level >= 3;
+                            })?.[0];
+
+                            return {
+                                name: a.name,
+                                actorId: a.id,
+                                tokenId: null,
+                                foundryUserId: ownerId || targetUser.id
+                            };
+                        });
+                } else {
+                    // Players see tokens they own on the canvas
+                    actors = canvas.tokens.placeables
+                        .filter(t => t.actor && (t.actor.type === 'character' || t.actor.type === 'mook'))
+                        .filter(t => t.actor.testUserPermission(targetUser, "OWNER"))
+                        .map(t => {
+                            // Find the primary owner (player)
+                            const ownerId = Object.entries(t.actor.ownership || {}).find(([id, level]) => {
+                                const u = game.users.get(id);
+                                return u && !u.isGM && level >= 3;
+                            })?.[0];
+
+                            return {
+                                name: t.name,
+                                actorId: t.actor.id,
+                                tokenId: t.id,
+                                foundryUserId: ownerId || null
+                            };
+                        });
+
+                    // If they have an assigned character, always include it
+                    if (targetUser.character) {
+                        const alreadyInList = actors.some(a => a.actorId === targetUser.character.id);
+                        if (!alreadyInList) {
+                            actors.push({
+                                name: targetUser.character.name,
+                                actorId: targetUser.character.id,
+                                tokenId: null,
+                                foundryUserId: targetUser.id
+                            });
+                        }
+
+                        // If the user is a player and has an assigned character, only return that one
+                        actors = actors.filter(a => a.actorId === targetUser.character.id);
+                    }
+                }
+
+                console.log("GET_ACTORS result:", actors);
+                await this.sendResponse({ type: 'ACTORS_DATA', actors: actors, requestId });
                 break;
             }
 
@@ -1408,33 +1620,50 @@ class CyberpunkBridge {
     }
 
     reconnect() {
-        if (this.echo) {
+        if (game.user.isGM && this.echo) {
             this.connect();
         }
     }
 }
-
-// Instantiate and Hook
+// ==================================================================
+// BOOT SEQUENCE & VITE ASYNC FAILSAFE
+// ==================================================================
 if (window.cyberpunkBridge) {
     window.cyberpunkBridge.destroy();
 }
 window.cyberpunkBridge = new CyberpunkBridge();
 
-// Handle registration and connection regardless of when the script is loaded
-if (game.ready) {
-    window.cyberpunkBridge.registerSettings();
-    if (game.user.isGM) {
-        window.cyberpunkBridge.connect();
-    }
-} else {
-    Hooks.once('init', () => {
+// Helper to safely register settings without duplicating
+function ensureSettingsRegistered() {
+    if (!game.settings.settings.has(`${MODULE_ID}.apiUrl`)) {
+        console.log("[Bridge] Registering Module Settings...");
         window.cyberpunkBridge.registerSettings();
+    }
+}
+
+// If Foundry is completely loaded (Hot Reloading / Very Late Load)
+if (game.ready) {
+    ensureSettingsRegistered();
+    if (game.user.isGM) window.cyberpunkBridge.connect();
+    window.cyberpunkBridge.syncPlayerLink();
+    window.cyberpunkBridge.registerGlobalHooks();
+}
+// Standard Foundry Boot Sequence
+else {
+    // Try to catch the normal init hook
+    Hooks.once('init', () => {
+        ensureSettingsRegistered();
     });
 
+    // When Foundry is ready to play
     Hooks.once('ready', () => {
-        // Only GM usually manages the global bridge, but players might need their own
+        // FAILSAFE: If Vite caused us to miss the 'init' hook, do it right now!
+        ensureSettingsRegistered();
+
         if (game.user.isGM) {
             window.cyberpunkBridge.connect();
         }
+        window.cyberpunkBridge.syncPlayerLink();
+        window.cyberpunkBridge.registerGlobalHooks();
     });
 }

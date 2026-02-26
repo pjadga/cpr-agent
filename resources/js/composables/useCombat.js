@@ -1,5 +1,5 @@
-import { ref, watch, onUnmounted } from 'vue';
-import { debounce } from '../utils/helpers';
+import { ref, watch } from 'vue';
+import { debounce, throttle } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
 import { useEchoListener } from '../utils/listener';
 /**
@@ -40,10 +40,47 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const debouncedFetchDV = debounce(fetchDVForSelectedWeapon, 250);
 
     /**
+     * Update mock enemies list and handle selection
+     */
+    const updateMockEnemies = (list) => {
+        if (!Array.isArray(list)) return;
+
+        // Update existing list to prevent complete re-render if possible
+        const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
+        const newIds = list.map(e => e.id).sort().join(',');
+
+        if (currentIds !== newIds) {
+            const prevSelectedId = controlState.value.selectedTarget?.id;
+            mockEnemies.value = list;
+            if (prevSelectedId) {
+                controlState.value.selectedTarget = list.find(t => t.id === prevSelectedId) || null;
+            }
+        } else {
+            list.forEach(newItem => {
+                const existing = mockEnemies.value.find(e => e.id === newItem.id);
+                if (existing) {
+                    if (existing.distanceM !== newItem.distanceM) existing.distanceM = newItem.distanceM;
+                    if (existing.name !== newItem.name) existing.name = newItem.name;
+                }
+            });
+            // Ensure list remains sorted by distance even if IDs didn't change but positions did
+            mockEnemies.value.sort((a, b) => a.distanceM - b.distanceM);
+        }
+
+        if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
+            debouncedFetchDV();
+        }
+    };
+
+    /**
      * Get list of visible tokens (enemies) from the server
      */
     const getVisibleTokens = () => {
-        window.axios.post("/listvisibletokens", {}).catch(err => console.error('Error fetching visible tokens', err));
+        window.axios.post("/listvisibletokens", {}).then(response => {
+            if (response.data && response.data.success && response.data.data) {
+                updateMockEnemies(response.data.data);
+            }
+        }).catch(err => console.error('Error fetching visible tokens', err));
     };
 
     const handleFoundryResponse = (e) => {
@@ -54,43 +91,17 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             dvInfo.value = payload.result?.dv;
             dvLoading.value = false;
         } else if (payload.type === 'VISIBLE_TOKENS_DATA') {
-            const list = payload.tokens || [];
-
-            // Update existing list to prevent complete re-render if possible
-            const currentIds = (mockEnemies.value || []).map(e => e.id).sort().join(',');
-            const newIds = list.map(e => e.id).sort().join(',');
-
-            if (currentIds !== newIds) {
-                const prevSelectedId = controlState.value.selectedTarget?.id;
-                mockEnemies.value = list;
-                if (prevSelectedId) {
-                    controlState.value.selectedTarget = list.find(t => t.id === prevSelectedId) || null;
-                }
-            } else {
-                list.forEach(newItem => {
-                    const existing = mockEnemies.value.find(e => e.id === newItem.id);
-                    if (existing) {
-                        if (existing.distanceM !== newItem.distanceM) existing.distanceM = newItem.distanceM;
-                        if (existing.name !== newItem.name) existing.name = newItem.name;
-                    }
-                });
-                // Ensure list remains sorted by distance even if IDs didn't change but positions did
-                mockEnemies.value.sort((a, b) => a.distanceM - b.distanceM);
-            }
-
-            if (controlState.value.selectedTarget && controlState.value.selectedWeapon) {
-                debouncedFetchDV();
-            }
+            updateMockEnemies(payload.tokens || []);
         }
     };
 
     useEchoListener(handleFoundryResponse);
 
-    const debouncedGetVisibleTokens = debounce(getVisibleTokens, 200);
+    const debouncedGetVisibleTokens = debounce(getVisibleTokens, 800);
+    const throttledGetVisibleTokens = throttle(getVisibleTokens, 1500);
 
     const debouncedFetchCharacterData = debounce(fetchCharacterData, 1000);
 
-    let moveThrottleTimer = null;
     let lastMoveTime = 0;
 
     /**
@@ -98,33 +109,33 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      */
     const moveToken = (direction) => {
         const weaponId = controlState.value.selectedWeapon?._id;
+        const actorId = charData.value?.uuid;
+        const tokenId = charData.value?.tokenId;
         const now = Date.now();
 
-        // Check if we are within the 1.5s throttle window
-        if (now - lastMoveTime < 1500) {
-            // If a timer is already set, clear it
-            if (moveThrottleTimer) clearTimeout(moveThrottleTimer);
+        // 20ms throttle to prevent OS-level bounce but feel completely raw
+        if (now - lastMoveTime < 20) return;
 
-            // Set a new timer to execute after 1.5s of no movement
-            moveThrottleTimer = setTimeout(() => {
-                window.axios.post("/movetoken", { direction, weaponId });
-                lastMoveTime = Date.now();
-            }, 1500 - (now - lastMoveTime));
-
-            return;
-        }
-
-        // Immediate execution if outside throttle window
         lastMoveTime = now;
-        window.axios.post("/movetoken", { direction, weaponId });
-        // Handled immediately by Foundry pushing SHEET_DELTA/VISIBLE_TOKENS_DATA
+        window.axios.post("/movetoken", { direction, weaponId, actorId, tokenId });
+
+        // Refresh visible tokens after movement.
+        // throttled version ensures we get updates while moving (every 1.5s)
+        // debounced version ensures we get a final update after we STOP moving (800ms)
+        throttledGetVisibleTokens();
+        debouncedGetVisibleTokens();
     };
 
     /**
      * Target a specific token
      */
     const targetToken = (tokenId) => {
-        window.axios.post("/targettokens", { token: tokenId }).then(() => {
+        const payload = {
+            targetTokenId: tokenId,
+            actorId: charData.value?.uuid,
+            tokenId: charData.value?.tokenId
+        };
+        window.axios.post("/targettokens", payload).then(() => {
             debouncedFetchCharacterData();
         });
     };
@@ -137,7 +148,13 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (!controlState.value.selectedWeapon) return throwError("No Weapon Selected");
         if (controlState.value.reloadRequired) return throwError("Out of Ammo!");
 
-        window.axios.post("/attackroll", controlState.value).then((response) => {
+        const payload = {
+            ...controlState.value,
+            actorId: charData.value?.uuid,
+            tokenId: charData.value?.tokenId
+        };
+
+        window.axios.post("/attackroll", payload).then((response) => {
             // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo updates to avoid race conditions with stale DB data
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
@@ -156,7 +173,12 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      * Execute a damage roll
      */
     const rollDamage = () => {
-        window.axios.post("/damageroll", controlState.value).then((response) => {
+        const payload = {
+            ...controlState.value,
+            actorId: charData.value?.uuid,
+            tokenId: charData.value?.tokenId
+        };
+        window.axios.post("/damageroll", payload).then((response) => {
             // debouncedFetchCharacterData();
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
@@ -189,7 +211,9 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const reloadWeapon = (refreshAll) => {
         if (controlState.value.selectedWeapon) {
             const payload = {
-                weaponId: controlState.value.selectedWeapon._id
+                weaponId: controlState.value.selectedWeapon._id,
+                actorId: charData.value?.uuid,
+                tokenId: charData.value?.tokenId
             };
             window.axios.post("/reloadweapon", payload);
             // Handled by SHEET_DELTA from Foundry
@@ -201,10 +225,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             targetToken(newTarget.id);
             debouncedFetchDV();
         }
-    });
-
-    onUnmounted(() => {
-        if (moveThrottleTimer) clearTimeout(moveThrottleTimer);
     });
 
     return {

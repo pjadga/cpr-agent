@@ -10,46 +10,54 @@
 
         <div class="space-y-8 text-cpr-text-main">
             <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">1. Preparation</h2>
+                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">1. Preparation & Installation</h2>
                 <ul class="list-disc list-inside space-y-2 ml-4">
                     <li>Ensure you have the <a href="https://foundryvtt.com/packages/cyberpunk-red-core" target="_blank" class="text-cpr-red hover:text-cpr-red underline">Cyberpunk Red module</a> installed in Foundry VTT.</li>
-                    <li>Install the <a href="https://foundryvtt.com/packages/foundry-rest-api" target="_blank" class="text-cpr-red hover:text-cpr-red underline">ThreeHats API module</a> in your Foundry VTT instance.</li>
+                    <li>Install the <strong>Cyberpunk Red Agent Bridge</strong> module in Foundry VTT by adding this manifest URL in the module installer:
+                        <div class="bg-cpr-black/50 p-3 rounded border border-cpr-border font-mono text-cpr-red my-3 select-all text-sm break-all">
+                            https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge/-/raw/main/module.json
+                        </div>
+                    </li>
+                    <li>Sign up and log in to this app. Your personal data is only used for authentication.</li>
                 </ul>
             </section>
 
             <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. Account Setup</h2>
-                <p class="mb-2">Sign up to this app. Your personal data is not used for any purposes other than authentication.</p>
-                <p class="text-sm text-cpr-yellow italic">Note: Account deletion is accessible at any time through your account settings.</p>
-            </section>
-
-            <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">3. Configuration</h2>
+                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
                 <ol class="list-decimal list-inside space-y-2 ml-4">
-                    <li>Navigate to the <strong>Config</strong> page.</li>
-                    <li>Input your <strong>Foundry URL</strong>.</li>
-                    <li>Input your <strong>API Key</strong> (this must be the same one added to your Foundry ThreeHats module).</li>
-                    <li>Click <strong>Save</strong>.</li>
+                    <li>As the Game Master, navigate to the <strong>Settings</strong> page.</li>
+                    <li>Generate a <strong>Connection Key (API Key)</strong> and copy it.</li>
+                    <li>Input your <strong>Foundry URL</strong> and click <strong>Update Core Settings</strong>.</li>
+                    <li>Check the connection to ensure it is active and communicating with your Foundry instance.</li>
                 </ol>
             </section>
 
             <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Foundry Module Settings</h2>
-                <p>In the ThreeHats module settings within Foundry VTT, add the following as the relay link:</p>
-                <div class="bg-cpr-black/50 p-4 rounded border border-cpr-border font-mono text-cpr-red my-4 select-all">
-                    wss://agent-relay.surrealdisco.co.uk
-                </div>
-                <p class="text-sm text-cpr-text-muted">
-                    This relay is self-hosted through IONOS on a VPS. Call frequency is monitored to improve the app and manage costs.
-                </p>
+                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">3. Player Setup</h2>
+                <p class="mb-4">Players must link their own Agent accounts to synchronize their characters:</p>
+                <ol class="list-decimal list-inside space-y-2 ml-4">
+                    <li>Have each player sign up and log in to this Agent app.</li>
+                    <li>They must generate their own <strong>Connection Key</strong> in their personal Settings page.</li>
+                    <li>Within Foundry VTT, players must go to <strong>Configure Settings</strong> -> <strong>Agent Bridge</strong> and enter their individual API Key.</li>
+                </ol>
             </section>
 
             <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">5. Connecting Characters</h2>
+                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Character Assignment</h2>
                 <ol class="list-decimal list-inside space-y-2 ml-4">
-                    <li>Once the GM account is up and running, refresh the <strong>Config</strong> page.</li>
-                    <li>A <strong>Foundry Client</strong> should now appear in the dropdown menu.</li>
-                    <li>Selecting that client will load the <strong>Playable Characters</strong> and <strong>Player Owned characters</strong> currently in the session.</li>
+                    <li>In Foundry VTT, the GM should use the <strong>Manage Characters</strong> tool within the Agent Bridge module.</li>
+                    <li>Assign playable characters to the players who have successfully linked their API keys.</li>
+                    <li>This creates the secure link between the Foundry Actor and the Agent Interface.</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">5. Final Synchronization</h2>
+                <ol class="list-decimal list-inside space-y-2 ml-4">
+                    <li>Return to the <strong>Settings</strong> page in this app.</li>
+                    <li>Use the <strong>Agent Sync</strong> refresh button to pull the updated player and character assignments.</li>
+                    <li>Once the biometric signature (Actor) appears in the dropdown, select it and click <strong>Commit Sync</strong>.</li>
+                    <li>Your character data will now flow between Foundry and this Agent interface in real-time.</li>
                 </ol>
             </section>
         </div>

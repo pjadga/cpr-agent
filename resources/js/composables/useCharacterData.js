@@ -1,5 +1,6 @@
 import { ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef } from 'vue';
 import { isDeepEqual } from '../utils/helpers';
+import { isMyRequest } from '../utils/requests';
 
 // Shared state to prevent multiple fetches/intervals
 const charData = shallowRef(null);
@@ -68,18 +69,16 @@ export function useCharacterData() {
     };
 
     /**
-     * Apply a focused delta update to the local cached sheet (no network).
-     * Incoming paths are assumed to be Foundry-like (e.g., 'system.derivedStats.hp.value' or 'items')
-     * We map them under our Vue mirror which nests under 'data'.
+     * Applies a focused delta update to the local character data.
      */
     const applyDelta = (delta = {}, { tab } = {}) => {
         if (!charData.value || !delta) return;
 
-        // Check for UUID mismatch if present in delta or whole data
+        // Verify character ID consistency
         if (delta.uuid) {
             const incomingUuid = String(delta.uuid).replace(/^Actor\./, '');
             if (incomingUuid && incomingUuid !== actorUuid) {
-                console.log(`UUID mismatch from delta: Local (${actorUuid}) vs Incoming (${incomingUuid}). Updating...`);
+                console.log(`Character ID mismatch: Local (${actorUuid}) vs Incoming (${incomingUuid}). Updating...`);
                 actorUuid = incomingUuid;
                 localStorage.setItem('cpr_actor_uuid', actorUuid);
             }
@@ -218,14 +217,14 @@ export function useCharacterData() {
      */
     const fetchCharacterData = async (isInitial = false, forceFresh = false) => {
         try {
-            // if (!actorUuid) {
-            //     // If we don't have a UUID, fetch it once from the backend
-            //     const getActors = await window.axios.post("/getactors");
-            //     if (getActors.data && getActors.data.uuid) {
-            //         actorUuid = String(getActors.data.uuid).replace(/^Actor\./, '');
-            //         localStorage.setItem('cpr_actor_uuid', actorUuid);
-            //     }
-            // }
+            if (!actorUuid) {
+                // If we don't have a UUID, fetch it once from the backend
+                const getActors = await window.axios.post("/getactors");
+                if (getActors.data && getActors.data.uuid) {
+                    actorUuid = String(getActors.data.uuid).replace(/^Actor\./, '');
+                    localStorage.setItem('cpr_actor_uuid', actorUuid);
+                }
+            }
 
             if (!actorUuid) {
                 error.value = "No character UUID found. Please check your settings.";
@@ -281,6 +280,31 @@ export function useCharacterData() {
         if (useCount === 1) {
             await fetchBaseUrl();
             await fetchCharacterData(true);
+
+            // Listen for Foundry responses
+            if (window.Echo) {
+                window.Echo.private('cpr-agent')
+                    .listen('.FoundryResponse', (e) => {
+                        const payload = e.payload || e;
+                        console.log("Received Foundry Response:", payload);
+
+                        // If the request was initiated by another agent, ignore it IF it has a requestId
+                        if (payload.requestId && !isMyRequest(payload.requestId)) {
+                            console.log(`Ignoring FoundryResponse with requestId [${payload.requestId}] - initiated by another agent.`);
+                            return;
+                        }
+
+                        // If it's actor data or a sheet delta, apply it
+                        if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                            charData.value = { ...charData.value, data: payload.actor, uuid: payload.actor._id };
+                            triggerRef(charData);
+                            setTimeout(refreshIcons, 50);
+                        } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
+                            applyDelta(payload.delta, { tab: payload.tab });
+                        }
+                    });
+            }
+
             // Poll for updates every 60 seconds (reduced frequency)
             refreshInterval = setInterval(() => fetchCharacterData(), 60000);
         }

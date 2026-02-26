@@ -1,4 +1,5 @@
 import './bootstrap';
+import { setupAxiosInterceptors } from './utils/requests';
 import Alpine from 'alpinejs';
 import {createApp} from "vue";
 import CharacterSheet from "./components/character-sheet.vue";
@@ -22,6 +23,8 @@ import { vCprImg } from "./directives/cpr-img";
 import mitt from 'mitt';
 
 window.emitter = mitt();
+
+setupAxiosInterceptors();
 
 window.Alpine = Alpine;
 Alpine.start();

@@ -131,7 +131,7 @@
                     </a>
                 </div>
             </div>
-            @if(!$config->base_url && !config('services.foundry.base_url'))
+            @if(!$config->foundry_url && !config('services.foundry.base_url'))
                 <div class="bg-cpr-red-dark/30 border border-cpr-red-dark text-cpr-red p-4 text-xs italic">
                     SYSTEM OFFLINE: Configure Core System Settings to enable Agent synchronization.
                 </div>
@@ -152,7 +152,7 @@
                         <select id="actor_selection" class="cyber-select-field mt-1 text-base">
                             <option value="" disabled {{ !$user->default_actor_id ? 'selected' : '' }}>Select Biometric Data</option>
                             @foreach($actors as $actor)
-                                <option value="{{ $actor['actorId'] }}|{{ $actor['tokenId'] }}" {{ $user->default_actor_id == $actor["actorId"] && $user->default_token_id == $actor["tokenId"] ? 'selected' : '' }} class="cyber-select-option">
+                                <option value="{{ $actor['actorId'] }}|{{ $actor['tokenId'] }}|{{ $actor['foundryUserId'] ?? '' }}" {{ ($user->default_actor_id == $actor["actorId"]) ? 'selected' : '' }} class="cyber-select-option">
                                     {{ $actor["name"] }} [{{ $actor["actorId"] }}]
                                 </option>
                             @endforeach
@@ -305,12 +305,15 @@
         const syncIds = () => {
             const val = actorSelection.value;
             if (val && val.includes('|')) {
-                let [actorId, tokenId] = val.split('|');
+                let [actorId, tokenId, foundryUserId] = val.split('|');
                 if (actorId.startsWith('Actor.')) {
                     actorId = actorId.replace('Actor.', '');
                 }
                 document.getElementById('default_actor_id').value = actorId;
-                document.getElementById('default_token_id').value = tokenId;
+                document.getElementById('default_token_id').value = tokenId !== 'null' ? tokenId : '';
+                if (foundryUserId) {
+                    document.getElementById('client_id').value = foundryUserId;
+                }
             }
         };
 

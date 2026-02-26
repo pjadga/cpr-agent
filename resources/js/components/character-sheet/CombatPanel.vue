@@ -60,6 +60,30 @@
                     <span class="text-xs text-cpr-text-dim uppercase font-bold tracking-widest">No Weapon Selected</span>
                 </div>
 
+                <!-- Tactical Movement -->
+                <div class="pt-4 border-t border-cpr-red-dark/30">
+                    <div class="flex items-center justify-center gap-4 mb-3">
+                        <div class="h-px bg-cpr-red-dark/30 flex-1"></div>
+                        <span class="text-[10px] font-black text-cpr-red uppercase tracking-[0.3em]">Positioning</span>
+                        <div class="h-px bg-cpr-red-dark/30 flex-1"></div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-2">
+                        <div></div>
+                        <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                            <i v-icon data-lucide="chevron-up" class="w-6 h-6"></i>
+                        </button>
+                        <div></div>
+                        <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                            <i v-icon data-lucide="chevron-left" class="w-6 h-6"></i>
+                        </button>
+                        <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                            <i v-icon data-lucide="chevron-down" class="w-6 h-6"></i>
+                        </button>
+                        <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                            <i v-icon data-lucide="chevron-right" class="w-6 h-6"></i>
+                        </button>
+                    </div>
+                </div>
 
             </div>
         </div>
@@ -76,7 +100,7 @@ export default {
         'dvLoading', 'dvError', 'dvInfo', 'reloadRequired'
     ],
     directives: { icon: vIcon },
-    emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'update:fireMode']
+    emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'move', 'update:fireMode']
 }
 </script>
 
