@@ -75,6 +75,16 @@ export function useCharacterData() {
     const applyDelta = (delta = {}, { tab } = {}) => {
         if (!charData.value || !delta) return;
 
+        // Check for UUID mismatch if present in delta or whole data
+        if (delta.uuid) {
+            const incomingUuid = String(delta.uuid).replace(/^Actor\./, '');
+            if (incomingUuid && incomingUuid !== actorUuid) {
+                console.log(`UUID mismatch from delta: Local (${actorUuid}) vs Incoming (${incomingUuid}). Updating...`);
+                actorUuid = incomingUuid;
+                localStorage.setItem('cpr_actor_uuid', actorUuid);
+            }
+        }
+
         const deepSet = (obj, path, value) => {
             // Special case for items.+ID (addition)
             if (path.startsWith('data.items.+')) {
@@ -208,14 +218,14 @@ export function useCharacterData() {
      */
     const fetchCharacterData = async (isInitial = false, forceFresh = false) => {
         try {
-            if (!actorUuid) {
-                // If we don't have a UUID, fetch it once from the backend
-                const getActors = await window.axios.post("/getactors");
-                if (getActors.data && getActors.data.uuid) {
-                    actorUuid = String(getActors.data.uuid).replace(/^Actor\./, '');
-                    localStorage.setItem('cpr_actor_uuid', actorUuid);
-                }
-            }
+            // if (!actorUuid) {
+            //     // If we don't have a UUID, fetch it once from the backend
+            //     const getActors = await window.axios.post("/getactors");
+            //     if (getActors.data && getActors.data.uuid) {
+            //         actorUuid = String(getActors.data.uuid).replace(/^Actor\./, '');
+            //         localStorage.setItem('cpr_actor_uuid', actorUuid);
+            //     }
+            // }
 
             if (!actorUuid) {
                 error.value = "No character UUID found. Please check your settings.";
@@ -223,26 +233,37 @@ export function useCharacterData() {
                 return;
             }
 
-            // 1. STEP ONE: Database-First Load (Instant)
-            // Always try to load what we have in the DB first for zero-latency initial paint
-            try {
-                const dbResponse = await window.axios.post("/actorsheet", { "actorUuid": actorUuid });
-                if (dbResponse.data && dbResponse.data.data) {
-                    charData.value = dbResponse.data;
-                    if (isInitial) loading.value = false;
-                    setTimeout(refreshIcons, 50);
+            console.log("ActorUUID: " + actorUuid)
+
+            if (!forceFresh) {
+                try {
+                    const dbResponse = await window.axios.post("/actorsheet");
+                    if (dbResponse.data && dbResponse.data.data) {
+                        // Check if the UUID from the database matches our local actorUuid
+                        const dbActorUuid = String(dbResponse.data.uuid).replace(/^Actor\./, '');
+                        if (dbActorUuid && dbActorUuid !== actorUuid) {
+                            console.log(`UUID mismatch: Local (${actorUuid}) vs DB (${dbActorUuid}). Updating...`);
+                            actorUuid = dbActorUuid;
+                            localStorage.setItem('cpr_actor_uuid', actorUuid);
+                        }
+
+                        charData.value = dbResponse.data;
+                        if (isInitial) loading.value = false;
+                        setTimeout(refreshIcons, 50);
+                    }
+                } catch (dbErr) {
+                    console.warn("Local DB fetch failed or empty:", dbErr);
+                    // If it's the very first time (no DB entry), we MUST force a fresh fetch
+                    if (isInitial) forceFresh = true;
                 }
-            } catch (dbErr) {
-                console.warn("Local DB fetch failed or empty:", dbErr);
-                // If it's the very first time (no DB entry), we MUST force a fresh fetch
-                if (isInitial) forceFresh = true;
+            } else {
+                // When forcing fresh, we show loading state while waiting for Foundry
+                loading.value = true;
             }
 
-            // 2. STEP TWO: Background Refresh from Foundry
-            // Only trigger if specifically requested, or if it's initial load (to ensure we're not stale)
-            if (forceFresh || isInitial) {
+            if (forceFresh) {
+                //Only trigger this when asked to refresh
                 console.log("Triggering background refresh from Foundry...");
-                // Note: This endpoint is now async and returns 202 immediately
                 await window.axios.post("/getactor", { "actorId": actorUuid });
             }
 

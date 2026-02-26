@@ -45,7 +45,7 @@ class ActorSheet extends FormRequest
 
             // Pass through IDs
             'type' => $characterData['type'] ?? 'character',
-            'uuid' => $characterData['uuid'] ?? '',
+            'uuid' => $characterData['_id'] ?? '',
 
             // The core data object your Vue app expects
             'data' => [

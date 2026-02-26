@@ -503,6 +503,7 @@ export default {
                     data: payload.actor,
                     requestId: payload.requestId
                 };
+                loading.value = false;
                 setTimeout(refreshIcons, 50);
             } else if (payload.type === 'ROLL_RESULT') {
                 const isDamage = /\(Damage\)/i.test(payload.label || '');
