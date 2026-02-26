@@ -27,18 +27,22 @@ class RemoveProgram extends FormRequest
 
         $user = auth()->user();
         $actorId = $user->default_actor_id;
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'REMOVE_PROGRAM',
             'actorId' => $actorId,
             'programId' => $programId,
             'cyberdeckId' => $deckId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

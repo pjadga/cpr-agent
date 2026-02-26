@@ -26,6 +26,7 @@ class GetVisibleTokens extends FormRequest
 
         $user = auth()->user();
         $tokenId = $user->getTokenId();
+        $actorId = $user->getActorId();
         $weaponId = $validatedData['selectedWeapon']["_id"] ?? null;
         $targetTokenId = $validatedData['selectedTarget']["id"] ?? null;
 
@@ -36,11 +37,12 @@ class GetVisibleTokens extends FormRequest
             ], 422);
         }
 
-        $requestId = (string) Str::uuid();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'GET_DV_INFO',
             'tokenId' => $tokenId,
+            'actorId' => $actorId,
             'weaponId' => $weaponId,
             'targetTokenId' => $targetTokenId,
             'requestId' => $requestId,
@@ -48,7 +50,7 @@ class GetVisibleTokens extends FormRequest
 
         // Polling loop
         $startTime = microtime(true);
-        $timeout = 2.0; // Reduced timeout
+        $timeout = 5.0; // Increased timeout
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {
@@ -70,6 +72,7 @@ class GetVisibleTokens extends FormRequest
         return response()->json([
             'success' => true,
             'message' => 'DV info received',
+            'requestId' => $requestId,
             'data' => $foundryData['result'] ?? null,
         ], 200);
     }

@@ -17,19 +17,31 @@ class TargetTokens extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'token' => 'required|string|max:255'
+            'targetTokenId' => 'required|string|max:255',
+            'actorId' => 'nullable|string|max:255',
+            'tokenId' => 'nullable|string|max:255',
         ]);
 
-        $token = $validatedData["token"];
+        $targetTokenId = $validatedData["targetTokenId"];
+        $user = auth()->user();
+        $actorId = $validatedData['actorId'] ?? $user->getActorId();
+        $tokenId = $validatedData['tokenId'] ?? $user->getTokenId();
+        $requestId = $this->createRequestId();
+
         CyberpunkAgentChannel::dispatch([
             'type' => 'TARGET_TOKEN',
-            'tokenId' => $token,
+            'targetTokenId' => $targetTokenId,
+            'actorId' => $actorId,
+            'tokenId' => $tokenId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null
+            'data' => [
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

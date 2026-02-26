@@ -18,25 +18,33 @@ class ReloadWeapon extends FormRequest
         // Validate incoming request
         $validatedData = $request->validate([
             'weaponId' => 'required|string',
-            'ammoId' => 'nullable|string'
+            'ammoId' => 'nullable|string',
+            'actorId' => 'nullable|string',
+            'tokenId' => 'nullable|string',
         ]);
 
         $weaponId = $validatedData["weaponId"];
         $ammoId = $validatedData["ammoId"] ?? null;
         $user = auth()->user();
-        $actorId = $user->getActorId();
+        $actorId = $validatedData['actorId'] ?? $user->getActorId();
+        $tokenId = $validatedData['tokenId'] ?? $user->getTokenId();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'RELOAD_WEAPON',
             'actorId' => $actorId,
+            'tokenId' => $tokenId,
             'weaponId' => $weaponId,
             'ammoId' => $ammoId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

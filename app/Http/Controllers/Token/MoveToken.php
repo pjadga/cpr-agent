@@ -6,19 +6,20 @@ use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MoveToken extends FormRequest
 {
     use HasConfiguration;
 
-    public function moveToken(Request $request): JsonResponse
+    public function moveToken(Request $request)
     {
         // Validate incoming request
         $validatedData = $request->validate([
             'direction' => 'required|string|max:255',
-            'weaponId' => 'nullable|string|max:255'
+            'weaponId' => 'nullable|string|max:255',
+            'actorId' => 'nullable|string|max:255',
+            'tokenId' => 'nullable|string|max:255',
         ]);
 
         //Need to get the actors either ID or Name -
@@ -26,19 +27,22 @@ class MoveToken extends FormRequest
         $direction = $validatedData['direction'];
         $weaponId = $validatedData['weaponId'] ?? null;
         $user = auth()->user();
-        $tokenId = $user->getTokenId();
+        $tokenId = $validatedData['tokenId'] ?? $user->getTokenId();
+        $actorId = $validatedData['actorId'] ?? $user->getActorId();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'MOVE_TOKEN',
             'tokenId' => $tokenId,
+            'actorId' => $actorId,
             'direction' => $direction,
             'weaponId' => $weaponId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Data successfully submitted!',
-            'data' => null,
-        ], 201);
+            'requestId' => $requestId,
+        ], 200);
     }
 }

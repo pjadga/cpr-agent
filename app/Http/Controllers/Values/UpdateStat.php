@@ -51,12 +51,14 @@ class UpdateStat extends FormRequest
 
         $user = auth()->user();
         $actorId = $user->getActorId();
+        $requestId = $this->createRequestId();
 
         $payload = [
             'type' => 'UPDATE_STAT',
             'actorId' => $actorId,
             'label' => $label,
             'operation' => $operation,
+            'requestId' => $requestId,
         ];
 
         if ($operation === 'set') {
@@ -70,7 +72,7 @@ class UpdateStat extends FormRequest
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'requestId' => $requestId,
         ], 201);
     }
 }

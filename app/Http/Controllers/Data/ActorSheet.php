@@ -12,13 +12,13 @@ class ActorSheet extends FormRequest
     use HasConfiguration;
 
     /**
-     * Main entry point to get the simplified Vue-ready JSON
+     * Retrieves and cleans character data for the Vue-ready sheet.
      */
     public function getCleanData(Request $request)
     {
         $user = auth()->user();
 
-        // If character JSON data is provided in the request, save it
+        // Save character JSON data if provided in the request
         if ($request->has('actorData')) {
             $user->update([
                 'character_data' => $request->get('actorData')
@@ -27,7 +27,16 @@ class ActorSheet extends FormRequest
         }
 
         $characterData = $user->character_data;
-        $isOffline = $request->has('actorData'); // Defaulting to true as we are not fetching live data here anymore
+
+        // Ensure we only return data for the assigned character if one is set
+        if ($user->default_actor_id && !empty($characterData)) {
+            // Verify that the cached data matches the assigned character
+            if (($characterData['_id'] ?? '') !== $user->default_actor_id) {
+                $characterData = null;
+            }
+        }
+
+        $isOffline = $request->has('actorData');
 
         if (empty($characterData)) {
             return response()->json([
@@ -38,16 +47,15 @@ class ActorSheet extends FormRequest
         }
 
         return [
-            // Generate a request ID for tracking (useful for React/Vue keys)
+            // Unique ID for the current data state
             'requestId' => uniqid('entity_'),
 
             'isOffline' => $isOffline,
 
-            // Pass through IDs
             'type' => $characterData['type'] ?? 'character',
             'uuid' => $characterData['_id'] ?? '',
+            'tokenId' => $user->default_token_id,
 
-            // The core data object your Vue app expects
             'data' => [
                 'name' => $characterData['name'] ?? 'Unknown Character',
                 'img' => $characterData['img'] ?? '',
@@ -61,11 +69,10 @@ class ActorSheet extends FormRequest
                     'roleInfo' => $characterData['system']['roleInfo'] ?? [],
                     'lifepath' => $characterData['system']['lifepath'] ?? [],
                     'information' => $characterData['system']['information'] ?? ['notes' => ''],
-                    // Crucial for the "Equipped" section in your Vue app
                     'externalData' => $characterData['system']['externalData'] ?? [],
                 ],
 
-                // Process and clean the items array
+                // Process and whitelist item fields
                 'items' => $this->processItems($characterData['items'] ?? [])
             ]
         ];

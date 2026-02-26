@@ -15,40 +15,86 @@ class FoundryController extends Controller
     {
         $start = microtime(true);
 
-        // 1. Validate the incoming data
         $validated = $request->validate([
             'requestId' => 'nullable|string',
             'type' => 'required|string',
             'action' => 'nullable|string',
             'actorId' => 'nullable|string',
             'success' => 'nullable|boolean',
-            'result' => 'nullable', // For complex data like Roll Modifiers
-            'actors' => 'nullable|array', // For GET_ACTORS
-            'actor' => 'nullable|array',  // For GET_ACTOR
-            'tokens' => 'nullable|array', // For VISIBLE_TOKENS
+            'result' => 'nullable',
+            'actors' => 'nullable|array',
+            'actor' => 'nullable',
+            'tokens' => 'nullable|array',
             'data' => 'nullable|array',
             'total' => 'nullable',
             'isCriticalSuccess' => 'nullable|boolean',
             'isCriticalFailure' => 'nullable|boolean',
             'label' => 'nullable|string',
             'rawRoll' => 'nullable|array',
-            'delta' => 'nullable|array', // For selective sheet updates (path => value)
-            'tab' => 'nullable|string'   // Optional hint for which tab was affected
+            'delta' => 'nullable|array',
+            'tab' => 'nullable|string',
+            'character' => 'nullable',
+            'foundryUserId' => 'nullable|string'
         ]);
+
+        if ($validated['type'] === 'LINK_PLAYER_CHARACTER' || $validated['type'] === 'GM_LINK_PLAYER_CHARACTER') {
+            $user = $request->user();
+            $targetFoundryUserId = $validated['foundryUserId'] ?? null;
+
+            // If it's a GM-initiated link, find the target user by client_id
+            if ($validated['type'] === 'GM_LINK_PLAYER_CHARACTER' && !empty($targetFoundryUserId)) {
+                $targetUser = \App\Models\User::where('client_id', $targetFoundryUserId)->first();
+                if ($targetUser) {
+                    $user = $targetUser;
+                } else {
+                    \Log::info("GM tried to sync character for Foundry User [{$targetFoundryUserId}] but no Laravel user found with that client_id.");
+                    return response()->json(['success' => false, 'message' => 'Target user not found']);
+                }
+            }
+
+            $user->default_actor_id = is_array($validated['character']) ? ($validated['character']['id'] ?? null) : $validated['character'];
+
+            if (!empty($targetFoundryUserId)) {
+                $user->client_id = $targetFoundryUserId;
+            }
+
+            $user->save();
+
+            \Log::info("Character link updated for User [{$user->id}] (Foundry: {$targetFoundryUserId}, Actor: {$user->default_actor_id}) via {$validated['type']}");
+
+            return response()->json(['success' => true]);
+        }
 
         $type = $validated['type'] ?? null;
 
-        // 2. PERSISTENCE: If this is full actor data or a delta, save to the user's mirror
+        // Persist actor data to the user's mirror if it's a full update or a delta
         if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA'])) {
-            $user = $request->user();
+            $actorId = $validated['actorId'] ?? ($validated['actor']['_id'] ?? null);
+            $user = null;
+
+            if ($actorId) {
+                $user = \App\Models\User::where('default_actor_id', $actorId)->first();
+            }
+
+            // Fallback to the current user (GM) if no assigned user found
+            if (!$user) {
+                $user = $request->user();
+            }
+
             if ($user) {
+                // If update is not for the user's assigned character, only GMs should save it
+                if ($user->default_actor_id && $actorId && $user->default_actor_id !== $actorId) {
+                    $user = $request->user();
+                }
+
+                if (!$user) return response()->json(['status' => 'ignored']);
+
                 $current = $user->character_data ?? [];
                 if (!is_array($current)) $current = [];
 
                 if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
                     $current = $validated['actor'];
                 } elseif ($type === 'SHEET_DELTA' && !empty($validated['delta'])) {
-                    // Apply dot-path updates
                     foreach ($validated['delta'] as $path => $value) {
                         $this->arraySetDot($current, $path, $value);
                     }
@@ -59,10 +105,10 @@ class FoundryController extends Controller
             }
         }
 
-        // 3. BROADCAST to the Web Client
+        // Broadcast to the Web Client
         \App\Events\FoundryResponse::dispatch($validated);
 
-        // 4. Legacy Cache support (Phase 1)
+        // Put in cache for synchronous polling
         if (!empty($validated['requestId'])) {
             \Illuminate\Support\Facades\Cache::put('foundry_response_' . $validated['requestId'], $request->all(), 10);
         }

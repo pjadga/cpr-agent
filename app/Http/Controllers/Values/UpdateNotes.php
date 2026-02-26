@@ -20,6 +20,7 @@ class UpdateNotes extends FormRequest
 
         $user = auth()->user();
         $actorId = $user->getActorId();
+        $requestId = $this->createRequestId();
 
         $payload = [
             'type' => 'UPDATE_STAT',
@@ -27,6 +28,7 @@ class UpdateNotes extends FormRequest
             'label' => 'information.notes',
             'operation' => 'set',
             'value' => $validatedData['notes'],
+            'requestId' => $requestId,
         ];
 
         CyberpunkAgentChannel::dispatch($payload);
@@ -34,7 +36,9 @@ class UpdateNotes extends FormRequest
         return response()->json([
             'success' => true,
             'message' => 'Notes successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

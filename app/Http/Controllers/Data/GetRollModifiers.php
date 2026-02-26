@@ -25,11 +25,13 @@ class GetRollModifiers extends FormRequest
         // Use user's client_id if available, otherwise fallback to a default or dummy for testing
         $actorId = $user->getActorId();
         $weaponId = isset($validatedData['selectedWeapon']['_id']) ? $validatedData['selectedWeapon']['_id'] : null;
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'GET_ROLL_MODIFIERS',
             'actorId' => $actorId,
             'weaponId' => $weaponId,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([

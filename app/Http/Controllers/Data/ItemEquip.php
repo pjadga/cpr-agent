@@ -42,16 +42,20 @@ class ItemEquip extends Controller
             };
 
 
+            $requestId = $this->createRequestId();
+
             CyberpunkAgentChannel::dispatch([
                 'type' => 'ITEM_EQUIP',
                 'actorId' => $actorId,
                 'itemId' => $itemId,
                 'state' => $state,
+                'requestId' => $requestId,
             ]);
 
             return response()->json([
                 'success' => true,
-                'result' => true
+                'result' => true,
+                'requestId' => $requestId,
             ]);
         } catch (\Exception $e) {
             return response()->json([

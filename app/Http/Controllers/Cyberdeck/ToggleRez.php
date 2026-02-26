@@ -28,18 +28,22 @@ class ToggleRez extends FormRequest
         $user = auth()->user();
         $actorId = $user->default_actor_id;
         $targetState = $targetState ? 1 : 0;
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'TOGGLE_REZ',
             'actorId' => $actorId,
             'programId' => $programId,
             'targetState' => $targetState,
+            'requestId' => $requestId,
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Data successfully submitted!',
-            'data' => null,
+            'data' => [
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

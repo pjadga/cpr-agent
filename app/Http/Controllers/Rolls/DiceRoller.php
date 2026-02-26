@@ -28,7 +28,7 @@ class DiceRoller extends Controller
             ], 401);
         }
 
-        $requestId = uniqid();
+        $requestId = $this->createRequestId();
 
         $payload = [
             'type' => 'DICE_ROLL',

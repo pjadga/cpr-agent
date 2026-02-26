@@ -25,7 +25,7 @@ class StatRollRequest extends FormRequest
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
 
-        $requestId = uniqid();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'STAT_ROLL',

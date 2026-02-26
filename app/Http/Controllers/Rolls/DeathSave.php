@@ -18,7 +18,7 @@ class DeathSave extends FormRequest
         $user = auth()->user();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
-        $requestId = uniqid();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'DEATH_SAVE',

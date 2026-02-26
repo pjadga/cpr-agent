@@ -22,17 +22,22 @@ class ProfileSetupController extends Controller
         $clientIds = [];
         $actors = [];
 
-        if ($config->base_url || config('services.foundry.base_url')) {
-            $requestId = (string) Str::uuid();
+        if ($config->foundry_url || config('services.foundry.base_url')) {
+            $requestId = $this->createRequestId();
 
-            CyberpunkAgentChannel::dispatch([
-                'type' => 'GET_ACTORS',
+            // Fetch the list of actors from Foundry.
+            // We always use GET_ACTORS to populate the dropdown.
+            $type = 'GET_ACTORS';
+            $payload = [
+                'type' => $type,
                 'requestId' => $requestId,
-            ]);
+                'foundryUserId' => $user->client_id,
+            ];
+            CyberpunkAgentChannel::dispatch($payload);
 
             // 2. Wait for the response (The Polling Loop)
             $startTime = microtime(true);
-            $timeout = 2.0; // Reduced timeout
+            $timeout = 5.0; // Increased timeout
             $foundryData = null;
 
             while ((microtime(true) - $startTime) < $timeout) {
@@ -46,9 +51,13 @@ class ProfileSetupController extends Controller
                 usleep(20000); // 20ms
             }
 
+            if (!empty($foundryData['actors'])) {
+                $actors = $foundryData['actors'];
+            }
+
             return view('settings', [
                 'clientIds' => $clientIds,
-                'actors' => $foundryData['actors'] ?? [],
+                'actors' => $actors,
                 'user' => Auth::user(),
                 'config' => $config,
             ]);
@@ -67,13 +76,13 @@ class ProfileSetupController extends Controller
         $validated = $request->validate([
             'client_id' => 'nullable|string',
             'default_actor_id' => 'required|string',
-            'default_token_id' => 'required|string',
+            'default_token_id' => 'nullable|string',
         ]);
 
         $user = Auth::user();
         $user->update($validated);
 
-        $this->refreshCharacterData($user);
+        $this->refreshCharacterData($user, $user->default_actor_id);
 
         return redirect()->route('settings')->with('success', 'Profile synchronized and character data refreshed!');
     }
@@ -86,25 +95,40 @@ class ProfileSetupController extends Controller
         return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
     }
 
-    protected function refreshCharacterData($user)
+    protected function refreshCharacterData($user, $actorId = null)
     {
         // Wipe and replace character_data from Foundry
-        $requestId = (string) Str::uuid();
-        CyberpunkAgentChannel::dispatch([
+        $requestId = $this->createRequestId();
+
+        $payload = [
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
-            'actorId' => $user->getActorId(),
-        ]);
+            'foundryUserId' => $user->client_id,
+        ];
+
+        if ($actorId) {
+            $payload['actorId'] = $actorId;
+        }
+
+        // We don't pass actorId if it's null, so the bridge will return the currently assigned character for the user
+        CyberpunkAgentChannel::dispatch($payload);
 
         // Wait for the response to ensure character_data is populated
         $startTime = microtime(true);
-        $timeout = 3.0;
+        $timeout = 5.0; // Increased timeout
         while ((microtime(true) - $startTime) < $timeout) {
             $key = 'foundry_response_' . $requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
                 if (!empty($foundryData['actor'])) {
-                    $user->character_data = $foundryData['actor'];
+                    $actor = $foundryData['actor'];
+
+                    // If the character has changed, update the ID as well
+                    if (isset($actor['_id']) && $actor['_id'] !== $user->default_actor_id) {
+                        $user->default_actor_id = $actor['_id'];
+                    }
+
+                    $user->character_data = $actor;
                     $user->save();
                 }
                 break;

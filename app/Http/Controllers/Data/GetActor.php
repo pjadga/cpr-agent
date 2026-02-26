@@ -17,13 +17,15 @@ class GetActor extends FormRequest
 
     public function getActor(Request $request)
     {
+        $user = auth()->user();
         // 1. Generate a unique ID for this specific transaction
-        $requestId = (string) Str::uuid();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
-            'actorId' => str_replace("Actor.", "", $request->get('actorId'))
+            'actorId' => str_replace("Actor.", "", $request->get('actorId')),
+            'foundryUserId' => $user->client_id,
         ]);
 
         // 2. Return immediately (Asynchronous)

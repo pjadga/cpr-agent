@@ -18,25 +18,25 @@ class GetActors extends FormRequest
     public function getActors(Request $request)
     {
         $user = auth()->user();
-        $actorId = $user->default_actor_id ?? null;
+        $actorId = $user->getActorId();
 
-        // 1. Dispatch background request to Foundry to refresh the list
-        $requestId = (string) Str::uuid();
-        CyberpunkAgentChannel::dispatch([
-            'type' => 'GET_ACTORS',
+        // Dispatch background request to Foundry to refresh the list
+        $requestId = $this->createRequestId();
+
+        // We always use GET_ACTORS to get the full available list for the user
+        $type = 'GET_ACTORS';
+        $payload = [
+            'type' => $type,
             'requestId' => $requestId,
-        ]);
+            'actorId' => $actorId,
+            'foundryUserId' => $user->client_id,
+        ];
 
-        // 2. Return current known state immediately (if any)
-        // Note: For simplicity in the initial settings screen, we could keep polling
-        // OR we return a list of previously cached actors.
-        // For now, let's keep GetActors synchronous but with the fast 20ms polling
-        // unless it's a major bottleneck. The instructions said "GetActor" specifically.
-        // However, for consistency let's look at the polling loop.
+        CyberpunkAgentChannel::dispatch($payload);
 
-        // Polling loop (already optimized to 20ms in Phase 1)
+        // Polling loop for live data
         $startTime = microtime(true);
-        $timeout = 2.0; // Reduced timeout
+        $timeout = 5.0; // Increased timeout
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {
@@ -48,9 +48,12 @@ class GetActors extends FormRequest
             usleep(20000); // 20ms
         }
 
+        $actors = $foundryData['actors'] ?? [];
+
         return response()->json([
-            'actors' => $foundryData['actors'] ?? [],
+            'actors' => $actors,
             'uuid' => $actorId,
+            'requestId' => $requestId,
             'isOffline' => ($foundryData === null)
         ], 200);
     }

@@ -18,18 +18,20 @@ class ListVisibleTokens extends FormRequest
     {
         $user = auth()->user();
         $tokenId = $user->getTokenId();
+        $actorId = $user->getActorId();
 
-        $requestId = (string) Str::uuid();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'LIST_VISIBLE_TOKENS',
             'tokenId' => $tokenId,
+            'actorId' => $actorId,
             'requestId' => $requestId,
         ]);
 
         // Polling loop
         $startTime = microtime(true);
-        $timeout = 2.0; // Reduced timeout
+        $timeout = 5.0; // Increased timeout
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {
@@ -51,6 +53,7 @@ class ListVisibleTokens extends FormRequest
         return response()->json([
             'success' => true,
             'message' => 'Visible tokens received',
+            'requestId' => $requestId,
             'data' => $foundryData['tokens'] ?? [],
         ], 200);
     }

@@ -33,7 +33,7 @@ class ProgramRoll extends FormRequest
         $actorId = $user->getActorId();
         $rollType = ($executionType ? 'cyberdeckProgram' : 'interfaceAbility');
 
-        $requestId = uniqid();
+        $requestId = $this->createRequestId();
 
         CyberpunkAgentChannel::dispatch([
             'type' => 'PROGRAM_ROLL',
