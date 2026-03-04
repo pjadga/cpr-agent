@@ -27,6 +27,7 @@ class User extends Authenticatable
         'default_token_id',
         'character_data',
         'agent_link',
+        'is_gm',
     ];
 
     /**
@@ -50,6 +51,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'character_data' => 'array',
+            'is_gm' => 'boolean',
         ];
     }
 
