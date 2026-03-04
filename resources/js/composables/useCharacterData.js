@@ -7,6 +7,8 @@ const charData = shallowRef(null);
 const loading = ref(true);
 const isWssConnected = ref(true); // Default to true as initial state
 const error = ref(null);
+const agentLink = ref(localStorage.getItem('cpr_agent_link') || '');
+const isGM = ref(localStorage.getItem('cpr_is_gm') === 'true');
 const baseUrl = ref(localStorage.getItem('cpr_base_url') || '');
 let refreshInterval = null;
 let actorUuid = localStorage.getItem('cpr_actor_uuid') || null;
@@ -238,6 +240,14 @@ export function useCharacterData() {
                 try {
                     const dbResponse = await window.axios.post("/actorsheet");
                     if (dbResponse.data && dbResponse.data.data) {
+                        if (dbResponse.data.agentLink) {
+                            agentLink.value = dbResponse.data.agentLink;
+                            localStorage.setItem('cpr_agent_link', dbResponse.data.agentLink);
+                        }
+                        if (typeof dbResponse.data.isGM !== 'undefined') {
+                            isGM.value = !!dbResponse.data.isGM;
+                            localStorage.setItem('cpr_is_gm', isGM.value);
+                        }
                         // Check if the UUID from the database matches our local actorUuid
                         const dbActorUuid = String(dbResponse.data.uuid).replace(/^Actor\./, '');
                         if (dbActorUuid && dbActorUuid !== actorUuid) {
@@ -288,17 +298,25 @@ export function useCharacterData() {
                         const payload = e.payload || e;
 
                         // If the request was initiated by another agent, ignore it IF it has a requestId
-                        if (payload.requestId && !isMyRequest(payload.requestId)) {
+                        // Except for DICE_ROLL_EVENT and ROLL_RESULT which are for everyone
+                        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type);
+                        if (!isPublicEvent && payload.requestId && !isMyRequest(payload.requestId)) {
                             console.log(`Ignoring FoundryResponse with requestId [${payload.requestId}] - initiated by another agent.`);
                             return;
                         }
 
                         // If it's actor data or a sheet delta, apply it
                         if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                            if (typeof payload.isGM !== 'undefined') {
+                                isGM.value = !!payload.isGM;
+                                localStorage.setItem('cpr_is_gm', isGM.value);
+                            }
+                            if (actorUuid && payload.actor._id !== actorUuid) return;
                             charData.value = { ...charData.value, data: payload.actor, uuid: payload.actor._id };
                             triggerRef(charData);
                             setTimeout(refreshIcons, 50);
                         } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
+                            if (actorUuid && payload.actorId && payload.actorId !== actorUuid) return;
                             applyDelta(payload.delta, { tab: payload.tab });
                         }
                     });
@@ -322,6 +340,8 @@ export function useCharacterData() {
         loading,
         isWssConnected,
         error,
+        agentLink,
+        isGM,
         getImageUrl,
         fetchCharacterData,
         refreshIcons,

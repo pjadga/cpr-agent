@@ -35,40 +35,54 @@ class FoundryController extends Controller
             'tab' => 'nullable|string',
             'character' => 'nullable',
             'foundryUserId' => 'nullable|string',
-            'agentLink' => 'nullable|string'
+            'agentLink' => 'nullable|string',
+            'isGM' => 'nullable|boolean',
+            'playerName' => 'nullable|string',
+            'flavor' => 'nullable|string',
+            'formula' => 'nullable|string',
+            'target' => 'nullable|string',
+            'tokenId' => 'nullable|string',
+            'message' => 'nullable|string',
         ]);
 
-        $agentLink = $validated['agentLink'] ?? null;
+        $agentLink = $validated['agentLink'] ?? $validated['agent_link'] ?? null;
+        $type = $validated['type'] ?? null;
 
-        if ($validated['type'] === 'LINK_PLAYER_CHARACTER' || $validated['type'] === 'GM_LINK_PLAYER_CHARACTER') {
-            $user = null;
-            $targetFoundryUserId = $validated['foundryUserId'] ?? null;
+        // Try to identify the user first for all request types
+        $user = null;
+        if ($agentLink) {
+            $user = \App\Models\User::where('agent_link', $agentLink)->first();
+        }
 
-            // Try to find the user by agentLink first
-            if ($agentLink) {
-                $user = \App\Models\User::where('agent_link', $agentLink)->first();
-            }
+        // If it's a link request, we might be creating/updating a user
+        if ($type === 'LINK_PLAYER_CHARACTER' || $type === 'GM_LINK_PLAYER_CHARACTER') {
+            $targetUser = null;
+            $userIdentifier = $validated['agentLink'] ?? $validated['agent_link'] ?? $validated['foundryUserId'] ?? null;
 
             if (!$user) {
                 $user = $request->user();
             }
 
-            // If it's a GM-initiated link, find the target user by agent_link (passed as foundryUserId)
-            if ($validated['type'] === 'GM_LINK_PLAYER_CHARACTER' && !empty($targetFoundryUserId)) {
-                $targetUser = \App\Models\User::where('agent_link', $targetFoundryUserId)->first();
+            // If it's a GM-initiated link, find the target user by agentLink or foundryUserId
+            if ($type === 'GM_LINK_PLAYER_CHARACTER' && !empty($userIdentifier)) {
+                $targetUser = \App\Models\User::where('agent_link', $userIdentifier)->first();
                 if ($targetUser) {
                     $user = $targetUser;
                 } else {
-                    \Log::info("GM tried to sync character for Foundry User but no Laravel user found with agent_link [{$targetFoundryUserId}].");
+                    \Log::info("GM tried to sync character for Foundry User but no Laravel user found with identifier [{$userIdentifier}].");
                     return response()->json(['success' => false, 'message' => 'Target user not found']);
                 }
             }
 
             $user->default_actor_id = is_array($validated['character']) ? ($validated['character']['id'] ?? null) : $validated['character'];
 
+            if (isset($validated['isGM'])) {
+                $user->is_gm = $validated['isGM'];
+            }
+
             $user->save();
 
-            \Log::info("Character link updated for User [{$user->id}] (Actor: {$user->default_actor_id}) via {$validated['type']}");
+            \Log::info("Character link updated for User [{$user->id}] (Actor: {$user->default_actor_id}) via {$type}");
 
             return response()->json([
                 'success' => true,
@@ -76,7 +90,14 @@ class FoundryController extends Controller
             ]);
         }
 
-        $type = $validated['type'] ?? null;
+        // General update for is_gm if present and user identified
+        if ($user && isset($validated['isGM'])) {
+            if ($user->is_gm !== (bool)$validated['isGM']) {
+                $user->is_gm = $validated['isGM'];
+                $user->save();
+                \Log::info("User [{$user->id}] is_gm status updated to [{$user->is_gm}] via {$type}");
+            }
+        }
 
         // Persist actor data to the user's mirror if it's a full update or a delta
         if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA'])) {
@@ -117,7 +138,11 @@ class FoundryController extends Controller
         }
 
         // Broadcast to the Web Client
-        \App\Events\FoundryResponse::dispatch($validated);
+        $broadcastPayload = $validated;
+        if ($agentLink) {
+            $broadcastPayload['agentLink'] = $agentLink;
+        }
+        \App\Events\FoundryResponse::dispatch($broadcastPayload);
 
         // Put in cache for synchronous polling
         if (!empty($validated['requestId'])) {

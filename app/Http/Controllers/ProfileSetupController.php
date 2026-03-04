@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use App\Models\Config;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +19,6 @@ class ProfileSetupController extends Controller
     {
         $user = Auth::user();
         $config = $user->config ?? new Config();
-
         $actors = [];
 
         if ($config->foundry_url || config('services.foundry.base_url')) {
@@ -30,40 +30,83 @@ class ProfileSetupController extends Controller
             $payload = [
                 'type' => $type,
                 'requestId' => $requestId,
+                'agent_link' => $user->agent_link,
                 'isLinkRequest' => true,
+                'isGM' => (bool)$user->is_gm,
             ];
             CyberpunkAgentChannel::dispatch($payload);
 
             // 2. Wait for the response (The Polling Loop)
             $startTime = microtime(true);
             $timeout = 5.0; // Increased timeout
-            $foundryData = null;
 
             while ((microtime(true) - $startTime) < $timeout) {
                 $key = 'foundry_response_' . $requestId;
 
                 if (Cache::has($key)) {
                     $foundryData = Cache::pull($key);
+                    if (!empty($foundryData['actors'])) {
+                        $actors = $foundryData['actors'];
+                    }
                     break;
                 }
 
                 usleep(20000); // 20ms
             }
+        }
 
-            if (!empty($foundryData['actors'])) {
-                $actors = $foundryData['actors'];
+        // Fallback: Ensure the currently saved actor is in the list
+        // This ensures the current selection is displayed even if the bridge is offline or slow.
+        if ($user->default_actor_id) {
+            $found = false;
+            foreach ($actors as $actor) {
+                // Check if the actor is already in the list (handle actorId or _id)
+                $id = $actor['actorId'] ?? ($actor['_id'] ?? '');
+                if ($id == $user->default_actor_id) {
+                    $found = true;
+                    break;
+                }
             }
 
-            return view('settings', [
-                'actors' => $actors,
-                'user' => Auth::user(),
-                'config' => $config,
-            ]);
+            if (!$found) {
+                $actors[] = [
+                    'name' => $user->character_data['name'] ?? 'Saved Character',
+                    'actorId' => $user->default_actor_id,
+                    'tokenId' => $user->default_token_id,
+                ];
+            }
+        }
+
+        // Enhancement for GM: If the bridge is offline or the list is still empty,
+        // include all other synced characters that exist in the database.
+        if ($user->is_gm) {
+            $otherUsers = User::whereNotNull('default_actor_id')
+                ->where('id', '!=', $user->id)
+                ->get();
+
+            foreach ($otherUsers as $otherUser) {
+                $found = false;
+                foreach ($actors as $actor) {
+                    $id = $actor['actorId'] ?? ($actor['_id'] ?? '');
+                    if ($id == $otherUser->default_actor_id) {
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found && !empty($otherUser->character_data)) {
+                    $actors[] = [
+                        'name' => ($otherUser->character_data['name'] ?? 'Saved Character') . ' (' . $otherUser->name . ')',
+                        'actorId' => $otherUser->default_actor_id,
+                        'tokenId' => $otherUser->default_token_id,
+                    ];
+                }
+            }
         }
 
         return view('settings', [
             'actors' => $actors,
-            'user' => Auth::user(),
+            'user' => $user,
             'config' => $config,
         ]);
     }
@@ -105,6 +148,7 @@ class ProfileSetupController extends Controller
         $payload = [
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
+            'agent_link' => $user->agent_link,
         ];
 
         if ($actorId) {

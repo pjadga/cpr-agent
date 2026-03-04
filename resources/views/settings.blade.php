@@ -43,6 +43,11 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <x-input-label readonly for="api_key" :value="__('API Key')" class="text-xs uppercase text-cpr-teal" />
+                        @if(auth()->user()->is_gm)
+                            <span class="ml-auto bg-cpr-red/20 border border-cpr-red text-cpr-red px-2 py-0.5 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                                GM Authorized
+                            </span>
+                        @endif
                         <div class="group relative flex items-center">
                             <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
                             <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">

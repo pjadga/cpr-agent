@@ -66,11 +66,11 @@
                     </div>
                 </div>
 
-                <div v-if="loading" class="text-center py-8 text-cpr-text-muted text-xs">Loading modifiers...</div>
+                <div v-if="loading" class="text-center py-8 text-cpr-text-muted text-xs font-mono animate-pulse">Initializing Modifiers...</div>
 
-                <div v-else-if="error" class="border border-cpr-red-dark bg-cpr-red-dark/20 text-cpr-red text-xs p-3">
+                <div v-else-if="error && hasWeapon" class="border border-cpr-red-dark bg-cpr-red-dark/20 text-cpr-red text-xs p-3">
                     {{ error }}
-                    <div v-if="!hasWeapon" class="mt-2">
+                    <div class="mt-2">
                         <button @click="$emit('go-to-control')" class="text-[10px] uppercase font-bold border border-cpr-red text-cpr-red px-2 py-1 hover:bg-cpr-red hover:text-black transition-colors">Go to Control</button>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                         </div>
                     </div>
 
-                    <div class="bg-cpr-black-deep border border-cpr-border p-2">
+                    <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
                             <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Final Modifier</div>
                             <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-mono font-bold text-xs">{{ data.finalModifier }}</div>

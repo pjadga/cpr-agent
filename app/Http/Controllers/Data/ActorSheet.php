@@ -62,6 +62,8 @@ class ActorSheet extends FormRequest
             'type' => $characterData['type'] ?? 'character',
             'uuid' => $characterData['_id'] ?? '',
             'tokenId' => $user->default_token_id,
+            'agentLink' => $user->agent_link,
+            'isGM' => (bool)$user->is_gm,
 
             'data' => [
                 'name' => $characterData['name'] ?? 'Unknown Character',

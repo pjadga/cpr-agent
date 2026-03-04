@@ -14,7 +14,10 @@ export function useEchoListener(handler, channel = 'cpr-agent', event = '.Foundr
 
         console.log(`%c[Agent] Incoming Response: ${payload.type}`, "color: #00ff00; font-weight: bold;", payload);
 
-        if (isMyRequest(requestId)) {
+        // Dice rolls and results should ALWAYS be processed, even if initiated by another agent
+        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type);
+
+        if (isPublicEvent || isMyRequest(requestId)) {
             handler(e);
         } else {
             console.log(`Ignoring FoundryResponse with requestId [${requestId}] - initiated by another agent.`);

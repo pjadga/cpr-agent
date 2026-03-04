@@ -19,6 +19,7 @@ import SkillsTab from "./components/character-sheet/SkillsTab.vue";
 import LifepathTab from "./components/character-sheet/LifepathTab.vue";
 import NavBtn from "./components/character-sheet/NavBtn.vue";
 import RollResultPopup from "./components/RollResultPopup.vue";
+import DiceHistory from "./components/DiceHistory.vue";
 import { vCprImg } from "./directives/cpr-img";
 import mitt from 'mitt';
 
@@ -47,5 +48,6 @@ app.component('skills-tab', SkillsTab);
 app.component('lifepath-tab', LifepathTab);
 app.component('nav-btn', NavBtn);
 app.component('roll-result-popup', RollResultPopup);
+app.component('dice-history', DiceHistory);
 app.directive('cpr-img', vCprImg);
 app.mount('#app');

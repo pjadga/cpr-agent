@@ -80,6 +80,7 @@
             </resource-modal>
 
             <roll-result-popup></roll-result-popup>
+            <dice-history></dice-history>
 
             <combat-panel
                 :show="showCombatPanel"
@@ -343,6 +344,8 @@ import LifepathTab from './character-sheet/LifepathTab.vue';
 import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
+import DiceHistory from './DiceHistory.vue';
+import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
 
 // --- COMPOSABLES ---
@@ -359,7 +362,7 @@ import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
 
 export default {
     name: 'CharacterSheet',
-    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, LifepathTab, ResourceModal, RollModifierPanel, SkillsTab },
+    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, LifepathTab, ResourceModal, RollModifierPanel, SkillsTab, DiceHistory, RollResultPopup },
     directives: { icon: vIcon },
     setup() {
         // --- COMPOSABLES ---
@@ -368,6 +371,8 @@ export default {
             loading,
             isWssConnected,
             error: dataError,
+            agentLink: localAgentLink,
+            isGM,
             getImageUrl,
             fetchCharacterData,
             refreshIcons,
@@ -487,6 +492,10 @@ export default {
             const payload = e.payload || e;
 
             if (payload.type === 'SHEET_DELTA' && payload.delta) {
+                // Ensure this update is for the character we are currently viewing
+                const currentId = charData.value?.data?._id;
+                if (payload.actorId && currentId && payload.actorId !== currentId) return;
+
                 // Apply focused delta from Foundry/Backend without full refresh
                 try {
                     applyDelta(payload.delta, { tab: payload.tab });
@@ -495,6 +504,14 @@ export default {
                     debouncedFetchCharacterData();
                 }
             } else if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                if (typeof payload.isGM !== 'undefined') {
+                    isGM.value = !!payload.isGM;
+                    localStorage.setItem('cpr_is_gm', isGM.value);
+                }
+                // Ensure this update is for the character we are currently viewing
+                const currentId = charData.value?.data?._id;
+                if (payload.actor?._id && currentId && payload.actor._id !== currentId) return;
+
                 // Background refresh finished: update our local state with the full fresh actor object
                 // We wrap it in a structure that matches our Vue expectations (top-level 'data' usually)
                 charData.value = {
@@ -504,28 +521,35 @@ export default {
                 };
                 loading.value = false;
                 setTimeout(refreshIcons, 50);
-            } else if (payload.type === 'ROLL_RESULT') {
-                const isDamage = /\(Damage\)/i.test(payload.label || '');
-                let details = '';
-                if ((payload.label || '').includes('Attack')) {
-                    if (typeof payload.dv !== 'undefined') {
-                        const dvText = typeof payload.dv === 'number' ? payload.dv : String(payload.dv);
-                        const outcome = payload.outcome || '';
-                        details = `DV ${dvText} — ${outcome}`.trim();
+            } else if (payload.type === 'DICE_ROLL_EVENT' || payload.type === 'ROLL_RESULT') {
+                const isMyRoll = (payload.agentLink || payload.agent_link) === localAgentLink.value;
+
+                if (isMyRoll) {
+                    // It's my roll: trigger the big popup
+                    const isDamage = /\(Damage\)/i.test(payload.label || '');
+                    let details = '';
+                    if ((payload.label || '').includes('Attack')) {
+                        if (typeof payload.dv !== 'undefined') {
+                            const dvText = typeof payload.dv === 'number' ? payload.dv : String(payload.dv);
+                            const outcome = payload.outcome || '';
+                            details = `DV ${dvText} — ${outcome}`.trim();
+                        }
                     }
+                    window.emitter.emit('show-roll-result', {
+                        title: payload.label || payload.rawRoll?.rollTitle || 'Roll Result',
+                        result: payload.total,
+                        formula: payload.rawRoll?._roll?.formula || payload.rawRoll?.formula || '',
+                        flavor: payload.rawRoll?.statName || payload.rawRoll?.rollTitle || '',
+                        isCriticalSuccess: payload.isCriticalSuccess,
+                        isCriticalFailure: payload.isCriticalFailure,
+                        raw: payload.rawRoll,
+                        details,
+                        type: isDamage ? 'damage' : 'default'
+                    });
+                } else {
+                    // It's someone else's roll: trigger the small popup
+                    window.emitter.emit('dice-roll-event', payload);
                 }
-                window.emitter.emit('show-roll-result', {
-                    title: payload.label || payload.rawRoll?.rollTitle || 'Roll Result',
-                    result: payload.total,
-                    formula: payload.rawRoll?._roll?.formula || payload.rawRoll?.formula || '',
-                    flavor: payload.rawRoll?.statName || payload.rawRoll?.rollTitle || '',
-                    isCriticalSuccess: payload.isCriticalSuccess,
-                    isCriticalFailure: payload.isCriticalFailure,
-                    raw: payload.rawRoll,
-                    details,
-                    type: isDamage ? 'damage' : 'default'
-                });
-                // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo/stat updates
             }
 
             if (payload.type === 'CONFIRMATION') {
@@ -570,6 +594,8 @@ export default {
             closeRollPanel,
             fetchRollModifiers
         } = useRollModifiers(controlState);
+
+        fetchRollModifiers();
 
         const {
             activeCyberdeck,

@@ -1,8 +1,15 @@
 <x-guest-layout>
     <div class="max-w-2xl mx-auto">
-        <h2 class="text-3xl font-bold mb-6 glow-red text-cpr-red uppercase tracking-tighter border-b-2 border-cpr-red-dark pb-2">
-            Profile Synchronization
-        </h2>
+        <div class="flex items-center justify-between border-b-2 border-cpr-red-dark mb-6 pb-2">
+            <h2 class="text-3xl font-bold glow-red text-cpr-red uppercase tracking-tighter">
+                Profile Synchronization
+            </h2>
+            @if(auth()->user()->is_gm)
+                <span class="bg-cpr-red/20 border border-cpr-red text-cpr-red px-2 py-1 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                    GM Authorized
+                </span>
+            @endif
+        </div>
 
         <p class="mb-8 text-cpr-text-muted italic">
             First time link detected. Please synchronize your Agent interface with a Foundry instance and select your default biometric signature (Actor).

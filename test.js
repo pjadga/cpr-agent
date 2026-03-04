@@ -114,8 +114,9 @@ class CharacterAssignmentMenu extends FormApplication {
 
                     await window.cyberpunkBridge.sendResponse({
                         type: 'GM_LINK_PLAYER_CHARACTER',
-                        foundryUserId: agentLink || update._id, // Use agent-link as primary ID for Laravel
-                        character: update.character
+                        agentLink: agentLink || update._id, // Use agent-link as primary ID for Laravel
+                        character: update.character,
+                        isGM: user.isGM
                     });
                 }
 
@@ -136,11 +137,14 @@ class CyberpunkBridge {
         this.echo = null;
         this.isConnected = false;
         this.activeRequests = new Map();
+        this.requestAgentLinks = new Map();
         this.hookIds = {};
+        this._isCapturingRoll = false;
     }
 
     async rollAndCapture(actorId, triggerFunction) {
         console.log(`%c[Bridge] Starting Render Interceptor for Actor ${actorId}`, "color: #00ffff; font-weight: bold;");
+        this._isCapturingRoll = true;
 
         return new Promise(async (resolve, reject) => {
             let rollFound = false;
@@ -179,6 +183,8 @@ class CyberpunkBridge {
             } catch (e) {
                 renderTemplate = originalRender;
                 resolve({ success: false, error: "Trigger failed" });
+            } finally {
+                setTimeout(() => { this._isCapturingRoll = false; }, 1000);
             }
         });
     }
@@ -378,7 +384,8 @@ class CyberpunkBridge {
                     type: 'LINK_PLAYER_CHARACTER',
                     character: char ? { id: char.id, name: char.name } : null,
                     actorName: char ? char.name : null,
-                    foundryUserId: game.user.id
+                    agentLink: game.user.getFlag(MODULE_ID, 'agent-link') || game.user.id,
+                    isGM: game.user.isGM
                 });
 
                 if (response && response.agent_link) {
@@ -510,6 +517,51 @@ class CyberpunkBridge {
         this.hookIds.closeSettingsConfig = Hooks.on('closeSettingsConfig', (app, html) => {
             this.syncPlayerLink();
         });
+
+        this.hookIds.updateToken = Hooks.on('updateToken', (token, changes, options, userId) => {
+            if (changes.x || changes.y || changes.disposition || changes.hidden) {
+                this.broadcastRefresh('VISIBLE_TOKENS_DATA');
+            }
+        });
+
+        this.hookIds.deleteToken = Hooks.on('deleteToken', (token, options, userId) => {
+            this.broadcastRefresh('VISIBLE_TOKENS_DATA');
+        });
+
+        this.hookIds.createChatMessage = Hooks.on('createChatMessage', (message, options, userId) => {
+            if (message.author.id !== game.user.id) return;
+            if (this._isCapturingRoll) return;
+            if (message.rolls && message.rolls.length > 0) {
+                // If not whispered and not hidden
+                if (message.whisper.length === 0 && !message.blind) {
+                    this.broadcastRoll(message);
+                }
+            }
+        });
+    }
+
+    broadcastRefresh(type) {
+        this.sendResponse({ type: 'REFRESH_SIGNAL', target: type });
+    }
+
+    broadcastRoll(message) {
+        const user = game.users.get(message.author.id);
+        const roll = message.rolls[0];
+        this.sendResponse({
+            type: 'ROLL_RESULT',
+            agentLink: user ? user.getFlag(MODULE_ID, 'agent-link') : null,
+            playerName: message.alias,
+            total: roll.total,
+            formula: roll.formula,
+            label: message.flavor || 'Dice Roll',
+            rawRoll: {
+                total: roll.total,
+                formula: roll.formula,
+                rollTitle: message.flavor || 'Dice Roll',
+                _roll: roll.toJSON()
+            },
+            success: true
+        });
     }
 
     /**
@@ -527,9 +579,15 @@ class CyberpunkBridge {
         }
 
         // Include agent-link if available on the current Foundry user
-        const agentLink = game.user.getFlag(MODULE_ID, 'agent-link');
+        const agentLink = (data.requestId ? this.requestAgentLinks.get(data.requestId) : null) || game.user.getFlag(MODULE_ID, 'agent-link');
         if (agentLink && !data.agentLink) {
             data.agentLink = agentLink;
+        }
+
+        // Include player name for roll results
+        if (data.type === 'ROLL_RESULT' && !data.playerName) {
+            const actor = data.actorId ? game.actors.get(data.actorId) : null;
+            data.playerName = actor ? actor.name : game.user.name;
         }
 
         try {
@@ -567,6 +625,13 @@ class CyberpunkBridge {
 
         const requestId = data.requestId;
         const agentLink = data.agent_link || data.agentLink;
+
+        if (requestId && agentLink) {
+            this.requestAgentLinks.set(requestId, agentLink);
+            // Cleanup after 30 seconds to prevent leaks
+            setTimeout(() => this.requestAgentLinks.delete(requestId), 30000);
+        }
+
         const myAgentLink = game.user.getFlag(MODULE_ID, 'agent-link');
         const actorId = data.actorId;
         const myCharacterId = game.user.character?.id;
@@ -578,7 +643,7 @@ class CyberpunkBridge {
         let isForMe = false;
         if (game.user.isGM) {
             isForMe = true;
-        } else if (myAgentLink && requestId === myAgentLink) {
+        } else if (myAgentLink && (requestId === myAgentLink || agentLink === myAgentLink)) {
             isForMe = true;
         } else if (!myAgentLink && requestId && actorId && myCharacterId === actorId) {
             // "Discovery" link: We aren't linked yet, but the message is for our character.
@@ -1565,12 +1630,19 @@ class CyberpunkBridge {
 
             case 'GET_ACTOR': {
                 let actorId = data.actorId;
+                let targetUser = game.user;
+                const userIdentifier = data.agentLink || data.agent_link || data.foundryUserId || data.requestId;
+
+                if (userIdentifier) {
+                    targetUser = game.users.find(u => u.getFlag(MODULE_ID, 'agent-link') === userIdentifier)
+                                || game.users.get(userIdentifier)
+                                || (userIdentifier === game.user.id ? game.user : null);
+                }
+
+                if (!targetUser) targetUser = game.user;
+
                 // If no actorId provided, try to get the assigned character for the user
                 if (!actorId) {
-                    let targetUser = game.user;
-                    if (data.foundryUserId) {
-                        targetUser = game.users.get(data.foundryUserId) || game.user;
-                    }
                     const assignedChar = targetUser.character;
                     if (assignedChar) {
                         actorId = assignedChar.id;
@@ -1596,30 +1668,31 @@ class CyberpunkBridge {
                             })),
                             flags: obj.flags && obj.flags['cyberpunk-red-core'] ? { 'cyberpunk-red-core': obj.flags['cyberpunk-red-core'] } : {}
                         };
-                        await this.sendResponse({ type: 'ACTOR_DATA', actor: slim, requestId });
+                        await this.sendResponse({ type: 'ACTOR_DATA', actor: slim, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
                         break;
                     }
                 }
-                await this.sendResponse({ type: 'ACTOR_DATA', actor: false, requestId });
+                await this.sendResponse({ type: 'ACTOR_DATA', actor: false, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
                 break;
             }
 
             case 'GET_ACTORS': {
                 let targetUser = game.user;
-                const userIdentifier = data.agentLink || data.agent_link || data.requestId;
+                const userIdentifier = data.agentLink || data.agent_link || data.foundryUserId || data.requestId;
 
                 if (userIdentifier) {
                     // Try to find the user by their agent-link flag
                     targetUser = game.users.find(u => u.getFlag(MODULE_ID, 'agent-link') === userIdentifier)
                                 || game.users.get(userIdentifier) // Fallback to ID
-                                || game.user;
+                                || (userIdentifier === game.user.id ? game.user : null);
                 }
 
+                if (!targetUser) targetUser = game.user;
+
                 let actors = [];
-                // If the user IS Game Master, we always return ALL characters and mooks.
-                // We use game.user.isGM here because the current user running the bridge
-                // needs to have GM permissions to see all actors in the world.
-                if (game.user.isGM) {
+                // If the target user is a Game Master, we always return ALL characters and mooks.
+                // We check targetUser.isGM instead of game.user.isGM.
+                if (targetUser.isGM) {
                     // GM sees ALL characters and mooks in the world
                     actors = game.actors
                         .filter(a => a.type === 'character' || a.type === 'mook')
@@ -1634,7 +1707,7 @@ class CyberpunkBridge {
                                 name: a.name,
                                 actorId: a.id,
                                 tokenId: null,
-                                foundryUserId: ownerId || targetUser.id
+                                agentLink: (ownerId ? game.users.get(ownerId)?.getFlag(MODULE_ID, 'agent-link') : null) || (ownerId || targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id)
                             };
                         });
                 } else {
@@ -1653,7 +1726,7 @@ class CyberpunkBridge {
                                 name: t.name,
                                 actorId: t.actor.id,
                                 tokenId: t.id,
-                                foundryUserId: ownerId || null
+                                agentLink: (ownerId ? game.users.get(ownerId)?.getFlag(MODULE_ID, 'agent-link') : null) || ownerId || null
                             };
                         });
 
@@ -1665,16 +1738,18 @@ class CyberpunkBridge {
                                 name: targetUser.character.name,
                                 actorId: targetUser.character.id,
                                 tokenId: null,
-                                foundryUserId: targetUser.id
+                                agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id
                             });
                         }
+                    }
 
-                        // If the user is a player and has an assigned character, only return that one
+                    // If the user is a player, only return their assigned character if they have one
+                    if (!targetUser.isGM && targetUser.character) {
                         actors = actors.filter(a => a.actorId === targetUser.character.id);
                     }
                 }
 
-                await this.sendResponse({ type: 'ACTORS_DATA', actors: actors, requestId });
+                await this.sendResponse({ type: 'ACTORS_DATA', actors: actors, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
                 break;
             }
 
