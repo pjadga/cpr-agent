@@ -85,7 +85,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
     const handleFoundryResponse = (e) => {
         const payload = e.payload || e;
-        console.log('useCombat: Received FoundryResponse', payload);
 
         if (payload.type === 'DV_INFO_DATA') {
             dvInfo.value = payload.result?.dv;
@@ -97,8 +96,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
     useEchoListener(handleFoundryResponse);
 
-    const debouncedGetVisibleTokens = debounce(getVisibleTokens, 800);
-    const throttledGetVisibleTokens = throttle(getVisibleTokens, 1500);
+    const debouncedGetVisibleTokens = debounce(getVisibleTokens, 1500);
+    const throttledGetVisibleTokens = throttle(getVisibleTokens, 15000);
 
     const debouncedFetchCharacterData = debounce(fetchCharacterData, 1000);
 
@@ -114,15 +113,13 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         const now = Date.now();
 
         // 20ms throttle to prevent OS-level bounce but feel completely raw
-        if (now - lastMoveTime < 20) return;
+        // if (now - lastMoveTime < 20) return;
 
         lastMoveTime = now;
         window.axios.post("/movetoken", { direction, weaponId, actorId, tokenId });
 
         // Refresh visible tokens after movement.
         // throttled version ensures we get updates while moving (every 1.5s)
-        // debounced version ensures we get a final update after we STOP moving (800ms)
-        throttledGetVisibleTokens();
         debouncedGetVisibleTokens();
     };
 

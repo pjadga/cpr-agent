@@ -140,7 +140,7 @@ class CyberpunkBridge {
 
             const spyRender = function(path, data) {
                 if (path && typeof path === 'string' && path.includes('rollcard')) {
-                    console.log(`%c[Bridge] 🎯 Intercepted Render: ${path}`, "color: #00ff00;", data);
+                    console.log(`%c[Bridge] Intercepted Render: ${path}`, "color: #00ff00;", data);
                     rollFound = true;
                     renderTemplate = originalRender;
 
@@ -522,9 +522,10 @@ class CyberpunkBridge {
     async handleIncomingData(payload) {
         // 1. Unwrap the data (Laravel sometimes wraps it in a 'payload' property)
         const data = payload.payload || payload;
-        console.log("Received Order:", data);
-
         const type = data.type;
+
+        console.log(`%c[Bridge] Incoming Call: ${type}`, "color: #00ffff; font-weight: bold;", data);
+
         const actorId = data.actorId;
         let tokenId = data.tokenId;
         const requestId = data.requestId;
@@ -1383,7 +1384,6 @@ class CyberpunkBridge {
                     finalModifier: statValue + skillLevel + weaponAcc + totalPenalty,
                     injuries: effectList
                 };
-                console.log("GET_ROLL_MODIFIERS result:", result);
                 await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', result, requestId });
                 break;
             }
@@ -1455,7 +1455,6 @@ class CyberpunkBridge {
                         weaponCategory: category,
                         dv: targetDV === 99 ? 'Out of Range' : targetDV
                     };
-                    console.log("GET_DV_INFO result:", result);
                     await this.sendResponse({ type: 'DV_INFO_DATA', result, requestId });
                 } else {
                     console.warn(`GET_DV_INFO: Token(s) not found. Jim: ${!!jim}, Target: ${!!target}`);
@@ -1494,7 +1493,6 @@ class CyberpunkBridge {
                             };
                         })
                         .sort((a, b) => a.distanceM - b.distanceM);
-                    console.log("LIST_VISIBLE_TOKENS result:", nearbyTokens);
                 } else {
                     console.warn(`LIST_VISIBLE_TOKENS: Token ID ${tokenId} not found.`);
                 }
@@ -1608,7 +1606,6 @@ class CyberpunkBridge {
                     }
                 }
 
-                console.log("GET_ACTORS result:", actors);
                 await this.sendResponse({ type: 'ACTORS_DATA', actors: actors, requestId });
                 break;
             }

@@ -485,7 +485,6 @@ export default {
         // Listen for responses from Foundry
         const handleFoundryResponse = (e) => {
             const payload = e.payload || e;
-            console.log('CharacterSheet: Received FoundryResponse', payload);
 
             if (payload.type === 'SHEET_DELTA' && payload.delta) {
                 // Apply focused delta from Foundry/Backend without full refresh

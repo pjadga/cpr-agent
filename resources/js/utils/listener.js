@@ -12,6 +12,8 @@ export function useEchoListener(handler, channel = 'cpr-agent', event = '.Foundr
         const payload = e.payload || e;
         const requestId = payload.requestId;
 
+        console.log(`%c[Agent] Incoming Response: ${payload.type}`, "color: #00ff00; font-weight: bold;", payload);
+
         if (isMyRequest(requestId)) {
             handler(e);
         } else {

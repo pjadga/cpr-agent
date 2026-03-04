@@ -286,7 +286,6 @@ export function useCharacterData() {
                 window.Echo.private('cpr-agent')
                     .listen('.FoundryResponse', (e) => {
                         const payload = e.payload || e;
-                        console.log("Received Foundry Response:", payload);
 
                         // If the request was initiated by another agent, ignore it IF it has a requestId
                         if (payload.requestId && !isMyRequest(payload.requestId)) {

@@ -33,7 +33,6 @@ export function useRollModifiers(controlState) {
 
     const handleFoundryResponse = (e) => {
         const payload = e.payload || e;
-        console.log('useRollModifiers: Received FoundryResponse', payload);
         if (payload.type === 'ROLL_MODIFIERS_DATA') {
             const result = payload.result;
             if (!isDeepEqual(rollModsData.value || {}, result || {})) {
