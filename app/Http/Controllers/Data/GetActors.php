@@ -29,7 +29,6 @@ class GetActors extends FormRequest
             'type' => $type,
             'requestId' => $requestId,
             'actorId' => $actorId,
-            'foundryUserId' => $user->client_id,
         ];
 
         CyberpunkAgentChannel::dispatch($payload);

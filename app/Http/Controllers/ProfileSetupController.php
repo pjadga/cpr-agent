@@ -19,7 +19,6 @@ class ProfileSetupController extends Controller
         $user = Auth::user();
         $config = $user->config ?? new Config();
 
-        $clientIds = [];
         $actors = [];
 
         if ($config->foundry_url || config('services.foundry.base_url')) {
@@ -31,7 +30,7 @@ class ProfileSetupController extends Controller
             $payload = [
                 'type' => $type,
                 'requestId' => $requestId,
-                'foundryUserId' => $user->client_id,
+                'isLinkRequest' => true,
             ];
             CyberpunkAgentChannel::dispatch($payload);
 
@@ -56,7 +55,6 @@ class ProfileSetupController extends Controller
             }
 
             return view('settings', [
-                'clientIds' => $clientIds,
                 'actors' => $actors,
                 'user' => Auth::user(),
                 'config' => $config,
@@ -64,7 +62,6 @@ class ProfileSetupController extends Controller
         }
 
         return view('settings', [
-            'clientIds' => $clientIds,
             'actors' => $actors,
             'user' => Auth::user(),
             'config' => $config,
@@ -74,12 +71,17 @@ class ProfileSetupController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id' => 'nullable|string',
             'default_actor_id' => 'required|string',
             'default_token_id' => 'nullable|string',
         ]);
 
         $user = Auth::user();
+
+        // If the user doesn't have an agent-link, create one now.
+        if (empty($user->agent_link)) {
+            $validated['agent_link'] = (string) Str::uuid();
+        }
+
         $user->update($validated);
 
         $this->refreshCharacterData($user, $user->default_actor_id);
@@ -103,7 +105,6 @@ class ProfileSetupController extends Controller
         $payload = [
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
-            'foundryUserId' => $user->client_id,
         ];
 
         if ($actorId) {

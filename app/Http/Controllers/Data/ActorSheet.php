@@ -20,9 +20,16 @@ class ActorSheet extends FormRequest
 
         // Save character JSON data if provided in the request
         if ($request->has('actorData')) {
-            $user->update([
+            $update = [
                 'character_data' => $request->get('actorData')
-            ]);
+            ];
+
+            // If the user doesn't have an agent-link, create one now.
+            if (empty($user->agent_link)) {
+                $update['agent_link'] = (string) \Illuminate\Support\Str::uuid();
+            }
+
+            $user->update($update);
             $user->refresh();
         }
 

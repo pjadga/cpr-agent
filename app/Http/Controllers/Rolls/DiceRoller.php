@@ -21,10 +21,10 @@ class DiceRoller extends Controller
 
         $user = auth()->user();
 
-        if (!$user || !$user->getClientId()) {
+        if (!$user || !$user->agent_link) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not authenticated or Client ID missing.',
+                'message' => 'User not authenticated or Agent Link missing.',
             ], 401);
         }
 
@@ -54,10 +54,10 @@ class DiceRoller extends Controller
 
         $user = auth()->user();
 
-        if (!$user || !$user->getClientId()) {
+        if (!$user || !$user->agent_link) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not authenticated or Client ID missing.',
+                'message' => 'User not authenticated or Agent Link missing.',
             ], 401);
         }
 

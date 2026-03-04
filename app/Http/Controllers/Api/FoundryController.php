@@ -34,35 +34,46 @@ class FoundryController extends Controller
             'delta' => 'nullable|array',
             'tab' => 'nullable|string',
             'character' => 'nullable',
-            'foundryUserId' => 'nullable|string'
+            'foundryUserId' => 'nullable|string',
+            'agentLink' => 'nullable|string'
         ]);
 
+        $agentLink = $validated['agentLink'] ?? null;
+
         if ($validated['type'] === 'LINK_PLAYER_CHARACTER' || $validated['type'] === 'GM_LINK_PLAYER_CHARACTER') {
-            $user = $request->user();
+            $user = null;
             $targetFoundryUserId = $validated['foundryUserId'] ?? null;
 
-            // If it's a GM-initiated link, find the target user by client_id
+            // Try to find the user by agentLink first
+            if ($agentLink) {
+                $user = \App\Models\User::where('agent_link', $agentLink)->first();
+            }
+
+            if (!$user) {
+                $user = $request->user();
+            }
+
+            // If it's a GM-initiated link, find the target user by agent_link (passed as foundryUserId)
             if ($validated['type'] === 'GM_LINK_PLAYER_CHARACTER' && !empty($targetFoundryUserId)) {
-                $targetUser = \App\Models\User::where('client_id', $targetFoundryUserId)->first();
+                $targetUser = \App\Models\User::where('agent_link', $targetFoundryUserId)->first();
                 if ($targetUser) {
                     $user = $targetUser;
                 } else {
-                    \Log::info("GM tried to sync character for Foundry User [{$targetFoundryUserId}] but no Laravel user found with that client_id.");
+                    \Log::info("GM tried to sync character for Foundry User but no Laravel user found with agent_link [{$targetFoundryUserId}].");
                     return response()->json(['success' => false, 'message' => 'Target user not found']);
                 }
             }
 
             $user->default_actor_id = is_array($validated['character']) ? ($validated['character']['id'] ?? null) : $validated['character'];
 
-            if (!empty($targetFoundryUserId)) {
-                $user->client_id = $targetFoundryUserId;
-            }
-
             $user->save();
 
-            \Log::info("Character link updated for User [{$user->id}] (Foundry: {$targetFoundryUserId}, Actor: {$user->default_actor_id}) via {$validated['type']}");
+            \Log::info("Character link updated for User [{$user->id}] (Actor: {$user->default_actor_id}) via {$validated['type']}");
 
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'agent_link' => $user->agent_link
+            ]);
         }
 
         $type = $validated['type'] ?? null;

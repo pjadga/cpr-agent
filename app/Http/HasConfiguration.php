@@ -18,11 +18,19 @@ trait HasConfiguration
 
     /**
      * Create a unique request ID for a Foundry transaction.
+     * Uses the agent_link if available, as requested.
      */
     public function createRequestId(): string
     {
         $user = auth()->user();
-        $prefix = $user ? 'user-' . $user->id . '-' : 'anon-';
-        return $prefix . \Illuminate\Support\Str::random(12);
+        return $user?->agent_link ?? (string) \Illuminate\Support\Str::uuid();
+    }
+
+    /**
+     * Get the user's agent link ID.
+     */
+    public function getAgentLink(): ?string
+    {
+        return auth()->user()?->agent_link;
     }
 }

@@ -27,14 +27,16 @@ class CharacterAssignmentMenu extends FormApplication {
                     <tr>
                         <th>Player</th>
                         <th>API Status</th>
+                        <th>Agent Link</th>
                         <th>Assigned Character</th>
                     </tr>`;
 
         for (let u of data.users) {
             html += `<tr><td style="padding: 5px 0;"><strong>${u.name}</strong></td>`;
             if (u.hasKey) {
-                html += `<td style="color: #00ff00;">✔ Linked</td>
-                         <td><select class="character-select" data-userid="${u.id}" style="width: 100%;">
+                html += `<td style="color: #00ff00;">✔ Linked</td>`;
+                html += `<td><small><code>${u.agentLink || 'Pending...'}</code></small></td>`;
+                html += `<td><select class="character-select" data-userid="${u.id}" style="width: 100%;">
                          <option value="">- None -</option>`;
                 for (let c of data.characters) {
                     const selected = c.id === u.characterId ? 'selected' : '';
@@ -43,6 +45,7 @@ class CharacterAssignmentMenu extends FormApplication {
                 html += `</select></td>`;
             } else {
                 html += `<td style="color: #ff0000;">❌ Missing</td>
+                         <td><small>-</small></td>
                          <td><select disabled style="width: 100%;"><option>- Key Missing -</option></select></td>`;
             }
             html += `</tr>`;
@@ -55,10 +58,12 @@ class CharacterAssignmentMenu extends FormApplication {
     }
 
     getData() {
-        const users = game.users.filter(u => !u.isGM).map(u => ({
+        const users = game.users.map(u => ({
             id: u.id,
             name: u.name,
-            hasKey: !!u.getFlag('cpr-agent', 'hasApiKey'),
+            isGM: u.isGM,
+            hasKey: !!u.getFlag(MODULE_ID, 'hasApiKey'),
+            agentLink: u.getFlag(MODULE_ID, 'agent-link'),
             characterId: u.character?.id || ""
         }));
 
@@ -104,9 +109,12 @@ class CharacterAssignmentMenu extends FormApplication {
 
                 // Sync each change to Laravel so it knows immediately
                 for (let update of updates) {
+                    const user = game.users.get(update._id);
+                    const agentLink = user?.getFlag(MODULE_ID, 'agent-link');
+
                     await window.cyberpunkBridge.sendResponse({
                         type: 'GM_LINK_PLAYER_CHARACTER',
-                        foundryUserId: update._id,
+                        foundryUserId: agentLink || update._id, // Use agent-link as primary ID for Laravel
                         character: update.character
                     });
                 }
@@ -347,23 +355,44 @@ class CyberpunkBridge {
      */
     async syncPlayerLink() {
         const token = game.settings.get(MODULE_ID, 'apiKey');
+        const debug = game.settings.get(MODULE_ID, 'debugMode');
+
+        if (debug) console.log("[Bridge] syncPlayerLink: Checking API status...");
 
         // Update the key status flag on the user for GM visibility
         if (game.user.getFlag(MODULE_ID, 'hasApiKey') !== !!token) {
             await game.user.setFlag(MODULE_ID, 'hasApiKey', !!token);
         }
 
-        if (!token) return;
+        if (!token) {
+            if (debug) console.log("[Bridge] syncPlayerLink: No API Key set. Skipping character sync.");
+            return;
+        }
 
         const broadcastToLaravel = async () => {
             const char = game.user.character;
-            await this.sendResponse({
-                type: 'LINK_PLAYER_CHARACTER',
-                character: char ? char.id : null,
-                actorName: char ? char.name : null,
-                foundryUserId: game.user.id
-            });
-            console.log(`[Bridge] Player synced character assignment: ${char?.name || 'None'}`);
+            if (debug) console.log(`[Bridge] syncPlayerLink: Broadcasting character link for ${char?.name || 'None'}...`);
+
+            try {
+                const response = await this.sendResponse({
+                    type: 'LINK_PLAYER_CHARACTER',
+                    character: char ? { id: char.id, name: char.name } : null,
+                    actorName: char ? char.name : null,
+                    foundryUserId: game.user.id
+                });
+
+                if (response && response.agent_link) {
+                    if (game.user.getFlag(MODULE_ID, 'agent-link') !== response.agent_link) {
+                        console.log(`%c[Bridge] Link established! Agent Link: ${response.agent_link}`, "color: #00ff00; font-weight: bold;");
+                        await game.user.setFlag(MODULE_ID, 'agent-link', response.agent_link);
+                        ui.notifications?.info(`Agent: Account linked successfully.`);
+                    }
+                } else {
+                    console.warn("[Bridge] syncPlayerLink: API responded but no agent_link was returned.", response);
+                }
+            } catch (e) {
+                console.error("[Bridge] syncPlayerLink: Failed to broadcast link to Laravel.", e);
+            }
         };
 
         // Initial sync on load
@@ -497,6 +526,12 @@ class CyberpunkBridge {
             apiUrl = apiUrl.slice(0, -1);
         }
 
+        // Include agent-link if available on the current Foundry user
+        const agentLink = game.user.getFlag(MODULE_ID, 'agent-link');
+        if (agentLink && !data.agentLink) {
+            data.agentLink = agentLink;
+        }
+
         try {
             const response = await fetch(`${apiUrl}/api/foundry/callback`, {
                 method: 'POST',
@@ -510,9 +545,13 @@ class CyberpunkBridge {
 
             if (!response.ok) {
                 console.error("Cyberpunk Bridge: Callback failed", response.statusText);
+                return null;
             }
+
+            return await response.json();
         } catch (e) {
             console.error("Cyberpunk Bridge: Error sending callback", e);
+            return null;
         }
     }
 
@@ -526,9 +565,45 @@ class CyberpunkBridge {
 
         console.log(`%c[Bridge] Incoming Call: ${type}`, "color: #00ffff; font-weight: bold;", data);
 
-        const actorId = data.actorId;
-        let tokenId = data.tokenId;
         const requestId = data.requestId;
+        const agentLink = data.agent_link || data.agentLink;
+        const myAgentLink = game.user.getFlag(MODULE_ID, 'agent-link');
+        const actorId = data.actorId;
+        const myCharacterId = game.user.character?.id;
+        const debug = game.settings.get(MODULE_ID, 'debugMode');
+
+        if (debug) console.log(`[Bridge] handleIncomingData: requestId=${requestId}, agentLink=${agentLink}, myAgentLink=${myAgentLink}, actorId=${actorId}, myCharacterId=${myCharacterId}`);
+
+        // Determine if this message is intended for us
+        let isForMe = false;
+        if (game.user.isGM) {
+            isForMe = true;
+        } else if (myAgentLink && requestId === myAgentLink) {
+            isForMe = true;
+        } else if (!myAgentLink && requestId && actorId && myCharacterId === actorId) {
+            // "Discovery" link: We aren't linked yet, but the message is for our character.
+            console.log(`[Bridge] Discovery: Matching incoming request to character ${actorId}`);
+            isForMe = true;
+        }
+
+        // SECURITY & ROUTING:
+        // If not a GM and not for me, ignore it.
+        if (!isForMe) {
+            if (debug) console.log("[Bridge] handleIncomingData: Message ignored (not for me).");
+            return;
+        }
+
+        // Auto-link if we're not a GM and we found a new/different link for ourselves
+        if (!game.user.isGM && agentLink && myAgentLink !== agentLink) {
+            // Final check: Only set the flag if this message was specifically for us (myAgentLink match or actorId match)
+            if (requestId === agentLink || (actorId && myCharacterId === actorId)) {
+                console.log(`%c[Bridge] Setting agent-link flag: ${agentLink}`, "color: #00ff00; font-weight: bold;");
+                await game.user.setFlag(MODULE_ID, 'agent-link', agentLink);
+                ui.notifications?.info(`Agent: Account linked!`);
+            }
+        }
+
+        let tokenId = data.tokenId;
 
         // If no tokenId provided, but we have an actorId, try to find a token for that actor on the canvas
         if (!tokenId && actorId) {
@@ -1043,6 +1118,7 @@ class CyberpunkBridge {
             }
 
             case 'MOVE_TOKEN': {
+
                 const token = canvas.tokens.get(tokenId);
                 if (token) {
                     let newPos = {};
@@ -1051,19 +1127,6 @@ class CyberpunkBridge {
                     else if (data.direction === "left") newPos.x = token.document.x - canvas.grid.size;
                     else if (data.direction === "right") newPos.x = token.document.x + canvas.grid.size;
                     await token.document.update(newPos);
-
-                    // After movement, immediately push new proximity and DV info
-                    // This avoids waiting for Agent-side timers
-                    setTimeout(async () => {
-                        // Re-trigger visible tokens and DV logic (mimics the cases below)
-                        const dummyRequest = { tokenId, actorId, requestId: (requestId || 'move-refresh') };
-                        await this.handleIncomingData({ type: 'LIST_VISIBLE_TOKENS', ...dummyRequest });
-
-                        const target = Array.from(game.user.targets)[0];
-                        if (target && data.weaponId) {
-                            await this.handleIncomingData({ type: 'GET_DV_INFO', ...dummyRequest, weaponId: data.weaponId });
-                        }
-                    }, 200);
 
                     await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: true, requestId });
                 } else {
@@ -1543,8 +1606,13 @@ class CyberpunkBridge {
 
             case 'GET_ACTORS': {
                 let targetUser = game.user;
-                if (data.foundryUserId) {
-                    targetUser = game.users.get(data.foundryUserId) || game.user;
+                const userIdentifier = data.agentLink || data.agent_link || data.requestId;
+
+                if (userIdentifier) {
+                    // Try to find the user by their agent-link flag
+                    targetUser = game.users.find(u => u.getFlag(MODULE_ID, 'agent-link') === userIdentifier)
+                                || game.users.get(userIdentifier) // Fallback to ID
+                                || game.user;
                 }
 
                 let actors = [];

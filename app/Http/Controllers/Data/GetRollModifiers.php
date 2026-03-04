@@ -22,7 +22,7 @@ class GetRollModifiers extends FormRequest
             'selectedWeapon' => 'nullable|array|max:255',
         ]);
 
-        // Use user's client_id if available, otherwise fallback to a default or dummy for testing
+        // Use user's default_actor_id
         $actorId = $user->getActorId();
         $weaponId = isset($validatedData['selectedWeapon']['_id']) ? $validatedData['selectedWeapon']['_id'] : null;
         $requestId = $this->createRequestId();

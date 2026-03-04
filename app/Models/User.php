@@ -23,10 +23,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'client_id',
         'default_actor_id',
         'default_token_id',
         'character_data',
+        'agent_link',
     ];
 
     /**
@@ -53,9 +53,30 @@ class User extends Authenticatable
         ];
     }
 
-    public function getClientId(): string
+    protected static function boot()
     {
-        return $this->client_id ?? '';
+        parent::boot();
+        static::creating(function ($user) {
+            if (empty($user->agent_link)) {
+                $user->agent_link = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
+
+    /**
+     * Get the user's agent link ID.
+     * Ensures one is generated and saved if it's missing.
+     */
+    public function getAgentLinkAttribute($value)
+    {
+        if (empty($value)) {
+            $value = (string) \Illuminate\Support\Str::uuid();
+            $this->agent_link = $value;
+            if ($this->exists) {
+                $this->save();
+            }
+        }
+        return $value;
     }
 
     public function getActorId(): string

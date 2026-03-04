@@ -25,7 +25,6 @@ class GetActor extends FormRequest
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
             'actorId' => str_replace("Actor.", "", $request->get('actorId')),
-            'foundryUserId' => $user->client_id,
         ]);
 
         // 2. Return immediately (Asynchronous)

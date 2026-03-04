@@ -11,20 +11,6 @@
         <form method="POST" action="{{ route('profile-setup.store') }}" class="space-y-8">
             @csrf
 
-            <!-- Client ID -->
-            <div>
-                <x-input-label for="client_id" :value="__('Foundry Client Interface')" class="text-xs uppercase text-cpr-teal mb-1" />
-                <select id="client_id" name="client_id" class="cyber-select-field">
-                    <option value="" disabled {{ !$user->client_id ? 'selected' : '' }}>Select Client Interface ID</option>
-                    @foreach($clientIds as $id => $name)
-                        <option value="{{ $id }}" {{ $user->client_id == $id ? 'selected' : '' }} class="cyber-select-option">
-                            {{ $name }} [{{ $id }}]
-                        </option>
-                    @endforeach
-                </select>
-                <x-input-error :messages="$errors->get('client_id')" class="mt-2 text-cpr-red text-xs uppercase" />
-            </div>
-
             <!-- Default Actor ID -->
             <div>
                 <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-cpr-teal mb-1" />
