@@ -167,6 +167,23 @@
                         <x-input-error :messages="$errors->get('default_actor_id')" class="mt-1 text-cpr-red text-[10px] uppercase" />
                     </div>
 
+                    <!-- Channel ID -->
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <x-input-label for="channel_id" :value="__('Channel ID')" class="text-xs uppercase text-cpr-muted" />
+                            <div class="group relative flex items-center">
+                                <i data-lucide="help-circle" class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
+                                <div class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                    The unique channel ID for your game session. GMs generate this and share it with players.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <x-text-input type="text" name="channel_id" id="channel_id" value="{{ old('channel_id', $user->channel_id) }}" class="cyber-input-field mt-1 w-full" />
+                        </div>
+                        <x-input-error :messages="$errors->get('channel_id')" class="mt-1 text-cpr-red text-[10px] uppercase" />
+                    </div>
+
 
                     <button type="submit" class="cyber-button bg-cpr-teal-dark border-cpr-teal w-full uppercase font-bold py-2 text-black">
                         Commit Sync

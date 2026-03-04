@@ -38,8 +38,20 @@ class CyberpunkAgentChannel implements ShouldBroadcastNow
      */
     public function broadcastOn(): array
     {
-        // Must match the channel name in your Foundry module
-        // We used: this.echo.private('cyberpunk-relay')
+        $channelId = $this->payload['channel_id'] ?? null;
+
+        // If not in payload, try to get from user if they're logged in
+        if (!$channelId && auth()->check()) {
+            $channelId = auth()->user()->channel_id;
+        }
+
+        if ($channelId) {
+            return [
+                new PrivateChannel('cpr-agent.' . $channelId),
+            ];
+        }
+
+        // Fallback for legacy support
         return [
             new PrivateChannel('cpr-agent'),
         ];

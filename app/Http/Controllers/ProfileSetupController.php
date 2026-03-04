@@ -116,6 +116,7 @@ class ProfileSetupController extends Controller
         $validated = $request->validate([
             'default_actor_id' => 'required|string',
             'default_token_id' => 'nullable|string',
+            'channel_id' => 'nullable|string',
         ]);
 
         $user = Auth::user();
@@ -123,6 +124,10 @@ class ProfileSetupController extends Controller
         // If the user doesn't have an agent-link, create one now.
         if (empty($user->agent_link)) {
             $validated['agent_link'] = (string) Str::uuid();
+        }
+
+        if (empty($validated['channel_id'])) {
+            unset($validated['channel_id']);
         }
 
         $user->update($validated);

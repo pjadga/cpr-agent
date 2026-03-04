@@ -277,6 +277,18 @@ class CyberpunkBridge {
             }
         });
 
+        game.settings.register(MODULE_ID, 'channelId', {
+            name: 'Channel ID',
+            hint: 'The unique channel name for this game group. Must match your Agent dashboard.',
+            scope: 'world',
+            config: true,
+            type: String,
+            default: '',
+            onChange: () => {
+                if (game.user.isGM) this.reconnect();
+            }
+        });
+
         game.settings.register(MODULE_ID, 'debugMode', {
             name: 'Debug Mode',
             scope: 'client',
@@ -346,8 +358,11 @@ class CyberpunkBridge {
     }
 
     listen() {
+        const channelId = game.settings.get(MODULE_ID, 'channelId');
+        const channelName = channelId ? `cpr-agent.${channelId}` : `cpr-agent`;
+
         // Only the GM listens for World Updates
-        this.echo.private(`cpr-agent`)
+        this.echo.private(channelName)
             .listen('.GameUpdate', (e) => {
                 this.handleIncomingData(e);
             });
@@ -582,6 +597,12 @@ class CyberpunkBridge {
         const agentLink = (data.requestId ? this.requestAgentLinks.get(data.requestId) : null) || game.user.getFlag(MODULE_ID, 'agent-link');
         if (agentLink && !data.agentLink) {
             data.agentLink = agentLink;
+        }
+
+        // Include channelId if set
+        const channelId = game.settings.get(MODULE_ID, 'channelId');
+        if (channelId && !data.channelId) {
+            data.channelId = channelId;
         }
 
         // Include player name for roll results

@@ -24,6 +24,14 @@ class FoundryResponse implements ShouldBroadcast
     //Needs to be the same channel as the Agent
     public function broadcastOn(): array
     {
+        $channelId = $this->payload['channel_id'] ?? null;
+
+        if ($channelId) {
+            return [
+                new PrivateChannel('cpr-agent.' . $channelId),
+            ];
+        }
+
         return [
             new PrivateChannel('cpr-agent'),
         ];

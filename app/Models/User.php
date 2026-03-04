@@ -27,6 +27,7 @@ class User extends Authenticatable
         'default_token_id',
         'character_data',
         'agent_link',
+        'channel_id',
         'is_gm',
     ];
 
@@ -62,7 +63,26 @@ class User extends Authenticatable
             if (empty($user->agent_link)) {
                 $user->agent_link = (string) \Illuminate\Support\Str::uuid();
             }
+            if (empty($user->channel_id)) {
+                $user->channel_id = self::generateChannelId();
+            }
         });
+    }
+
+    public static function generateChannelId(): string
+    {
+        $words = [
+            'neon', 'cyber', 'punk', 'chrome', 'glitch', 'static', 'blade', 'runner',
+            'hacker', 'grid', 'data', 'wire', 'matrix', 'synth', 'wave', 'alloy',
+            'neural', 'link', 'deck', 'jack', 'signal', 'buffer', 'core', 'port',
+            'node', 'flux', 'spark', 'beam', 'circuit', 'code'
+        ];
+
+        $word1 = $words[array_rand($words)];
+        $word2 = $words[array_rand($words)];
+        $number = rand(100, 999);
+
+        return "{$word1}-{$word2}-{$number}";
     }
 
     /**
@@ -74,6 +94,22 @@ class User extends Authenticatable
         if (empty($value)) {
             $value = (string) \Illuminate\Support\Str::uuid();
             $this->agent_link = $value;
+            if ($this->exists) {
+                $this->save();
+            }
+        }
+        return $value;
+    }
+
+    /**
+     * Get the user's channel ID.
+     * Ensures one is generated and saved if it's missing.
+     */
+    public function getChannelIdAttribute($value)
+    {
+        if (empty($value)) {
+            $value = self::generateChannelId();
+            $this->channel_id = $value;
             if ($this->exists) {
                 $this->save();
             }

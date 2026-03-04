@@ -293,7 +293,9 @@ export function useCharacterData() {
 
             // Listen for Foundry responses
             if (window.Echo) {
-                window.Echo.private('cpr-agent')
+                const channelId = window.AgentConfig?.channelId;
+                const channelName = channelId ? `cpr-agent.${channelId}` : 'cpr-agent';
+                window.Echo.private(channelName)
                     .listen('.FoundryResponse', (e) => {
                         const payload = e.payload || e;
 

@@ -42,6 +42,7 @@ class FoundryController extends Controller
             'formula' => 'nullable|string',
             'target' => 'nullable|string',
             'tokenId' => 'nullable|string',
+            'channelId' => 'nullable|string',
             'message' => 'nullable|string',
         ]);
 
@@ -142,6 +143,14 @@ class FoundryController extends Controller
         if ($agentLink) {
             $broadcastPayload['agentLink'] = $agentLink;
         }
+
+        // Add channel ID if we have a user
+        if ($user && $user->channel_id) {
+            $broadcastPayload['channel_id'] = $user->channel_id;
+        } elseif (!empty($validated['channelId'])) {
+            $broadcastPayload['channel_id'] = $validated['channelId'];
+        }
+
         \App\Events\FoundryResponse::dispatch($broadcastPayload);
 
         // Put in cache for synchronous polling
