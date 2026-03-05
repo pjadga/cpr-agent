@@ -15,15 +15,17 @@ Sign up to this app. Your personal data is not used for any purposes other than 
 *Note: Account deletion is accessible at any time through your account settings.*
 
 ## 3. Configuration
-1. Navigate to the **Config** page if not directed to it after login.
-2. Generate an API key. This will be unique to your Agent and will be used within Foundry. 
-3. Input your **Foundry URL**, no trailing slash.
-4. Click **Update Core Settings** (very themed).
-5. Providing Foundry is running and configured as below, your Characters should have been populated in the Agent Sync section.
-6. Choose your character and **Commit Sync** to save.
+1. Navigate to the **Settings** page (top right menu).
+2. Generate an **API Key**. This will be unique to your Agent.
+3. **GMs**: Copy your **Channel ID** from the Settings page and paste it into the **Cyberpunk Agent Bridge** module settings in Foundry VTT. Share this Channel ID with your players.
+4. **Players**: Paste the **Channel ID** provided by your GM into your own Settings page and click **Commit Sync**.
+5. **Players**: Paste your individual **API Key** into the **Cyberpunk Agent Bridge** module settings in Foundry VTT.
 
-## 4. Foundry Module Settings
-1. Paste in your API key (AKA Sanctum Token). **Each Player will need to log in to their own Foundry account on your server to enter their API key in the same place - this way Foundry saves their individual data**. Once they have done this, all endpoints go through the GMs account.
+## 4. Character Assignment & Sync
+1. In Foundry VTT, the GM uses the **Agent Character Assignment** tool within the Agent Bridge module.
+2. The GM assigns a playable character to each player who has linked their API key.
+3. Once assigned, the player's **Agent Link** (a long unique code) will appear in the menu.
+4. The player is now **fully synced**. Character data, stats, and rolls will flow between Foundry and the Agent interface in real-time.
 
 
 The CPR Agent Bridge was built with my VPS in mind, so it will come configured out of the box. However for those wishing to

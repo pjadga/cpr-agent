@@ -26,38 +26,31 @@
                 <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
                 <ol class="list-decimal list-inside space-y-2 ml-4">
                     <li>As the Game Master, navigate to the <strong>Settings</strong> page.</li>
-                    <li>Generate a <strong>Connection Key (API Key)</strong> and copy it.</li>
-                    <li>Input your <strong>Foundry URL</strong> and click <strong>Update Core Settings</strong>.</li>
-                    <li>Check the connection to ensure it is active and communicating with your Foundry instance.</li>
+                    <li>Generate an <strong>API Key</strong> and copy it. This needs to be entered into the Agent Bridge module in Foundry.</li>
+                    <li>Copy your <strong>Channel ID</strong> from the Settings page.</li>
+                    <li>In Foundry, go to <strong>Configure Settings</strong> -> <strong>Agent Bridge</strong> and paste the <strong>Channel ID</strong> and API Key.</li>
+                    <li>Share this <strong>Channel ID</strong> with your players.</li>
                 </ol>
             </section>
 
             <section>
                 <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">3. Player Setup</h2>
-                <p class="mb-4">Players must link their own Agent accounts to synchronize their characters:</p>
+                <p class="mb-4">Players must link their accounts to the GM's session:</p>
                 <ol class="list-decimal list-inside space-y-2 ml-4">
-                    <li>Have each player sign up and log in to this Agent app.</li>
-                    <li>They must generate their own <strong>Connection Key</strong> in their personal Settings page.</li>
-                    <li>Within Foundry VTT, players must go to <strong>Configure Settings</strong> -> <strong>Agent Bridge</strong> and enter their individual API Key.</li>
+                    <li>Log in to this Agent app and navigate to <strong>Settings</strong>.</li>
+                    <li>Generate your own <strong>API Key</strong> and copy it. Enter this key into your Foundry account settings provided by the GM (as below).</li>
+                    <li>Paste the <strong>Channel ID</strong> provided by your GM into the Channel ID field and click <strong>Commit Sync</strong>.</li>
+                    <li>Within Foundry VTT, go to <strong>Configure Settings</strong> -> <strong>Agent Bridge</strong> and enter your individual <strong>API Key</strong>.</li>
                 </ol>
             </section>
 
             <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Character Assignment</h2>
+                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Character Assignment & Sync</h2>
                 <ol class="list-decimal list-inside space-y-2 ml-4">
-                    <li>In Foundry VTT, the GM should use the <strong>Manage Characters</strong> tool within the Agent Bridge module.</li>
-                    <li>Assign playable characters to the players who have successfully linked their API keys.</li>
-                    <li>This creates the secure link between the Foundry Actor and the Agent Interface.</li>
-                </ol>
-            </section>
-
-            <section>
-                <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">5. Final Synchronization</h2>
-                <ol class="list-decimal list-inside space-y-2 ml-4">
-                    <li>Return to the <strong>Settings</strong> page in this app.</li>
-                    <li>Use the <strong>Agent Sync</strong> refresh button to pull the updated player and character assignments.</li>
-                    <li>Once the biometric signature (Actor) appears in the dropdown, select it and click <strong>Commit Sync</strong>.</li>
-                    <li>Your character data will now flow between Foundry and this Agent interface in real-time.</li>
+                    <li>In Foundry VTT, the GM should open the <strong>Agent Character Assignment</strong> menu (found in the Agent Bridge module).</li>
+                    <li>The GM assigns a playable character to each player who has linked their API key.</li>
+                    <li>Once assigned, the player's <strong>Agent Link</strong> (a long unique code) should appear in the menu. The players must be online for this to appear, so dont worry if it doesn't appear straight away.</li>
+                    <li>The player is now <strong>fully synced</strong>. Character data, stats, and rolls will flow between Foundry and the Agent interface in real-time.</li>
                 </ol>
             </section>
         </div>
