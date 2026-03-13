@@ -77,31 +77,7 @@ class ProfileSetupController extends Controller
             }
         }
 
-        // Enhancement for GM: If the bridge is offline or the list is still empty,
-        // include all other synced characters that exist in the database.
         if ($user->is_gm) {
-            $otherUsers = User::whereNotNull('default_actor_id')
-                ->where('id', '!=', $user->id)
-                ->get();
-
-            foreach ($otherUsers as $otherUser) {
-                $found = false;
-                foreach ($actors as $actor) {
-                    $id = $actor['actorId'] ?? ($actor['_id'] ?? '');
-                    if ($id == $otherUser->default_actor_id) {
-                        $found = true;
-                        break;
-                    }
-                }
-
-                if (!$found && !empty($otherUser->character_data)) {
-                    $actors[] = [
-                        'name' => ($otherUser->character_data['name'] ?? 'Saved Character') . ' (' . $otherUser->name . ')',
-                        'actorId' => $otherUser->default_actor_id,
-                        'tokenId' => $otherUser->default_token_id,
-                    ];
-                }
-            }
         }
 
         return view('settings', [
