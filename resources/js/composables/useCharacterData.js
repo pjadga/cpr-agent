@@ -175,6 +175,7 @@ export function useCharacterData() {
             deepSet(charData.value, mapped, value);
         });
 
+        loading.value = false;
         triggerRef(charData);
         setTimeout(refreshIcons, 50);
     };
@@ -302,7 +303,7 @@ export function useCharacterData() {
 
                         // If the request was initiated by another agent, ignore it IF it has a requestId
                         // Except for DICE_ROLL_EVENT and ROLL_RESULT which are for everyone
-                        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type);
+                        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT', 'ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
                         if (!isPublicEvent && payload.requestId && !isMyRequest(payload.requestId)) {
                             console.log(`Ignoring FoundryResponse with requestId [${payload.requestId}] - initiated by another agent.`);
                             return;
@@ -321,6 +322,7 @@ export function useCharacterData() {
                             }
                             if (actorUuid && payload.actor._id !== actorUuid) return;
                             charData.value = { ...charData.value, data: payload.actor, uuid: payload.actor._id };
+                            loading.value = false;
                             triggerRef(charData);
                             setTimeout(refreshIcons, 50);
                         } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
