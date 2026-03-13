@@ -359,6 +359,7 @@ import { useEchoListener } from '../utils/listener';
 // --- DIRECTIVES & UTILS ---
 import { vIcon } from '../directives/icon';
 import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
+import { isMyRequest } from '../utils/requests';
 
 export default {
     name: 'CharacterSheet',
@@ -522,7 +523,9 @@ export default {
                 loading.value = false;
                 setTimeout(refreshIcons, 50);
             } else if (payload.type === 'DICE_ROLL_EVENT' || payload.type === 'ROLL_RESULT') {
-                const isMyRoll = (payload.agentLink || payload.agent_link) === localAgentLink.value;
+                const incomingLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '').toLowerCase();
+                const myLink = (localAgentLink.value || '').replace(/\/$/, '').toLowerCase();
+                const isMyRoll = (myLink && incomingLink === myLink) || (payload.requestId && isMyRequest(payload.requestId));
 
                 if (isMyRoll) {
                     // It's my roll: trigger the big popup

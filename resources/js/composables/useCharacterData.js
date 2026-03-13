@@ -7,7 +7,7 @@ const charData = shallowRef(null);
 const loading = ref(true);
 const isWssConnected = ref(true); // Default to true as initial state
 const error = ref(null);
-const agentLink = ref(localStorage.getItem('cpr_agent_link') || '');
+const agentLink = ref((localStorage.getItem('cpr_agent_link') || '').replace(/\/$/, ''));
 const isGM = ref(localStorage.getItem('cpr_is_gm') === 'true');
 const baseUrl = ref(localStorage.getItem('cpr_base_url') || '');
 let refreshInterval = null;
@@ -241,8 +241,9 @@ export function useCharacterData() {
                     const dbResponse = await window.axios.post("/actorsheet");
                     if (dbResponse.data && dbResponse.data.data) {
                         if (dbResponse.data.agentLink) {
-                            agentLink.value = dbResponse.data.agentLink;
-                            localStorage.setItem('cpr_agent_link', dbResponse.data.agentLink);
+                            const normalizedLink = dbResponse.data.agentLink.replace(/\/$/, '');
+                            agentLink.value = normalizedLink;
+                            localStorage.setItem('cpr_agent_link', normalizedLink);
                         }
                         if (typeof dbResponse.data.isGM !== 'undefined') {
                             isGM.value = !!dbResponse.data.isGM;
@@ -309,6 +310,11 @@ export function useCharacterData() {
 
                         // If it's actor data or a sheet delta, apply it
                         if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                            if (payload.agentLink || payload.agent_link) {
+                                const normalizedLink = (payload.agentLink || payload.agent_link).replace(/\/$/, '');
+                                agentLink.value = normalizedLink;
+                                localStorage.setItem('cpr_agent_link', normalizedLink);
+                            }
                             if (typeof payload.isGM !== 'undefined') {
                                 isGM.value = !!payload.isGM;
                                 localStorage.setItem('cpr_is_gm', isGM.value);
