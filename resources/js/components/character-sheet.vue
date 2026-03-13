@@ -396,11 +396,9 @@ export default {
             showPopup.value = true;
         };
 
-        const debouncedFetchCharacterData = debounce(() => fetchCharacterData(), 300);
-
         const sendRequest = (data, url) => {
             window.axios.post(url, data).then(response => {
-                debouncedFetchCharacterData(); // Throttled refresh
+                // Automatic refresh removed as requested.
                 if (response.data && response.data.data) {
                     let rollData = response.data.data;
                     // Handle list of rolls from getRolls(limit: 5)
@@ -458,7 +456,6 @@ export default {
                 });
                 showEquipModal.value = false;
                 editingItem.value = null;
-                debouncedFetchCharacterData();
             } catch (err) {
                 console.error("Error updating equip state:", err);
             }
@@ -501,8 +498,7 @@ export default {
                 try {
                     applyDelta(payload.delta, { tab: payload.tab });
                 } catch (e) {
-                    console.warn('Delta apply failed, fallback to refresh', e);
-                    debouncedFetchCharacterData();
+                    console.warn('Delta apply failed', e);
                 }
             } else if (payload.type === 'ACTOR_DATA' && payload.actor) {
                 if (typeof payload.isGM !== 'undefined') {
@@ -556,8 +552,7 @@ export default {
             }
 
             if (payload.type === 'CONFIRMATION') {
-                // Refresh data when an action is confirmed
-                debouncedFetchCharacterData();
+                // Refresh data removed as requested. Rely on Foundry pushing updates via Echo.
             }
         };
 
@@ -624,7 +619,7 @@ export default {
                 type: program.type,
                 executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk" ),
             }).then(response => {
-                debouncedFetchCharacterData();
+                // Automatic refresh removed as requested.
                 if (response.data && response.data.data) {
                     let rollData = response.data.data;
                     // Handle list of rolls from getRolls(limit: 5)

@@ -329,9 +329,6 @@ export function useCharacterData() {
                         }
                     });
             }
-
-            // Poll for updates every 60 seconds (reduced frequency)
-            refreshInterval = setInterval(() => fetchCharacterData(), 60000);
         }
     });
 

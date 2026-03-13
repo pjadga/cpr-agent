@@ -97,9 +97,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     useEchoListener(handleFoundryResponse);
 
     const debouncedGetVisibleTokens = debounce(getVisibleTokens, 1500);
-    const throttledGetVisibleTokens = throttle(getVisibleTokens, 15000);
-
-    const debouncedFetchCharacterData = debounce(fetchCharacterData, 1000);
 
     let lastMoveTime = 0;
 
@@ -112,7 +109,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         const tokenId = charData.value?.tokenId;
         const now = Date.now();
 
-        // 20ms throttle to prevent OS-level bounce but feel completely raw
+        // Calls every 300 as token can be called twice and end up out of grid
         if (now - lastMoveTime < 300) return;
 
         lastMoveTime = now;
@@ -132,7 +129,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             tokenId: charData.value?.tokenId
         };
         window.axios.post("/targettokens", payload).then(() => {
-            debouncedFetchCharacterData();
+            // Automatic refresh removed as requested.
         });
     };
 
