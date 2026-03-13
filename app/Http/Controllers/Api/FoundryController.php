@@ -49,11 +49,27 @@ class FoundryController extends Controller
 
         $agentLink = $validated['agentLink'] ?? $validated['agent_link'] ?? null;
         $type = $validated['type'] ?? null;
+        $actorId = $validated['actorId'] ?? ($validated['actor']['_id'] ?? null);
 
         // Try to identify the user first for all request types
         $user = null;
         if ($agentLink) {
-            $user = \App\Models\User::where('agent_link', $agentLink)->first();
+            $normalizedLink = rtrim($agentLink, '/');
+            $user = \App\Models\User::where('agent_link', $normalizedLink)
+                ->orWhere('agent_link', $normalizedLink . '/')
+                ->first();
+        }
+
+        if (!$user && $actorId) {
+            $cleanActorId = str_replace('Actor.', '', $actorId);
+            $user = \App\Models\User::where('default_actor_id', $actorId)
+                ->orWhere('default_actor_id', $cleanActorId)
+                ->first();
+        }
+
+        // Fallback to the user associated with the API token
+        if (!$user) {
+            $user = $request->user();
         }
 
         // If it's a link request, we might be creating/updating a user
@@ -102,41 +118,28 @@ class FoundryController extends Controller
         }
 
         // Persist actor data to the user's mirror if it's a full update or a delta
-        if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA'])) {
-            $actorId = $validated['actorId'] ?? ($validated['actor']['_id'] ?? null);
-            $user = null;
-
-            if ($actorId) {
-                $user = \App\Models\User::where('default_actor_id', $actorId)->first();
-            }
-
-            // Fallback to the current user (GM) if no assigned user found
-            if (!$user) {
-                $user = $request->user();
-            }
-
-            if ($user) {
-                // If update is not for the user's assigned character, only GMs should save it
-                if ($user->default_actor_id && $actorId && $user->default_actor_id !== $actorId) {
-                    $user = $request->user();
+        if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA']) && $user) {
+            // If update is not for the user's assigned character, only GMs should save it
+            if ($user->default_actor_id && $actorId && $user->default_actor_id !== $actorId && str_replace('Actor.', '', $user->default_actor_id) !== str_replace('Actor.', '', $actorId)) {
+                $authUser = $request->user();
+                if ($authUser && $authUser->is_gm) {
+                    // Logic to handle GM-driven updates if needed
                 }
-
-                if (!$user) return response()->json(['status' => 'ignored']);
-
-                $current = $user->character_data ?? [];
-                if (!is_array($current)) $current = [];
-
-                if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
-                    $current = $validated['actor'];
-                } elseif ($type === 'SHEET_DELTA' && !empty($validated['delta'])) {
-                    foreach ($validated['delta'] as $path => $value) {
-                        $this->arraySetDot($current, $path, $value);
-                    }
-                }
-
-                $user->character_data = $current;
-                $user->save();
             }
+
+            $current = $user->character_data ?? [];
+            if (!is_array($current)) $current = [];
+
+            if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
+                $current = $validated['actor'];
+            } elseif ($type === 'SHEET_DELTA' && !empty($validated['delta'])) {
+                foreach ($validated['delta'] as $path => $value) {
+                    $this->arraySetDot($current, $path, $value);
+                }
+            }
+
+            $user->character_data = $current;
+            $user->save();
         }
 
         // Broadcast to the Web Client

@@ -21,11 +21,14 @@ class CyberpunkAgentChannel implements ShouldBroadcastNow
      */
     public function __construct($data)
     {
-        // Automatically inject agent_link if not present and user is logged in
-        if (!isset($data['agent_link']) && !isset($data['agentLink']) && auth()->check()) {
+        // Automatically inject agent_link and channel_id if not present and user is logged in
+        if (auth()->check()) {
             $user = auth()->user();
-            if ($user->agent_link) {
+            if (!isset($data['agent_link']) && !isset($data['agentLink']) && $user->agent_link) {
                 $data['agent_link'] = $user->agent_link;
+            }
+            if (!isset($data['channel_id']) && !isset($data['channelId']) && $user->channel_id) {
+                $data['channel_id'] = $user->channel_id;
             }
         }
 
