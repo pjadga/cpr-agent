@@ -10,8 +10,8 @@
                     <button class="w-10 h-10 bg-cpr-black-deep border border-cpr-border text-white font-bold hover:bg-cpr-red-dark/40" @click="$emit('step', -1)">-</button>
                     <div class="text-center">
                         <div class="text-xs text-cpr-text-dim uppercase font-bold tracking-widest">Current</div>
-                        <div class="text-4xl font-black font-mono" :class="resourceColor">{{ resourceValue }}</div>
-                        <div class="text-xs text-cpr-text-dim font-mono">/ {{ resourceMax }}</div>
+                        <div class="text-4xl font-black font-numbers" :class="resourceColor">{{ resourceValue }}</div>
+                        <div class="text-xs text-cpr-text-dim font-numbers">/ {{ resourceMax }}</div>
                     </div>
                     <button class="w-10 h-10 bg-cpr-black-deep border border-cpr-border text-white font-bold hover:bg-green-900/40" @click="$emit('step', 1)">+</button>
                 </div>

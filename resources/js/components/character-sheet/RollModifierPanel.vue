@@ -26,8 +26,8 @@
 
                             <div class="relative z-10">
                                 <div class="text-[8px] text-cpr-red uppercase font-black tracking-[0.2em] mb-1 animate-bounce">Uplink Confirmed</div>
-                                <div class="text-4xl font-black text-white font-mono drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">{{ lastResult?.total }}</div>
-                                <div class="text-[10px] text-cpr-lime font-mono uppercase tracking-widest">{{ lastResult?.formula }}</div>
+                                <div class="text-4xl font-black text-white font-numbers drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">{{ lastResult?.total }}</div>
+                                <div class="text-[10px] text-cpr-lime font-numbers uppercase tracking-widest">{{ lastResult?.formula }}</div>
 
                                 <button @click="showResultPopup = false" class="mt-4 px-4 py-1 bg-cpr-red text-black text-[10px] font-black uppercase hover:bg-white transition-colors">Acknowledge</button>
                             </div>
@@ -56,7 +56,7 @@
 
                     <div v-if="formula" class="mt-2 space-y-1">
                         <div class="bg-cpr-black p-1.5 border border-cpr-border-dark flex items-center justify-between">
-                            <span class="text-[11px] font-mono text-cpr-lime">{{ formula }}</span>
+                            <span class="text-[11px] font-numbers text-cpr-lime">{{ formula }}</span>
                             <button @click="rollFormula"
                                     :disabled="rolling"
                                     class="bg-cpr-red text-black text-[9px] font-black uppercase px-2 py-0.5 hover:bg-cpr-red-light disabled:opacity-50 transition-colors">
@@ -84,9 +84,9 @@
                     <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
                             <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Base Bonus</div>
-                            <div class="text-cpr-lime font-mono font-bold text-xs">+{{ data.baseBonus }}</div>
+                            <div class="text-cpr-lime font-numbers font-bold text-xs">+{{ data.baseBonus }}</div>
                         </div>
-                        <div v-if="data.breakdown" class="mt-1 text-[10px] text-cpr-text-main font-mono space-y-0.5">
+                        <div v-if="data.breakdown" class="mt-1 text-[10px] text-cpr-text-main font-numbers space-y-0.5">
                             <div class="flex justify-between"><span>{{ (data.breakdown.statName || 'STAT').toUpperCase() }}</span><span>+{{ data.breakdown.statValue }}</span></div>
                             <div class="flex justify-between"><span>{{ data.breakdown.skillName }}</span><span>+{{ data.breakdown.skillLevel }}</span></div>
                             <div class="flex justify-between"><span>Weapon Acc</span><span>+{{ data.breakdown.weaponAcc }}</span></div>
@@ -100,7 +100,7 @@
                             <div v-for="(inj, idx) in data.injuries" :key="idx" class="border border-cpr-border p-1.5 bg-cpr-black/40">
                                 <div class="flex items-center justify-between">
                                     <div class="text-[10px] font-bold text-white">{{ inj.title }}</div>
-                                    <div :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}" class="text-[10px] font-mono">{{ inj.penalty }}</div>
+                                    <div :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}" class="text-[10px] font-numbers">{{ inj.penalty }}</div>
                                 </div>
                             </div>
                         </div>
@@ -109,14 +109,14 @@
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
                             <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
-                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-mono font-bold text-xs">{{ data.totalPenalty }}</div>
+                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-numbers font-bold text-xs">{{ data.totalPenalty }}</div>
                         </div>
                     </div>
 
                     <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
                             <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Final Modifier</div>
-                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-mono font-bold text-xs">{{ data.finalModifier }}</div>
+                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-numbers font-bold text-xs">{{ data.finalModifier }}</div>
                         </div>
                     </div>
                 </div>

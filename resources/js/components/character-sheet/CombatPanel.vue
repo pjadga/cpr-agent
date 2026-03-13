@@ -31,7 +31,7 @@
                             <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-1">Target DV</div>
                             <div v-if="dvLoading" class="text-cpr-yellow-dark animate-pulse font-mono font-bold">CALC...</div>
                             <div v-else-if="dvError" class="text-cpr-red font-mono text-xs">ERR</div>
-                            <div v-else class="text-3xl font-black text-cpr-yellow font-mono leading-none">{{ dvInfo || '--' }}</div>
+                            <div v-else class="text-3xl font-black text-cpr-yellow font-numbers leading-none">{{ dvInfo || '--' }}</div>
                         </div>
                     </div>
 

@@ -6,7 +6,7 @@
         </button>
         <div class="flex flex-col items-center">
             <span class="text-sm font-bold text-cpr-text-muted uppercase tracking-widest">{{ label }}</span>
-            <span class="text-xl font-mono font-black text-white">
+            <span class="text-xl font-numbers font-black text-white">
                 {{ current }}
                 <span class="text-cpr-text-dim text-sm">/ {{ max }}</span>
             </span>

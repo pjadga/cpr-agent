@@ -20,7 +20,7 @@
                         <div>
                             <h3 class="text-md font-black text-white uppercase">{{ activeCyberdeck.name }}</h3>
                             <div class="text-[10px] font-bold uppercase text-cpr-teal">
-                                Memory Slots: <span :class="activeCyberdeck.system.installedItems.usedSlots >= activeCyberdeck.system.installedItems.slots ? 'text-cpr-red' : 'text-white'">
+                                Memory Slots: <span :class="activeCyberdeck.system.installedItems.usedSlots >= activeCyberdeck.system.installedItems.slots ? 'text-cpr-red' : 'text-white'" class="font-numbers">
                                     {{ activeCyberdeck.system.installedItems.usedSlots }} / {{ activeCyberdeck.system.installedItems.slots }}
                                 </span>
                             </div>

@@ -49,29 +49,29 @@
                             <template v-if="category === 'armor' && armorDisplay">
                                 <div v-for="stat in armorDisplay" :key="stat.label" class="flex items-center gap-1 mr-2">
                                     <i v-icon :data-lucide="stat.icon" class="w-3 h-3 text-cpr-teal"></i>
-                                    <span class="text-[10px] font-mono text-cpr-teal">
+                                    <span class="text-[10px] text-cpr-teal">
                                         <span class="text-[8px] uppercase text-cpr-teal-dark mr-0.5">{{ stat.label }}:</span>
-                                        {{ stat.value }}
+                                        <span class="font-numbers">{{ stat.value }}</span>
                                     </span>
                                 </div>
                             </template>
 
                             <div v-else-if="category === 'ammo'" class="flex items-center gap-1">
-                                <span class="text-md font-black font-mono text-cpr-yellow">
-                                    x{{ item.system.amount || item.system.count || 0 }}
+                                <span class="text-md font-black text-cpr-yellow">
+                                    x<span class="font-numbers">{{ item.system.amount || item.system.count || 0 }}</span>
                                 </span>
                             </div>
 
 
                             <div v-if="category === 'weapon'" class="flex items-center gap-1">
                                 <i v-icon data-lucide="logs" class="w-3 h-3 text-cpr-text-dim" v-if="!isMeleeOrUnarmed"></i>
-                                <span class="text-[10px] font-mono text-cpr-text-muted">
+                                <span class="text-[10px] text-cpr-text-muted">
                                     <template v-if="!isMeleeOrUnarmed && item.system.magazine">
-                                        {{ item.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ item.system.magazine.max }}
-                                        <span v-if="ammoTotal !== null" class="text-cpr-yellow ml-1">[{{ ammoTotal }}]</span>
+                                        <span class="font-numbers">{{ item.system.magazine.value }}</span> <span class="text-cpr-text-dim">/</span> <span class="font-numbers">{{ item.system.magazine.max }}</span>
+                                        <span v-if="ammoTotal !== null" class="text-cpr-yellow ml-1 font-numbers">[{{ ammoTotal }}]</span>
                                     </template>
-                                    <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-cpr-red font-bold">{{ item.system.damage }}</span>
-                                    <span v-if="item.system.rof > 0" class="ml-2 text-cpr-teal">ROF:{{ item.system.rof }}</span>
+                                    <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}" class="text-cpr-red font-bold font-numbers">{{ item.system.damage }}</span>
+                                    <span v-if="item.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span class="font-numbers">{{ item.system.rof }}</span></span>
                                 </span>
                             </div>
 
@@ -85,14 +85,14 @@
 
                             <div v-if="category === 'cyberware'" class="flex items-center gap-1">
                                 <i v-icon data-lucide="cpu" class="w-3 h-3 text-cpr-teal"></i>
-                                <span class="text-[10px] font-mono text-cpr-teal">
+                                <span class="text-[10px] font-numbers text-cpr-teal">
                                 {{ item.system.installedItems.usedSlots }} / {{ item.system.installedItems.slots }}
                             </span>
                             </div>
 
                             <div v-if="category === 'criticalInjury'" class="flex items-center gap-1">
                                 <i v-icon data-lucide="activity" class="w-3 h-3 text-cpr-red"></i>
-                                <span class="text-[10px] font-mono text-cpr-red font-bold uppercase">
+                                <span class="text-[10px] font-numbers text-cpr-red font-bold uppercase">
                                     {{ injuryModifier }}
                                 </span>
                             </div>
@@ -154,14 +154,14 @@
                         <span class="text-[9px] text-cpr-teal uppercase font-bold">Quick Fix</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.quickFix.type }}</span>
-                            <span class="text-white font-mono">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
+                            <span class="text-white font-numbers">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
                         </div>
                     </div>
                     <div v-if="item.system.treatment && (item.system.treatment.dvParamedic || item.system.treatment.dvSurgery)" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-red flex flex-col gap-1">
                         <span class="text-[9px] text-cpr-red uppercase font-bold">Treatment</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.treatment.type }}</span>
-                            <span class="text-white font-mono">DV{{ item.system.treatment.dvParamedic || item.system.treatment.dvSurgery }}</span>
+                            <span class="text-white font-numbers">DV{{ item.system.treatment.dvParamedic || item.system.treatment.dvSurgery }}</span>
                         </div>
                     </div>
                 </div>
@@ -169,7 +169,7 @@
                 <div class="grid grid-cols-2 gap-2 text-[10px] uppercase font-bold text-cpr-text-dim">
                     <div v-if="item.system.price" class="bg-cpr-black-deep/50 p-1 px-2 border-l-2 border-cpr-yellow-dark flex justify-between items-center">
                         <span>Cost</span>
-                        <span class="text-cpr-yellow font-mono">
+                        <span class="text-cpr-yellow font-numbers">
                             {{ item.system.price.market }}eb
                         </span>
                     </div>
@@ -196,7 +196,7 @@
 
                     <div v-if="ammoTotal !== null" class="flex justify-between items-center text-[10px]">
                         <span class="text-cpr-text-dim uppercase text-[9px] font-bold">In Inventory</span>
-                        <span class="text-cpr-yellow font-bold font-mono">{{ ammoTotal }}</span>
+                        <span class="text-cpr-yellow font-bold font-numbers">{{ ammoTotal }}</span>
                     </div>
 
                     <button @click="showReloadPopup = !showReloadPopup"
@@ -213,7 +213,7 @@
                                     @click="reloadWithAmmo(ammoItem._id)"
                                     class="text-left px-2 py-1 bg-cpr-black border border-cpr-border hover:border-cpr-yellow text-[10px] flex justify-between items-center transition-all">
                                 <span class="text-cpr-text-main truncate pr-2">{{ ammoItem.name }}</span>
-                                <span class="text-cpr-yellow shrink-0">x{{ ammoItem.system.amount || ammoItem.system.count || 0 }}</span>
+                                <span class="text-cpr-yellow shrink-0 font-numbers">x{{ ammoItem.system.amount || ammoItem.system.count || 0 }}</span>
                             </button>
                         </div>
                         <button @click="showReloadPopup = false"

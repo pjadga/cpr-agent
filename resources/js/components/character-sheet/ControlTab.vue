@@ -25,7 +25,7 @@
                         <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
 
                             <span class="text-xs font-bold text-white uppercase">{{ controlState.selectedTarget.name }}</span>
-                            <span class="text-[9px] text-cpr-text-dim font-mono">({{ controlState.selectedTarget.distanceM }}m)</span>
+                            <span class="text-[9px] text-cpr-text-dim">(<span class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
                         </div>
                         <span v-else class="text-xs text-cpr-text-dim uppercase italic font-mono">No Hostile Signal Locked</span>
                         <i v-icon data-lucide="chevron-down" class="w-4 h-4 text-cpr-text-dim transition-transform duration-200" :class="{'rotate-180': showTargetDropdown}"></i>
@@ -40,7 +40,7 @@
 
                                     <div>
                                         <div class="text-xs font-bold text-white uppercase">{{ enemy.name }}</div>
-                                        <div class="text-[9px] text-cpr-text-dim font-mono">{{ enemy.distanceM }}m away</div>
+                                        <div class="text-[9px] text-cpr-text-dim"><span class="font-numbers">{{ enemy.distanceM }}</span>m away</div>
                                     </div>
                                 </div>
                                 <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-cpr-red">
@@ -79,14 +79,14 @@
                             <div>
                                 <div class="text-xs font-bold  uppercase">{{ weapon.name }}</div>
                                 <div class="flex items-center gap-2 mt-0.5">
-                                    <span class="text-[10px] font-mono text-cpr-text-muted">
+                                    <span class="text-[10px] text-cpr-text-muted">
                                         <template v-if="!isMeleeOrUnarmed(weapon) && weapon.system.magazine">
 
-                                            {{ weapon.system.magazine.value }} <span class="text-cpr-text-dim">/</span> {{ weapon.system.magazine.max }}
+                                            <span class="font-numbers">{{ weapon.system.magazine.value }}</span> <span class="text-cpr-text-dim">/</span> <span class="font-numbers">{{ weapon.system.magazine.max }}</span>
                                             <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{ getAmmoName(weapon) }}]</span>
                                         </template>
-                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-cpr-red font-bold">{{ weapon.system.damage }}</span>
-                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:{{ weapon.system.rof }}</span>
+                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-cpr-red font-bold font-numbers">{{ weapon.system.damage }}</span>
+                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span class="font-numbers">{{ weapon.system.rof }}</span></span>
                                     </span>
                                 </div>
                             </div>
@@ -152,7 +152,7 @@
                         <div v-if="programs.length > 0">
                             <h3 class="text-xs font-black text-white uppercase tracking-widest border-l-4 border-cpr-teal pl-2 mb-3 flex items-center justify-between">
                                 {{ category }}
-                                <span class="text-[9px] text-cpr-text-dim font-mono font-normal">{{ programs.length }} Installed</span>
+                                <span class="text-[9px] text-cpr-text-dim font-normal"><span class="font-numbers">{{ programs.length }}</span> Installed</span>
                             </h3>
 
                             <div class="space-y-3">

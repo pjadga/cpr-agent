@@ -45,27 +45,27 @@
         <div class="bg-[var(--cpr-black-soft)] border border-cpr-border p-3 flex justify-between divide-x divide-gray-800">
             <div class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
-                <div class="text-cpr-yellow font-mono font-bold">{{
+                <div class="text-cpr-yellow font-bold"><span class="font-numbers">{{
                         charData.data.system.wealth.value
-                    }}eb
+                    }}</span>eb
                 </div>
             </div>
             <div class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">IP</div>
-                <div class="text-white font-mono font-bold">
+                <div class="text-white font-numbers font-bold">
                     {{ charData.data.system.improvementPoints.value }}
                 </div>
             </div>
             <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors" @click="$emit('facedown')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Reputation</div>
-                <div class="text-white font-mono font-bold">{{
+                <div class="text-white font-numbers font-bold">{{
                         charData.data.system.reputation.value
                     }}
                 </div>
             </div>
             <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors" @click="$emit('deathsave')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Death Save</div>
-                <div class="text-cpr-red font-mono font-bold">
+                <div class="text-cpr-red font-numbers font-bold">
                     {{ charData.data.system.derivedStats.deathSave.penalty }}
                 </div>
             </div>

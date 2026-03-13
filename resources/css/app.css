@@ -2,8 +2,8 @@
 @tailwind utilities;
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Hack', monospace;
+    --font-numbers: 'Repetition Scrolling', sans-serif;
 
     --color-white: #e5e5e5; /* Dimmed from pure white */
 
@@ -76,7 +76,8 @@ body {
 .modal-scroll-content::-webkit-scrollbar-thumb { background: var(--cpr-yellow-dark);}
 .modal-scroll-content { scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);}
 
-.font-mono { font-family: 'Roboto Mono', monospace; }
+.font-mono { font-family: 'Hack', monospace; }
+.font-numbers { font-family: 'Repetition Scrolling', sans-serif; }
 
 .cpr-panel {
     background-color: var(--cpr-panel);

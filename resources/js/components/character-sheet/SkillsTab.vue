@@ -9,7 +9,7 @@
                             <p class="text-[10px] text-cpr-yellow/60 font-mono uppercase tracking-widest">{{ roleItem.system.mainRoleAbility }}</p>
                         </div>
                         <div class="flex flex-col items-end shrink-0">
-                            <span class="text-2xl font-black text-white leading-none">{{ roleItem.system.rank }}</span>
+                            <span class="text-2xl font-black text-white leading-none font-numbers">{{ roleItem.system.rank }}</span>
                             <span class="text-[8px] text-cpr-yellow/50 uppercase font-bold">Rank</span>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                                     <p class="text-[9px] text-cpr-text-dim font-mono">{{ ability.stat || 'Special' }}</p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-lg font-black text-white/80">{{ ability.rank }}</span>
+                                    <span class="text-lg font-black text-white/80 font-numbers">{{ ability.rank }}</span>
                                     <div class="w-1 h-8 bg-cpr-yellow/20 group-hover/ability:bg-cpr-yellow/40 transition-colors"></div>
                                 </div>
                             </div>
@@ -82,11 +82,11 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="text-[9px] text-cpr-text-dim uppercase font-mono mr-1">Lvl {{
+                            <span class="text-[9px] text-cpr-text-dim uppercase mr-1">Lvl <span class="font-numbers">{{
                                     skill.system.level
-                                }}</span>
+                                }}</span></span>
                             <div
-                                class="w-8 h-8 flex items-center justify-center bg-[var(--cpr-black-elevated)] border border-cpr-border text-cpr-red font-bold font-mono text-sm rounded-sm">
+                                class="w-8 h-8 flex items-center justify-center bg-[var(--cpr-black-elevated)] border border-cpr-border text-cpr-red font-bold font-numbers text-sm rounded-sm">
                                 {{ calculateBase(skill) }}
                             </div>
                             <button

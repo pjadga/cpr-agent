@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="relative inline-block">
-                    <div class="text-6xl font-black font-mono tracking-tighter" :class="resultColor">
+                    <div class="text-6xl font-black font-numbers tracking-tighter" :class="resultColor">
                         {{ result }}
                     </div>
                     <div v-if="isCriticalSuccess" class="absolute -top-4 -right-8 bg-green-600 text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-tighter rotate-12 shadow-lg">
@@ -36,7 +36,7 @@
                 <!-- Dice Breakdown -->
                 <div v-if="diceResults.length" class="flex justify-center gap-2">
                     <div v-for="(die, idx) in diceResults" :key="idx"
-                         class="w-10 h-10 border-2 flex items-center justify-center font-mono font-bold text-lg"
+                         class="w-10 h-10 border-2 flex items-center justify-center font-numbers font-bold text-lg"
                          :class="[
                              isCriticalSuccess ? 'border-green-600/50 text-green-400' :
                              isCriticalFailure ? 'border-cpr-red/50 text-cpr-red' :
@@ -50,21 +50,21 @@
                 <div v-if="modifiers.length || luck > 0 || statValue > 0 || skillValue > 0" class="text-[10px] space-y-1 font-mono uppercase tracking-wider text-cpr-text-dim border-t border-cpr-border/20 pt-4">
                     <div v-if="statValue" class="flex justify-between">
                         <span>Base Stat</span>
-                        <span class="text-white">+{{ statValue }}</span>
+                        <span class="text-white font-numbers">+{{ statValue }}</span>
                     </div>
                     <div v-if="skillValue" class="flex justify-between">
                         <span>Skill Level</span>
-                        <span class="text-white">+{{ skillValue }}</span>
+                        <span class="text-white font-numbers">+{{ skillValue }}</span>
                     </div>
                     <div v-for="(mod, idx) in modifiers" :key="idx" class="flex justify-between">
                         <span class="truncate pr-4">{{ mod.source || 'Modifier' }}</span>
-                        <span :class="mod.value >= 0 ? 'text-green-500' : 'text-cpr-red'">
+                        <span :class="mod.value >= 0 ? 'text-green-500' : 'text-cpr-red'" class="font-numbers">
                             {{ mod.value >= 0 ? '+' : '' }}{{ mod.value }}
                         </span>
                     </div>
                     <div v-if="luck > 0" class="flex justify-between border-t border-cpr-border/10 pt-1 mt-1">
                         <span class="text-cpr-yellow">Luck Spent</span>
-                        <span class="text-cpr-yellow">+{{ luck }}</span>
+                        <span class="text-cpr-yellow font-numbers">+{{ luck }}</span>
                     </div>
                 </div>
 

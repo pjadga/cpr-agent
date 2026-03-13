@@ -18,20 +18,20 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5" v-if="isEffectivelyRezzed(prog)">
                         <span class="text-[9px] font-mono text-cpr-text-dim uppercase">{{ prog.system.class || 'Generic' }}</span>
-                        <span v-if="prog.system.rez && !['Anti-Personnel', 'Anti-Program'].includes(category)" class="text-[9px] font-mono" :class="prog.system.rez.value < 5 ? 'text-cpr-red' : 'text-cpr-teal'">
-                            REZ: {{ prog.system.rez.value }}/{{ prog.system.rez.max }}
+                        <span v-if="prog.system.rez && !['Anti-Personnel', 'Anti-Program'].includes(category)" class="text-[9px]" :class="prog.system.rez.value < 5 ? 'text-cpr-red' : 'text-cpr-teal'">
+                            REZ: <span class="font-numbers">{{ prog.system.rez.value }}/{{ prog.system.rez.max }}</span>
                         </span>
-                        <span v-if="prog.system.atk" class="text-[9px] font-mono text-cpr-teal">
-                            ATK: +{{ prog.system.atk }}
+                        <span v-if="prog.system.atk" class="text-[9px] text-cpr-teal">
+                            ATK: +<span class="font-numbers">{{ prog.system.atk }}</span>
                         </span>
-                        <span v-if="prog.system.def" class="text-[9px] font-mono text-cpr-teal">
-                            DEF: +{{ prog.system.def }}
+                        <span v-if="prog.system.def" class="text-[9px] text-cpr-teal">
+                            DEF: +<span class="font-numbers">{{ prog.system.def }}</span>
                         </span>
-                        <span v-if="prog.system.per" class="text-[9px] font-mono text-cpr-yellow">
-                            PER: +{{ prog.system.per }}
+                        <span v-if="prog.system.per" class="text-[9px] text-cpr-yellow">
+                            PER: +<span class="font-numbers">{{ prog.system.per }}</span>
                         </span>
-                        <span v-if="prog.system.spd" class="text-[9px] font-mono text-cpr-yellow">
-                            SPD: +{{ prog.system.spd }}
+                        <span v-if="prog.system.spd" class="text-[9px] text-cpr-yellow">
+                            SPD: +<span class="font-numbers">{{ prog.system.spd }}</span>
                         </span>
                     </div>
                     <div v-else class="flex items-center gap-2 mt-0.5">
@@ -63,16 +63,16 @@
                     <div class="text-[8px] text-cpr-text-dim uppercase font-bold">Damage</div>
                     <div class="flex gap-2">
                         <div v-if="prog.system.damage.standard" class="text-[9px] bg-cpr-red-dark/30 border border-cpr-red-dark/50 px-1.5 py-0.5 text-cpr-red">
-                            STD: {{ prog.system.damage.standard }}
+                            STD: <span class="font-numbers">{{ prog.system.damage.standard }}</span>
                         </div>
                         <div v-if="prog.system.damage.blackIce" class="text-[9px] bg-cpr-yellow-dark/30 border border-cpr-yellow-dark/50 px-1.5 py-0.5 text-cpr-yellow">
-                            B.ICE: {{ prog.system.damage.blackIce }}
+                            B.ICE: <span class="font-numbers">{{ prog.system.damage.blackIce }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="space-y-1 text-right">
                     <div class="text-[8px] text-cpr-text-dim uppercase font-bold">Cost</div>
-                    <div class="text-[10px] text-cpr-teal font-bold">{{ prog.system.price?.market }}eb</div>
+                    <div class="text-[10px] text-cpr-teal font-bold"><span class="font-numbers">{{ prog.system.price?.market }}</span>eb</div>
                 </div>
             </div>
         </div>
