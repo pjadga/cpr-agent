@@ -66,9 +66,9 @@
                     </div>
                 </div>
 
-                <div v-if="loading" class="text-center py-8 text-cpr-text-muted text-xs font-mono animate-pulse">Initializing Modifiers...</div>
+                <div v-if="loading && !data" class="text-center py-8 text-cpr-text-muted text-xs font-mono animate-pulse">Initializing Modifiers...</div>
 
-                <div v-else-if="error && hasWeapon" class="border border-cpr-red-dark bg-cpr-red-dark/20 text-cpr-red text-xs p-3">
+                <div v-else-if="error" class="border border-cpr-red-dark bg-cpr-red-dark/20 text-cpr-red text-xs p-3">
                     {{ error }}
                     <div class="mt-2">
                         <button @click="$emit('go-to-control')" class="text-[10px] uppercase font-bold border border-cpr-red text-cpr-red px-2 py-1 hover:bg-cpr-red hover:text-black transition-colors">Go to Control</button>
@@ -78,7 +78,7 @@
                 <div v-if="data" class="space-y-2">
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Actor</div>
-                        <div class="text-white font-bold text-xs">{{ data.actorName }}</div>
+                        <div class="text-white font-bold text-xs">{{ data.actorName || 'Character' }}</div>
                     </div>
 
                     <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
@@ -113,15 +113,15 @@
                         </div>
                     </div>
 
-                    <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
+                    <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
-                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Final Modifier</div>
+                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">{{ hasWeapon ? 'Final Modifier' : 'Global Modifier' }}</div>
                             <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-numbers font-bold text-xs">{{ data.finalModifier }}</div>
                         </div>
                     </div>
                 </div>
 
-                <div v-if="!data" class="text-xs text-cpr-text-muted">No data available.</div>
+                <div v-if="!data && !loading" class="text-xs text-cpr-text-muted">No data available.</div>
             </div>
         </aside>
     </transition>

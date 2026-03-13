@@ -8,8 +8,8 @@ import { isMyRequest } from './requests';
  * @param {string} event - The event name to listen for (default: '.FoundryResponse')
  */
 export function useEchoListener(handler, channel = null, event = '.FoundryResponse') {
-    const channelId = window.AgentConfig?.channelId;
-    const effectiveChannel = channel || (channelId ? `cpr-agent.${channelId}` : 'cpr-agent');
+    const channel_id = window.AgentConfig?.channel_id;
+    const effectiveChannel = channel || (channel_id ? `cpr-agent.${channel_id}` : null);
 
     const wrappedHandler = (e) => {
         const payload = e.payload || e;
@@ -23,7 +23,7 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
         if (isPublicEvent || isMyRequest(requestId)) {
             handler(e);
         } else {
-            console.log(`Ignoring FoundryResponse with requestId [${requestId}] - initiated by another agent.`);
+            console.log(`Listener Ignoring FoundryResponse with requestId [${requestId}] - initiated by another agent.`);
         }
     };
 

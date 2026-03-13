@@ -37,6 +37,7 @@ class GetRollModifiers extends FormRequest
         return response()->json([
             'success' => true,
             'message' => 'Roll modifiers request sent to Foundry',
+            'requestId' => $requestId,
             'data' => null
         ], 201);
     }

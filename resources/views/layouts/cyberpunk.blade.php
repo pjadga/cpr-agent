@@ -20,7 +20,7 @@
         <script src="https://unpkg.com/lucide@latest" @cspNonce></script>
         <script @cspNonce>
             window.AgentConfig = {
-                channelId: '{{ Auth::user()?->channel_id }}',
+                channel_id: '{{ Auth::user()?->channel_id }}',
             };
         </script>
     </head>

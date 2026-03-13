@@ -860,8 +860,6 @@ export default {
             checkReloadRequired();
             if (newWeapon) {
                 debouncedFetchDV();
-                // Pre-fetch roll modifiers without opening the panel
-                fetchRollModifiers();
 
                 // Ensure current fireMode is still available for the new weapon
                 const availableIds = availableFireModes.value.map(m => m.id);
@@ -871,6 +869,8 @@ export default {
             } else {
                 dvInfo.value = null;
             }
+            // Refresh roll modifiers whether we have a weapon or not
+            fetchRollModifiers();
         }, { deep: true });
 
         watch(() => charData.value, (newData, oldData) => {

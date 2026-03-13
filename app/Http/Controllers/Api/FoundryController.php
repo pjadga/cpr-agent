@@ -43,6 +43,7 @@ class FoundryController extends Controller
             'target' => 'nullable|string',
             'tokenId' => 'nullable|string',
             'channelId' => 'nullable|string',
+            'channel_id' => 'nullable|string',
             'message' => 'nullable|string',
         ]);
 
@@ -145,10 +146,11 @@ class FoundryController extends Controller
         }
 
         // Add channel ID if we have a user
+        $incomingChannelId = $validated['channel_id'] ?? $validated['channelId'] ?? null;
         if ($user && $user->channel_id) {
             $broadcastPayload['channel_id'] = $user->channel_id;
-        } elseif (!empty($validated['channelId'])) {
-            $broadcastPayload['channel_id'] = $validated['channelId'];
+        } elseif ($incomingChannelId) {
+            $broadcastPayload['channel_id'] = $incomingChannelId;
         }
 
         \App\Events\FoundryResponse::dispatch($broadcastPayload);
