@@ -17,8 +17,8 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
 
         console.log(`%c[Agent] Incoming Response: ${payload.type}`, "color: #00ff00; font-weight: bold;", payload);
 
-        // Dice rolls and results should ALWAYS be processed, even if initiated by another agent
-        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type);
+        // Synchronize public events with useCharacterData.js
+        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT', 'ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
 
         if (isPublicEvent || isMyRequest(requestId)) {
             handler(e);
@@ -28,14 +28,14 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
     };
 
     onMounted(() => {
-        if (window.Echo) {
+        if (window.Echo && effectiveChannel) {
             window.Echo.private(effectiveChannel)
                 .listen(event, wrappedHandler);
         }
     });
 
     onUnmounted(() => {
-        if (window.Echo) {
+        if (window.Echo && effectiveChannel) {
             window.Echo.private(effectiveChannel)
                 .stopListening(event, wrappedHandler);
         }

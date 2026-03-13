@@ -290,47 +290,53 @@ export function useCharacterData() {
     onMounted(async () => {
         useCount++;
         if (useCount === 1) {
-            await fetchBaseUrl();
-            await fetchCharacterData(true);
-
-            // Listen for Foundry responses
+            // 1) Subscribe FIRST to avoid missing fast responses from Foundry
             if (window.Echo) {
                 const channel_id = window.AgentConfig?.channel_id;
                 const channelName = channel_id ? `cpr-agent.${channel_id}` : null;
-                window.Echo.private(channelName)
-                    .listen('.FoundryResponse', (e) => {
-                        const payload = e.payload || e;
 
-                        // If the request was initiated by another agent, ignore it IF it has a requestId
-                        // Except for DICE_ROLL_EVENT and ROLL_RESULT which are for everyone
-                        const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT', 'ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
-                        if (!isPublicEvent && payload.requestId && !isMyRequest(payload.requestId)) {
-                            console.log(`Ignoring FoundryResponse with requestId [${payload.requestId}] - initiated by another agent.`);
-                            return;
-                        }
+                if (channelName) {
+                    window.Echo.private(channelName)
+                        .listen('.FoundryResponse', (e) => {
+                            const payload = e.payload || e;
 
-                        // If it's actor data or a sheet delta, apply it
-                        if (payload.type === 'ACTOR_DATA' && payload.actor) {
-                            if (payload.agentLink || payload.agent_link) {
-                                const normalizedLink = (payload.agentLink || payload.agent_link).replace(/\/$/, '');
-                                agentLink.value = normalizedLink;
-                                localStorage.setItem('cpr_agent_link', normalizedLink);
+                            // If the request was initiated by another agent, ignore it IF it has a requestId
+                            // Except for Group events which are for everyone in this private channel
+                            const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT', 'ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
+                            if (!isPublicEvent && payload.requestId && !isMyRequest(payload.requestId)) {
+                                console.log(`Ignoring FoundryResponse with requestId [${payload.requestId}] - initiated by another agent.`);
+                                return;
                             }
-                            if (typeof payload.isGM !== 'undefined') {
-                                isGM.value = !!payload.isGM;
-                                localStorage.setItem('cpr_is_gm', isGM.value);
+
+                            // If it's actor data or a sheet delta, apply it
+                            if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                                if (payload.agentLink || payload.agent_link) {
+                                    const normalizedLink = (payload.agentLink || payload.agent_link).replace(/\/$/, '');
+                                    agentLink.value = normalizedLink;
+                                    localStorage.setItem('cpr_agent_link', normalizedLink);
+                                }
+                                if (typeof payload.isGM !== 'undefined') {
+                                    isGM.value = !!payload.isGM;
+                                    localStorage.setItem('cpr_is_gm', isGM.value);
+                                }
+                                if (actorUuid && payload.actor._id !== actorUuid) return;
+                                charData.value = { ...charData.value, data: payload.actor, uuid: payload.actor._id };
+                                loading.value = false;
+                                triggerRef(charData);
+                                setTimeout(refreshIcons, 50);
+                            } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
+                                if (actorUuid && payload.actorId && payload.actorId !== actorUuid) return;
+                                applyDelta(payload.delta, { tab: payload.tab });
                             }
-                            if (actorUuid && payload.actor._id !== actorUuid) return;
-                            charData.value = { ...charData.value, data: payload.actor, uuid: payload.actor._id };
-                            loading.value = false;
-                            triggerRef(charData);
-                            setTimeout(refreshIcons, 50);
-                        } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
-                            if (actorUuid && payload.actorId && payload.actorId !== actorUuid) return;
-                            applyDelta(payload.delta, { tab: payload.tab });
-                        }
-                    });
+                        });
+                } else {
+                    console.warn('[Agent] No channel_id configured. Live updates disabled.');
+                }
             }
+
+            // 2) Trigger data load AFTER subscription is ready
+            await fetchBaseUrl();
+            await fetchCharacterData(true);
         }
     });
 

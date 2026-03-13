@@ -32,9 +32,7 @@ class FoundryResponse implements ShouldBroadcast
             ];
         }
 
-        return [
-            new PrivateChannel('cpr-agent'),
-        ];
+        return [];
     }
 
     public function broadcastAs(): string

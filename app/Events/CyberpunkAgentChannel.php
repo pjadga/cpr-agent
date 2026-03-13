@@ -54,10 +54,7 @@ class CyberpunkAgentChannel implements ShouldBroadcastNow
             ];
         }
 
-        // Fallback for legacy support
-        return [
-            new PrivateChannel('cpr-agent'),
-        ];
+        return [];
     }
 
     /**
