@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <img v-cpr-img="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-cpr-border">
+                            <img v-cpr-img:cpr-red="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-cpr-border">
                             <div>
                                 <div class="text-xs font-bold  uppercase">{{ weapon.name }}</div>
                                 <div class="flex items-center gap-2 mt-0.5">

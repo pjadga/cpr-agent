@@ -47,6 +47,8 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'character_data' => $demoData,
+            'default_actor_id' => $demoData['_id'] ?? null,
+            'default_token_id' => $demoData['_id'] ?? null,
             'agent_link' => (string) Str::uuid(),
         ]);
 

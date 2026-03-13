@@ -51,7 +51,7 @@
                             <i v-icon data-lucide="x" class="w-6 h-6"></i>
                         </button>
                     </div>
-                    <img v-cpr-img="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
+                    <img v-cpr-img:cpr-red="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
                     <div class="mt-4 text-center">
                         <h2 class="text-white font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
@@ -104,7 +104,7 @@
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
                             class="absolute inset-0 border border-[var(--cpr-yellow)] bg-cpr-black-deep flex items-center justify-center overflow-hidden">
-                            <img v-if="charData.data.img" v-cpr-img="getImageUrl(charData.data.img)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" :alt="charData.data.name">
+                            <img v-if="charData.data.img" v-cpr-img:cpr-teal="getImageUrl(charData.data.img)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" :alt="charData.data.name">
                             <span v-else class="text-xl font-bold text-cpr-yellow">{{ charData.data.name[0] }}</span>
                         </div>
                         <div class="absolute inset-0 bg-cpr-yellow/0 group-hover:bg-cpr-yellow/20 transition-colors duration-300 flex items-center justify-center">

@@ -8,7 +8,7 @@
         <div class="p-3 pl-4 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer flex-1" @click="$emit('toggle-details')">
                 <div class="relative">
-                    <img v-cpr-img="getImageUrl(prog.img)" class="w-9 h-9 object-cover border border-cpr-border bg-cpr-black" :class="{'grayscale opacity-60': !isEffectivelyRezzed(prog)}">
+                    <img v-cpr-img:cpr-teal="getImageUrl(prog.img)" class="w-9 h-9 object-cover border border-cpr-border bg-cpr-black" :class="{'grayscale opacity-60': !isEffectivelyRezzed(prog)}">
                     <div v-if="isEffectivelyRezzed(prog)" class="absolute -bottom-1 -right-1 w-3 h-3 bg-cpr-teal rounded-full border-2 border-black animate-pulse"></div>
                 </div>
                 <div>

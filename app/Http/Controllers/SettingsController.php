@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
-class ProfileSetupController extends Controller
+class SettingsController extends Controller
 {
     use HasConfiguration;
 
@@ -23,9 +23,7 @@ class ProfileSetupController extends Controller
 
         if ($config->foundry_url || config('services.foundry.base_url')) {
             $requestId = $this->createRequestId();
-
             // Fetch the list of actors from Foundry.
-            // We always use GET_ACTORS to populate the dropdown.
             $type = 'GET_ACTORS';
             $payload = [
                 'type' => $type,
@@ -38,11 +36,9 @@ class ProfileSetupController extends Controller
 
             // 2. Wait for the response (The Polling Loop)
             $startTime = microtime(true);
-            $timeout = 5.0; // Increased timeout
-
+            $timeout = 5.0;
             while ((microtime(true) - $startTime) < $timeout) {
                 $key = 'foundry_response_' . $requestId;
-
                 if (Cache::has($key)) {
                     $foundryData = Cache::pull($key);
                     if (!empty($foundryData['actors'])) {
@@ -50,24 +46,20 @@ class ProfileSetupController extends Controller
                     }
                     break;
                 }
-
                 usleep(20000); // 20ms
             }
         }
 
         // Fallback: Ensure the currently saved actor is in the list
-        // This ensures the current selection is displayed even if the bridge is offline or slow.
         if ($user->default_actor_id) {
             $found = false;
             foreach ($actors as $actor) {
-                // Check if the actor is already in the list (handle actorId or _id)
                 $id = $actor['actorId'] ?? ($actor['_id'] ?? '');
                 if ($id == $user->default_actor_id) {
                     $found = true;
                     break;
                 }
             }
-
             if (!$found) {
                 $actors[] = [
                     'name' => $user->character_data['name'] ?? 'Saved Character',
@@ -77,83 +69,122 @@ class ProfileSetupController extends Controller
             }
         }
 
-        if ($user->is_gm) {
-        }
+        $isFirstTime = !$config->api_key || !$config->foundry_url;
 
         return view('settings', [
             'actors' => $actors,
             'user' => $user,
             'config' => $config,
+            'isFirstTime' => $isFirstTime,
         ]);
     }
 
-    public function store(Request $request)
+    public function storeSync(Request $request)
     {
+        // Fixing the bug where actor ID was required to save channel_id
         $validated = $request->validate([
-            'default_actor_id' => 'required|string',
+            'default_actor_id' => 'nullable|string',
             'default_token_id' => 'nullable|string',
             'channel_id' => 'nullable|string',
         ]);
 
         $user = Auth::user();
 
-        // If the user doesn't have an agent-link, create one now.
         if (empty($user->agent_link)) {
-            $validated['agent_link'] = (string) Str::uuid();
+            $user->agent_link = (string) Str::uuid();
         }
 
-        if (empty($validated['channel_id'])) {
-            unset($validated['channel_id']);
+        // Update fields if they are present in the request
+        if ($request->has('default_actor_id')) {
+            $user->default_actor_id = $validated['default_actor_id'];
+        }
+        if ($request->has('default_token_id')) {
+            $user->default_token_id = $validated['default_token_id'];
+        }
+        if ($request->has('channel_id')) {
+            $user->channel_id = $validated['channel_id'];
         }
 
-        $user->update($validated);
+        $user->save();
 
-        $this->refreshCharacterData($user, $user->default_actor_id);
+        if ($user->default_actor_id && $request->has('default_actor_id')) {
+            $this->refreshCharacterData($user, $user->default_actor_id);
+        }
 
         return redirect()->route('settings')->with('success', 'Profile synchronized and character data refreshed!');
+    }
+
+    public function storeConfig(Request $request)
+    {
+        $validated = $request->validate([
+            'api_key' => 'nullable|string',
+            'foundry_url' => 'nullable|string',
+            'theme' => 'nullable|string|in:night,day',
+        ]);
+
+        $user = Auth::user();
+
+        if (isset($validated['foundry_url'])) {
+            $validated['foundry_url'] = rtrim($validated['foundry_url'], '/');
+        }
+
+        $config = $user->config ?: new Config(['user_id' => $user->id]);
+
+        if ($request->has('api_key')) {
+            $config->api_key = $validated['api_key'];
+        }
+        if ($request->has('foundry_url')) {
+            $config->foundry_url = $validated['foundry_url'];
+        }
+        if ($request->has('theme')) {
+            $config->theme = $validated['theme'];
+        }
+
+        $config->save();
+
+        return redirect()->route('settings')->with('success', 'Configuration updated successfully.');
     }
 
     public function refresh()
     {
         $user = Auth::user();
-        $this->refreshCharacterData($user);
+        if ($user->default_actor_id) {
+            $this->refreshCharacterData($user);
+            return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
+        }
+        return redirect()->route('settings')->with('error', 'No character selected to refresh.');
+    }
 
-        return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
+    public function getFoundryUrl(Request $request)
+    {
+        return $request->user()->config->foundry_url ?? null;
     }
 
     protected function refreshCharacterData($user, $actorId = null)
     {
-        // Wipe and replace character_data from Foundry
         $requestId = $this->createRequestId();
-
         $payload = [
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
             'agent_link' => $user->agent_link,
         ];
-
         if ($actorId) {
             $payload['actorId'] = $actorId;
         }
 
-        // We don't pass actorId if it's null, so the bridge will return the currently assigned character for the user
         CyberpunkAgentChannel::dispatch($payload);
 
-        // Wait for the response to ensure character_data is populated
         $startTime = microtime(true);
-        $timeout = 5.0; // Increased timeout
+        $timeout = 5.0;
         while ((microtime(true) - $startTime) < $timeout) {
             $key = 'foundry_response_' . $requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
                 if (!empty($foundryData['actor'])) {
                     $actor = $foundryData['actor'];
-
-                    // If the character has changed, update the ID as well
                     if (isset($actor['_id']) && $actor['_id'] !== $user->default_actor_id) {
                         $user->default_actor_id = $actor['_id'];
                     }
-
                     $user->character_data = $actor;
                     $user->save();
                 }

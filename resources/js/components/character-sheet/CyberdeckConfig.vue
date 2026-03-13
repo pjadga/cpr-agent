@@ -15,7 +15,7 @@
                 <div class="flex-1 p-4 border-r border-cpr-teal-dark/30 overflow-y-auto">
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 bg-cpr-teal/10 border border-cpr-teal/30 flex items-center justify-center">
-                            <img v-cpr-img="getImageUrl(activeCyberdeck.img)" class="w-8 h-8">
+                            <img v-cpr-img:cpr-teal="getImageUrl(activeCyberdeck.img)" class="w-8 h-8">
                         </div>
                         <div>
                             <h3 class="text-md font-black text-white uppercase">{{ activeCyberdeck.name }}</h3>
@@ -32,7 +32,7 @@
                         <div v-for="program in activeCyberdeck.installedPrograms" :key="program._id"
                              class="bg-cpr-teal-dark/10 border border-cpr-teal/30 p-2 flex items-center justify-between group">
                             <div class="flex items-center gap-3">
-                                <img v-cpr-img="getImageUrl(program.img)" class="w-8 h-8 opacity-80 border border-cpr-teal/20 bg-cpr-black">
+                                <img v-cpr-img:cpr-teal="getImageUrl(program.img)" class="w-8 h-8 opacity-80 border border-cpr-teal/20 bg-cpr-black">
                                 <div>
                                     <div class="text-xs font-bold text-cpr-text-bright uppercase">{{ program.name }}</div>
                                     <div class="text-[9px] text-cpr-teal font-mono uppercase">{{ program.system.class || 'Program' }}</div>
@@ -56,7 +56,7 @@
                         <div v-for="program in availablePrograms" :key="program._id"
                              class="bg-[var(--cpr-black-soft)] border border-cpr-border p-2 flex items-center justify-between group hover:border-cpr-border-muted transition-colors">
                             <div class="flex items-center gap-3">
-                                <img v-cpr-img="getImageUrl(program.img)" class="w-8 h-8 opacity-50 grayscale group-hover:grayscale-0 transition-all">
+                                <img v-cpr-img:cpr-teal="getImageUrl(program.img)" class="w-8 h-8 opacity-50 grayscale group-hover:grayscale-0 transition-all">
                                 <div>
                                     <div class="text-xs font-bold text-cpr-text-muted group-hover:text-white uppercase">{{ program.name }}</div>
                                     <div class="text-[9px] text-cpr-text-dim font-mono uppercase">{{ program.system.class || 'Program' }}</div>

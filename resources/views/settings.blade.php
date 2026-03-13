@@ -320,6 +320,81 @@
     </form>
 </x-modal>
 
+<x-modal name="onboarding-modal" :show="$isFirstTime" focusable>
+    <div x-data="{ step: 1 }" class="p-6 bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)]">
+        <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-6 pb-2">
+            <h2 class="text-2xl font-bold text-cpr-teal uppercase tracking-tighter">
+                System Initialization <span class="text-xs font-mono ml-2 opacity-50" x-text="'[STEP 0' + step + ']'"></span>
+            </h2>
+            <div class="flex gap-1">
+                <template x-for="i in 3">
+                    <div :class="step >= i ? 'bg-cpr-teal' : 'bg-cpr-teal/20'" class="w-3 h-1 transition-colors duration-300"></div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
+            <p class="text-cpr-text mb-4 leading-relaxed">
+                Welcome, Edgerunner. Before we hit the Net, we need to establish a stable uplink to your Foundry instance.
+            </p>
+            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-4 mb-6 italic text-sm">
+                "First, enter your Foundry URL and generate an API key. Paste this key into the Cyberpunk Red Agent Bridge in Foundry."
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
+            <p class="text-cpr-text mb-4 leading-relaxed">
+                Uplink established. Now, let's setup some Personal ICE.
+            </p>
+            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-4 mb-6 italic text-sm">
+                "Make sure the Channel IDs match between the Module and Agent. Commit the Sync to save the channel ID."
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div x-show="step === 3" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
+            <p class="text-cpr-text mb-4 leading-relaxed">
+                Finalizing biometric handshake.
+            </p>
+            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-4 mb-6 italic text-sm">
+                "Assign a character in the Foundry Module, refresh the Agent, and select and save your character."
+            </div>
+        </div>
+
+        <div class="mt-8 flex justify-between items-center">
+            <button
+                type="button"
+                x-show="step > 1"
+                x-on:click="step--"
+                class="cyber-button bg-cpr-black-elevated border-cpr-border px-6 py-2 uppercase text-xs text-cpr-text"
+            >
+                Previous
+            </button>
+            <div x-show="step === 1"></div> <!-- Spacer -->
+
+            <button
+                type="button"
+                x-show="step < 3"
+                x-on:click="step++"
+                class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black"
+            >
+                Next
+            </button>
+
+            <button
+                type="button"
+                x-show="step === 3"
+                x-on:click="$dispatch('close')"
+                class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black"
+            >
+                Begin Sync
+            </button>
+        </div>
+    </div>
+</x-modal>
+
 <script @cspNonce>
     const actorSelection = document.getElementById('actor_selection');
     if (actorSelection) {

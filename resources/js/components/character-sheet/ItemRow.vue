@@ -30,7 +30,7 @@
 
         <div class="flex items-stretch min-h-[3.5rem]">
             <div class="flex items-center pl-3 py-2 shrink-0">
-                <img v-cpr-img="getImageUrl(item.img)" class="w-10 h-10 object-cover border border-cpr-border bg-cpr-black/50" />
+                <img v-cpr-img:[categoryColor]="getImageUrl(item.img)" class="w-10 h-10 object-cover border border-cpr-border bg-cpr-black/50" />
             </div>
             <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors" @click="console.log('Row clicked:', item.name); $emit('click', item)">
                 <div class="flex justify-between items-start pr-2">
@@ -424,6 +424,19 @@ export default {
             };
         });
 
+        const categoryColor = computed(() => {
+            switch (props.category) {
+                case 'weapon': return 'cpr-red';
+                case 'armor': return 'cpr-teal-dark';
+                case 'ammo': return 'cpr-yellow-dark';
+                case 'drug': return 'cpr-yellow';
+                case 'gear': return 'cpr-border-muted';
+                case 'cyberware': return 'cpr-teal';
+                case 'criticalInjury': return 'cpr-red';
+                default: return 'cpr-red';
+            }
+        });
+
         return {
             expanded,
             toggle,
@@ -441,7 +454,8 @@ export default {
             availableAmmoItems,
             equipIcon,
             equipStateLabel,
-            getEquipIconForState
+            getEquipIconForState,
+            categoryColor
         };
     }
 };

@@ -25,9 +25,7 @@ use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
 use App\Http\Controllers\Values\UpdateStat;
 use App\Http\Controllers\Values\UpdateNotes;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProfileSetupController;
-use App\Http\Controllers\Views\ConfigController;
+use App\Http\Controllers\SettingsController;
 use App\Events\CyberpunkAgentChannel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -65,10 +63,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
 
 Route::middleware(['auth', 'app.configured'])->group(function () {
-    Route::get('/settings/refresh', [ProfileSetupController::class, 'refresh'])->name('settings.refresh');
-    Route::get('/settings', [ProfileSetupController::class, 'show'])->name('settings');
-    Route::get('/profile-setup', [ProfileSetupController::class, 'show'])->name('profile-setup.show');
-    Route::post('/profile-setup', [ProfileSetupController::class, 'store'])->name('profile-setup.store');
+    Route::get('/settings/refresh', [SettingsController::class, 'refresh'])->name('settings.refresh');
+    Route::get('/settings', [SettingsController::class, 'show'])->name('settings');
 });
 
 Route::middleware('auth')->group(function () {
@@ -78,12 +74,13 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/config', [ConfigController::class, 'index'])->name('config.index');
-    Route::post('/config', [ConfigController::class, 'store'])->name('config.store');
+    Route::post('/settings/sync', [SettingsController::class, 'storeSync'])->name('profile-setup.store');
+    Route::get('/config', [SettingsController::class, 'show'])->name('config.index');
+    Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
 });
 
 Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
-    Route::get('/getbaseurl', [ConfigController::class, 'getFoundryUrl']);
+    Route::get('/getbaseurl', [SettingsController::class, 'getFoundryUrl']);
     Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
     Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
     Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
