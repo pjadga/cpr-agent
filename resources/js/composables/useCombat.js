@@ -113,7 +113,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         const now = Date.now();
 
         // 20ms throttle to prevent OS-level bounce but feel completely raw
-        if (now - lastMoveTime < 20) return;
+        if (now - lastMoveTime < 300) return;
 
         lastMoveTime = now;
         window.axios.post("/movetoken", { direction, weaponId, actorId, tokenId });
