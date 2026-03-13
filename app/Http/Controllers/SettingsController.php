@@ -69,7 +69,7 @@ class SettingsController extends Controller
             }
         }
 
-        $isFirstTime = !$config->api_key || !$config->foundry_url;
+        $isFirstTime = (!$config->api_key || !$config->foundry_url) && !$config->has_read_onboarding;
 
         return view('settings', [
             'actors' => $actors,
@@ -158,6 +158,16 @@ class SettingsController extends Controller
     public function getFoundryUrl(Request $request)
     {
         return $request->user()->config->foundry_url ?? null;
+    }
+
+    public function markOnboardingAsRead()
+    {
+        $user = Auth::user();
+        $config = $user->config ?: new Config(['user_id' => $user->id]);
+        $config->has_read_onboarding = true;
+        $config->save();
+
+        return response()->json(['success' => true]);
     }
 
     protected function refreshCharacterData($user, $actorId = null)

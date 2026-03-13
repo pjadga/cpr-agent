@@ -4,7 +4,7 @@
 <form action="{{ route('token.create') }}" method="POST" id="token-create-form" class="hidden">
     @csrf
 </form>
-<div class="max-w-4xl mx-auto p-8">
+<div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0) }">
     <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
         <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
             Agent Settings
@@ -32,7 +32,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
         <!-- Global App Configuration -->
-        <div class="space-y-6">
+        <div class="space-y-6 relative">
             <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">
                 Core System Settings
             </h3>
@@ -120,6 +120,40 @@
                     Update Core Settings
                 </button>
             </form>
+
+            <!-- Step 1 Tooltip -->
+            <div x-show="onboardingStep === 1"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6"
+                 style="display: none;">
+                <div class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
+
+                <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
+                    <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                        System Initialization <span class="text-xs font-mono ml-2 opacity-50">[STEP 01]</span>
+                    </h2>
+                    <div class="flex gap-1">
+                        <div class="bg-cpr-teal w-3 h-1"></div>
+                        <div class="bg-cpr-teal/20 w-3 h-1"></div>
+                        <div class="bg-cpr-teal/20 w-3 h-1"></div>
+                    </div>
+                </div>
+
+                <p class="text-cpr-text mb-4 leading-relaxed text-sm">
+                    Welcome, Edgerunner. Before we hit the Net, we need to establish a stable uplink to your Foundry instance.
+                </p>
+                <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
+                    "First, enter your Foundry URL and generate an API key. Paste this key into the Cyberpunk Red Agent Bridge in Foundry."
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="button" @click="onboardingStep = 2" class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black">
+                        Next
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- User Profile Synchronization -->
@@ -144,7 +178,7 @@
                 <form method="POST" action="{{ route('profile-setup.store') }}" class="space-y-4">
                     @csrf
                     <!-- Default Actor ID -->
-                    <div>
+                    <div class="relative">
                         <div class="flex items-center gap-2">
                             <x-input-label for="actor_selection" :value="__('Primary Biometric Signature (Actor)')" class="text-xs uppercase text-cpr-muted" />
                             <div class="group relative flex items-center">
@@ -165,10 +199,49 @@
                         <input type="hidden" name="default_actor_id" id="default_actor_id" value="{{ $user->default_actor_id }}">
                         <input type="hidden" name="default_token_id" id="default_token_id" value="{{ $user->default_token_id }}">
                         <x-input-error :messages="$errors->get('default_actor_id')" class="mt-1 text-cpr-red text-[10px] uppercase" />
+
+                        <!-- Step 3 Tooltip -->
+                        <div x-show="onboardingStep === 3"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 translate-y-4"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6"
+                             style="display: none;">
+                            <div class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
+
+                            <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
+                                <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                                    System Initialization <span class="text-xs font-mono ml-2 opacity-50">[STEP 03]</span>
+                                </h2>
+                                <div class="flex gap-1">
+                                    <div class="bg-cpr-teal w-3 h-1"></div>
+                                    <div class="bg-cpr-teal w-3 h-1"></div>
+                                    <div class="bg-cpr-teal w-3 h-1"></div>
+                                </div>
+                            </div>
+
+                            <p class="text-cpr-text mb-4 leading-relaxed text-sm">
+                                Finalizing biometric handshake.
+                            </p>
+                            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
+                                "Assign a character in the Foundry Module, refresh the Agent, and select and save your character."
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <button type="button" @click="onboardingStep = 2" class="cyber-button bg-cpr-black-elevated border-cpr-border px-6 py-2 uppercase text-xs text-cpr-text">
+                                    Previous
+                                </button>
+                                <button type="button"
+                                        @click="fetch('{{ route('settings.onboarding.read') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' } }).then(() => onboardingStep = 0)"
+                                        class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black">
+                                    Begin Sync
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Channel ID -->
-                    <div>
+                    <div class="relative">
                         <div class="flex items-center gap-2">
                             <x-input-label for="channel_id" :value="__('Channel ID')" class="text-xs uppercase text-cpr-muted" />
                             <div class="group relative flex items-center">
@@ -182,6 +255,43 @@
                             <x-text-input type="text" name="channel_id" id="channel_id" value="{{ old('channel_id', $user->channel_id) }}" class="cyber-input-field mt-1 w-full" />
                         </div>
                         <x-input-error :messages="$errors->get('channel_id')" class="mt-1 text-cpr-red text-[10px] uppercase" />
+
+                        <!-- Step 2 Tooltip -->
+                        <div x-show="onboardingStep === 2"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 translate-y-4"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6"
+                             style="display: none;">
+                            <div class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
+
+                            <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
+                                <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                                    System Initialization <span class="text-xs font-mono ml-2 opacity-50">[STEP 02]</span>
+                                </h2>
+                                <div class="flex gap-1">
+                                    <div class="bg-cpr-teal w-3 h-1"></div>
+                                    <div class="bg-cpr-teal w-3 h-1"></div>
+                                    <div class="bg-cpr-teal/20 w-3 h-1"></div>
+                                </div>
+                            </div>
+
+                            <p class="text-cpr-text mb-4 leading-relaxed text-sm">
+                                Uplink established. Now, let's setup some Personal ICE.
+                            </p>
+                            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
+                                "Make sure the Channel IDs match between the Module and Agent. Commit the Sync to save the channel ID."
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <button type="button" @click="onboardingStep = 1" class="cyber-button bg-cpr-black-elevated border-cpr-border px-6 py-2 uppercase text-xs text-cpr-text">
+                                    Previous
+                                </button>
+                                <button type="button" @click="onboardingStep = 3" class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
 
@@ -320,81 +430,6 @@
     </form>
 </x-modal>
 
-<x-modal name="onboarding-modal" :show="$isFirstTime" focusable>
-    <div x-data="{ step: 1 }" class="p-6 bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)]">
-        <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-6 pb-2">
-            <h2 class="text-2xl font-bold text-cpr-teal uppercase tracking-tighter">
-                System Initialization <span class="text-xs font-mono ml-2 opacity-50" x-text="'[STEP 0' + step + ']'"></span>
-            </h2>
-            <div class="flex gap-1">
-                <template x-for="i in 3">
-                    <div :class="step >= i ? 'bg-cpr-teal' : 'bg-cpr-teal/20'" class="w-3 h-1 transition-colors duration-300"></div>
-                </template>
-            </div>
-        </div>
-
-        <!-- Step 1 -->
-        <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0">
-            <p class="text-cpr-text mb-4 leading-relaxed">
-                Welcome, Edgerunner. Before we hit the Net, we need to establish a stable uplink to your Foundry instance.
-            </p>
-            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-4 mb-6 italic text-sm">
-                "First, enter your Foundry URL and generate an API key. Paste this key into the Cyberpunk Red Agent Bridge in Foundry."
-            </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
-            <p class="text-cpr-text mb-4 leading-relaxed">
-                Uplink established. Now, let's setup some Personal ICE.
-            </p>
-            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-4 mb-6 italic text-sm">
-                "Make sure the Channel IDs match between the Module and Agent. Commit the Sync to save the channel ID."
-            </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div x-show="step === 3" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-4" x-transition:enter-end="opacity-100 translate-x-0" style="display: none;">
-            <p class="text-cpr-text mb-4 leading-relaxed">
-                Finalizing biometric handshake.
-            </p>
-            <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-4 mb-6 italic text-sm">
-                "Assign a character in the Foundry Module, refresh the Agent, and select and save your character."
-            </div>
-        </div>
-
-        <div class="mt-8 flex justify-between items-center">
-            <button
-                type="button"
-                x-show="step > 1"
-                x-on:click="step--"
-                class="cyber-button bg-cpr-black-elevated border-cpr-border px-6 py-2 uppercase text-xs text-cpr-text"
-            >
-                Previous
-            </button>
-            <div x-show="step === 1"></div> <!-- Spacer -->
-
-            <button
-                type="button"
-                x-show="step < 3"
-                x-on:click="step++"
-                class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black"
-            >
-                Next
-            </button>
-
-            <button
-                type="button"
-                x-show="step === 3"
-                x-on:click="$dispatch('close')"
-                class="cyber-button bg-cpr-teal-dark border-cpr-teal px-8 py-2 uppercase text-xs font-bold text-black"
-            >
-                Begin Sync
-            </button>
-        </div>
-    </div>
-</x-modal>
-
 <script @cspNonce>
     const actorSelection = document.getElementById('actor_selection');
     if (actorSelection) {
@@ -416,4 +451,5 @@
         syncIds();
     }
 </script>
+</div>
 @endsection

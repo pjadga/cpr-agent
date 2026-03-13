@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::post('/settings/onboarding/read', [SettingsController::class, 'markOnboardingAsRead'])->name('settings.onboarding.read');
     Route::post('/settings/sync', [SettingsController::class, 'storeSync'])->name('profile-setup.store');
     Route::get('/config', [SettingsController::class, 'show'])->name('config.index');
     Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
