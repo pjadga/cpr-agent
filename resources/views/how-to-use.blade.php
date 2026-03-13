@@ -5,7 +5,7 @@
     <div class="cpr-panel p-8 max-w-4xl w-full border-t-4 border-t-red-600 shadow-2xl backdrop-blur-sm overflow-y-auto max-h-[90vh]">
         <div class="mb-8 border-b border-cpr-red/30 pb-4">
             <h1 class="text-4xl font-black glow-red text-cpr-red uppercase tracking-tighter">How to Use</h1>
-            <p class="text-cpr-text-muted italic">Follow these steps to synchronize your Agent interface with Night City.</p>
+            <p class="text-cpr-text-muted italic"><br>Follow these steps to synchronize your Agent interface with Night City.</p>
         </div>
 
         <div class="space-y-8 text-cpr-text-main">
@@ -47,7 +47,7 @@
             <section>
                 <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Character Assignment & Sync</h2>
                 <ol class="list-decimal list-inside space-y-2 ml-4">
-                    <li>In Foundry VTT, the GM should open the <strong>Agent Character Assignment</strong> menu (found in the Agent Bridge module).</li>
+                    <li>In Foundry VTT, the GM should open the <strong>Character Assignment</strong> menu (found in the Agent Bridge module).</li>
                     <li>The GM assigns a playable character to each player who has linked their API key.</li>
                     <li>Once assigned, the player's <strong>Agent Link</strong> (a long unique code) should appear in the menu. The players must be online for this to appear, so dont worry if it doesn't appear straight away.</li>
                     <li>The player is now <strong>fully synced</strong>. Character data, stats, and rolls will flow between Foundry and the Agent interface in real-time.</li>
