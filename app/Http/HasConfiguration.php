@@ -22,8 +22,7 @@ trait HasConfiguration
      */
     public function createRequestId(): string
     {
-        $user = auth()->user();
-        return $user?->agent_link ?? (string) \Illuminate\Support\Str::uuid();
+        return  (string) \Illuminate\Support\Str::uuid();
     }
 
     /**
