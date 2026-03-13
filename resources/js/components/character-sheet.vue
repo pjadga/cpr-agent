@@ -395,7 +395,7 @@ export default {
             showPopup.value = true;
         };
 
-        const debouncedFetchCharacterData = debounce(() => fetchCharacterData(), 1000);
+        const debouncedFetchCharacterData = debounce(() => fetchCharacterData(), 300);
 
         const sendRequest = (data, url) => {
             window.axios.post(url, data).then(response => {
