@@ -489,36 +489,7 @@ export default {
         const handleFoundryResponse = (e) => {
             const payload = e.payload || e;
 
-            if (payload.type === 'SHEET_DELTA' && payload.delta) {
-                // Ensure this update is for the character we are currently viewing
-                const currentId = charData.value?.data?._id;
-                if (payload.actorId && currentId && payload.actorId !== currentId) return;
-
-                // Apply focused delta from Foundry/Backend without full refresh
-                try {
-                    applyDelta(payload.delta, { tab: payload.tab });
-                } catch (e) {
-                    console.warn('Delta apply failed', e);
-                }
-            } else if (payload.type === 'ACTOR_DATA' && payload.actor) {
-                if (typeof payload.isGM !== 'undefined') {
-                    isGM.value = !!payload.isGM;
-                    localStorage.setItem('cpr_is_gm', isGM.value);
-                }
-                // Ensure this update is for the character we are currently viewing
-                const currentId = charData.value?.data?._id;
-                if (payload.actor?._id && currentId && payload.actor._id !== currentId) return;
-
-                // Background refresh finished: update our local state with the full fresh actor object
-                // We wrap it in a structure that matches our Vue expectations (top-level 'data' usually)
-                charData.value = {
-                    ...charData.value,
-                    data: payload.actor,
-                    requestId: payload.requestId
-                };
-                loading.value = false;
-                setTimeout(refreshIcons, 50);
-            } else if (payload.type === 'DICE_ROLL_EVENT' || payload.type === 'ROLL_RESULT') {
+            if (payload.type === 'DICE_ROLL_EVENT' || payload.type === 'ROLL_RESULT') {
                 const incomingLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '').toLowerCase();
                 const myLink = (localAgentLink.value || '').replace(/\/$/, '').toLowerCase();
                 const isMyRoll = (myLink && incomingLink === myLink) || (payload.requestId && isMyRequest(payload.requestId));
@@ -552,7 +523,7 @@ export default {
             }
 
             if (payload.type === 'CONFIRMATION') {
-                // Refresh data removed as requested. Rely on Foundry pushing updates via Echo.
+                // Potential confirmation handling
             }
         };
 

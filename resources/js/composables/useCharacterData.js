@@ -11,7 +11,7 @@ const agentLink = ref((localStorage.getItem('cpr_agent_link') || '').replace(/\/
 const isGM = ref(localStorage.getItem('cpr_is_gm') === 'true');
 const baseUrl = ref(localStorage.getItem('cpr_base_url') || '');
 let refreshInterval = null;
-let actorUuid = localStorage.getItem('cpr_actor_uuid') || null;
+let actorUuid = (localStorage.getItem('cpr_actor_uuid') || '').replace(/^Actor\./, '') || null;
 let useCount = 0;
 
 /**
@@ -276,6 +276,25 @@ export function useCharacterData() {
                 //Only trigger this when asked to refresh
                 console.log("Triggering background refresh from Foundry...");
                 await window.axios.post("/getactor", { "actorId": actorUuid });
+
+                // Safety fallback: if no event lands quickly, unstick the UI
+                setTimeout(async () => {
+                    if (loading.value) {
+                        console.warn('[Agent] Refresh timed out. Falling back to local cache.');
+                        try {
+                            const dbResponse = await window.axios.post('/actorsheet');
+                            if (dbResponse.data && dbResponse.data.data) {
+                                charData.value = dbResponse.data;
+                                loading.value = false;
+                                triggerRef(charData);
+                                setTimeout(refreshIcons, 50);
+                            }
+                        } catch (e) {
+                            console.error('[Agent] Fallback /actorsheet failed', e);
+                            loading.value = false; // Still unstick even if fallback fails
+                        }
+                    }
+                }, 4000);
             }
 
         } catch (err) {
@@ -310,6 +329,9 @@ export function useCharacterData() {
 
                             // If it's actor data or a sheet delta, apply it
                             if (payload.type === 'ACTOR_DATA' && payload.actor) {
+                                const payloadActorId = String(payload.actor._id).replace(/^Actor\./, '');
+                                if (actorUuid && payloadActorId !== actorUuid) return;
+
                                 if (payload.agentLink || payload.agent_link) {
                                     const normalizedLink = (payload.agentLink || payload.agent_link).replace(/\/$/, '');
                                     agentLink.value = normalizedLink;
@@ -319,13 +341,19 @@ export function useCharacterData() {
                                     isGM.value = !!payload.isGM;
                                     localStorage.setItem('cpr_is_gm', isGM.value);
                                 }
-                                if (actorUuid && payload.actor._id !== actorUuid) return;
-                                charData.value = { ...charData.value, data: payload.actor, uuid: payload.actor._id };
+
+                                charData.value = {
+                                    ...charData.value,
+                                    data: payload.actor,
+                                    uuid: payloadActorId,
+                                    requestId: payload.requestId
+                                };
                                 loading.value = false;
                                 triggerRef(charData);
                                 setTimeout(refreshIcons, 50);
                             } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
-                                if (actorUuid && payload.actorId && payload.actorId !== actorUuid) return;
+                                const payloadActorId = String(payload.actorId || '').replace(/^Actor\./, '');
+                                if (actorUuid && payloadActorId && payloadActorId !== actorUuid) return;
                                 applyDelta(payload.delta, { tab: payload.tab });
                             }
                         });
