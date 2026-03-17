@@ -1,35 +1,32 @@
 ### Foundry Module — Bullet Point Release Notes (Rough Write‑Up)
 
-- Purpose: Bridges the Cyberpunk RED “Agent” web app with a running Foundry VTT world via the ThreeHats/Foundry REST API and a secure callback channel.
+- Purpose: Displays character data from Foundry using a secure web-socket connection. Allows the user to interact with Foundry instance through callbacks.
 - Real‑time sheet sync: Applies selective “delta” updates to the Agent’s cached character sheet without requiring full refreshes. Deltas can add/update/delete nested values and item entries.
-- Webhook callback: Foundry posts results and sheet changes to the Agent’s `/api/foundry/callback`, which are then broadcast to the frontend over a private channel (`cpr-agent` → `FoundryResponse`).
+- Webhook callback: Foundry posts results and sheet changes to the Agent’s `/api/foundry/callback`, which are then broadcast to the frontend over a private channel (`cpr-agent.{{channel_id}}` → `FoundryResponse`).
 - Actor bootstrap: On first load, the Agent will try to resolve the user’s controlled Actor and persist a clean mirror of actor data server‑side to reduce round‑trips.
 - Rolls orchestration: Provides endpoints to initiate stat/skill/role/attack/damage/initiative rolls, forward them to Foundry, and deliver results (including modifiers, crit flags, and totals) back to the Agent.
-- Token controls: Exposes endpoints for visibility, targeting, movement, and weapon reload. Requests are proxied to Foundry; responses are relayed back via callback broadcast or short‑polling cache handoff.
+- Token controls: Exposes endpoints for visibility, targeting, movement, and weapon reload. 
 - Image routing: Supports proxying images from Foundry (including Ngrok URLs) to the Agent for reliable display outside the Foundry host.
 - Config integration: Stores per‑user `foundry_url` and an API token to address/authorize the correct Foundry instance and world.
 - Fault tolerance: Time‑boxed response collection using request IDs and cache; if Foundry is slow to respond, the Agent returns a structured timeout message.
-- Security: All Foundry callback and broadcast auth routes are protected by Sanctum; frontend listens on a private broadcast channel.
-
-
-### API-Style Documentation
+- Security: All Foundry callback and broadcast auth routes are protected by Sanctum; frontend listens on a private broadcast channel which is specific to the GM and their group.
 
 #### Overview and Architecture
 
 - Components:
     - Agent Backend (Laravel): Provides the HTTP API consumed by the frontend and mediates all requests and callbacks with Foundry.
-    - Foundry VTT + ThreeHats REST API: Executes rolls, reads/writes entities, and invokes an external callback to the Agent.
+    - Foundry VTT + CPR Agent Bridge: Executes calls from the Agent within Foundry, sends callbacks containing requested data or results to the Agent.
     - Agent Frontend (Vue): Renders character sheet, sends actions (rolls, updates), and applies realtime deltas via broadcast events.
 - Communication patterns:
-    1) Agent → Foundry: The Agent calls Foundry REST endpoints using the configured `foundry_url` and API key.
+    1) Agent → Foundry: The Agent calls CPRAB endpoints using the configured API key, foundry_url and channel_id.
     2) Foundry → Agent (webhook): Foundry posts results/updates to `/api/foundry/callback` with a `type`, optional `requestId`, and optional `delta`.
-    3) Agent → Frontend (broadcast): The Agent emits a `FoundryResponse` event on private channel `cpr-agent`; the Vue app consumes it and applies deltas immediately.
+    3) Agent → Frontend (broadcast): The Agent emits a `FoundryResponse` event on private channel `cpr-agent.{{channel_id}}`; the Vue app consumes it and applies deltas immediately.
     4) Agent Frontend → Agent Backend (poll/refresh): For first-load or when a targeted refresh is requested, the frontend calls `/actorsheet` (and, if needed, `/getactor`) to hydrate/rehydrate the local mirror.
 
 Key files for reference:
 - Webhook handler: `app/Http/Controllers/Api/FoundryController.php`
 - Broadcast event: `app/Events/FoundryResponse.php`
-- Frontend mirror & delta applier: `resources/js/composables/useCharacterData.js`
+- Frontend Listener (Axios): `resources/js/composables/listener.js`
 - Routes: `routes/api.php`, `routes/web.php`
 
 
@@ -37,15 +34,10 @@ Key files for reference:
 
 - Auth: All relevant API routes use Laravel Sanctum. The frontend must hold an authenticated web session or a valid bearer token.
 - Configuration:
-    - `foundry_url`: Base URL to the Foundry instance (stored per user in `configs` and exposed by `/getbaseurl`).
-    - API Token: Generated in the Agent (`/settings/api-token`) and configured in Foundry’s ThreeHats module; used for mutual trust.
-
-
-#### Broadcast Channel
-
-- Channel: `private:cpr-agent`
-- Event name: `FoundryResponse`
-- Payload: Mirrors the webhook payload posted by Foundry (see Webhook: Foundry → Agent below). Frontend listeners update UI and cached sheet data on arrival.
+    - `foundry_url`: Base URL to the Foundry instance (stored per user in `configs`).
+    - API Token: Generated in the Agent (`/settings/api-token`) and shared with the CPRAB Module per user.
+    - Channel ID: Generated for each user, however only one is needed for a group. Channel IDs can be shared between the group.
+    - Agent ID: Unique identifier to each user - this is a unique identifier that allows the CPRAB to correctly communicate back to the correct user.
 
 
 #### Webhook: Foundry → Agent
