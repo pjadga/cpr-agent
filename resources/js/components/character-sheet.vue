@@ -456,6 +456,8 @@ export default {
                 });
                 showEquipModal.value = false;
                 editingItem.value = null;
+                // Refresh character data to update icons
+                refreshAll();
             } catch (err) {
                 console.error("Error updating equip state:", err);
             }
