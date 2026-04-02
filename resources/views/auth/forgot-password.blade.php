@@ -9,7 +9,7 @@
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
-        <form method="POST" action="{{ route('password.email') }}" class="space-y-6">
+        <form id="forgot-password-form" method="POST" action="{{ route('password.email') }}" class="space-y-6">
             @csrf
 
             <!-- Email Address -->
@@ -20,9 +20,8 @@
             </div>
 
             <div class="flex items-center justify-end">
-                <x-primary-button class="w-full py-3">
-                    {{ __('Transmit Reset Link') }}
-                </x-primary-button>
+                {!! NoCaptcha::displaySubmit('forgot-password-form', 'Transmit Reset Link', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-black text-lg']) !!}
+                <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
             </div>
         </form>
 

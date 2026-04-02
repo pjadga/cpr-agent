@@ -17,7 +17,7 @@
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')" />
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-6">
+                <form id="login-form" method="POST" action="{{ route('login') }}" class="space-y-6">
                     @csrf
 
                     <!-- Email Address -->
@@ -43,11 +43,13 @@
                         <label for="remember_me" class="ms-2 text-sm text-cpr-text-muted italic">Stay connected</label>
                     </div>
 
-                    <div class="flex flex-col gap-4">
-                        <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3">
-                            Initiate Link-up
-                        </button>
+                    <!-- Captcha -->
+                    <div class="mt-4 flex flex-col items-center">
+                        {!! NoCaptcha::displaySubmit('login-form', 'Initiate Link-up', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3']) !!}
+                        <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
+                    </div>
 
+                    <div class="flex flex-col gap-4">
                         @if (Route::has('password.request'))
                             <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-yellow uppercase transition-colors" href="{{ route('password.request') }}">
                                 {{ __('Forgot access code?') }}

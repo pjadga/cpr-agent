@@ -1,4 +1,4 @@
-/**
+ /**
  * Frontend API Client Tests
  * Tests for API communication from the frontend
  */
