@@ -251,8 +251,6 @@ export default {
         const reloadWithAmmo = async (ammoId) => {
             try {
                 // The /reloadweapon expects controlState which includes selectedWeapon
-                // But we want to reload THIS weapon.
-                // Looking at ReloadWeapon.php, it uses selectedWeapon._id
                 await window.axios.post("/reloadweapon", {
                     weaponId: props.item._id,
                     ammoId: ammoId // Passing ammoId as well
