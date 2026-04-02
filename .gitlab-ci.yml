@@ -7,21 +7,22 @@ stages:
   - lint
 
 variables:
-  MYSQL_DATABASE: "testing"
-  MYSQL_ROOT_PASSWORD: "secret"
+  # Set specific cache directories for package managers
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer-cache"
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm-cache"
 
-# Cache composer and npm dependencies between jobs
+# Cache internal download directories, not the project output folders
 .composer-cache: &composer-cache
   cache:
     key: composer-$CI_COMMIT_REF_SLUG
     paths:
-      - vendor/
+      - .composer-cache/
 
 .npm-cache: &npm-cache
   cache:
     key: npm-$CI_COMMIT_REF_SLUG
     paths:
-      - node_modules/
+      - .npm-cache/
 
 # ============================================
 # Build Stage
@@ -32,11 +33,9 @@ composer:
   image: php:8.4-cli
   <<: *composer-cache
   before_script:
-    # Install system dependencies
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev
-    # Install PHP extensions needed for Laravel
-    - docker-php-ext-install pdo pdo_mysql zip bcmath gd mbstring xml
-    # Install Composer
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev
+    # Removed mbstring, xml, and pdo as they are built into the base image
+    - docker-php-ext-install pdo_mysql zip bcmath gd
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
   script:
     - composer install --prefer-dist --no-ansi --no-interaction --no-progress
@@ -50,7 +49,7 @@ npm:
   image: node:20-alpine
   <<: *npm-cache
   script:
-    - npm ci
+    - npm ci --prefer-offline
   artifacts:
     paths:
       - node_modules/
@@ -60,23 +59,25 @@ npm:
 # Test Stage
 # ============================================
 
+# Common before_script for all PHP tests
+.php-test-setup: &php-test-setup
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev
+    - docker-php-ext-install pdo_sqlite zip bcmath gd
+    - cp .env.template .env || cp .env.example .env || true
+    - php artisan key:generate --no-interaction || true
+    - php artisan config:clear
+
+# Run only on the default branch (e.g., main/master) to avoid double-running on MRs
 phpunit:
   stage: test
   image: php:8.4-cli
   needs:
-    - job: composer
-      optional: true
-  before_script:
-    # Install system dependencies
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
-    # Install PHP extensions (including SQLite for testing)
-    - docker-php-ext-install pdo pdo_sqlite pdo_mysql zip bcmath gd mbstring xml
-    # Setup Laravel environment
-    - cp .env.template .env || cp .env.example .env || true
-    - php artisan key:generate --no-interaction || true
+    - composer
+  <<: *php-test-setup
   script:
-    - php artisan config:clear
-    - php vendor/bin/phpunit --colors=always
+    # Added the --log-junit flag to actually generate the artifact
+    - php vendor/bin/phpunit --colors=always --log-junit storage/logs/junit.xml
   artifacts:
     when: always
     reports:
@@ -84,37 +85,29 @@ phpunit:
     paths:
       - storage/logs/
     expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
-# Run only unit tests (faster, no database needed)
+# Run only unit tests on Merge Requests
 phpunit:unit:
   stage: test
   image: php:8.4-cli
   needs:
     - composer
-  before_script:
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
-    - docker-php-ext-install pdo pdo_sqlite zip bcmath gd mbstring xml
-    - cp .env.template .env || cp .env.example .env || true
-    - php artisan key:generate --no-interaction || true
+  <<: *php-test-setup
   script:
-    - php artisan config:clear
     - php vendor/bin/phpunit --testsuite=Unit --colors=always
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-# Run feature tests
+# Run only feature tests on Merge Requests
 phpunit:feature:
   stage: test
   image: php:8.4-cli
   needs:
     - composer
-  before_script:
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
-    - docker-php-ext-install pdo pdo_sqlite zip bcmath gd mbstring xml
-    - cp .env.template .env || cp .env.example .env || true
-    - php artisan key:generate --no-interaction || true
+  <<: *php-test-setup
   script:
-    - php artisan config:clear
     - php vendor/bin/phpunit --testsuite=Feature --colors=always
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -125,7 +118,6 @@ vitest:
   needs:
     - npm
   script:
-    # --run ensures vitest exits after running (not watch mode)
     - npx vitest --run
   artifacts:
     when: always
