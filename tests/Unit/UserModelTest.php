@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -13,7 +14,7 @@ class UserModelTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function user_generates_agent_link_on_creation()
     {
         $user = User::factory()->create();
@@ -27,7 +28,7 @@ class UserModelTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function user_generates_channel_id_on_creation()
     {
         $user = User::factory()->create();
@@ -38,7 +39,7 @@ class UserModelTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-z]+-[a-z]+-\d{3}$/', $user->channel_id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_have_custom_agent_link()
     {
         $customLink = 'custom-agent-link-123';
@@ -49,7 +50,7 @@ class UserModelTest extends TestCase
         $this->assertEquals($customLink, $user->agent_link);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_have_custom_channel_id()
     {
         $customChannel = 'custom-channel-001';
@@ -60,7 +61,7 @@ class UserModelTest extends TestCase
         $this->assertEquals($customChannel, $user->channel_id);
     }
 
-    /** @test */
+    #[Test]
     public function user_character_data_is_cast_to_array()
     {
         $characterData = [
@@ -78,7 +79,7 @@ class UserModelTest extends TestCase
         $this->assertEquals($characterData, $user->character_data);
     }
 
-    /** @test */
+    #[Test]
     public function user_is_gm_is_cast_to_boolean()
     {
         $user = User::factory()->create(['is_gm' => true]);
@@ -90,7 +91,7 @@ class UserModelTest extends TestCase
         $this->assertFalse($user2->is_gm);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_store_default_actor_id()
     {
         $user = User::factory()->create([
@@ -100,7 +101,7 @@ class UserModelTest extends TestCase
         $this->assertEquals('Actor.abc123', $user->default_actor_id);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_store_default_token_id()
     {
         $user = User::factory()->create([
@@ -110,7 +111,7 @@ class UserModelTest extends TestCase
         $this->assertEquals('Token.xyz789', $user->default_token_id);
     }
 
-    /** @test */
+    #[Test]
     public function get_actor_id_returns_default_actor_id()
     {
         $user = User::factory()->create([
@@ -120,7 +121,7 @@ class UserModelTest extends TestCase
         $this->assertEquals('Actor.test123', $user->getActorId());
     }
 
-    /** @test */
+    #[Test]
     public function get_actor_id_returns_empty_string_when_null()
     {
         $user = User::factory()->create([
@@ -130,7 +131,7 @@ class UserModelTest extends TestCase
         $this->assertEquals('', $user->getActorId());
     }
 
-    /** @test */
+    #[Test]
     public function get_token_id_returns_default_token_id()
     {
         $user = User::factory()->create([
@@ -140,7 +141,7 @@ class UserModelTest extends TestCase
         $this->assertEquals('Token.test456', $user->getTokenId());
     }
 
-    /** @test */
+    #[Test]
     public function get_token_id_returns_empty_string_when_null()
     {
         $user = User::factory()->create([
@@ -150,7 +151,7 @@ class UserModelTest extends TestCase
         $this->assertEquals('', $user->getTokenId());
     }
 
-    /** @test */
+    #[Test]
     public function user_password_is_hidden_in_array()
     {
         $user = User::factory()->create();
@@ -160,7 +161,7 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('password', $array);
     }
 
-    /** @test */
+    #[Test]
     public function user_remember_token_is_hidden_in_array()
     {
         $user = User::factory()->create();
@@ -170,7 +171,7 @@ class UserModelTest extends TestCase
         $this->assertArrayNotHasKey('remember_token', $array);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_create_sanctum_tokens()
     {
         $user = User::factory()->create();
@@ -184,7 +185,7 @@ class UserModelTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_have_multiple_tokens()
     {
         $user = User::factory()->create();
@@ -196,7 +197,7 @@ class UserModelTest extends TestCase
         $this->assertCount(2, $user->tokens);
     }
 
-    /** @test */
+    #[Test]
     public function generate_channel_id_creates_valid_format()
     {
         $channelId = User::generateChannelId();
@@ -204,7 +205,7 @@ class UserModelTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-z]+-[a-z]+-\d{3}$/', $channelId);
     }
 
-    /** @test */
+    #[Test]
     public function generate_channel_id_creates_unique_ids()
     {
         $ids = [];
@@ -217,7 +218,7 @@ class UserModelTest extends TestCase
         $this->assertGreaterThan(1, count($uniqueIds));
     }
 
-    /** @test */
+    #[Test]
     public function user_fillable_attributes_are_correct()
     {
         $user = new User();
@@ -235,7 +236,7 @@ class UserModelTest extends TestCase
         $this->assertContains('is_gm', $fillable);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_character_data()
     {
         $user = User::factory()->create([
@@ -248,7 +249,7 @@ class UserModelTest extends TestCase
         $this->assertEquals(['hp' => 40], $user->fresh()->character_data);
     }
 
-    /** @test */
+    #[Test]
     public function user_character_data_can_be_null()
     {
         $user = User::factory()->create([

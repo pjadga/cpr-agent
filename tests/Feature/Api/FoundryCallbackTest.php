@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Events\FoundryResponse;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use App\Http\Controllers\Api\FoundryController;
 
@@ -30,7 +31,7 @@ class FoundryCallbackTest extends TestCase
         $this->token = $this->user->createToken('test-token')->plainTextToken;
     }
 
-    /** @test */
+    #[Test]
     public function it_requires_authentication()
     {
         $response = $this->postJson('/api/foundry/callback', [
@@ -40,7 +41,7 @@ class FoundryCallbackTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function it_validates_required_type_field()
     {
         $response = $this->withToken($this->token)
@@ -50,7 +51,7 @@ class FoundryCallbackTest extends TestCase
         $response->assertJsonValidationErrors(['type']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_link_player_character_request()
     {
         Event::fake([FoundryResponse::class]);
@@ -74,7 +75,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertFalse($this->user->is_gm);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_gm_link_player_character_request()
     {
         $gm = User::factory()->create(['is_gm' => true]);
@@ -101,7 +102,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertEquals('Actor.player123', $targetUser->default_actor_id);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_actor_data_update()
     {
         Event::fake([FoundryResponse::class]);
@@ -137,7 +138,7 @@ class FoundryCallbackTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_sheet_delta_updates()
     {
         // Set initial character data
@@ -175,7 +176,7 @@ class FoundryCallbackTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_roll_result_callback()
     {
         Event::fake([FoundryResponse::class]);
@@ -206,7 +207,7 @@ class FoundryCallbackTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_item_creation_delta()
     {
         $this->user->character_data = [
@@ -243,7 +244,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertEquals('Heavy Pistol', $this->user->character_data['items'][0]['name']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_item_deletion_delta()
     {
         $this->user->character_data = [
@@ -273,7 +274,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertEquals('Rifle', $this->user->character_data['items'][0]['name']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_item_update_delta()
     {
         $this->user->character_data = [
@@ -305,7 +306,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertTrue($this->user->character_data['items'][0]['system']['equipped']);
     }
 
-    /** @test */
+    #[Test]
     public function it_caches_response_for_request_id()
     {
         Event::fake([FoundryResponse::class]);
@@ -328,7 +329,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertEquals(20, $cached['total']);
     }
 
-    /** @test */
+    #[Test]
     public function it_broadcasts_with_channel_id()
     {
         Event::fake([FoundryResponse::class]);
@@ -348,7 +349,7 @@ class FoundryCallbackTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_updates_gm_status_when_provided()
     {
         $this->assertFalse($this->user->is_gm);
@@ -370,7 +371,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertTrue($this->user->is_gm);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_death_save_roll()
     {
         Event::fake([FoundryResponse::class]);
@@ -395,7 +396,7 @@ class FoundryCallbackTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_damage_roll()
     {
         Event::fake([FoundryResponse::class]);
@@ -416,7 +417,7 @@ class FoundryCallbackTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_initiative_roll()
     {
         Event::fake([FoundryResponse::class]);
@@ -436,7 +437,7 @@ class FoundryCallbackTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_refresh_signal()
     {
         Event::fake([FoundryResponse::class]);
@@ -456,7 +457,7 @@ class FoundryCallbackTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_confirmation_response()
     {
         Event::fake([FoundryResponse::class]);
@@ -476,7 +477,7 @@ class FoundryCallbackTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function it_identifies_user_by_actor_id_when_agent_link_missing()
     {
         $userWithoutLink = User::factory()->create([
@@ -500,7 +501,7 @@ class FoundryCallbackTest extends TestCase
         $this->assertNotNull($userWithoutLink->character_data);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_cyberdeck_program_operations()
     {
         $this->user->character_data = [

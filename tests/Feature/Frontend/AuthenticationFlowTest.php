@@ -4,6 +4,7 @@ namespace Tests\Feature\Frontend;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -13,7 +14,7 @@ class AuthenticationFlowTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function registration_screen_can_be_rendered()
     {
         $response = $this->get('/register');
@@ -21,7 +22,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function new_users_can_register()
     {
         $response = $this->post('/register', [
@@ -29,13 +30,14 @@ class AuthenticationFlowTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'g-recaptcha-response' => 'test-token',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect('/dashboard');
     }
 
-    /** @test */
+    #[Test]
     public function login_screen_can_be_rendered()
     {
         $response = $this->get('/login');
@@ -43,7 +45,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function users_can_authenticate_using_the_login_screen()
     {
         $user = User::factory()->create();
@@ -51,13 +53,14 @@ class AuthenticationFlowTest extends TestCase
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
+            'g-recaptcha-response' => 'test-token',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect('/dashboard');
     }
 
-    /** @test */
+    #[Test]
     public function users_can_not_authenticate_with_invalid_password()
     {
         $user = User::factory()->create();
@@ -70,7 +73,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function users_can_logout()
     {
         $user = User::factory()->create();
@@ -81,7 +84,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertRedirect('/');
     }
 
-    /** @test */
+    #[Test]
     public function user_has_agent_link_on_creation()
     {
         $user = User::factory()->create();
@@ -90,7 +93,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertIsString($user->agent_link);
     }
 
-    /** @test */
+    #[Test]
     public function user_has_channel_id_on_creation()
     {
         $user = User::factory()->create();
@@ -100,7 +103,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-z]+-[a-z]+-\d{3}$/', $user->channel_id);
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_user_can_access_dashboard()
     {
         $user = User::factory()->create([
@@ -113,7 +116,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function guest_cannot_access_dashboard()
     {
         $response = $this->get('/dashboard');
@@ -121,7 +124,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertRedirect('/login');
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_profile_information()
     {
         $user = User::factory()->create();
@@ -140,7 +143,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertEquals('updated@example.com', $user->email);
     }
 
-    /** @test */
+    #[Test]
     public function user_can_delete_their_account()
     {
         $user = User::factory()->create();
@@ -156,7 +159,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertNull($user->fresh());
     }
 
-    /** @test */
+    #[Test]
     public function password_confirmation_screen_can_be_rendered()
     {
         $user = User::factory()->create();
@@ -166,7 +169,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function password_can_be_confirmed()
     {
         $user = User::factory()->create();
@@ -179,7 +182,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertSessionHasNoErrors();
     }
 
-    /** @test */
+    #[Test]
     public function password_is_not_confirmed_with_invalid_password()
     {
         $user = User::factory()->create();
@@ -191,7 +194,7 @@ class AuthenticationFlowTest extends TestCase
         $response->assertSessionHasErrors();
     }
 
-    /** @test */
+    #[Test]
     public function user_can_update_password()
     {
         $user = User::factory()->create();
@@ -207,7 +210,7 @@ class AuthenticationFlowTest extends TestCase
         $this->assertTrue(\Hash::check('new-password', $user->fresh()->password));
     }
 
-    /** @test */
+    #[Test]
     public function correct_password_must_be_provided_to_update_password()
     {
         $user = User::factory()->create();

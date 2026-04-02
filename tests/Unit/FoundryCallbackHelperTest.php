@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 use App\Http\Controllers\Api\FoundryController;
 
@@ -17,7 +18,8 @@ class FoundryCallbackHelperTest extends TestCase
         parent::setUp();
         $this->controller = new FoundryController();
     }
-    /** @test */
+
+    #[Test]
     public function it_can_parse_dot_notation_paths()
     {
         $array = [];
@@ -26,7 +28,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals(8, $array['system']['stats']['body']['value']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_handle_nested_updates()
     {
         $array = [
@@ -44,7 +46,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals(6, $array['system']['stats']['ref']['value']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete_values_with_null()
     {
         $array = [
@@ -62,7 +64,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals(7, $array['system']['stats']['ref']['value']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_add_items_to_array()
     {
         $array = ['items' => []];
@@ -78,7 +80,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals('Pistol', $array['items'][0]['name']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_update_existing_item_by_id()
     {
         $array = [
@@ -94,7 +96,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals('Pistol', $array['items'][0]['name']);
     }
 
-    /** @test */
+    #[Test]
     public function it_can_delete_item_by_id()
     {
         $array = [
@@ -110,7 +112,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals('Rifle', $array['items'][0]['name']);
     }
 
-    /** @test */
+    #[Test]
     public function it_prevents_duplicate_items_when_adding()
     {
         $array = [
@@ -126,7 +128,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals('Heavy Pistol', $array['items'][0]['name']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_deep_nested_paths()
     {
         $array = [];
@@ -136,7 +138,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals('deep value', $array['a']['b']['c']['d']['e']['f']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_numeric_values()
     {
         $array = [];
@@ -148,7 +150,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals(50, $array['system']['hp']['max']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_boolean_values()
     {
         $array = [];
@@ -160,7 +162,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertFalse($array['system']['broken']);
     }
 
-    /** @test */
+    #[Test]
     public function it_handles_array_values()
     {
         $array = [];
@@ -170,7 +172,7 @@ class FoundryCallbackHelperTest extends TestCase
         $this->assertEquals([1, 2, 3], $array['system']['modifiers']);
     }
 
-    /** @test */
+    #[Test]
     public function it_overwrites_existing_values()
     {
         $array = [

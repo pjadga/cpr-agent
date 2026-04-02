@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use App\Events\FoundryResponse;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -41,7 +42,7 @@ class FoundryIntegrationTest extends TestCase
         $this->gmToken = $this->gm->createToken('gm-token')->plainTextToken;
     }
 
-    /** @test */
+    #[Test]
     public function complete_character_link_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -91,7 +92,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function complete_combat_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -170,7 +171,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatchedTimes(FoundryResponse::class, 4);
     }
 
-    /** @test */
+    #[Test]
     public function complete_netrunning_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -248,7 +249,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatchedTimes(FoundryResponse::class, 3);
     }
 
-    /** @test */
+    #[Test]
     public function complete_death_save_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -297,7 +298,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatchedTimes(FoundryResponse::class, 2);
     }
 
-    /** @test */
+    #[Test]
     public function gm_can_update_player_character()
     {
         Event::fake([FoundryResponse::class]);
@@ -330,7 +331,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function multiple_players_in_same_channel()
     {
         Event::fake([FoundryResponse::class]);
@@ -372,7 +373,7 @@ class FoundryIntegrationTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function item_equip_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -412,7 +413,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatched(FoundryResponse::class);
     }
 
-    /** @test */
+    #[Test]
     public function face_down_roll_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -437,7 +438,7 @@ class FoundryIntegrationTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function stat_and_skill_roll_workflow()
     {
         Event::fake([FoundryResponse::class]);
@@ -467,7 +468,7 @@ class FoundryIntegrationTest extends TestCase
         Event::assertDispatchedTimes(FoundryResponse::class, 2);
     }
 
-    /** @test */
+    #[Test]
     public function refresh_signal_workflow()
     {
         Event::fake([FoundryResponse::class]);

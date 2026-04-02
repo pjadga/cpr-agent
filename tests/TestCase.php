@@ -19,5 +19,8 @@ abstract class TestCase extends BaseTestCase
 
         \NoCaptcha::shouldReceive('renderJs')
             ->andReturn('<script></script>');
+
+        \NoCaptcha::shouldReceive('displaySubmit')
+            ->andReturn('<button type="submit">Submit</button>');
     }
 }

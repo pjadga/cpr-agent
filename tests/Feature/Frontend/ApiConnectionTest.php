@@ -6,6 +6,7 @@ use App\Events\FoundryResponse;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -31,7 +32,7 @@ class ApiConnectionTest extends TestCase
         $this->token = $this->user->createToken('test-token')->plainTextToken;
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_authenticate_with_sanctum_token()
     {
         $response = $this->withToken($this->token)
@@ -44,7 +45,7 @@ class ApiConnectionTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_send_foundry_callback()
     {
         Event::fake([FoundryResponse::class]);
@@ -60,7 +61,7 @@ class ApiConnectionTest extends TestCase
         $response->assertJsonStructure(['status', 'processing_ms']);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_receives_validation_errors()
     {
         $response = $this->withToken($this->token)
@@ -73,7 +74,7 @@ class ApiConnectionTest extends TestCase
         $response->assertJsonValidationErrors(['type']);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_cannot_access_api_without_authentication()
     {
         $response = $this->postJson('/api/foundry/callback', [
@@ -84,7 +85,7 @@ class ApiConnectionTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_create_sanctum_token()
     {
         $user = User::factory()->create();
@@ -100,7 +101,7 @@ class ApiConnectionTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_revoke_sanctum_token()
     {
         // Create a new user to avoid token conflicts
@@ -126,7 +127,7 @@ class ApiConnectionTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_access_broadcasting_auth_endpoint()
     {
         // Broadcasting auth with Sanctum tokens requires special handling
@@ -134,7 +135,7 @@ class ApiConnectionTest extends TestCase
         $this->markTestSkipped('Broadcasting auth with Sanctum tokens requires additional configuration');
     }
 
-    /** @test */
+    #[Test]
     public function frontend_receives_correct_cors_headers()
     {
         $response = $this->withToken($this->token)
@@ -144,7 +145,7 @@ class ApiConnectionTest extends TestCase
         // Laravel handles CORS via middleware, just verify request succeeds
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_handle_large_character_data()
     {
         Event::fake([FoundryResponse::class]);
@@ -177,7 +178,7 @@ class ApiConnectionTest extends TestCase
         $this->assertCount(100, $this->user->character_data['items']);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_send_concurrent_requests()
     {
         Event::fake([FoundryResponse::class]);
@@ -200,7 +201,7 @@ class ApiConnectionTest extends TestCase
         }
     }
 
-    /** @test */
+    #[Test]
     public function frontend_receives_json_responses()
     {
         Event::fake([FoundryResponse::class]);
@@ -216,7 +217,7 @@ class ApiConnectionTest extends TestCase
         $this->assertJson($response->getContent());
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_handle_special_characters_in_data()
     {
         Event::fake([FoundryResponse::class]);
@@ -241,7 +242,7 @@ class ApiConnectionTest extends TestCase
         $this->assertEquals('V "The Merc" O\'Brien', $this->user->character_data['name']);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_can_access_user_endpoint_with_web_session()
     {
         $response = $this->actingAs($this->user)
@@ -254,7 +255,7 @@ class ApiConnectionTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function frontend_api_returns_proper_error_messages()
     {
         $response = $this->withToken($this->token)

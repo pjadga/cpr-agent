@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Events\FoundryResponse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -27,7 +28,7 @@ class BroadcastingTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[Test]
     public function foundry_response_event_can_be_dispatched()
     {
         Event::fake([FoundryResponse::class]);
@@ -46,7 +47,7 @@ class BroadcastingTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function foundry_response_broadcasts_on_correct_channel()
     {
         Event::fake([FoundryResponse::class]);
@@ -63,7 +64,7 @@ class BroadcastingTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function broadcasting_auth_requires_authentication()
     {
         $response = $this->getJson('/api/broadcasting/auth');
@@ -71,7 +72,7 @@ class BroadcastingTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[Test]
     public function authenticated_user_can_access_broadcasting_auth()
     {
         // Broadcasting auth with Sanctum tokens requires special handling
@@ -79,7 +80,7 @@ class BroadcastingTest extends TestCase
         $this->markTestSkipped('Broadcasting auth with Sanctum tokens requires additional configuration');
     }
 
-    /** @test */
+    #[Test]
     public function web_session_can_access_broadcasting_auth()
     {
         $response = $this->actingAs($this->user)
@@ -91,7 +92,7 @@ class BroadcastingTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[Test]
     public function event_payload_includes_all_required_fields()
     {
         Event::fake([FoundryResponse::class]);
@@ -119,7 +120,7 @@ class BroadcastingTest extends TestCase
         });
     }
 
-    /** @test */
+    #[Test]
     public function multiple_events_can_be_dispatched_sequentially()
     {
         Event::fake([FoundryResponse::class]);
@@ -137,7 +138,7 @@ class BroadcastingTest extends TestCase
         Event::assertDispatchedTimes(FoundryResponse::class, 3);
     }
 
-    /** @test */
+    #[Test]
     public function event_handles_null_channel_id_gracefully()
     {
         Event::fake([FoundryResponse::class]);
