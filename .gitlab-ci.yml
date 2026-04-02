@@ -64,7 +64,8 @@ phpunit:
   stage: test
   image: php:8.4-cli
   needs:
-    - composer
+    - job: composer
+      optional: true
   before_script:
     # Install system dependencies
     - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
