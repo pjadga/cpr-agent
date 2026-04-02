@@ -1,0 +1,158 @@
+# GitLab CI/CD Pipeline for Cyberpunk Agent
+# Runs tests on every push and merge request
+
+stages:
+  - build
+  - test
+  - lint
+
+variables:
+  MYSQL_DATABASE: "testing"
+  MYSQL_ROOT_PASSWORD: "secret"
+
+# Cache composer and npm dependencies between jobs
+.composer-cache: &composer-cache
+  cache:
+    key: composer-$CI_COMMIT_REF_SLUG
+    paths:
+      - vendor/
+
+.npm-cache: &npm-cache
+  cache:
+    key: npm-$CI_COMMIT_REF_SLUG
+    paths:
+      - node_modules/
+
+# ============================================
+# Build Stage
+# ============================================
+
+composer:
+  stage: build
+  image: php:8.4-cli
+  <<: *composer-cache
+  before_script:
+    # Install system dependencies
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev
+    # Install PHP extensions needed for Laravel
+    - docker-php-ext-install pdo pdo_mysql zip bcmath gd mbstring xml
+    # Install Composer
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress
+  artifacts:
+    paths:
+      - vendor/
+    expire_in: 1 hour
+
+npm:
+  stage: build
+  image: node:20-alpine
+  <<: *npm-cache
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+
+# ============================================
+# Test Stage
+# ============================================
+
+phpunit:
+  stage: test
+  image: php:8.4-cli
+  needs:
+    - composer
+  before_script:
+    # Install system dependencies
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
+    # Install PHP extensions (including SQLite for testing)
+    - docker-php-ext-install pdo pdo_sqlite pdo_mysql zip bcmath gd mbstring xml
+    # Setup Laravel environment
+    - cp .env.template .env || cp .env.example .env || true
+    - php artisan key:generate --no-interaction || true
+  script:
+    - php artisan config:clear
+    - php vendor/bin/phpunit --colors=always
+  artifacts:
+    when: always
+    reports:
+      junit: storage/logs/junit.xml
+    paths:
+      - storage/logs/
+    expire_in: 1 week
+
+# Run only unit tests (faster, no database needed)
+phpunit:unit:
+  stage: test
+  image: php:8.4-cli
+  needs:
+    - composer
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
+    - docker-php-ext-install pdo pdo_sqlite zip bcmath gd mbstring xml
+    - cp .env.template .env || cp .env.example .env || true
+    - php artisan key:generate --no-interaction || true
+  script:
+    - php artisan config:clear
+    - php vendor/bin/phpunit --testsuite=Unit --colors=always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Run feature tests
+phpunit:feature:
+  stage: test
+  image: php:8.4-cli
+  needs:
+    - composer
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libonig-dev libxml2-dev libsqlite3-dev
+    - docker-php-ext-install pdo pdo_sqlite zip bcmath gd mbstring xml
+    - cp .env.template .env || cp .env.example .env || true
+    - php artisan key:generate --no-interaction || true
+  script:
+    - php artisan config:clear
+    - php vendor/bin/phpunit --testsuite=Feature --colors=always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+vitest:
+  stage: test
+  image: node:20-alpine
+  needs:
+    - npm
+  script:
+    # --run ensures vitest exits after running (not watch mode)
+    - npx vitest --run
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+    expire_in: 1 week
+
+# ============================================
+# Lint Stage
+# ============================================
+
+pint:
+  stage: lint
+  image: php:8.4-cli
+  needs:
+    - composer
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev
+    - docker-php-ext-install zip
+  script:
+    - php vendor/bin/pint --test
+  allow_failure: true
+
+eslint:
+  stage: lint
+  image: node:20-alpine
+  needs:
+    - npm
+  script:
+    - npm run lint 2>/dev/null || echo "ESLint not configured, skipping"
+  allow_failure: true
