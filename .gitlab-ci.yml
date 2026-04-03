@@ -69,8 +69,10 @@ npm:
   before_script:
     - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev
     - docker-php-ext-install pdo_sqlite zip bcmath gd
-    - cp .env.template .env || cp .env.example .env || true
-    - php artisan key:generate --no-interaction || true
+    # Fallback to creating an empty .env if templates don't exist
+    - cp .env.example .env 2>/dev/null || cp .env.template .env 2>/dev/null || touch .env
+    # Remove '|| true' so if key generation fails, you actually see the error in GitLab
+    - php artisan key:generate --no-interaction
     - php artisan config:clear
 
 # Run only on the default branch (e.g., main/master) to avoid double-running on MRs
