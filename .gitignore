@@ -25,6 +25,5 @@ npm-debug.log
 Thumbs.db
 yarn-error.log
 /composer.lock
-/package-lock.json
 
 .env.template

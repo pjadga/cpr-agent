@@ -9,6 +9,15 @@ const MODULE_ID = 'cpr-agent';
 // ==================================================================
 // CUSTOM GM MENU: CHARACTER ASSIGNMENT
 // ==================================================================
+
+/**
+ * Truncates a string to show first and last N characters with ellipsis
+ */
+function truncateAgentLink(link, chars = 6) {
+    if (!link || link.length <= chars * 2 + 3) return link;
+    return `${link.substring(0, chars)}...${link.substring(link.length - chars)}`;
+}
+
 class CharacterAssignmentMenu extends FormApplication {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
@@ -29,13 +38,15 @@ class CharacterAssignmentMenu extends FormApplication {
                         <th>API Status</th>
                         <th>Agent Link</th>
                         <th>Assigned Character</th>
+                        <th style="width: 50px;"></th>
                     </tr>`;
 
         for (let u of data.users) {
+            const truncatedLink = truncateAgentLink(u.agentLink);
             html += `<tr><td style="padding: 5px 0;"><strong>${u.name}</strong></td>`;
             if (u.hasKey) {
                 html += `<td style="color: #00ff00;">✔ Linked</td>`;
-                html += `<td><small><code>${u.agentLink || 'Pending...'}</code></small></td>`;
+                html += `<td><small><code title="${u.agentLink || ''}">${truncatedLink || 'Pending...'}</code></small></td>`;
                 html += `<td><select class="character-select" data-userid="${u.id}" style="width: 100%;">
                          <option value="">- None -</option>`;
                 for (let c of data.characters) {
@@ -43,16 +54,21 @@ class CharacterAssignmentMenu extends FormApplication {
                     html += `<option value="${c.id}" ${selected}>${c.name}</option>`;
                 }
                 html += `</select></td>`;
+                html += `<td><button type="button" class="refresh-user" data-userid="${u.id}" title="Refresh user details"><i class="fas fa-sync-alt"></i></button></td>`;
             } else {
                 html += `<td style="color: #ff0000;">❌ Missing</td>
                          <td><small>-</small></td>
-                         <td><select disabled style="width: 100%;"><option>- Key Missing -</option></select></td>`;
+                         <td><select disabled style="width: 100%;"><option>- Key Missing -</option></select></td>
+                         <td><button type="button" class="refresh-user" data-userid="${u.id}" title="Refresh user details"><i class="fas fa-sync-alt"></i></button></td>`;
             }
             html += `</tr>`;
         }
 
         html += `</table>
-                 <button type="button" id="save-agent-assignments"><i class="fas fa-save"></i> Save Assignments</button>
+                 <div style="display: flex; gap: 10px; margin-top: 10px;">
+                     <button type="button" id="save-agent-assignments"><i class="fas fa-save"></i> Save Assignments</button>
+                     <button type="button" id="refresh-all-users"><i class="fas fa-sync-alt"></i> Refresh All Users</button>
+                 </div>
                  </div>`;
         return $(html);
     }
@@ -127,6 +143,35 @@ class CharacterAssignmentMenu extends FormApplication {
             }
 
             this.close(); // Close the window manually after saving
+        });
+
+        // Handle individual user refresh
+        html.find('.refresh-user').click(async (event) => {
+            event.preventDefault();
+            const userId = event.currentTarget.dataset.userid;
+            const user = game.users.get(userId);
+
+            if (user) {
+                // Clear the agent-link flag so it can be re-synced
+                await user.unsetFlag(MODULE_ID, 'agent-link');
+                await user.unsetFlag(MODULE_ID, 'hasApiKey');
+
+                ui.notifications.info(`Cyberpunk Bridge: Cleared cached data for ${user.name}. They will need to re-sync.`);
+                this.render(true); // Re-render the menu to show updated state
+            }
+        });
+
+        // Handle refresh all users
+        html.find('#refresh-all-users').click(async (event) => {
+            event.preventDefault();
+
+            for (let user of game.users) {
+                await user.unsetFlag(MODULE_ID, 'agent-link');
+                await user.unsetFlag(MODULE_ID, 'hasApiKey');
+            }
+
+            ui.notifications.info(`Cyberpunk Bridge: Cleared cached data for all users. They will need to re-sync.`);
+            this.render(true); // Re-render the menu to show updated state
         });
     }
 }
@@ -392,20 +437,33 @@ class CyberpunkBridge {
 
         const broadcastToLaravel = async () => {
             const char = game.user.character;
-            if (debug) console.log(`[Bridge] syncPlayerLink: Broadcasting character link for ${char?.name || 'None'}...`);
+            const currentAgentLink = game.user.getFlag(MODULE_ID, 'agent-link');
+
+            if (debug) {
+                console.log(`[Bridge] syncPlayerLink: Broadcasting character link for ${char?.name || 'None'}...`);
+                console.log(`[Bridge] syncPlayerLink: Foundry User ID: ${game.user.id}, Name: ${game.user.name}, isGM: ${game.user.isGM}`);
+                console.log(`[Bridge] syncPlayerLink: Current stored agent-link: ${currentAgentLink || '(none)'}`);
+            }
 
             try {
                 const response = await this.sendResponse({
                     type: 'LINK_PLAYER_CHARACTER',
                     character: char ? { id: char.id, name: char.name } : null,
                     actorName: char ? char.name : null,
-                    agentLink: game.user.getFlag(MODULE_ID, 'agent-link') || game.user.id,
+                    agentLink: currentAgentLink || game.user.id,
+                    foundryUserId: game.user.id,
+                    foundryUserName: game.user.name,
                     isGM: game.user.isGM
                 });
 
+                if (debug) {
+                    console.log(`[Bridge] syncPlayerLink: Laravel response:`, response);
+                }
+
                 if (response && response.agent_link) {
-                    if (game.user.getFlag(MODULE_ID, 'agent-link') !== response.agent_link) {
+                    if (currentAgentLink !== response.agent_link) {
                         console.log(`%c[Bridge] Link established! Agent Link: ${response.agent_link}`, "color: #00ff00; font-weight: bold;");
+                        console.log(`%c[Bridge] Laravel User ID: ${response.user_id || '(not provided)'}`, "color: #00ff00;");
                         await game.user.setFlag(MODULE_ID, 'agent-link', response.agent_link);
                         ui.notifications?.info(`Agent: Account linked successfully.`);
                     }

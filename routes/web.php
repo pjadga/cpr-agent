@@ -29,6 +29,7 @@ use App\Http\Controllers\SettingsController;
 use App\Events\CyberpunkAgentChannel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 /*
  * This is creating the problem of ownership. Each user will need their own Client ID - which is linked to their foundry instance.

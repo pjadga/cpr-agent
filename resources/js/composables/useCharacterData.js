@@ -86,6 +86,9 @@ export function useCharacterData() {
             }
         }
 
+        // Track which item indices were modified so we can replace their references
+        const modifiedItemIndices = new Set();
+
         const deepSet = (obj, path, value) => {
             // Special case for items.+ID (addition)
             if (path.startsWith('data.items.+')) {
@@ -94,6 +97,7 @@ export function useCharacterData() {
                 const existingIndex = obj.data.items.findIndex(i => i._id === itemId);
                 if (existingIndex > -1) {
                     obj.data.items[existingIndex] = value;
+                    modifiedItemIndices.add(existingIndex);
                 } else {
                     obj.data.items.push(value);
                 }
@@ -116,6 +120,7 @@ export function useCharacterData() {
                         // Addition/Replacement: data.items.ID
                         if (existingIndex > -1) {
                             obj.data.items[existingIndex] = value;
+                            modifiedItemIndices.add(existingIndex);
                         } else {
                             obj.data.items.push(value);
                         }
@@ -140,6 +145,7 @@ export function useCharacterData() {
                         else t[lastK] = v;
                     };
                     setNested(targetItem, subPath, value);
+                    modifiedItemIndices.add(existingIndex);
                 }
                 return;
             }
@@ -174,6 +180,35 @@ export function useCharacterData() {
 
             deepSet(charData.value, mapped, value);
         });
+
+        // Replace charData.value entirely to trigger Vue reactivity with shallowRef
+        // We need to create new references all the way up the chain
+        if (modifiedItemIndices.size > 0 && charData.value.data.items) {
+            // Deep clone modified items to ensure all nested properties are new references
+            const newItems = charData.value.data.items.map((item, index) => {
+                if (modifiedItemIndices.has(index)) {
+                    // Deep clone to ensure system.equipped, system.installedItems etc. are new refs
+                    return JSON.parse(JSON.stringify(item));
+                }
+                return item;
+            });
+
+            // Replace the entire charData.value to trigger shallowRef reactivity
+            charData.value = {
+                ...charData.value,
+                data: {
+                    ...charData.value.data,
+                    items: newItems
+                }
+            };
+        } else {
+            // Even without item changes, we might have system-level changes
+            // Replace charData.value to ensure reactivity
+            charData.value = {
+                ...charData.value,
+                data: { ...charData.value.data }
+            };
+        }
 
         loading.value = false;
         triggerRef(charData);

@@ -1,0 +1,22 @@
+{
+    "$schema": "https://json.schemastore.org/package.json",
+    "name": "cyberpunk-agent-frontend-tests",
+    "version": "1.0.0",
+    "description": "Frontend testing configuration for Cyberpunk Agent",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "vitest",
+        "test:ui": "vitest --ui",
+        "test:coverage": "vitest --coverage",
+        "test:watch": "vitest --watch"
+    },
+    "devDependencies": {
+        "@testing-library/vue": "^8.0.0",
+        "@vitest/ui": "^1.0.0",
+        "@vue/test-utils": "^2.4.0",
+        "happy-dom": "^12.0.0",
+        "vitest": "^1.0.0",
+        "@vitest/coverage-v8": "^1.0.0"
+    }
+}

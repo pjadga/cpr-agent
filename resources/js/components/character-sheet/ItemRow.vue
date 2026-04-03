@@ -251,17 +251,15 @@ export default {
         const reloadWithAmmo = async (ammoId) => {
             try {
                 // The /reloadweapon expects controlState which includes selectedWeapon
-                // But we want to reload THIS weapon.
-                // Looking at ReloadWeapon.php, it uses selectedWeapon._id
                 await window.axios.post("/reloadweapon", {
-                    weaponId: props.item._id ,
+                    weaponId: props.item._id,
                     ammoId: ammoId // Passing ammoId as well
                 });
                 showReloadPopup.value = false;
 
-                // Use standard refresh if available, otherwise fallback to fetchCharacterData
+                // Refresh character data to update ammo display
                 const refresh = props.refreshAll || fetchCharacterData;
-                setTimeout(refresh, 1000);
+                refresh();
             } catch (err) {
                 console.error("Error reloading weapon:", err);
             }

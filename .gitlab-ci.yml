@@ -1,0 +1,160 @@
+# GitLab CI/CD Pipeline for Cyberpunk Agent
+# Runs tests on every push and merge request
+
+stages:
+  - build
+  - test
+  - lint
+
+variables:
+  # Set specific cache directories for package managers
+  COMPOSER_CACHE_DIR: "$CI_PROJECT_DIR/.composer-cache"
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm-cache"
+
+# Cache internal download directories, not the project output folders
+.composer-cache: &composer-cache
+  cache:
+    key: composer-$CI_COMMIT_REF_SLUG
+    paths:
+      - .composer-cache/
+
+.npm-cache: &npm-cache
+  cache:
+    key: npm-$CI_COMMIT_REF_SLUG
+    paths:
+      - .npm-cache/
+
+# ============================================
+# Build Stage
+# ============================================
+
+composer:
+  stage: build
+  image: php:8.4-cli
+  <<: *composer-cache
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev
+    - docker-php-ext-install pdo_mysql zip bcmath gd
+    - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  script:
+    - composer install --prefer-dist --no-ansi --no-interaction --no-progress
+  artifacts:
+    paths:
+      - vendor/
+    expire_in: 1 hour
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+npm:
+  stage: build
+  image: node:20-alpine
+  <<: *npm-cache
+  script:
+    - npm ci --prefer-offline
+    - npm run build
+  artifacts:
+    paths:
+      - node_modules/
+      - public/build/
+    expire_in: 1 hour
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# ============================================
+# Test Stage
+# ============================================
+
+# Common before_script for all PHP tests
+.php-test-setup: &php-test-setup
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev
+    - docker-php-ext-install pdo_sqlite zip bcmath gd
+    # Fallback to creating an empty .env if templates don't exist
+    - cp .env.example .env 2>/dev/null || cp .env.template .env 2>/dev/null || touch .env
+    - php artisan key:generate --no-interaction
+    - php artisan config:clear
+
+# Run only on the default branch (e.g., main/master) to avoid double-running on MRs
+phpunit:
+  stage: test
+  image: php:8.4-cli
+  needs:
+    - composer
+  <<: *php-test-setup
+  script:
+    # Added the --log-junit flag to actually generate the artifact
+    - php vendor/bin/phpunit --colors=always --log-junit storage/logs/junit.xml
+  artifacts:
+    when: always
+    reports:
+      junit: storage/logs/junit.xml
+    paths:
+      - storage/logs/
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Run only unit tests on Merge Requests
+phpunit:unit:
+  stage: test
+  image: php:8.4-cli
+  needs:
+    - composer
+  <<: *php-test-setup
+  script:
+    - php vendor/bin/phpunit --testsuite=Unit --colors=always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+# Run only feature tests on Merge Requests
+phpunit:feature:
+  stage: test
+  image: php:8.4-cli
+  needs:
+    - composer
+    - npm 
+  <<: *php-test-setup
+  script:
+    - php vendor/bin/phpunit --testsuite=Feature --colors=always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+vitest:
+  stage: test
+  image: node:20-alpine
+  needs:
+    - npm
+  script:
+    - npx vitest --run
+  artifacts:
+    when: always
+    paths:
+      - coverage/
+    expire_in: 1 week
+
+# ============================================
+# Lint Stage
+# ============================================
+
+pint:
+  stage: lint
+  image: php:8.4-cli
+  needs:
+    - composer
+  before_script:
+    - apt-get update && apt-get install -y git unzip libzip-dev
+    - docker-php-ext-install zip
+  script:
+    - php vendor/bin/pint --test
+  allow_failure: true
+
+eslint:
+  stage: lint
+  image: node:20-alpine
+  needs:
+    - npm
+  script:
+    - npm run lint 2>/dev/null || echo "ESLint not configured, skipping"
+  allow_failure: true

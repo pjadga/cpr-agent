@@ -2,7 +2,7 @@
     <div class="max-w-md mx-auto">
         <h2 class="text-2xl font-bold mb-6 glow-red text-cpr-red uppercase tracking-tighter">Override Access Code</h2>
 
-        <form method="POST" action="{{ route('password.store') }}" class="space-y-4">
+        <form id="reset-password-form" method="POST" action="{{ route('password.store') }}" class="space-y-4">
             @csrf
 
             <!-- Password Reset Token -->
@@ -33,10 +33,10 @@
                 <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             </div>
 
-            <div class="flex items-center justify-end pt-4">
-                <x-primary-button class="w-full py-3">
-                    {{ __('Apply Override') }}
-                </x-primary-button>
+            <!-- Captcha -->
+            <div class="mt-4 flex flex-col items-center text-center">
+                {!! NoCaptcha::displaySubmit('reset-password-form', 'Apply Override', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-bold text-sm']) !!}
+                <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
             </div>
         </form>
     </div>

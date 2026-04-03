@@ -449,15 +449,23 @@ export default {
 
         const updateEquipState = async (state) => {
             if (!editingItem.value) return;
+            const itemId = editingItem.value._id;
+
+            // Close modal immediately for responsiveness
+            showEquipModal.value = false;
+            editingItem.value = null;
+
             try {
                 await window.axios.post('/item-equip', {
-                    itemId: editingItem.value._id,
+                    itemId: itemId,
                     state: state
                 });
-                showEquipModal.value = false;
-                editingItem.value = null;
+                // Don't call refreshAll() here - the SHEET_DELTA websocket event
+                // from Foundry will update the UI via applyDelta() automatically
             } catch (err) {
                 console.error("Error updating equip state:", err);
+                // On error, refresh to restore correct state
+                refreshAll();
             }
         };
 

@@ -12,7 +12,7 @@
         </div>
         <div class="w-full md:w-1/2 max-w-xl">
             <div class="p-6 bg-cpr-black-deep/50 rounded-lg border border-cpr-border">
-                <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                <form id="register-form" method="POST" action="{{ route('register') }}" class="space-y-4">
                     @csrf
 
                     <!-- Name -->
@@ -48,11 +48,13 @@
                         <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                     </div>
 
-                    <div class="flex flex-col gap-4 pt-4">
-                        <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3">
-                            Authorize Connection
-                        </button>
+                    <!-- Captcha -->
+                    <div class="mt-4 flex flex-col items-center">
+                        {!! NoCaptcha::displaySubmit('register-form', 'Authorize Connection', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3']) !!}
+                        <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
+                    </div>
 
+                    <div class="flex flex-col gap-4 pt-4">
                         <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-yellow uppercase transition-colors" href="{{ route('login') }}">
                             {{ __('Already registered? Login here') }}
                         </a>

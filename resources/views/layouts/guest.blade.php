@@ -18,6 +18,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        {!! NoCaptcha::renderJs() !!}
     </head>
     <body class="font-sans antialiased bg-cpr-black-deep text-cpr-text-main {{ (Auth::user()?->config?->theme ?? 'night') === 'day' ? 'theme-day' : '' }} bg-[url('{{ asset('images/external/splash-square.png') }}')] bg-cover bg-center bg-no-repeat bg-blend-overlay">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
