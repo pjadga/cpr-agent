@@ -33,27 +33,12 @@ class GetActors extends FormRequest
 
         CyberpunkAgentChannel::dispatch($payload);
 
-        // Polling loop for live data
-        $startTime = microtime(true);
-        $timeout = 5.0; // Increased timeout
-        $foundryData = null;
-
-        while ((microtime(true) - $startTime) < $timeout) {
-            $key = 'foundry_response_' . $requestId;
-            if (Cache::has($key)) {
-                $foundryData = Cache::pull($key);
-                break;
-            }
-            usleep(20000); // 20ms
-        }
-
-        $actors = $foundryData['actors'] ?? [];
-
+        // Return immediately (Asynchronous)
+        // The frontend will receive the update via Echo/Pusher/Reverb
         return response()->json([
-            'actors' => $actors,
-            'uuid' => $actorId,
             'requestId' => $requestId,
-            'isOffline' => ($foundryData === null)
-        ], 200);
+            'status' => 'pending',
+            'message' => 'Refreshing actor list from Foundry...'
+        ], 202);
     }
 }

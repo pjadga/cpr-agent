@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\FoundryResponse;
+use App\Jobs\SyncCharacterDataToDb;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class FoundryController extends Controller
 {
@@ -127,7 +130,10 @@ class FoundryController extends Controller
                 }
             }
 
-            $current = $user->character_data ?? [];
+            $current = Cache::get("user_char_{$user->id}");
+            if (!$current) {
+                $current = $user->character_data ?? [];
+            }
             if (!is_array($current)) $current = [];
 
             if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
@@ -138,8 +144,11 @@ class FoundryController extends Controller
                 }
             }
 
-            $user->character_data = $current;
-            $user->save();
+            // Update Redis Cache (High Speed)
+            Cache::put("user_char_{$user->id}", $current, 3600);
+
+            // Queue the DB sync (Async Persistence)
+            SyncCharacterDataToDb::dispatch($user->id, $current);
         }
 
         // Broadcast to the Web Client

@@ -18,10 +18,16 @@ class ActorSheet extends FormRequest
     {
         $user = auth()->user();
 
+        // Try Redis cache first (High Speed)
+        $characterData = \Illuminate\Support\Facades\Cache::get("user_char_{$user->id}");
+
         // Save character JSON data if provided in the request
         if ($request->has('actorData')) {
+            $characterData = $request->get('actorData');
+            \Illuminate\Support\Facades\Cache::put("user_char_{$user->id}", $characterData, 3600);
+
             $update = [
-                'character_data' => $request->get('actorData')
+                'character_data' => $characterData
             ];
 
             // If the user doesn't have an agent-link, create one now.
@@ -33,7 +39,9 @@ class ActorSheet extends FormRequest
             $user->refresh();
         }
 
-        $characterData = $user->character_data;
+        if (empty($characterData)) {
+            $characterData = $user->character_data;
+        }
 
         // Ensure we only return data for the assigned character if one is set
         if ($user->default_actor_id && !empty($characterData)) {

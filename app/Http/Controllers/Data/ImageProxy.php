@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Data;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,6 +16,16 @@ class ImageProxy extends Controller
 
         if (!$url) {
             return response()->json(['error' => 'URL is required'], 400);
+        }
+
+        $cacheKey = 'img_proxy_' . md5($url);
+
+        // Try to get the image from cache
+        if (Cache::has($cacheKey)) {
+            $cached = Cache::get($cacheKey);
+            return response($cached['body'], 200)
+                ->header('Content-Type', $cached['type'])
+                ->header('Cache-Control', 'public, max-age=86400');
         }
 
         try {
@@ -31,8 +42,17 @@ class ImageProxy extends Controller
                 return response()->json(['error' => 'Failed to fetch image'], $response->status());
             }
 
-            return response($response->body(), 200)
-                ->header('Content-Type', $response->header('Content-Type'))
+            $body = $response->body();
+            $type = $response->header('Content-Type');
+
+            // Cache the response for 24 hours
+            Cache::put($cacheKey, [
+                'body' => $body,
+                'type' => $type
+            ], 86400);
+
+            return response($body, 200)
+                ->header('Content-Type', $type)
                 ->header('Cache-Control', 'public, max-age=86400');
 
         } catch (\Exception $e) {
