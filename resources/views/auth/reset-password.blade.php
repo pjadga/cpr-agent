@@ -35,8 +35,14 @@
 
             <!-- Captcha -->
             <div class="mt-4 flex flex-col items-center text-center">
-                {!! NoCaptcha::displaySubmit('reset-password-form', 'Apply Override', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-bold text-sm']) !!}
-                <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
+                <x-turnstile />
+                <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2" />
+            </div>
+
+            <div class="mt-4 flex flex-col items-center text-center">
+                <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-bold text-sm">
+                    Apply Override
+                </button>
             </div>
         </form>
     </div>

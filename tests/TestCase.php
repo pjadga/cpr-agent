@@ -11,16 +11,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        \NoCaptcha::shouldReceive('verifyResponse')
+        \RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile::shouldReceive('verify')
             ->andReturn(true);
-
-        \NoCaptcha::shouldReceive('display')
-            ->andReturn('<div id="captcha"></div>');
-
-        \NoCaptcha::shouldReceive('renderJs')
-            ->andReturn('<script></script>');
-
-        \NoCaptcha::shouldReceive('displaySubmit')
-            ->andReturn('<button type="submit">Submit</button>');
     }
 }

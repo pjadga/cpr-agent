@@ -34,7 +34,7 @@ class NewPasswordController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'g-recaptcha-response' => ['required', 'captcha'],
+            'cf-turnstile-response' => ['required', 'turnstile'],
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we

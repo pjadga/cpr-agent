@@ -24,7 +24,7 @@ class AuthenticationTest extends TestCase
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
-            'g-recaptcha-response' => 'test-token',
+            'cf-turnstile-response' => 'test-token',
         ]);
 
         $this->assertAuthenticated();

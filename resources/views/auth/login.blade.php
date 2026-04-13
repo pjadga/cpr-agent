@@ -45,8 +45,8 @@
 
                     <!-- Captcha -->
                     <div class="mt-4 flex flex-col items-center">
-                        {!! NoCaptcha::displaySubmit('login-form', 'Initiate Link-up', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3']) !!}
-                        <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
+                        <x-turnstile />
+                        <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2" />
                     </div>
 
                     <div class="flex flex-col gap-4">

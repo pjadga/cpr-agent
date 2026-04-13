@@ -19,9 +19,15 @@
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
+            <div class="mt-4 flex flex-col items-center">
+                <x-turnstile />
+                <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2" />
+            </div>
+
             <div class="flex items-center justify-end">
-                {!! NoCaptcha::displaySubmit('forgot-password-form', 'Transmit Reset Link', ['class' => 'cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-black text-lg']) !!}
-                <x-input-error :messages="$errors->get('g-recaptcha-response')" class="mt-2" />
+                <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-black text-lg">
+                    Transmit Reset Link
+                </button>
             </div>
         </form>
 

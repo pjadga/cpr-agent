@@ -20,13 +20,15 @@ class Policy implements Preset
                 Keyword::UNSAFE_EVAL,
                 'https://unpkg.com',
                 'https://unpkg.com/lucide.min.js.map',
-                'https://unpkg.com/lucide@latest'
+                'https://unpkg.com/lucide@latest',
+                'https://challenges.cloudflare.com',
             ])
             ->add(Directive::SCRIPT_ELEM, [
                 Keyword::SELF,
                 Keyword::UNSAFE_INLINE,
                 Keyword::UNSAFE_EVAL,
-                'https://unpkg.com/lucide@latest'
+                'https://unpkg.com/lucide@latest',
+                'https://challenges.cloudflare.com',
             ])
             ->add(Directive::STYLE, [
                 Keyword::SELF,
@@ -40,6 +42,9 @@ class Policy implements Preset
                 'https://fonts.gstatic.com',
                 'https://fonts.bunny.net',
             ])
+            ->add(Directive::FRAME, [
+                'https://challenges.cloudflare.com',
+            ])
             ->add(Directive::IMG, [
                 Keyword::SELF,
                 'data:',
@@ -51,7 +56,8 @@ class Policy implements Preset
                 Keyword::UNSAFE_EVAL,
                 'ws:',
                 'wss:',
-                'https://unpkg.com/lucide.min.js.map'
+                'https://unpkg.com/lucide.min.js.map',
+                'https://challenges.cloudflare.com',
             ])
             ->addNonce(Directive::SCRIPT)
             ->addNonce(Directive::STYLE);

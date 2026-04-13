@@ -27,7 +27,7 @@ class PasswordResetTest extends TestCase
 
         $this->post('/forgot-password', [
             'email' => $user->email,
-            'g-recaptcha-response' => 'test-token',
+            'cf-turnstile-response' => 'test-token',
         ]);
 
         Notification::assertSentTo($user, ResetPassword::class);
@@ -41,7 +41,7 @@ class PasswordResetTest extends TestCase
 
         $this->post('/forgot-password', [
             'email' => $user->email,
-            'g-recaptcha-response' => 'test-token',
+            'cf-turnstile-response' => 'test-token',
         ]);
 
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
@@ -61,7 +61,7 @@ class PasswordResetTest extends TestCase
 
         $this->post('/forgot-password', [
             'email' => $user->email,
-            'g-recaptcha-response' => 'test-token',
+            'cf-turnstile-response' => 'test-token',
         ]);
 
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {

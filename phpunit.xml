@@ -24,8 +24,8 @@
         </include>
     </source>
     <php>
-        <env name="NOCAPTCHA_SITEKEY" value="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"/>
-        <env name="NOCAPTCHA_SECRET" value="6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"/>
+        <env name="TURNSTILE_SITE_KEY" value="0x4AAAAAAAAAAA0000000000"/>
+        <env name="TURNSTILE_SECRET_KEY" value="0x4AAAAAAAAAAA000000000000000000000"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_KEY" value="base64:JqX9e6P7vX9zR6w3tY2u8q9p5r1s4w7tY2u8q9p5r1s="/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>

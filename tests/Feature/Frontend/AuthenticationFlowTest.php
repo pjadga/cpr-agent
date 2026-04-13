@@ -30,7 +30,7 @@ class AuthenticationFlowTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
-            'g-recaptcha-response' => 'test-token',
+            'cf-turnstile-response' => 'test-token',
         ]);
 
         $this->assertAuthenticated();
@@ -53,7 +53,7 @@ class AuthenticationFlowTest extends TestCase
         $response = $this->post('/login', [
             'email' => $user->email,
             'password' => 'password',
-            'g-recaptcha-response' => 'test-token',
+            'cf-turnstile-response' => 'test-token',
         ]);
 
         $this->assertAuthenticated();
