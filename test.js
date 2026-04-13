@@ -30,16 +30,16 @@ class CharacterAssignmentMenu extends FormApplication {
 
     async _renderInner(data) {
         let html = `
-            <div>
-                <p>Assign playable characters to players who have linked their API keys.</p>
-                <table style="width: 100%; text-align: left; margin-bottom: 10px;">
-                    <tr>
-                        <th>Player</th>
-                        <th>API Status</th>
-                        <th>Agent Link</th>
-                        <th>Assigned Character</th>
-                        <th style="width: 50px;"></th>
-                    </tr>`;
+        <div>
+        <p>Assign playable characters to players who have linked their API keys.</p>
+        <table style="width: 100%; text-align: left; margin-bottom: 10px;">
+        <tr>
+        <th>Player</th>
+        <th>API Status</th>
+        <th>Agent Link</th>
+        <th>Assigned Character</th>
+        <th style="width: 50px;"></th>
+        </tr>`;
 
         for (let u of data.users) {
             const truncatedLink = truncateAgentLink(u.agentLink);
@@ -48,7 +48,7 @@ class CharacterAssignmentMenu extends FormApplication {
                 html += `<td style="color: #00ff00;">✔ Linked</td>`;
                 html += `<td><small><code title="${u.agentLink || ''}">${truncatedLink || 'Pending...'}</code></small></td>`;
                 html += `<td><select class="character-select" data-userid="${u.id}" style="width: 100%;">
-                         <option value="">- None -</option>`;
+                <option value="">- None -</option>`;
                 for (let c of data.characters) {
                     const selected = c.id === u.characterId ? 'selected' : '';
                     html += `<option value="${c.id}" ${selected}>${c.name}</option>`;
@@ -57,19 +57,19 @@ class CharacterAssignmentMenu extends FormApplication {
                 html += `<td><button type="button" class="refresh-user" data-userid="${u.id}" title="Refresh user details"><i class="fas fa-sync-alt"></i></button></td>`;
             } else {
                 html += `<td style="color: #ff0000;">❌ Missing</td>
-                         <td><small>-</small></td>
-                         <td><select disabled style="width: 100%;"><option>- Key Missing -</option></select></td>
-                         <td><button type="button" class="refresh-user" data-userid="${u.id}" title="Refresh user details"><i class="fas fa-sync-alt"></i></button></td>`;
+                <td><small>-</small></td>
+                <td><select disabled style="width: 100%;"><option>- Key Missing -</option></select></td>
+                <td><button type="button" class="refresh-user" data-userid="${u.id}" title="Refresh user details"><i class="fas fa-sync-alt"></i></button></td>`;
             }
             html += `</tr>`;
         }
 
         html += `</table>
-                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                     <button type="button" id="save-agent-assignments"><i class="fas fa-save"></i> Save Assignments</button>
-                     <button type="button" id="refresh-all-users"><i class="fas fa-sync-alt"></i> Refresh All Users</button>
-                 </div>
-                 </div>`;
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button type="button" id="save-agent-assignments"><i class="fas fa-save"></i> Save Assignments</button>
+        <button type="button" id="refresh-all-users"><i class="fas fa-sync-alt"></i> Refresh All Users</button>
+        </div>
+        </div>`;
         return $(html);
     }
 
@@ -1472,6 +1472,7 @@ class CyberpunkBridge {
                     }
 
                     const result = await this.rollAndCapture(actorId, trigger);
+                    const magazineValue = weapon?.system?.magazine?.value ?? null;
 
                     if (result.success) {
                         let outcome = null;
@@ -1497,6 +1498,7 @@ class CyberpunkBridge {
                                 rollTitle: result.rawRoll?.rollTitle
                             },
                             dv: computedDV,
+                            ammoTo: magazineValue,
                             outcome,
                             success: true
                         });
@@ -1714,8 +1716,8 @@ class CyberpunkBridge {
 
                 if (userIdentifier) {
                     targetUser = game.users.find(u => u.getFlag(MODULE_ID, 'agent-link') === userIdentifier)
-                                || game.users.get(userIdentifier)
-                                || (userIdentifier === game.user.id ? game.user : null);
+                        || game.users.get(userIdentifier)
+                        || (userIdentifier === game.user.id ? game.user : null);
                 }
 
                 if (!targetUser) targetUser = game.user;
@@ -1762,8 +1764,8 @@ class CyberpunkBridge {
                 if (userIdentifier) {
                     // Try to find the user by their agent-link flag
                     targetUser = game.users.find(u => u.getFlag(MODULE_ID, 'agent-link') === userIdentifier)
-                                || game.users.get(userIdentifier) // Fallback to ID
-                                || (userIdentifier === game.user.id ? game.user : null);
+                        || game.users.get(userIdentifier) // Fallback to ID
+                        || (userIdentifier === game.user.id ? game.user : null);
                 }
 
                 if (!targetUser) targetUser = game.user;
