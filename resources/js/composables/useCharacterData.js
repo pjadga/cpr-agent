@@ -5,7 +5,7 @@ import { isMyRequest } from '../utils/requests';
 // Shared state to prevent multiple fetches/intervals
 const charData = shallowRef(null);
 const loading = ref(true);
-const isWssConnected = ref(true); // Default to true as initial state
+const isWssConnected = ref(false);
 const error = ref(null);
 const agentLink = ref((localStorage.getItem('cpr_agent_link') || '').replace(/\/$/, ''));
 const isGM = ref(localStorage.getItem('cpr_is_gm') === 'true');
@@ -104,7 +104,7 @@ export function useCharacterData() {
                 return;
             }
 
-            // Special case for items.ID (deletion or update)
+            // Special case for refreshSheetitems.ID (deletion or update)
             if (path.startsWith('data.items.')) {
                 const parts = path.split('.');
                 const itemId = parts[2];
@@ -344,7 +344,7 @@ export function useCharacterData() {
     onMounted(async () => {
         useCount++;
         if (useCount === 1) {
-            // 1) Subscribe FIRST to avoid missing fast responses from Foundry
+            // Subscribe FIRST to avoid missing fast responses from Foundry
             if (window.Echo) {
                 const channel_id = window.AgentConfig?.channel_id;
                 const channelName = channel_id ? `cpr-agent.${channel_id}` : null;
@@ -387,7 +387,7 @@ export function useCharacterData() {
                                 triggerRef(charData);
                                 setTimeout(refreshIcons, 50);
                             } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
-                                const payloadActorId = String(payload.actorId || '').replace(/^Actor\./, '');
+                                const payloadActorId = String(payload.uuid || '').replace(/^Actor\./, '');
                                 if (actorUuid && payloadActorId && payloadActorId !== actorUuid) return;
                                 applyDelta(payload.delta, { tab: payload.tab });
                             }
@@ -397,7 +397,7 @@ export function useCharacterData() {
                 }
             }
 
-            // 2) Trigger data load AFTER subscription is ready
+            // Trigger data load AFTER subscription is ready
             await fetchBaseUrl();
             await fetchCharacterData(true);
         }

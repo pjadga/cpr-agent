@@ -148,7 +148,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         };
 
         window.axios.post("/attackroll", payload).then((response) => {
-            // debouncedFetchCharacterData(); // REMOVED: Rely on SHEET_DELTA for ammo updates to avoid race conditions with stale DB data
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
                 // Handle list of rolls from getRolls(limit: 5)
@@ -209,7 +208,6 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
                 tokenId: charData.value?.tokenId
             };
             window.axios.post("/reloadweapon", payload);
-            // Handled by SHEET_DELTA from Foundry
         }
     };
 

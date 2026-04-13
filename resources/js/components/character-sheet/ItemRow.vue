@@ -191,7 +191,7 @@
                 <div v-if="category === 'weapon' && item.system.ammoVariety" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-border-muted flex flex-col gap-2 mt-2">
                     <div class="flex justify-between items-center">
                         <span class="text-cpr-text-dim uppercase text-[9px] font-bold">Ammo Type</span>
-                        <span class="text-cpr-yellow font-bold normal-case max-w-[100px] text-right">{{ ammoName }}</span>
+                        <span class="text-cpr-yellow font-bold text-[10px] normal-case max-w-[100px] text-right">{{ ammoName }}</span>
                     </div>
 
                     <div v-if="ammoTotal !== null" class="flex justify-between items-center text-[10px]">
