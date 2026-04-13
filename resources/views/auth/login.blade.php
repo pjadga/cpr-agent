@@ -3,7 +3,7 @@
         <h3 class="text-2xl font-bold mb-2 text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">Authentication Required</h3>
         <div class="flex justify-between items-center">
             <p class="text-[12px] text-cpr-yellow/80 uppercase italic">
-                Note: Ensure your credentials match your Foundry VTT login for seamless synchronization.
+                Note: Your data is not used for any purpose other than logging in. No RABIDS here.
             </p>
         </div>
     </div>

@@ -142,10 +142,10 @@
                 </div>
 
                 <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                    Welcome, Edgerunner. Before we hit the Net, we need to establish a stable uplink to your Foundry instance.
+                    First, enter your Foundry URL and generate an API key. Paste this key into the Cyberpunk Red Agent Bridge in Foundry.
                 </p>
                 <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
-                    "First, enter your Foundry URL and generate an API key. Paste this key into the Cyberpunk Red Agent Bridge in Foundry."
+                    Welcome, Edgerunner. Before we hit the Net, we need to establish a stable uplink to your Foundry instance.
                 </div>
 
                 <div class="flex justify-end">
@@ -221,10 +221,10 @@
                             </div>
 
                             <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                                Finalizing biometric handshake.
+                                Assign a character in the Foundry Module, refresh the Agent, and select and save your character.
                             </p>
                             <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
-                                "Assign a character in the Foundry Module, refresh the Agent, and select and save your character."
+                                Finalizing biometric handshake.
                             </div>
 
                             <div class="flex justify-between items-center">
@@ -277,10 +277,10 @@
                             </div>
 
                             <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                                Uplink established. Now, let's setup some Personal ICE.
+                                Make sure the Channel IDs match between the Module and Agent. Commit the Sync to save the channel ID.
                             </p>
                             <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
-                                "Make sure the Channel IDs match between the Module and Agent. Commit the Sync to save the channel ID."
+                                Uplink established. Now, let's setup some Personal ICE.
                             </div>
 
                             <div class="flex justify-between items-center">
