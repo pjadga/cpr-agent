@@ -47,6 +47,10 @@
                     <div class="mt-4 flex flex-col items-center">
                         <x-turnstile />
                         <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2" />
+
+                        <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3 mt-4">
+                            Initiate Link-up
+                        </button>
                     </div>
 
                     <div class="flex flex-col gap-4">

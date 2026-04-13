@@ -40,7 +40,7 @@
             </div>
 
             <div class="mt-4 flex flex-col items-center text-center">
-                <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-bold text-sm">
+                <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-black text-lg">
                     Apply Override
                 </button>
             </div>

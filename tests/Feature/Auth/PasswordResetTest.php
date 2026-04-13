@@ -70,7 +70,7 @@ class PasswordResetTest extends TestCase
                 'email' => $user->email,
                 'password' => 'password',
                 'password_confirmation' => 'password',
-                'g-recaptcha-response' => 'test-token',
+                'cf-turnstile-response' => 'test-token',
             ]);
 
             $response
