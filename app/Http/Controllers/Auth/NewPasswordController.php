@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use RyanChandler\LaravelCloudflareTurnstile\Rules\Turnstile;
 
 class NewPasswordController extends Controller
 {
@@ -34,7 +35,7 @@ class NewPasswordController extends Controller
             'token' => ['required'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'cf-turnstile-response' => ['required', 'turnstile'],
+            'cf-turnstile-response' => ['required', new Turnstile],
         ]);
 
         // Here we will attempt to reset the user's password. If it is successful we

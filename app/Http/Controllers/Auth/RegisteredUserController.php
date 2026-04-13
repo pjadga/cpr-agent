@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use RyanChandler\LaravelCloudflareTurnstile\Rules\Turnstile;
 
 class RegisteredUserController extends Controller
 {
@@ -35,7 +36,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'cf-turnstile-response' => ['required', 'turnstile'],
+            'cf-turnstile-response' => ['required', new Turnstile],
         ]);
 
         $demoData = null;

@@ -11,7 +11,6 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        \RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile::shouldReceive('verify')
-            ->andReturn(true);
+        \RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile::fake();
     }
 }
