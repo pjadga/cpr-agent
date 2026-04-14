@@ -27,11 +27,16 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            'cf-turnstile-response' => ['required', new Turnstile],
         ];
+
+        if (!app()->environment('local')) {
+            $rules['cf-turnstile-response'] = ['required', new Turnstile];
+        }
+
+        return $rules;
     }
 
     /**

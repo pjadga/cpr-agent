@@ -19,10 +19,12 @@
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
+            @if(!app()->environment('local'))
             <div class="mt-4 flex flex-col items-center">
                 <x-turnstile />
                 <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2" />
             </div>
+            @endif
 
             <div class="flex items-center justify-end">
                 <button type="submit" class="cyber-button bg-cpr-red border-cpr-red w-full py-3 uppercase font-black text-lg">
