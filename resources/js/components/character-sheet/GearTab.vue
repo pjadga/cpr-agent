@@ -28,12 +28,13 @@
                                     :active-tab="activeTab"
                                     :refresh-all="refreshAll"
                                     @click="$emit('item-click', cw)"
-                                    @equip-click="$emit('equip-click', $event)">
+                                    @equip-click="$emit('equip-click', $event)"
+                                    @consume-click="$emit('consume-click', $event)">
                                 </item-row>
                                 <div v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
                                      class="ml-6 mt-1 space-y-1 border-l border-cpr-teal-dark/50 pl-2">
                                     <div v-for="childId in cw.system.installedItems.list" :key="childId">
-                                        <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" category="cyberware" :all-items="charData.data.items" :active-tab="activeTab" :refresh-all="refreshAll" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)"></item-row>
+                                        <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" category="cyberware" :all-items="charData.data.items" :active-tab="activeTab" :refresh-all="refreshAll" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)" @consume-click="$emit('consume-click', $event)"></item-row>
                                     </div>
                                 </div>
                             </div>
@@ -69,12 +70,13 @@
                                         :active-tab="activeTab"
                                         :refresh-all="refreshAll"
                                         @click="$emit('item-click', item)"
-                                        @equip-click="$emit('equip-click', $event)">
+                                        @equip-click="$emit('equip-click', $event)"
+                                        @consume-click="$emit('consume-click', $event)">
                                     </item-row>
                                     <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
                                          class="ml-6 mt-1 space-y-1 border-l border-cpr-border pl-2">
                                         <div v-for="childId in item.system.installedItems.list" :key="childId">
-                                            <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" :active-tab="activeTab" :refresh-all="refreshAll" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)"></item-row>
+                                            <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" :active-tab="activeTab" :refresh-all="refreshAll" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)" @consume-click="$emit('consume-click', $event)"></item-row>
                                         </div>
                                     </div>
                                 </div>
@@ -97,7 +99,7 @@ export default {
     props: ['activeTab', 'collapsedCategories', 'groupedCyberware', 'groupedGear', 'charData', 'refreshAll'],
     components: { ItemRow },
     directives: { icon: vIcon },
-    emits: ['toggle-category', 'item-click', 'equip-click'],
+    emits: ['toggle-category', 'item-click', 'equip-click', 'consume-click'],
     setup() {
         return { formatCategory: formatCategoryName };
     }

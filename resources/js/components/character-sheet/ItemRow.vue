@@ -107,7 +107,7 @@
                 </div>
             </div>
 
-            <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug'" class="flex items-center gap-1 shrink-0 relative mr-1">
+    <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug' && category !== 'gear'" class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"
                     class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
@@ -117,13 +117,21 @@
                 </button>
             </div>
 
-            <div v-if="category === 'drug'" class="flex items-center gap-1 shrink-0 relative mr-1">
+            <div v-if="category === 'drug' || category === 'gear'" class="flex items-center gap-1 shrink-0 relative mr-1">
+                <button
+                    v-if="category === 'drug'"
+                    @click.stop="$emit('consume-click', item)"
+                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
+                    title="Consume Item"
+                >
+                    <i v-icon :data-lucide="consumeIcon" class="w-5 h-5 pointer-events-none"></i>
+                </button>
                 <button
                     @click.stop="$emit('equip-click', item)"
                     class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
                     :title="'Status: ' + equipStateLabel"
                 >
-                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i> NOM
+                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
                 </button>
             </div>
 
@@ -225,6 +233,8 @@
             </div>
         </transition>
     </div>
+
+
 </template>
 
 <script>
@@ -237,7 +247,7 @@ export default {
     name: 'ItemRow',
     props: ['item', 'category', 'allItems', 'activeTab', 'refreshAll'],
     directives: { icon: vIcon },
-    emits: ['click', 'equip-click'],
+    emits: ['click', 'equip-click', 'consume-click'],
     setup(props, { emit }) {
         console.log(`ItemRow setup: ${props.item.name} (${props.category})`);
         const { getImageUrl, fetchCharacterData } = useCharacterData();
@@ -271,6 +281,11 @@ export default {
                 i.type === 'ammo' &&
                 props.item.system.ammoVariety.includes(i.system.variety)
             );
+        });
+
+
+        const consumeIcon = computed(() => {
+            return 'syringe'; // 'syringe' is the Lucide icon for a needle/injector
         });
 
         const equipIcon = computed(() =>
@@ -448,6 +463,7 @@ export default {
             statusLine,
             getImageUrl,
             showReloadPopup,
+            consumeIcon,
             reloadWithAmmo,
             availableAmmoItems,
             equipIcon,

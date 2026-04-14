@@ -498,10 +498,10 @@ class CyberpunkBridge {
             // We only sync if the actor is a character or mook and has owners
             if (!actor || !['character', 'mook'].includes(actor.type)) return;
 
-            console.log(`%c[Bridge] 🔄 Syncing change for ${actor.name}`, "color: #ffaa00;", delta);
+            console.log(`%c[Bridge] Syncing change for ${actor.name}`, "color: #ffaa00;", delta);
             await this.sendResponse({
                 type: 'SHEET_DELTA',
-                actorId: actor.id,
+                uuid: actor.id,
                 delta: delta,
                 success: true
             });
@@ -1421,7 +1421,7 @@ class CyberpunkBridge {
                     // Compute DV against current target if available
                     let computedDV = null;
                     if (targetToken) {
-                        const shooter = canvas.tokens.get(tokenId) || actor.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
+                        const shooter = canvas.tokens.get(tokenId) || actoweaponIdr.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
                         if (shooter) {
                             const RANGE_DV_TABLE = {
                                 'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
@@ -1472,7 +1472,7 @@ class CyberpunkBridge {
                     }
 
                     const result = await this.rollAndCapture(actorId, trigger);
-                    const magazineValue = weapon?.system?.magazine?.value ?? null;
+
 
                     if (result.success) {
                         let outcome = null;
@@ -1481,6 +1481,7 @@ class CyberpunkBridge {
                         } else if (computedDV === 'Out of Range') {
                             outcome = 'Miss';
                         }
+                        const magazineValue = actor.items.get(weaponId)?.system?.magazine?.value ?? null;
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             requestId,

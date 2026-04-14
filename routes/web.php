@@ -3,6 +3,7 @@
 use App\Http\Controllers\Cyberdeck\InstallProgram;
 use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
+use App\Http\Controllers\Item\ConsumeItem;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActors;
 use App\Http\Controllers\Data\GetActor;
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post("/facedown", [FaceDown::class, "getFaceDown"]);
     Route::post("/initiativeroll", [InitiativeRoll::class, "rollInitiative"]);
     Route::post("/item-equip", [ItemEquip::class, "updateState"]);
+    Route::post("/consume-item", [ConsumeItem::class, "consume"]);
     Route::post("/installprogram", [InstallProgram::class, "installProgram"]);
     Route::post("/uninstallprogram", [RemoveProgram::class, "removeProgram"]);
     Route::post("/toggleprogramrez", [ToggleRez::class, "toggleRez"]);

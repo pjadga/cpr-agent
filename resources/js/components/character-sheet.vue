@@ -166,6 +166,7 @@
                         @deathsave="sendDeathSave"
                         @item-click="handleItemClick"
                         @equip-click="openEquipModal"
+                        @consume-click="openConsumeModal"
                         @toggle-category="toggleCategory"
                     ></stats-tab>
 
@@ -198,6 +199,7 @@
                         @toggle-category="toggleCategory"
                         @item-click="handleItemClick"
                         @equip-click="openEquipModal"
+                        @consume-click="openConsumeModal"
                     ></gear-tab>
 
                     <lifepath-tab
@@ -282,6 +284,41 @@
                             class="w-full py-2 bg-cpr-red/10 border border-cpr-red/40 text-cpr-red text-[10px] font-bold uppercase tracking-widest hover:bg-cpr-red hover:text-black transition-all"
                             @click="showPopup = false">
                             Acknowledge
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item Consume Modal -->
+            <div v-if="showConsumeModal"
+                 class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
+                 @click="showConsumeModal = false">
+                <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-yellow shadow-[0_0_30px_rgba(234,179,8,0.2)]"
+                     @click.stop>
+                    <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-yellow-dark/30 bg-cpr-yellow-dark/10">
+                        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-yellow">Consume Item</span>
+                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showConsumeModal = false">
+                            <i v-icon data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 text-center space-y-4">
+                        <div v-if="consumingItem" class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
+                            {{ consumingItem.name }}
+                        </div>
+                        <div class="text-sm text-cpr-text-muted mb-6">
+                            Are you sure you want to consume this item?
+                        </div>
+                        <div class="grid grid-cols-1 gap-2">
+                            <button @click="confirmConsume"
+                                    class="w-full py-3 bg-cpr-yellow text-black border border-cpr-yellow transition-all flex items-center justify-center gap-3 uppercase font-bold tracking-widest text-xs hover:bg-cpr-yellow-dark">
+                                <i v-icon data-lucide="check" class="w-5 h-5 pointer-events-none"></i>
+                                Confirm
+                            </button>
+                        </div>
+                        <button
+                            class="w-full py-2 mt-4 bg-cpr-black-elevated border border-cpr-border text-cpr-text-muted text-[10px] font-bold uppercase tracking-widest hover:text-white transition-all"
+                            @click="showConsumeModal = false">
+                            Cancel
                         </button>
                     </div>
                 </div>
@@ -384,7 +421,9 @@ export default {
         const activeTab = ref('stats');
         const showPopup = ref(false);
         const showEquipModal = ref(false);
+        const showConsumeModal = ref(false);
         const editingItem = ref(null);
+        const consumingItem = ref(null);
         const showImagePopup = ref(false);
         const showCombatPanel = ref(false);
         const popupMessage = ref('');
@@ -438,6 +477,11 @@ export default {
             showEquipModal.value = true;
         };
 
+        const openConsumeModal = (item) => {
+            consumingItem.value = item;
+            showConsumeModal.value = true;
+        };
+
         const getEquipIconForState = (state) => {
             switch (state) {
                 case 'equipped': return 'hand';
@@ -465,6 +509,24 @@ export default {
             } catch (err) {
                 console.error("Error updating equip state:", err);
                 // On error, refresh to restore correct state
+                refreshAll();
+            }
+        };
+
+        const confirmConsume = async () => {
+            if (!consumingItem.value) return;
+            const itemId = consumingItem.value._id;
+
+            showConsumeModal.value = false;
+            consumingItem.value = null;
+
+            try {
+                await window.axios.post("/consume-item", {
+                    itemId: itemId
+                });
+                refreshAll();
+            } catch (err) {
+                console.error("Error consuming item:", err);
                 refreshAll();
             }
         };
@@ -917,7 +979,8 @@ export default {
             showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
             showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
             openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
-            showEquipModal, editingItem, openEquipModal, updateEquipState, getEquipIconForState
+            showEquipModal, editingItem, openEquipModal, updateEquipState, getEquipIconForState,
+            showConsumeModal, consumingItem, openConsumeModal, confirmConsume
         };
     }
 };
