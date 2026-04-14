@@ -39,9 +39,11 @@ self-host the agent app, here are the main ones to change:
 * Debug mode - sweet console logs showing pretty much everything.
 
 
-## Workarounds
+## Workarounds/Troubleshooting
 * The Modifiers window opens in Foundry whenever I roll.
   * Head over to the Settings in Foundry - Cyberpunk RED - CORE, and toggle the "Invert Function of CTRL".
+* There are only coloured squares for the images?
+  * This is a fallback for if the Foundry server is either not running or on a http connection and unable to share images due to CORS. NGROK is supported, so if tunnelling; make sure the Foundry URL in Config does NOT have "/game" at the end. It needs to be the vanilla URL.
 
 ## A few notes on NGROK & Images not showing up
 As the Agent app is hosted on a live VPS, images from a local Foundry setup will generally not work, unless the session is running on the same computer. 
