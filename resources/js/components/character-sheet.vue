@@ -22,7 +22,7 @@
                         {{ error }}
                     </div>
                     <div class="flex gap-4">
-                        <button @click="window.location.reload()" class="flex-1 py-2 bg-cpr-red text-black font-bold uppercase text-xs hover:bg-cpr-red transition-colors">
+                        <button @click="reloadPage" class="flex-1 py-2 bg-cpr-red text-black font-bold uppercase text-xs hover:bg-cpr-red transition-colors">
                             Retry Connection
                         </button>
                         <button @click="goToSettings" class="flex-1 py-2 border border-cpr-red text-cpr-red font-bold uppercase text-xs hover:bg-cpr-red/10 transition-colors">
@@ -415,7 +415,8 @@ export default {
             fetchCharacterData,
             refreshIcons,
             applyDelta,
-            refreshSheet
+            refreshSheet,
+            rollMode
         } = useCharacterData();
 
         const activeTab = ref('stats');
@@ -436,7 +437,8 @@ export default {
         };
 
         const sendRequest = (data, url) => {
-            window.axios.post(url, data).then(response => {
+            const payload = { ...data, rollMode: rollMode.value };
+            window.axios.post(url, payload).then(response => {
                 // Automatic refresh removed as requested.
                 if (response.data && response.data.data) {
                     let rollData = response.data.data;
@@ -659,6 +661,7 @@ export default {
                 programName: program.name,
                 type: program.type,
                 executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk" ),
+                rollMode: rollMode.value
             }).then(response => {
                 // Automatic refresh removed as requested.
                 if (response.data && response.data.data) {
@@ -865,6 +868,8 @@ export default {
 
         const goToSettings = () => (window.location.href = '/settings');
 
+        const reloadPage = () => (window.location.href = '');
+
         const availableFireModes = computed(() => {
             const modes = [
                 { id: 'Single', label: 'Single', icon: 'locate' },
@@ -969,7 +974,7 @@ export default {
             // Actions
             sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, updateNotes, rollInitiative,
             sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings, refreshSheet,
-            isWssConnected,
+            isWssConnected, reloadPage,
 
             // Combat
             mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,

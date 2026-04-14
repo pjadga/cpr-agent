@@ -15,6 +15,9 @@ class DeathSave extends FormRequest
 
     public function getDeathSave(Request $request): JsonResponse
     {
+        $validatedData = $request->validate([
+            'rollMode' => 'nullable|string'
+        ]);
         $user = auth()->user();
         $actorId = $user->getActorId();
         $actorId = str_replace("Actor.", "", $actorId);
@@ -23,6 +26,7 @@ class DeathSave extends FormRequest
         CyberpunkAgentChannel::dispatch([
             'type' => 'DEATH_SAVE',
             'actorId' => $actorId,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

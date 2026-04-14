@@ -14,6 +14,9 @@ class InitiativeRoll extends FormRequest
 
     public function rollInitiative(Request $request): JsonResponse
     {
+        $validatedData = $request->validate([
+            'rollMode' => 'nullable|string'
+        ]);
 
         $user = auth()->user();
         $actorId = $user->getActorId();
@@ -24,6 +27,7 @@ class InitiativeRoll extends FormRequest
         CyberpunkAgentChannel::dispatch([
             'type' => 'INITIATIVE_ROLL',
             'actorId' => $actorId,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

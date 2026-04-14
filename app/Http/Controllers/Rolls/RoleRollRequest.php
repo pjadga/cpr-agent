@@ -19,7 +19,8 @@ class RoleRollRequest extends FormRequest
         $validatedData = $request->validate([
             'label' => 'required|string|max:255',
             'role' => 'required|string|max:255',
-            'isAbility' => 'required|boolean'
+            'isAbility' => 'required|boolean',
+            'rollMode' => 'nullable|string'
         ]);
 
         $label = ucfirst($validatedData['label']); //Will also be role, but could be abilities
@@ -37,6 +38,7 @@ class RoleRollRequest extends FormRequest
             'itemName' => ($validatedData['isAbility'] ? $role : $label),
             'label' => $label,
             'isAbility' => $validatedData['isAbility'],
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

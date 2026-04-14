@@ -17,7 +17,8 @@ class SkillRollRequest extends FormRequest
     {
         // Validate incoming request
         $validatedData = $request->validate([
-            'label' => 'required|string|max:255'
+            'label' => 'required|string|max:255',
+            'rollMode' => 'nullable|string'
         ]);
 
         $label = ucfirst($validatedData['label']);
@@ -31,6 +32,7 @@ class SkillRollRequest extends FormRequest
             'type' => 'SKILL_ROLL',
             'actorId' => $actorId,
             'label' => $label,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

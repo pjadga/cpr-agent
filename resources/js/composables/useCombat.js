@@ -2,10 +2,12 @@ import { ref, watch } from 'vue';
 import { debounce, throttle } from '../utils/helpers';
 import { cachedPost } from '../utils/api';
 import { useEchoListener } from '../utils/listener';
+import { useCharacterData } from './useCharacterData';
 /**
  * Composable for combat-related logic (movement, target selection, rolls)
  */
 export function useCombat(controlState, charData, fetchCharacterData, throwError) {
+    const { rollMode } = useCharacterData();
     const mockEnemies = ref([]);
     const dvInfo = ref(null);
     const dvLoading = ref(false);
@@ -144,7 +146,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         const payload = {
             ...controlState.value,
             actorId: charData.value?.uuid,
-            tokenId: charData.value?.tokenId
+            tokenId: charData.value?.tokenId,
+            rollMode: rollMode.value
         };
 
         window.axios.post("/attackroll", payload).then((response) => {
@@ -168,7 +171,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         const payload = {
             ...controlState.value,
             actorId: charData.value?.uuid,
-            tokenId: charData.value?.tokenId
+            tokenId: charData.value?.tokenId,
+            rollMode: rollMode.value
         };
         window.axios.post("/damageroll", payload).then((response) => {
             // debouncedFetchCharacterData();

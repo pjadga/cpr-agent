@@ -22,6 +22,7 @@ class AttackRoll extends FormRequest
             'fireMode' => 'required|string|max:255',
             'actorId' => 'nullable|string|max:255',
             'tokenId' => 'nullable|string|max:255',
+            'rollMode' => 'nullable|string'
         ]);
 
         //Need to get the actors either ID or Name -
@@ -42,6 +43,7 @@ class AttackRoll extends FormRequest
             'weaponId' => $weaponId,
             'fireMode' => $fireMode,
             'targetId' => $targetId,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

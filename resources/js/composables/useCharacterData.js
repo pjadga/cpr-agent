@@ -10,6 +10,7 @@ const error = ref(null);
 const agentLink = ref((localStorage.getItem('cpr_agent_link') || '').replace(/\/$/, ''));
 const isGM = ref(localStorage.getItem('cpr_is_gm') === 'true');
 const baseUrl = ref(localStorage.getItem('cpr_base_url') || '');
+const rollMode = ref(localStorage.getItem('cpr_roll_mode') || 'publicroll');
 let refreshInterval = null;
 let actorUuid = (localStorage.getItem('cpr_actor_uuid') || '').replace(/^Actor\./, '') || null;
 let useCount = 0;
@@ -256,18 +257,14 @@ export function useCharacterData() {
     const fetchCharacterData = async (isInitial = false, forceFresh = false) => {
         try {
             if (!actorUuid) {
-                // If we don't have a UUID, fetch it once from the backend
+                // If we don't have a UUID, trigger a fetch from the backend
                 const getActors = await window.axios.post("/getactors");
-                if (getActors.data && getActors.data.uuid) {
-                    actorUuid = String(getActors.data.uuid).replace(/^Actor\./, '');
+                if (getActors.data?.actors?.[0]?.actorId) {
+                    actorUuid = String(getActors.data.actors[0].actorId).replace(/^Actor\./, '');
                     localStorage.setItem('cpr_actor_uuid', actorUuid);
+                } else {
+                    console.log("[Agent] No immediate actor ID found, waiting for background refresh...");
                 }
-            }
-
-            if (!actorUuid) {
-                error.value = "No character UUID found. Please check your settings.";
-                loading.value = false;
-                return;
             }
 
             console.log("ActorUUID: " + actorUuid)
@@ -310,7 +307,9 @@ export function useCharacterData() {
             if (forceFresh) {
                 //Only trigger this when asked to refresh
                 console.log("Triggering background refresh from Foundry...");
-                await window.axios.post("/getactor", { "actorId": actorUuid });
+                if (actorUuid) {
+                    await window.axios.post("/getactor", { "actorId": actorUuid });
+                }
 
                 // Safety fallback: if no event lands quickly, unstick the UI
                 setTimeout(async () => {
@@ -367,6 +366,13 @@ export function useCharacterData() {
                                 const payloadActorId = String(payload.actor._id).replace(/^Actor\./, '');
                                 if (actorUuid && payloadActorId !== actorUuid) return;
 
+                                // Adopting the UUID if we don't have one
+                                if (!actorUuid) {
+                                    console.log(`[Agent] Adopting Actor ID: ${payloadActorId}`);
+                                    actorUuid = payloadActorId;
+                                    localStorage.setItem('cpr_actor_uuid', actorUuid);
+                                }
+
                                 if (payload.agentLink || payload.agent_link) {
                                     const normalizedLink = (payload.agentLink || payload.agent_link).replace(/\/$/, '');
                                     agentLink.value = normalizedLink;
@@ -389,6 +395,14 @@ export function useCharacterData() {
                             } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
                                 const payloadActorId = String(payload.uuid || '').replace(/^Actor\./, '');
                                 if (actorUuid && payloadActorId && payloadActorId !== actorUuid) return;
+
+                                // Adopting the UUID if we don't have one
+                                if (!actorUuid && payloadActorId) {
+                                    console.log(`[Agent] Adopting Actor ID from delta: ${payloadActorId}`);
+                                    actorUuid = payloadActorId;
+                                    localStorage.setItem('cpr_actor_uuid', actorUuid);
+                                }
+
                                 applyDelta(payload.delta, { tab: payload.tab });
                             }
                         });
@@ -411,6 +425,11 @@ export function useCharacterData() {
         }
     });
 
+    const setRollMode = (mode) => {
+        rollMode.value = mode;
+        localStorage.setItem('cpr_roll_mode', mode);
+    };
+
     return {
         charData,
         loading,
@@ -418,6 +437,8 @@ export function useCharacterData() {
         error,
         agentLink,
         isGM,
+        rollMode,
+        setRollMode,
         getImageUrl,
         fetchCharacterData,
         refreshIcons,

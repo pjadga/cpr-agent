@@ -17,6 +17,7 @@ class DiceRoller extends Controller
             'formula' => 'required|string',
             'flavor' => 'nullable|string',
             'createChatMessage' => 'nullable|boolean',
+            'rollMode' => 'nullable|string',
         ]);
 
         $user = auth()->user();
@@ -35,6 +36,7 @@ class DiceRoller extends Controller
             'formula' => $validatedData['formula'],
             'flavor' => $validatedData['flavor'] ?? 'Manual Roll',
             'createChatMessage' => $validatedData['createChatMessage'] ?? true,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'speaker' => 'Actor.' . $user->getActorId(),
             'requestId' => $requestId,
         ];

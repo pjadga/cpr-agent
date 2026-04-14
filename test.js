@@ -187,9 +187,17 @@ class CyberpunkBridge {
         this._isCapturingRoll = false;
     }
 
-    async rollAndCapture(actorId, triggerFunction) {
+    async rollAndCapture(actorId, triggerFunction, rollMode = null) {
         console.log(`%c[Bridge] Starting Render Interceptor for Actor ${actorId}`, "color: #00ffff; font-weight: bold;");
         this._isCapturingRoll = true;
+
+        const prevRollMode = game.settings.get("core", "rollMode");
+        if (rollMode) await game.settings.set("core", "rollMode", rollMode);
+
+        // const restoreRollMode = async () => {
+        //     if (rollMode) await game.settings.set("core", "rollMode", prevRollMode);
+        //     setTimeout(() => { this._isCapturingRoll = false; }, 1000);
+        // };
 
         return new Promise(async (resolve, reject) => {
             let rollFound = false;
@@ -201,12 +209,15 @@ class CyberpunkBridge {
                     rollFound = true;
                     renderTemplate = originalRender;
 
+                    //restoreRollMode();
+
                     resolve({
                         success: true,
                         total: data.resultTotal,
                         isCriticalSuccess: data.wasCritSuccess ? data.wasCritSuccess() : (data.isCriticalSuccess || false),
                         isCriticalFailure: data.wasCritFail ? data.wasCritFail() : (data.isCriticalFailure || false),
                         label: data.rollTitle,
+                        rollMode: rollMode || game.settings.get("core", "rollMode"),
                         rawRoll: data
                     });
                 }
@@ -215,10 +226,11 @@ class CyberpunkBridge {
 
             renderTemplate = spyRender;
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (!rollFound) {
                     renderTemplate = originalRender;
                     console.warn("[Bridge] ❌ Interceptor timed out. No rollcard rendered.");
+                    //await restoreRollMode();
                     resolve({ success: false, error: "Timed out waiting for render" });
                 }
             }, 5000);
@@ -227,9 +239,8 @@ class CyberpunkBridge {
                 await triggerFunction();
             } catch (e) {
                 renderTemplate = originalRender;
+                //await restoreRollMode();
                 resolve({ success: false, error: "Trigger failed" });
-            } finally {
-                setTimeout(() => { this._isCapturingRoll = false; }, 1000);
             }
         });
     }
@@ -605,10 +616,7 @@ class CyberpunkBridge {
             if (message.author.id !== game.user.id) return;
             if (this._isCapturingRoll) return;
             if (message.rolls && message.rolls.length > 0) {
-                // If not whispered and not hidden
-                if (message.whisper.length === 0 && !message.blind) {
-                    this.broadcastRoll(message);
-                }
+                this.broadcastRoll(message);
             }
         });
     }
@@ -620,12 +628,28 @@ class CyberpunkBridge {
     broadcastRoll(message) {
         const user = game.users.get(message.author.id);
         const roll = message.rolls[0];
+
+        // Determine roll mode from message properties
+        let rollMode = "publicroll";
+        if (message.blind) {
+            rollMode = "blindroll";
+        } else if (message.whisper && message.whisper.length > 0) {
+            const gms = game.users.filter(u => u.isGM).map(u => u.id);
+            const isToGMs = message.whisper.every(id => gms.includes(id) || id === message.author.id);
+            const isSelf = message.whisper.length === 1 && message.whisper[0] === message.author.id;
+
+            if (isSelf) rollMode = "selfroll";
+            else if (isToGMs) rollMode = "gmroll";
+            else rollMode = "gmroll"; // Default to private if there's a whisper
+        }
+
         this.sendResponse({
             type: 'ROLL_RESULT',
             agentLink: user ? user.getFlag(MODULE_ID, 'agent-link') : null,
             playerName: message.alias,
             total: roll.total,
             formula: roll.formula,
+            rollMode: message.rollMode || rollMode,
             label: message.flavor || 'Dice Roll',
             rawRoll: {
                 total: roll.total,
@@ -663,10 +687,15 @@ class CyberpunkBridge {
             data.channelId = channelId;
         }
 
-        // Include player name for roll results
-        if (data.type === 'ROLL_RESULT' && !data.playerName) {
-            const actor = data.actorId ? game.actors.get(data.actorId) : null;
-            data.playerName = actor ? actor.name : game.user.name;
+        // Include player name and rollMode for roll results
+        if (data.type === 'ROLL_RESULT') {
+            if (!data.playerName) {
+                const actor = data.actorId ? game.actors.get(data.actorId) : null;
+                data.playerName = actor ? actor.name : game.user.name;
+            }
+            if (!data.rollMode) {
+                data.rollMode = game.settings.get("core", "rollMode");
+            }
         }
 
         try {
@@ -894,11 +923,12 @@ class CyberpunkBridge {
                         });
                     };
 
-                    const result = await this.rollAndCapture(actorId, trigger);
+                    const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                     if (result.success) {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
+                            rollMode: result.rollMode,
                             requestId: requestId,
                             actorId,
                             total: result.total,
@@ -935,7 +965,7 @@ class CyberpunkBridge {
                         });
                     };
 
-                    const result = await this.rollAndCapture(actorId, trigger);
+                    const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                     if (result.success) {
                         // After roll, sync the updated death saves counter
@@ -943,6 +973,7 @@ class CyberpunkBridge {
 
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
+                            rollMode: result.rollMode,
                             requestId: requestId,
                             actorId,
                             total: result.total,
@@ -990,11 +1021,12 @@ class CyberpunkBridge {
                 };
 
                 // Use the Interceptor
-                const result = await this.rollAndCapture(actorId, trigger);
+                const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                 if (result.success) {
                     await this.sendResponse({
                         type: 'ROLL_RESULT',
+                        rollMode: result.rollMode,
                         requestId,
                         actorId,
                         total: result.total,
@@ -1021,11 +1053,12 @@ class CyberpunkBridge {
                         await actor.rollInitiative();
                     };
 
-                    const result = await this.rollAndCapture(actorId, trigger);
+                    const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                     if (result.success) {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
+                            rollMode: result.rollMode,
                             requestId,
                             actorId,
                             total: result.total,
@@ -1066,11 +1099,12 @@ class CyberpunkBridge {
                         });
                     };
 
-                    const result = await this.rollAndCapture(actorId, trigger);
+                    const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                     if (result.success) {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
+                            rollMode: result.rollMode,
                             requestId,
                             actorId,
                             total: result.total,
@@ -1120,11 +1154,12 @@ class CyberpunkBridge {
                             await actor.sheet._onRoll(rollData);
                         };
 
-                        const result = await this.rollAndCapture(actorId, trigger);
+                        const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                         if (result.success) {
                             await this.sendResponse({
                                 type: 'ROLL_RESULT',
+                                rollMode: result.rollMode,
                                 requestId,
                                 actorId,
                                 total: result.total,
@@ -1166,11 +1201,12 @@ class CyberpunkBridge {
                             });
                         };
 
-                        const result = await this.rollAndCapture(actorId, trigger);
+                        const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                         if (result.success) {
                             await this.sendResponse({
                                 type: 'ROLL_RESULT',
+                                rollMode: result.rollMode,
                                 requestId,
                                 actorId,
                                 total: result.total,
@@ -1208,11 +1244,12 @@ class CyberpunkBridge {
                         });
                     };
 
-                    const result = await this.rollAndCapture(actorId, trigger);
+                    const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
                     if (result.success) {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
+                            rollMode: result.rollMode,
                             requestId,
                             actorId,
                             total: result.total,
@@ -1240,10 +1277,12 @@ class CyberpunkBridge {
                 await roll.evaluate();
                 await roll.toMessage({
                     speaker: ChatMessage.getSpeaker({actor: game.actors.get(actorId)}),
-                    flavor: data.flavor
+                    flavor: data.flavor,
+                    rollMode: data.rollMode || game.settings.get("core", "rollMode")
                 });
                 await this.sendResponse({
                     type: 'ROLL_RESULT',
+                    rollMode: data.rollMode || game.settings.get("core", "rollMode"),
                     requestId,
                     actorId,
                     total: roll.total,
@@ -1421,7 +1460,7 @@ class CyberpunkBridge {
                     // Compute DV against current target if available
                     let computedDV = null;
                     if (targetToken) {
-                        const shooter = canvas.tokens.get(tokenId) || actoweaponIdr.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
+                        const shooter = canvas.tokens.get(tokenId) || actor.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
                         if (shooter) {
                             const RANGE_DV_TABLE = {
                                 'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
@@ -1471,7 +1510,7 @@ class CyberpunkBridge {
                         }
                     }
 
-                    const result = await this.rollAndCapture(actorId, trigger);
+                    const result = await this.rollAndCapture(actorId, trigger, data.rollMode);
 
 
                     if (result.success) {
@@ -1484,6 +1523,7 @@ class CyberpunkBridge {
                         const magazineValue = actor.items.get(weaponId)?.system?.magazine?.value ?? null;
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
+                            rollMode: result.rollMode,
                             requestId,
                             actorId,
                             total: result.total,

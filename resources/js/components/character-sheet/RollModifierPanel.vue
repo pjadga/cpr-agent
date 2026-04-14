@@ -123,6 +123,19 @@
 
                 <div v-if="!data && !loading" class="text-xs text-cpr-text-muted">No data available.</div>
             </div>
+
+            <!-- Privacy Setting -->
+            <div class="p-3 border-t border-cpr-red-dark bg-cpr-black/90 sticky bottom-0 shrink-0 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+                <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1.5 flex items-center gap-2">
+                    <i v-icon data-lucide="eye" class="w-2.5 h-2.5"></i> Roll Privacy
+                </div>
+                <select v-model="rollMode" class="w-full bg-cpr-black-deep border border-cpr-border text-white text-[11px] p-2 focus:border-cpr-red outline-none appearance-none hover:border-cpr-red/50 transition-colors">
+                    <option value="publicroll">Public Roll</option>
+                    <option value="gmroll">Private GM Roll</option>
+                    <option value="blindroll">Blind GM Roll</option>
+                    <option value="selfroll">Self Roll</option>
+                </select>
+            </div>
         </aside>
     </transition>
 </template>
@@ -131,6 +144,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { vIcon } from '../../directives/icon';
 import axios from 'axios';
+import { useCharacterData } from '../../composables/useCharacterData';
 
 export default {
     name: 'RollModifierPanel',
@@ -138,6 +152,7 @@ export default {
     directives: { icon: vIcon },
     emits: ['close', 'refresh', 'go-to-control'],
     setup(props) {
+        const { rollMode } = useCharacterData();
         const formula = ref('');
         const diceCounts = ref({});
         const rolling = ref(false);
@@ -172,7 +187,8 @@ export default {
                 const response = await axios.post('/make-roll', {
                     formula: formula.value,
                     flavor: 'Manual Roll',
-                    createChatMessage: true
+                    createChatMessage: true,
+                    rollMode: rollMode.value
                 });
 
                 if (response.data.success) {
@@ -204,7 +220,8 @@ export default {
             showResultPopup,
             addDie,
             clearFormula,
-            rollFormula
+            rollFormula,
+            rollMode
         };
     }
 }

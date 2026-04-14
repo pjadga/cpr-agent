@@ -48,6 +48,7 @@ class FoundryController extends Controller
             'channelId' => 'nullable|string',
             'channel_id' => 'nullable|string',
             'message' => 'nullable|string',
+            'rollMode' => 'nullable|string',
         ]);
 
         $agentLink = $validated['agentLink'] ?? $validated['agent_link'] ?? null;

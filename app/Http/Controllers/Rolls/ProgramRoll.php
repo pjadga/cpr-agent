@@ -20,7 +20,8 @@ class ProgramRoll extends FormRequest
             'programId' => 'string|max:255',
             'type' => 'string|max:255',
             'executionType' => 'string|max:255',
-            'cyberdeckId' => 'string|max:255'
+            'cyberdeckId' => 'string|max:255',
+            'rollMode' => 'nullable|string'
         ]);
 
         $programName = lcfirst($validatedData['programName'])  ?? null;
@@ -43,6 +44,7 @@ class ProgramRoll extends FormRequest
             'programName' => $programName,
             'programId' => $programId,
             'executionType' => $executionType,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

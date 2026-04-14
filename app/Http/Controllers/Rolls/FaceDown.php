@@ -15,6 +15,9 @@ class FaceDown extends FormRequest
 
     public function getFaceDown(Request $request): JsonResponse
     {
+        $validatedData = $request->validate([
+            'rollMode' => 'nullable|string'
+        ]);
 
         $user = auth()->user();
         $actorId = $user->getActorId();
@@ -25,6 +28,7 @@ class FaceDown extends FormRequest
         CyberpunkAgentChannel::dispatch([
             'type' => 'FACEDOWN_ROLL',
             'actorId' => $actorId,
+            'rollMode' => $validatedData['rollMode'] ?? null,
             'requestId' => $requestId,
         ]);
 
