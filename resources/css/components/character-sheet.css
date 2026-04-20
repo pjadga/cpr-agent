@@ -50,7 +50,7 @@
 
 .animate-pulse-purple {
     animation: pulse-purple 3s infinite ease-in-out;
-    border-color: var(--cpr-purple-dark) !important;
+    border-color: var(--cpr-yellow-dark) !important;
     color: var(--cpr-text-main) !important;
 }
 

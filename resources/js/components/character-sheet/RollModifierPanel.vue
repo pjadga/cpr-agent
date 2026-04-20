@@ -228,38 +228,10 @@ export default {
 </script>
 
 <style scoped>
-.slide-right-enter-active,
-.slide-right-leave-active {
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.slide-right-enter-from,
-.slide-right-leave-to {
-    transform: translateX(100%);
-    opacity: 0.5;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
 
 @keyframes shimmer {
     0% { transform: translateX(-100%) rotate(45deg); }
     100% { transform: translateX(200%) rotate(45deg); }
 }
 
-.scrollbar-thin::-webkit-scrollbar {
-    width: 4px;
-}
-.scrollbar-thumb-cpr-red\/30::-webkit-scrollbar-thumb {
-    background: rgba(220, 38, 38, 0.3);
-    border-radius: 2px;
-}
-.scrollbar-track-transparent::-webkit-scrollbar-track {
-    background: transparent;
-}
 </style>

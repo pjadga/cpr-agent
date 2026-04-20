@@ -150,7 +150,7 @@ class ApiConnectionTest extends TestCase
                 'skills' => array_fill(0, 50, ['value' => 3]),
             ],
             'items' => array_fill(0, 100, [
-                '_id' => 'item-' . uniqid(),
+                '_id' => 'item-' . uniqid('', true),
                 'name' => 'Test Item',
                 'type' => 'gear',
             ]),

@@ -63,7 +63,7 @@ class ActorSheet extends FormRequest
 
         return [
             // Unique ID for the current data state
-            'requestId' => uniqid('entity_'),
+            'requestId' => uniqid('entity_', true),
 
             'isOffline' => $isOffline,
 
