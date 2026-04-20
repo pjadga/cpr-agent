@@ -71,8 +71,8 @@ npm:
   before_script:
     - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev
     - docker-php-ext-install pdo_sqlite zip bcmath gd
-    # Fallback to creating an empty .env if templates don't exist
     - cp .env.example .env 2>/dev/null || cp .env.template .env 2>/dev/null || touch .env
+    - grep -q "^APP_KEY=" .env || echo "APP_KEY=" >> .env
     - php artisan key:generate --no-interaction
     - php artisan config:clear
     - npm run build
@@ -108,7 +108,7 @@ phpunit:feature:
   image: php:8.4-cli
   needs:
     - composer
-    - npm 
+    - npm
   <<: *php-test-setup
   script:
     - php vendor/bin/phpunit --testsuite=Feature --colors=always
