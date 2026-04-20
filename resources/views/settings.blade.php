@@ -111,11 +111,11 @@
                 <div>
                     <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-teal" />
                     <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">
-                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>
-                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (High Contrast)</option>
-                        <option value="bartmoss" {{ old('theme', $config->theme) == 'bartmoss' ? 'selected' : '' }} class="cyber-select-option">Rache Bartmoss (90s Hacker)</option>
-                        <option value="corpo" {{ old('theme', $config->theme) == 'corpo' ? 'selected' : '' }} class="cyber-select-option">Corpo (Minimalist)</option>
-                        <option value="medtech" {{ old('theme', $config->theme) == 'medtech' ? 'selected' : '' }} class="cyber-select-option">Med Tech (Clinical)</option>
+                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode</option>
+                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode</option>
+                        <option value="bartmoss" {{ old('theme', $config->theme) == 'bartmoss' ? 'selected' : '' }} class="cyber-select-option">Rache Bartmoss</option>
+                        <option value="corpo" {{ old('theme', $config->theme) == 'corpo' ? 'selected' : '' }} class="cyber-select-option">Corpo</option>
+                        <option value="medtech" {{ old('theme', $config->theme) == 'medtech' ? 'selected' : '' }} class="cyber-select-option">Med Tech</option>
                         <option value="blind" {{ old('theme', $config->theme) == 'blind' ? 'selected' : '' }} class="cyber-select-option">Colour Blind Mode</option>
                     </select>
                 </div>

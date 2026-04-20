@@ -42,7 +42,7 @@
             </adjustable-stat>
         </div>
 
-        <div class="border border-cpr-border p-3 flex justify-between divide-x divide-gray-800">
+        <div class="cpr-box border-cpr-red p-3 flex justify-between divide-x divide-gray-800">
             <div class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
                 <div class="text-cpr-yellow font-bold"><span class="font-numbers">{{
