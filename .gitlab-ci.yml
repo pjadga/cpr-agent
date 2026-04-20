@@ -75,7 +75,6 @@ npm:
     - grep -q "^APP_KEY=" .env || echo "APP_KEY=" >> .env
     - php artisan key:generate --no-interaction
     - php artisan config:clear
-    - npm run build
 
 # Run only on the default branch (e.g., main/master) to avoid double-running on MRs
 phpunit:
