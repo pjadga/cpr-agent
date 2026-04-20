@@ -73,14 +73,6 @@ class BroadcastingTest extends TestCase
     }
 
     #[Test]
-    public function authenticated_user_can_access_broadcasting_auth()
-    {
-        // Broadcasting auth with Sanctum tokens requires special handling
-        // This test verifies the endpoint is accessible with proper authentication
-        $this->markTestSkipped('Broadcasting auth with Sanctum tokens requires additional configuration');
-    }
-
-    #[Test]
     public function web_session_can_access_broadcasting_auth()
     {
         $response = $this->actingAs($this->user)

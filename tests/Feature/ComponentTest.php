@@ -13,8 +13,5 @@ class ComponentTest extends TestCase
         $view->assertSee('Test content');
     }
 
-    public function test_sheet_layout_component_can_be_rendered(): void
-    {
-        $this->markTestSkipped('cyberpunk-layout component not yet implemented');
-    }
+    //Cyberpunk blade loads the Vue, so no template.
 }

@@ -128,14 +128,6 @@ class ApiConnectionTest extends TestCase
     }
 
     #[Test]
-    public function frontend_can_access_broadcasting_auth_endpoint()
-    {
-        // Broadcasting auth with Sanctum tokens requires special handling
-        // This test verifies the endpoint is accessible with proper authentication
-        $this->markTestSkipped('Broadcasting auth with Sanctum tokens requires additional configuration');
-    }
-
-    #[Test]
     public function frontend_receives_correct_cors_headers()
     {
         $response = $this->withToken($this->token)
