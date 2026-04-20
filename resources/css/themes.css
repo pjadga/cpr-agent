@@ -138,5 +138,22 @@
     --cpr-red-dark: #d55e00;
     --cpr-yellow: #f0e442;
     --cpr-teal: #56b4e9; /* Blue instead of Teal */
-    --cpr-teal-dark: #0072b2;
+    --cpr-teal-dark: #2ea2e3;
+
+    --cpr-black: #1a1a1a;
+    --cpr-black-deep: #141414;
+    --cpr-black-soft: rgba(35, 35, 35, 0.51);
+    --cpr-black-elevated: rgba(50, 50, 50, 0.73);
+    --cpr-panel: rgba(28, 28, 28, 0.85);
+    --cpr-panel-hover: rgba(213, 94, 0, 0.15);
+    --cpr-border: #333333;
+    --cpr-border-dark: #262626;
+    --cpr-border-muted: #404040;
+    --cpr-border-accent: rgba(213, 94, 0, 0.44);
+    --cpr-text-main: #b0b0b0;
+    --cpr-text-muted: #7d8c99;
+    --cpr-text-bright: #e5e5e5;
+    --cpr-text-dim: #91a6af;
+    --cpr-font-sans: 'Hack', monospace;
+    --cpr-border-radius: 4px; /* Default slightly rounded for standard inputs */
 }
