@@ -69,12 +69,16 @@ npm:
 # Common before_script for all PHP tests
 .php-test-setup: &php-test-setup
   before_script:
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev curl
+    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    - apt-get install -y nodejs
     - docker-php-ext-install pdo_sqlite zip bcmath gd
     - cp .env.example .env 2>/dev/null || cp .env.template .env 2>/dev/null || touch .env
     - grep -q "^APP_KEY=" .env || echo "APP_KEY=" >> .env
     - php artisan key:generate --no-interaction
     - php artisan config:clear
+    - npm install
+    - npm run build
 
 # Run only on the default branch (e.g., main/master) to avoid double-running on MRs
 phpunit:
