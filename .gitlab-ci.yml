@@ -87,13 +87,6 @@ phpunit:
   script:
     # Added the --log-junit flag to actually generate the artifact
     - php vendor/bin/phpunit --colors=always --log-junit storage/logs/junit.xml
-  artifacts:
-    when: always
-    reports:
-      junit: storage/logs/junit.xml
-    paths:
-      - storage/logs/
-    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
