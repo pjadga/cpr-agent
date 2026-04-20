@@ -11,16 +11,16 @@ class EnsureAppIsConfigured
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
         $config = $user?->config;
 
-        $hasCharacter = !empty($user?->character_data);
+        $hasCharacter = ! empty($user?->character_data);
 
-        if ((!$config || !$config->api_key || !$config->foundry_url) && !$hasCharacter && !$request->routeIs('settings*')) {
+        if ((! $config || ! $config->api_key || ! $config->foundry_url) && ! $hasCharacter && ! $request->routeIs('settings*')) {
             return redirect()->route('settings');
         }
 

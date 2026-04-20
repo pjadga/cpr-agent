@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Rolls;
 
+use App\Events\CyberpunkAgentChannel;
+use App\Http\Controllers\Controller;
 use App\Http\HasConfiguration;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 class DiceRoller extends Controller
 {
@@ -22,7 +23,7 @@ class DiceRoller extends Controller
 
         $user = auth()->user();
 
-        if (!$user || !$user->agent_link) {
+        if (! $user || ! $user->agent_link) {
             return response()->json([
                 'success' => false,
                 'message' => 'User not authenticated or Agent Link missing.',
@@ -37,16 +38,16 @@ class DiceRoller extends Controller
             'flavor' => $validatedData['flavor'] ?? 'Manual Roll',
             'createChatMessage' => $validatedData['createChatMessage'] ?? true,
             'rollMode' => $validatedData['rollMode'] ?? null,
-            'speaker' => 'Actor.' . $user->getActorId(),
+            'speaker' => 'Actor.'.$user->getActorId(),
             'requestId' => $requestId,
         ];
 
-        \App\Events\CyberpunkAgentChannel::dispatch($payload);
+        CyberpunkAgentChannel::dispatch($payload);
 
         return response()->json([
             'success' => true,
             'data' => [
-                'requestId' => $requestId
+                'requestId' => $requestId,
             ],
         ]);
     }
@@ -56,7 +57,7 @@ class DiceRoller extends Controller
 
         $user = auth()->user();
 
-        if (!$user || !$user->agent_link) {
+        if (! $user || ! $user->agent_link) {
             return response()->json([
                 'success' => false,
                 'message' => 'User not authenticated or Agent Link missing.',
@@ -64,7 +65,7 @@ class DiceRoller extends Controller
         }
 
         return response()->json([
-            'success' => true
+            'success' => true,
         ]);
     }
 }

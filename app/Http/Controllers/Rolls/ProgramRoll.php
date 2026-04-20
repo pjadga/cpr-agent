@@ -21,14 +21,14 @@ class ProgramRoll extends FormRequest
             'type' => 'string|max:255',
             'executionType' => 'string|max:255',
             'cyberdeckId' => 'string|max:255',
-            'rollMode' => 'nullable|string'
+            'rollMode' => 'nullable|string',
         ]);
 
-        $programName = lcfirst($validatedData['programName'])  ?? null;
-        $programId = $validatedData['programId']  ?? null;
-        $cyberdeckId = $validatedData['cyberdeckId']  ?? null;
-        $executionType = $validatedData['executionType']  ?? null;
-        $type = $validatedData['type']  ?? null;
+        $programName = lcfirst($validatedData['programName']) ?? null;
+        $programId = $validatedData['programId'] ?? null;
+        $cyberdeckId = $validatedData['cyberdeckId'] ?? null;
+        $executionType = $validatedData['executionType'] ?? null;
+        $type = $validatedData['type'] ?? null;
 
         $user = auth()->user();
         $actorId = $user->getActorId();
@@ -52,8 +52,8 @@ class ProgramRoll extends FormRequest
             'success' => true,
             'message' => 'Data successfully submitted!',
             'data' => [
-                'requestId' => $requestId
-            ]
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

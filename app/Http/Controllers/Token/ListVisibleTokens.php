@@ -8,8 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
-use Illuminate\Support\Str;
-
 class ListVisibleTokens extends FormRequest
 {
     use HasConfiguration;
@@ -35,7 +33,7 @@ class ListVisibleTokens extends FormRequest
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {
-            $key = 'foundry_response_' . $requestId;
+            $key = 'foundry_response_'.$requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
                 break;

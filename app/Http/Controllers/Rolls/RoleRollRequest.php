@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Rolls;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,15 +19,15 @@ class RoleRollRequest extends FormRequest
             'label' => 'required|string|max:255',
             'role' => 'required|string|max:255',
             'isAbility' => 'required|boolean',
-            'rollMode' => 'nullable|string'
+            'rollMode' => 'nullable|string',
         ]);
 
-        $label = ucfirst($validatedData['label']); //Will also be role, but could be abilities
-        $role = ucfirst($validatedData['role']); //Top  level role name
+        $label = ucfirst($validatedData['label']); // Will also be role, but could be abilities
+        $role = ucfirst($validatedData['role']); // Top  level role name
 
         $user = auth()->user();
         $actorId = $user->getActorId();
-        $actorId = str_replace("Actor.", "", $actorId);
+        $actorId = str_replace('Actor.', '', $actorId);
 
         $requestId = $this->createRequestId();
 
@@ -46,8 +45,8 @@ class RoleRollRequest extends FormRequest
             'success' => true,
             'message' => 'Data successfully submitted!',
             'data' => [
-                'requestId' => $requestId
-            ]
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

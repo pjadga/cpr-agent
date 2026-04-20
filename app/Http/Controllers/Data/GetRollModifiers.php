@@ -4,11 +4,8 @@ namespace App\Http\Controllers\Data;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class GetRollModifiers extends FormRequest
 {
@@ -38,7 +35,7 @@ class GetRollModifiers extends FormRequest
             'success' => true,
             'message' => 'Roll modifiers request sent to Foundry',
             'requestId' => $requestId,
-            'data' => null
+            'data' => null,
         ], 201);
     }
 }

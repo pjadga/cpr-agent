@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\FoundryResponse;
-use App\Jobs\SyncCharacterDataToDb;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Jobs\SyncCharacterDataToDb;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class FoundryController extends Controller
 {
@@ -59,20 +59,20 @@ class FoundryController extends Controller
         $user = null;
         if ($agentLink) {
             $normalizedLink = rtrim($agentLink, '/');
-            $user = \App\Models\User::where('agent_link', $normalizedLink)
-                ->orWhere('agent_link', $normalizedLink . '/')
+            $user = User::where('agent_link', $normalizedLink)
+                ->orWhere('agent_link', $normalizedLink.'/')
                 ->first();
         }
 
-        if (!$user && $actorId) {
+        if (! $user && $actorId) {
             $cleanActorId = str_replace('Actor.', '', $actorId);
-            $user = \App\Models\User::where('default_actor_id', $actorId)
+            $user = User::where('default_actor_id', $actorId)
                 ->orWhere('default_actor_id', $cleanActorId)
                 ->first();
         }
 
         // Fallback to the user associated with the API token
-        if (!$user) {
+        if (! $user) {
             $user = $request->user();
         }
 
@@ -81,17 +81,18 @@ class FoundryController extends Controller
             $targetUser = null;
             $userIdentifier = $validated['agentLink'] ?? $validated['agent_link'] ?? $validated['foundryUserId'] ?? null;
 
-            if (!$user) {
+            if (! $user) {
                 $user = $request->user();
             }
 
             // If it's a GM-initiated link, find the target user by agentLink or foundryUserId
-            if ($type === 'GM_LINK_PLAYER_CHARACTER' && !empty($userIdentifier)) {
-                $targetUser = \App\Models\User::where('agent_link', $userIdentifier)->first();
+            if ($type === 'GM_LINK_PLAYER_CHARACTER' && ! empty($userIdentifier)) {
+                $targetUser = User::where('agent_link', $userIdentifier)->first();
                 if ($targetUser) {
                     $user = $targetUser;
                 } else {
                     \Log::info("GM tried to sync character for Foundry User but no Laravel user found with identifier [{$userIdentifier}].");
+
                     return response()->json(['success' => false, 'message' => 'Target user not found']);
                 }
             }
@@ -108,13 +109,13 @@ class FoundryController extends Controller
 
             return response()->json([
                 'success' => true,
-                'agent_link' => $user->agent_link
+                'agent_link' => $user->agent_link,
             ]);
         }
 
         // General update for is_gm if present and user identified
         if ($user && isset($validated['isGM'])) {
-            if ($user->is_gm !== (bool)$validated['isGM']) {
+            if ($user->is_gm !== (bool) $validated['isGM']) {
                 $user->is_gm = $validated['isGM'];
                 $user->save();
                 \Log::info("User [{$user->id}] is_gm status updated to [{$user->is_gm}] via {$type}");
@@ -132,14 +133,16 @@ class FoundryController extends Controller
             }
 
             $current = Cache::get("user_char_{$user->id}");
-            if (!$current) {
+            if (! $current) {
                 $current = $user->character_data ?? [];
             }
-            if (!is_array($current)) $current = [];
+            if (! is_array($current)) {
+                $current = [];
+            }
 
-            if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
+            if ($type === 'ACTOR_DATA' && ! empty($validated['actor'])) {
                 $current = $validated['actor'];
-            } elseif ($type === 'SHEET_DELTA' && !empty($validated['delta'])) {
+            } elseif ($type === 'SHEET_DELTA' && ! empty($validated['delta'])) {
                 foreach ($validated['delta'] as $path => $value) {
                     $this->arraySetDot($current, $path, $value);
                 }
@@ -166,16 +169,16 @@ class FoundryController extends Controller
             $broadcastPayload['channel_id'] = $incomingChannelId;
         }
 
-        \App\Events\FoundryResponse::dispatch($broadcastPayload);
+        FoundryResponse::dispatch($broadcastPayload);
 
         // Put in cache for synchronous polling
-        if (!empty($validated['requestId'])) {
-            \Illuminate\Support\Facades\Cache::put('foundry_response_' . $validated['requestId'], $request->all(), 10);
+        if (! empty($validated['requestId'])) {
+            Cache::put('foundry_response_'.$validated['requestId'], $request->all(), 10);
         }
 
         $duration = round((microtime(true) - $start) * 1000, 2);
         \Log::info("Foundry Callback [{$type}] processed in {$duration}ms", [
-            'requestId' => $validated['requestId'] ?? 'N/A'
+            'requestId' => $validated['requestId'] ?? 'N/A',
         ]);
 
         return response()->json(['status' => 'acknowledged', 'processing_ms' => $duration]);
@@ -188,7 +191,7 @@ class FoundryController extends Controller
     {
         // Special case for items: if path is "items.+ID", we append the item to the items array
         if (str_starts_with($path, 'items.+')) {
-            if (!isset($array['items']) || !is_array($array['items'])) {
+            if (! isset($array['items']) || ! is_array($array['items'])) {
                 $array['items'] = [];
             }
 
@@ -203,9 +206,10 @@ class FoundryController extends Controller
                 }
             }
 
-            if (!$found) {
+            if (! $found) {
                 $array['items'][] = $value;
             }
+
             return;
         }
 
@@ -223,7 +227,7 @@ class FoundryController extends Controller
                     $remainingPath = implode('.', array_slice($keys, 2));
 
                     // Navigate to the nested property
-                    $ref =& $item;
+                    $ref = &$item;
                     $remainingKeys = array_slice($keys, 2);
                     foreach ($remainingKeys as $i => $key) {
                         if ($i === count($remainingKeys) - 1) {
@@ -233,20 +237,21 @@ class FoundryController extends Controller
                                 $ref[$key] = $value;
                             }
                         } else {
-                            if (!isset($ref[$key]) || !is_array($ref[$key])) {
+                            if (! isset($ref[$key]) || ! is_array($ref[$key])) {
                                 $ref[$key] = [];
                             }
-                            $ref =& $ref[$key];
+                            $ref = &$ref[$key];
                         }
                     }
                     break;
                 }
             }
 
-            if (!$found) {
+            if (! $found) {
                 // Item not found, can't update
                 return;
             }
+
             return;
         }
 
@@ -260,6 +265,7 @@ class FoundryController extends Controller
                     if (isset($item['_id']) && $item['_id'] === $itemId) {
                         unset($array['items'][$index]);
                         $array['items'] = array_values($array['items']); // Re-index
+
                         return;
                     }
                 }
@@ -273,15 +279,16 @@ class FoundryController extends Controller
                         break;
                     }
                 }
-                if (!$found) {
+                if (! $found) {
                     $array['items'][] = $value;
                 }
             }
+
             return;
         }
 
         // Standard dot notation handling for non-items paths
-        $ref =& $array;
+        $ref = &$array;
         foreach ($keys as $i => $key) {
             if ($i === count($keys) - 1) {
                 if ($value === null) {
@@ -290,10 +297,10 @@ class FoundryController extends Controller
                     $ref[$key] = $value;
                 }
             } else {
-                if (!isset($ref[$key]) || !is_array($ref[$key])) {
+                if (! isset($ref[$key]) || ! is_array($ref[$key])) {
                     $ref[$key] = [];
                 }
-                $ref =& $ref[$key];
+                $ref = &$ref[$key];
             }
         }
     }

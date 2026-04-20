@@ -5,11 +5,7 @@ namespace App\Http\Controllers\Data;
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-
-use Illuminate\Support\Str;
 
 class GetActor extends FormRequest
 {
@@ -24,7 +20,7 @@ class GetActor extends FormRequest
         CyberpunkAgentChannel::dispatch([
             'type' => 'GET_ACTOR',
             'requestId' => $requestId,
-            'actorId' => str_replace("Actor.", "", $request->get('actorId')),
+            'actorId' => str_replace('Actor.', '', $request->get('actorId')),
         ]);
 
         // 2. Return immediately (Asynchronous)
@@ -32,7 +28,7 @@ class GetActor extends FormRequest
         return response()->json([
             'requestId' => $requestId,
             'status' => 'pending',
-            'message' => 'Request dispatched to Foundry VTT.'
+            'message' => 'Request dispatched to Foundry VTT.',
         ], 202);
     }
 }

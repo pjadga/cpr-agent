@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Rolls;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,12 +15,12 @@ class FaceDown extends FormRequest
     public function getFaceDown(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
-            'rollMode' => 'nullable|string'
+            'rollMode' => 'nullable|string',
         ]);
 
         $user = auth()->user();
         $actorId = $user->getActorId();
-        $actorId = str_replace("Actor.", "", $actorId);
+        $actorId = str_replace('Actor.', '', $actorId);
 
         $requestId = $this->createRequestId();
 
@@ -36,7 +35,7 @@ class FaceDown extends FormRequest
             'success' => true,
             'message' => 'Data successfully submitted!',
             'data' => [
-                'requestId' => $requestId
+                'requestId' => $requestId,
             ],
         ], 201);
     }

@@ -25,13 +25,13 @@ class UpdateStat extends FormRequest
 
         $operation = $validatedData['operation'] ?? 'set';
 
-        if ($operation === 'set' && !isset($validatedData['value'])) {
+        if ($operation === 'set' && ! isset($validatedData['value'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Value is required for set operation',
             ], 422);
         }
-        if ($operation === 'inc' && !isset($validatedData['delta'])) {
+        if ($operation === 'inc' && ! isset($validatedData['delta'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Delta is required for inc operation',
@@ -46,7 +46,7 @@ class UpdateStat extends FormRequest
             $label = 'derivedStats.humanity.value';
         } else {
             // luck, emp, and other stats
-            $label = 'stats.' . $label . '.value';
+            $label = 'stats.'.$label.'.value';
         }
 
         $user = auth()->user();
@@ -62,9 +62,9 @@ class UpdateStat extends FormRequest
         ];
 
         if ($operation === 'set') {
-            $payload['value'] = (int)$validatedData['value'];
+            $payload['value'] = (int) $validatedData['value'];
         } else {
-            $payload['delta'] = (int)$validatedData['delta'];
+            $payload['delta'] = (int) $validatedData['delta'];
         }
 
         CyberpunkAgentChannel::dispatch($payload);

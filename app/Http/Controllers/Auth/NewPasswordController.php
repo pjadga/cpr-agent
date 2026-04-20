@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use RyanChandler\LaravelCloudflareTurnstile\Rules\Turnstile;
 
@@ -27,7 +28,7 @@ class NewPasswordController extends Controller
     /**
      * Handle an incoming new password request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -37,7 +38,7 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
 
-        if (!app()->environment('local')) {
+        if (! app()->environment('local')) {
             $rules['cf-turnstile-response'] = ['required', new Turnstile];
         }
 
@@ -62,8 +63,8 @@ class NewPasswordController extends Controller
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         return $status == Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+            ? redirect()->route('login')->with('status', __($status))
+            : back()->withInput($request->only('email'))
+                ->withErrors(['email' => __($status)]);
     }
 }

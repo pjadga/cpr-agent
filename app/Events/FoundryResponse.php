@@ -2,9 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -21,14 +19,14 @@ class FoundryResponse implements ShouldBroadcastNow
         $this->payload = $payload;
     }
 
-    //Needs to be the same channel as the Agent
+    // Needs to be the same channel as the Agent
     public function broadcastOn(): array
     {
         $channelId = $this->payload['channel_id'] ?? null;
 
         if ($channelId) {
             return [
-                new PrivateChannel('cpr-agent.' . $channelId),
+                new PrivateChannel('cpr-agent.'.$channelId),
             ];
         }
 

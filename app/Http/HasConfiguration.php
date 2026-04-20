@@ -2,17 +2,21 @@
 
 namespace App\Http;
 
+use Illuminate\Support\Str;
+
 trait HasConfiguration
 {
     public function getApiKey(): ?string
     {
         $config = auth()->user()->config;
+
         return $config?->api_key;
     }
 
     public function getFoundryUrl(): ?string
     {
         $config = auth()->user()->config;
+
         return $config?->foundry_url;
     }
 
@@ -22,7 +26,7 @@ trait HasConfiguration
      */
     public function createRequestId(): string
     {
-        return  (string) \Illuminate\Support\Str::uuid();
+        return (string) Str::uuid();
     }
 
     /**

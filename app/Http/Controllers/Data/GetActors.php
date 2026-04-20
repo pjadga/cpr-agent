@@ -5,11 +5,7 @@ namespace App\Http\Controllers\Data;
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-
-use Illuminate\Support\Str;
 
 class GetActors extends FormRequest
 {
@@ -38,7 +34,7 @@ class GetActors extends FormRequest
         return response()->json([
             'requestId' => $requestId,
             'status' => 'pending',
-            'message' => 'Refreshing actor list from Foundry...'
+            'message' => 'Refreshing actor list from Foundry...',
         ], 202);
     }
 }

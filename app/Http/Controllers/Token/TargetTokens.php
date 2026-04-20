@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Token;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,7 +21,7 @@ class TargetTokens extends FormRequest
             'tokenId' => 'nullable|string|max:255',
         ]);
 
-        $targetTokenId = $validatedData["targetTokenId"];
+        $targetTokenId = $validatedData['targetTokenId'];
         $user = auth()->user();
         $actorId = $validatedData['actorId'] ?? $user->getActorId();
         $tokenId = $validatedData['tokenId'] ?? $user->getTokenId();

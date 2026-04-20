@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use RyanChandler\LaravelCloudflareTurnstile\Rules\Turnstile;
 
@@ -28,7 +29,7 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -38,7 +39,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
 
-        if (!app()->environment('local')) {
+        if (! app()->environment('local')) {
             $rules['cf-turnstile-response'] = ['required', new Turnstile];
         }
 

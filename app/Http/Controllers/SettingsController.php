@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
 use App\Models\Config;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +17,7 @@ class SettingsController extends Controller
     public function show()
     {
         $user = Auth::user();
-        $config = $user->config ?? new Config();
+        $config = $user->config ?? new Config;
         $actors = [];
 
         if ($config->foundry_url || config('services.foundry.base_url')) {
@@ -30,7 +29,7 @@ class SettingsController extends Controller
                 'requestId' => $requestId,
                 'agent_link' => $user->agent_link,
                 'isLinkRequest' => true,
-                'isGM' => (bool)$user->is_gm,
+                'isGM' => (bool) $user->is_gm,
             ];
             CyberpunkAgentChannel::dispatch($payload);
 
@@ -38,10 +37,10 @@ class SettingsController extends Controller
             $startTime = microtime(true);
             $timeout = 5.0;
             while ((microtime(true) - $startTime) < $timeout) {
-                $key = 'foundry_response_' . $requestId;
+                $key = 'foundry_response_'.$requestId;
                 if (Cache::has($key)) {
                     $foundryData = Cache::pull($key);
-                    if (!empty($foundryData['actors'])) {
+                    if (! empty($foundryData['actors'])) {
                         $actors = $foundryData['actors'];
                     }
                     break;
@@ -60,7 +59,7 @@ class SettingsController extends Controller
                     break;
                 }
             }
-            if (!$found) {
+            if (! $found) {
                 $actors[] = [
                     'name' => $user->character_data['name'] ?? 'Saved Character',
                     'actorId' => $user->default_actor_id,
@@ -69,7 +68,7 @@ class SettingsController extends Controller
             }
         }
 
-        $isFirstTime = (!$config->api_key || !$config->foundry_url) && !$config->has_read_onboarding;
+        $isFirstTime = (! $config->api_key || ! $config->foundry_url) && ! $config->has_read_onboarding;
 
         return view('settings', [
             'actors' => $actors,
@@ -150,8 +149,10 @@ class SettingsController extends Controller
         $user = Auth::user();
         if ($user->default_actor_id) {
             $this->refreshCharacterData($user);
+
             return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
         }
+
         return redirect()->route('settings')->with('error', 'No character selected to refresh.');
     }
 
@@ -187,10 +188,10 @@ class SettingsController extends Controller
         $startTime = microtime(true);
         $timeout = 5.0;
         while ((microtime(true) - $startTime) < $timeout) {
-            $key = 'foundry_response_' . $requestId;
+            $key = 'foundry_response_'.$requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
-                if (!empty($foundryData['actor'])) {
+                if (! empty($foundryData['actor'])) {
                     $actor = $foundryData['actor'];
                     if (isset($actor['_id']) && $actor['_id'] !== $user->default_actor_id) {
                         $user->default_actor_id = $actor['_id'];

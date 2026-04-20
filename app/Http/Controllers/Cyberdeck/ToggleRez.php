@@ -17,11 +17,11 @@ class ToggleRez extends FormRequest
         // Validate incoming request
         $validatedData = $request->validate([
             'programId' => 'required|string|max:255',
-            'isRezzed' => 'required|bool|max:255'
+            'isRezzed' => 'required|bool|max:255',
         ]);
 
-        //Need to get the actors either ID or Name -
-        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
+        // Need to get the actors either ID or Name -
+        // The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $programId = $validatedData['programId'];
         $targetState = $validatedData['isRezzed'];
 

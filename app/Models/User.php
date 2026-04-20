@@ -3,15 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
@@ -61,7 +63,7 @@ class User extends Authenticatable
         parent::boot();
         static::creating(function ($user) {
             if (empty($user->agent_link)) {
-                $user->agent_link = (string) \Illuminate\Support\Str::uuid();
+                $user->agent_link = (string) Str::uuid();
             }
             if (empty($user->channel_id)) {
                 $user->channel_id = self::generateChannelId();
@@ -75,7 +77,7 @@ class User extends Authenticatable
             'neon', 'cyber', 'punk', 'chrome', 'glitch', 'static', 'blade', 'runner',
             'hacker', 'grid', 'data', 'wire', 'matrix', 'synth', 'wave', 'alloy',
             'neural', 'link', 'deck', 'jack', 'signal', 'buffer', 'core', 'port',
-            'node', 'flux', 'spark', 'beam', 'circuit', 'code'
+            'node', 'flux', 'spark', 'beam', 'circuit', 'code',
         ];
 
         $word1 = $words[array_rand($words)];
@@ -92,12 +94,13 @@ class User extends Authenticatable
     public function getAgentLinkAttribute($value)
     {
         if (empty($value)) {
-            $value = (string) \Illuminate\Support\Str::uuid();
+            $value = (string) Str::uuid();
             $this->agent_link = $value;
             if ($this->exists) {
                 $this->save();
             }
         }
+
         return $value;
     }
 
@@ -114,6 +117,7 @@ class User extends Authenticatable
                 $this->save();
             }
         }
+
         return $value;
     }
 

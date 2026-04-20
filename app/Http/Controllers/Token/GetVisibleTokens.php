@@ -4,13 +4,10 @@ namespace App\Http\Controllers\Token;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-
-use Illuminate\Support\Str;
 
 class GetVisibleTokens extends FormRequest
 {
@@ -21,16 +18,16 @@ class GetVisibleTokens extends FormRequest
         // Validate incoming request
         $validatedData = $request->validate([
             'selectedWeapon' => 'required|array|max:255',
-            'selectedTarget' => 'nullable|array|max:255'
+            'selectedTarget' => 'nullable|array|max:255',
         ]);
 
         $user = auth()->user();
         $tokenId = $user->getTokenId();
         $actorId = $user->getActorId();
-        $weaponId = $validatedData['selectedWeapon']["_id"] ?? null;
-        $targetTokenId = $validatedData['selectedTarget']["id"] ?? null;
+        $weaponId = $validatedData['selectedWeapon']['_id'] ?? null;
+        $targetTokenId = $validatedData['selectedTarget']['id'] ?? null;
 
-        if (!$weaponId) {
+        if (! $weaponId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Weapon ID not provided',
@@ -54,7 +51,7 @@ class GetVisibleTokens extends FormRequest
         $foundryData = null;
 
         while ((microtime(true) - $startTime) < $timeout) {
-            $key = 'foundry_response_' . $requestId;
+            $key = 'foundry_response_'.$requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
                 break;

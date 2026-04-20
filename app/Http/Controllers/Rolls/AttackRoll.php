@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Rolls;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,13 +21,13 @@ class AttackRoll extends FormRequest
             'fireMode' => 'required|string|max:255',
             'actorId' => 'nullable|string|max:255',
             'tokenId' => 'nullable|string|max:255',
-            'rollMode' => 'nullable|string'
+            'rollMode' => 'nullable|string',
         ]);
 
-        //Need to get the actors either ID or Name -
-        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
-        $weaponId = $validatedData['selectedWeapon']["_id"];
-        $targetId = $validatedData['selectedTarget']["id"];
+        // Need to get the actors either ID or Name -
+        // The app needs a way of selecting an actor to follow - then we have access to it's ID.
+        $weaponId = $validatedData['selectedWeapon']['_id'];
+        $targetId = $validatedData['selectedTarget']['id'];
         $fireMode = $validatedData['fireMode'];
 
         $user = auth()->user();
@@ -51,8 +50,8 @@ class AttackRoll extends FormRequest
             'success' => true,
             'message' => 'Attack roll request sent to Foundry',
             'data' => [
-                'requestId' => $requestId
-            ]
+                'requestId' => $requestId,
+            ],
         ], 201);
     }
 }

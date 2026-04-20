@@ -1,9 +1,9 @@
 <?php
+
 namespace App\Http\Controllers\Rolls;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -15,12 +15,12 @@ class InitiativeRoll extends FormRequest
     public function rollInitiative(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
-            'rollMode' => 'nullable|string'
+            'rollMode' => 'nullable|string',
         ]);
 
         $user = auth()->user();
         $actorId = $user->getActorId();
-        $actorId = str_replace("Actor.", "", $actorId);
+        $actorId = str_replace('Actor.', '', $actorId);
 
         $requestId = $this->createRequestId();
 
@@ -35,7 +35,7 @@ class InitiativeRoll extends FormRequest
             'success' => true,
             'message' => 'Initiative rolled successfully!',
             'data' => [
-                'requestId' => $requestId
+                'requestId' => $requestId,
             ],
         ], 201);
     }

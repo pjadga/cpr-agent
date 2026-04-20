@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Token;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
-use FoundryClient\FoundryClient;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 
@@ -22,8 +21,8 @@ class MoveToken extends FormRequest
             'tokenId' => 'nullable|string|max:255',
         ]);
 
-        //Need to get the actors either ID or Name -
-        //The app needs a way of selecting an actor to follow - then we have access to it's ID.
+        // Need to get the actors either ID or Name -
+        // The app needs a way of selecting an actor to follow - then we have access to it's ID.
         $direction = $validatedData['direction'];
         $weaponId = $validatedData['weaponId'] ?? null;
         $user = auth()->user();

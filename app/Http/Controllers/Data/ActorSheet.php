@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Data;
 
 use App\Http\HasConfiguration;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class ActorSheet extends FormRequest
 {
@@ -19,20 +20,20 @@ class ActorSheet extends FormRequest
         $user = auth()->user();
 
         // Try Redis cache first (High Speed)
-        $characterData = \Illuminate\Support\Facades\Cache::get("user_char_{$user->id}");
+        $characterData = Cache::get("user_char_{$user->id}");
 
         // Save character JSON data if provided in the request
         if ($request->has('actorData')) {
             $characterData = $request->get('actorData');
-            \Illuminate\Support\Facades\Cache::put("user_char_{$user->id}", $characterData, 3600);
+            Cache::put("user_char_{$user->id}", $characterData, 3600);
 
             $update = [
-                'character_data' => $characterData
+                'character_data' => $characterData,
             ];
 
             // If the user doesn't have an agent-link, create one now.
             if (empty($user->agent_link)) {
-                $update['agent_link'] = (string) \Illuminate\Support\Str::uuid();
+                $update['agent_link'] = (string) Str::uuid();
             }
 
             $user->update($update);
@@ -44,7 +45,7 @@ class ActorSheet extends FormRequest
         }
 
         // Ensure we only return data for the assigned character if one is set
-        if ($user->default_actor_id && !empty($characterData)) {
+        if ($user->default_actor_id && ! empty($characterData)) {
             // Verify that the cached data matches the assigned character
             if (($characterData['_id'] ?? '') !== $user->default_actor_id) {
                 $characterData = null;
@@ -71,7 +72,7 @@ class ActorSheet extends FormRequest
             'uuid' => $characterData['_id'] ?? '',
             'tokenId' => $user->default_token_id,
             'agentLink' => $user->agent_link,
-            'isGM' => (bool)$user->is_gm,
+            'isGM' => (bool) $user->is_gm,
 
             'data' => [
                 'name' => $characterData['name'] ?? 'Unknown Character',
@@ -90,8 +91,8 @@ class ActorSheet extends FormRequest
                 ],
 
                 // Process and whitelist item fields
-                'items' => $this->processItems($characterData['items'] ?? [])
-            ]
+                'items' => $this->processItems($characterData['items'] ?? []),
+            ],
         ];
     }
 
@@ -119,10 +120,10 @@ class ActorSheet extends FormRequest
             'system' => [
                 // Text & Econ
                 'description' => [
-                    'value' => $sys['description']['value'] ?? ''
+                    'value' => $sys['description']['value'] ?? '',
                 ],
                 'price' => [
-                    'market' => $sys['price']['market'] ?? 0
+                    'market' => $sys['price']['market'] ?? 0,
                 ],
                 'amount' => $sys['amount'] ?? 0,
                 'source' => $sys['source'] ?? 0,
@@ -134,7 +135,6 @@ class ActorSheet extends FormRequest
                 'category' => $sys['category'] ?? '', // Important for your new grouping logic
                 'skillType' => $sys['skillType'] ?? '',
                 'abilities' => $sys['abilities'] ?? [],
-
 
                 // Combat / Weapon Specifics
                 'damage' => $sys['damage'] ?? '',
@@ -148,7 +148,6 @@ class ActorSheet extends FormRequest
                 'equipped' => $sys['equipped'] ?? '',
                 'isWeapon' => $sys['isWeapon'] ?? false,
                 'fireModes' => $sys['fireModes'] ?? [],
-
 
                 // Cyberware Specifics
                 'installLocation' => $sys['installLocation'] ?? '',
@@ -168,7 +167,6 @@ class ActorSheet extends FormRequest
                 'isShield' => $sys['isShield'] ?? false,
                 'shieldHitPoints' => $sys['shieldHitPoints'] ?? [],
 
-
                 // Role Specifics
                 'rank' => $sys['rank'] ?? 0,
                 'mainRoleAbility' => $sys['mainRoleAbility'] ?? '',
@@ -177,7 +175,7 @@ class ActorSheet extends FormRequest
                 // Critical Injury Specifics
                 'quickFix' => $sys['quickFix'] ?? null,
                 'treatment' => $sys['treatment'] ?? null,
-            ]
+            ],
         ];
     }
 }
