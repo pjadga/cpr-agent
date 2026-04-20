@@ -1,0 +1,133 @@
+:root {
+    /* DEFAULT THEME (Night Mode) */
+    --cpr-red: #da0000;
+    --cpr-red-dark: #a30000;
+    --cpr-yellow: #fcee0a;
+    --cpr-yellow-dark: #cfc100;
+    --cpr-teal: #14b8a6;
+    --cpr-teal-dark: #0d9488;
+    --cpr-black: #1a1a1a;
+    --cpr-black-deep: #141414;
+    --cpr-black-soft: rgba(35, 35, 35, 0.51);
+    --cpr-black-elevated: rgba(50, 50, 50, 0.73);
+    --cpr-panel: rgba(28, 28, 28, 0.85);
+    --cpr-panel-hover: rgba(218, 0, 0, 0.15);
+    --cpr-border: #333333;
+    --cpr-border-dark: #262626;
+    --cpr-border-muted: #404040;
+    --cpr-border-accent: rgba(218, 0, 0, 0.44);
+    --cpr-text-main: #b0b0b0;
+    --cpr-text-muted: #7d8c99;
+    --cpr-text-bright: #e5e5e5;
+    --cpr-text-dim: #555f66;
+    --cpr-font-sans: 'Hack', monospace;
+    --cpr-border-radius: 4px; /* Default slightly rounded for standard inputs */
+}
+
+/* Specificity boost for themes */
+:root.theme-night {
+    --cpr-border-radius: 0px; /* Sharp corners for the true cyberpunk feel */
+}
+
+:root.theme-day {
+    --cpr-red: rgb(148 1 12);
+    --cpr-red-dark: rgb(148 1 12);
+    --cpr-yellow: rgb(148 1 12);
+    --cpr-yellow-dark: rgb(148 1 12);
+    --cpr-teal: #0c796d;
+    --cpr-teal-dark: #136962;
+    --cpr-black: #e5e5e5;
+    --cpr-black-deep: #f5f5f5;
+    --cpr-black-soft: rgb(255 219 219);
+    --cpr-black-elevated: rgba(180, 180, 180, 0.73);
+    --cpr-panel: rgba(240, 240, 240, 0.85);
+    --cpr-panel-hover: rgba(218, 0, 0, 0.1);
+    --cpr-border: #b22929;
+    --cpr-border-dark: #ad2929;
+    --cpr-border-muted: #d9d9d9;
+    --cpr-text-main: #151515;
+    --cpr-text-muted: #151515;
+    --cpr-text-bright: #000000;
+    --cpr-text-dim: #291f34;
+    --cpr-border-radius: 2px;
+}
+
+:root.theme-bartmoss {
+    --cpr-black-deep: #000814;
+    --cpr-black: #001d3d;
+    --cpr-black-soft: rgba(0, 29, 61, 0.5);
+    --cpr-black-elevated: rgba(0, 53, 102, 0.7);
+    --cpr-panel: rgba(0, 8, 20, 0.9);
+    --cpr-text-main: #00ff41; /* Matrix green */
+    --cpr-text-muted: #008f11;
+    --cpr-text-bright: #00ff41;
+    --cpr-text-dim: #003b00;
+    --cpr-red: #00ff41;
+    --cpr-yellow: #00ff41;
+    --cpr-border: #00ff41;
+    --cpr-border-dark: #008f11;
+    --cpr-font-sans: 'Courier New', monospace;
+    --cpr-border-radius: 0px;
+}
+
+:root.theme-corpo {
+    --cpr-black-deep: #f5f5f7;
+    --cpr-black: #ffffff;
+    --cpr-black-soft: rgba(255, 255, 255, 0.8);
+    --cpr-black-elevated: rgba(240, 240, 240, 0.9);
+    --cpr-panel: rgba(255, 255, 255, 0.95);
+    --cpr-text-main: #1d1d1f;
+    --cpr-text-muted: #86868b;
+    --cpr-text-bright: #000000;
+    --cpr-text-dim: #a1a1a6;
+    --cpr-red: #0071e3; /* Blue accent for Corpo */
+    --cpr-yellow: #ff9f0a;
+    --cpr-border: #d2d2d7;
+    --cpr-border-dark: #86868b;
+    --cpr-border-radius: 12px;
+    --cpr-font-sans: 'SF Pro Display', 'Inter', 'system-ui', sans-serif;
+}
+
+:root.theme-corpo .cpr-panel {
+    clip-path: none;
+    border-radius: var(--cpr-border-radius);
+}
+
+:root.theme-corpo .cpr-corner-square {
+    display: none;
+}
+
+:root.theme-medtech {
+    --cpr-black-deep: #f0f4f8;
+    --cpr-black: #ffffff;
+    --cpr-black-soft: rgba(255, 255, 255, 0.8);
+    --cpr-black-elevated: rgba(226, 232, 240, 0.9);
+    --cpr-panel: rgba(255, 255, 255, 0.95);
+    --cpr-text-main: #2d3748;
+    --cpr-text-muted: #718096;
+    --cpr-text-bright: #1a202c;
+    --cpr-text-dim: #a0aec0;
+    --cpr-red: #38a169; /* Green for medical */
+    --cpr-red-dark: #2f855a;
+    --cpr-teal: #319795;
+    --cpr-border: #cbd5e0;
+    --cpr-border-radius: 4px;
+    --cpr-font-sans: 'Rajdhani', sans-serif;
+}
+
+:root.theme-medtech .cpr-panel {
+    clip-path: none;
+    border-radius: var(--cpr-border-radius);
+}
+
+:root.theme-medtech .cpr-corner-square {
+    display: none;
+}
+
+:root.theme-blind {
+    --cpr-red: #e69f00; /* Orange instead of Red */
+    --cpr-red-dark: #d55e00;
+    --cpr-yellow: #f0e442;
+    --cpr-teal: #56b4e9; /* Blue instead of Teal */
+    --cpr-teal-dark: #0072b2;
+}

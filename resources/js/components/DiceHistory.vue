@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="flex items-end justify-between gap-4 border-t border-cpr-red/20 pt-2">
-                        <div class="text-3xl font-black text-white font-numbers leading-none tracking-tighter">
+                        <div class="text-3xl font-black text-cpr-yellow font-numbers leading-none tracking-tighter">
                             {{ roll.total }}
                         </div>
                         <div v-if="roll.flavor" class="text-[8px] text-cpr-text-dim uppercase font-bold tracking-widest max-w-[100px] truncate pb-0.5">

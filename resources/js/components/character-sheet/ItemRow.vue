@@ -110,7 +110,7 @@
     <div v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug' && category !== 'gear'" class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"
-                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
+                    class="p-2 text-cpr-text-dim hover:text-cpr-yellow transition-colors flex items-center justify-center relative z-10"
                     :title="'Status: ' + equipStateLabel"
                 >
                     <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
@@ -121,14 +121,14 @@
                 <button
                     v-if="category === 'drug'"
                     @click.stop="$emit('consume-click', item)"
-                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
+                    class="p-2 text-cpr-text-dim hover:text-cpr-yellow transition-colors flex items-center justify-center relative z-10"
                     title="Consume Item"
                 >
                     <i v-icon :data-lucide="consumeIcon" class="w-5 h-5 pointer-events-none"></i>
                 </button>
                 <button
                     @click.stop="$emit('equip-click', item)"
-                    class="p-2 text-cpr-text-dim hover:text-white transition-colors flex items-center justify-center relative z-10"
+                    class="p-2 text-cpr-text-dim hover:text-cpr-yellow transition-colors flex items-center justify-center relative z-10"
                     :title="'Status: ' + equipStateLabel"
                 >
                     <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
@@ -162,14 +162,14 @@
                         <span class="text-[9px] text-cpr-teal uppercase font-bold">Quick Fix</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.quickFix.type }}</span>
-                            <span class="text-white font-numbers">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
+                            <span class="text-cpr-yellow font-numbers">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
                         </div>
                     </div>
                     <div v-if="item.system.treatment && (item.system.treatment.dvParamedic || item.system.treatment.dvSurgery)" class="bg-cpr-black-deep/50 p-2 border-l-2 border-cpr-red flex flex-col gap-1">
                         <span class="text-[9px] text-cpr-red uppercase font-bold">Treatment</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.treatment.type }}</span>
-                            <span class="text-white font-numbers">DV{{ item.system.treatment.dvParamedic || item.system.treatment.dvSurgery }}</span>
+                            <span class="text-cpr-yellow font-numbers">DV{{ item.system.treatment.dvParamedic || item.system.treatment.dvSurgery }}</span>
                         </div>
                     </div>
                 </div>

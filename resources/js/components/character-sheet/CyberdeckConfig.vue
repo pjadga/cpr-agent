@@ -6,7 +6,7 @@
                     <i v-icon data-lucide="cpu" class="w-5 h-5 text-black"></i>
                     <span class="text-sm font-black text-black tracking-tighter uppercase italic">Cyberdeck Configuration</span>
                 </div>
-                <button @click="$emit('close')" class="text-black hover:text-white transition-colors">
+                <button @click="$emit('close')" class="text-black hover:text-cpr-yellow transition-colors">
                     <i v-icon data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -18,9 +18,9 @@
                             <img v-cpr-img:cpr-teal="getImageUrl(activeCyberdeck.img)" class="w-8 h-8">
                         </div>
                         <div>
-                            <h3 class="text-md font-black text-white uppercase">{{ activeCyberdeck.name }}</h3>
+                            <h3 class="text-md font-black text-cpr-yellow uppercase">{{ activeCyberdeck.name }}</h3>
                             <div class="text-[10px] font-bold uppercase text-cpr-teal">
-                                Memory Slots: <span :class="activeCyberdeck.system.installedItems.usedSlots >= activeCyberdeck.system.installedItems.slots ? 'text-cpr-red' : 'text-white'" class="font-numbers">
+                                Memory Slots: <span :class="activeCyberdeck.system.installedItems.usedSlots >= activeCyberdeck.system.installedItems.slots ? 'text-cpr-red' : 'text-cpr-yellow'" class="font-numbers">
                                     {{ activeCyberdeck.system.installedItems.usedSlots }} / {{ activeCyberdeck.system.installedItems.slots }}
                                 </span>
                             </div>
@@ -39,7 +39,7 @@
                                 </div>
                             </div>
                             <button @click="$emit('uninstall', program)"
-                                    class="text-[9px] font-bold text-cpr-red hover:text-white hover:bg-cpr-red border border-cpr-red-dark/50 uppercase px-2 py-1 transition-all">
+                                    class="text-[9px] font-bold text-cpr-red hover:text-cpr-yellow hover:bg-cpr-red border border-cpr-red-dark/50 uppercase px-2 py-1 transition-all">
                                 <i v-icon data-lucide="minus" class="w-3 h-3"></i>
                             </button>
                         </div>
@@ -58,7 +58,7 @@
                             <div class="flex items-center gap-3">
                                 <img v-cpr-img:cpr-teal="getImageUrl(program.img)" class="w-8 h-8 opacity-50 grayscale group-hover:grayscale-0 transition-all">
                                 <div>
-                                    <div class="text-xs font-bold text-cpr-text-muted group-hover:text-white uppercase">{{ program.name }}</div>
+                                    <div class="text-xs font-bold text-cpr-text-muted group-hover:text-cpr-yellow uppercase">{{ program.name }}</div>
                                     <div class="text-[9px] text-cpr-text-dim font-mono uppercase">{{ program.system.class || 'Program' }}</div>
                                 </div>
                             </div>

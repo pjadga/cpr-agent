@@ -9,7 +9,7 @@ export function useResources(charData, updateStatCallback) {
     const resourceLabel = ref('');
     const resourceValue = ref(0);
     const resourceMax = ref(0);
-    const resourceColor = ref('text-white');
+    const resourceColor = ref('text-cpr-yellow');
     const bulkSign = ref('+');
     const bulkAmount = ref(0);
 
@@ -23,7 +23,7 @@ export function useResources(charData, updateStatCallback) {
         resourceLabel.value = label;
         resourceValue.value = clampResource(Number(current) || 0);
         resourceMax.value = Number(max) || 0;
-        resourceColor.value = color || 'text-white';
+        resourceColor.value = color || 'text-cpr-yellow';
         bulkSign.value = '+';
         bulkAmount.value = 0;
         showResourceModal.value = true;

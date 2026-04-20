@@ -1,13 +1,12 @@
-@import 'tailwindcss';
-@tailwind utilities;
+@import "tailwindcss";
+@import "./themes.css";
 
 @theme {
-    --font-sans: 'Hack', monospace;
+    --font-sans: var(--cpr-font-sans, 'Hack', monospace);
     --font-numbers: 'Repetition Scrolling', sans-serif;
 
-    --color-white: #e5e5e5; /* Dimmed from pure white */
+    --color-white: #e5e5e5;
 
-    /* Strict Palette */
     --color-cpr-red: var(--cpr-red);
     --color-cpr-red-dark: var(--cpr-red-dark);
     --color-cpr-yellow: var(--cpr-yellow);
@@ -15,7 +14,6 @@
     --color-cpr-teal: var(--cpr-teal);
     --color-cpr-teal-dark: var(--cpr-teal-dark);
 
-    /* Neutrals */
     --color-cpr-black: var(--cpr-black);
     --color-cpr-black-deep: var(--cpr-black-deep);
     --color-cpr-black-soft: var(--cpr-black-soft);
@@ -29,42 +27,18 @@
     --color-cpr-text-muted: var(--cpr-text-muted);
     --color-cpr-text-dim: var(--cpr-text-dim);
     --color-cpr-text-bright: var(--cpr-text-bright);
-}
 
-:root {
-    /* Brand/Accent Colors - CPR Red and Yellow are main */
-    --cpr-red: #da0000;
-    --cpr-red-dark: #a30000;
-    --cpr-yellow: #fcee0a;
-    --cpr-yellow-dark: #cfc100;
-
-    /* Secondary/Tertiary Colors - Stripped back */
-    --cpr-teal: #14b8a6;
-    --cpr-teal-dark: #0d9488;
-
-    /* Base Colors - Softened Night Mode */
-    --cpr-black: #1a1a1a;
-    --cpr-black-deep: #141414; /* Was #050505 */
-    --cpr-black-soft: rgba(35, 35, 35, 0.51);
-    --cpr-black-elevated: rgba(50, 50, 50, 0.73);
-
-    --cpr-panel: rgba(28, 28, 28, 0.85);
-    --cpr-panel-hover: rgba(218, 0, 0, 0.15);
-
-    --cpr-border: #333333;
-    --cpr-border-dark: #262626;
-    --cpr-border-muted: #404040;
-    --cpr-border-accent: rgba(218, 0, 0, 0.44);
-
-    /* Text Colors - Softened Contrast */
-    --cpr-text-main: #b0b0b0; /* Was #cdcdcd */
-    --cpr-text-muted: #7d8c99;
-    --cpr-text-bright: #e5e5e5; /* Was #f5f5f5 */
-    --cpr-text-dim: #555f66;
+    --radius-xs: calc(var(--cpr-border-radius, 0.375rem) * 0.5);
+    --radius-sm: calc(var(--cpr-border-radius, 0.375rem) * 0.75);
+    --radius-md: var(--cpr-border-radius, 0.375rem);
+    --radius-lg: calc(var(--cpr-border-radius, 0.375rem) * 1.5);
+    --radius-xl: calc(var(--cpr-border-radius, 0.375rem) * 2);
 }
 
 body {
     touch-action: manipulation;
+    background-color: var(--cpr-black-deep);
+    color: var(--cpr-text-main);
 }
 
 

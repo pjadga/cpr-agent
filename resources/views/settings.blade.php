@@ -108,13 +108,17 @@
                     <x-text-input type="text" name="foundry_url" id="foundry_url" value="{{ old('foundry_url', $config->foundry_url) }}" class="cyber-input-field mt-1 w-full" />
                 </div>
 
-{{--                <div>--}}
-{{--                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-teal" />--}}
-{{--                    <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">--}}
-{{--                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>--}}
-{{--                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (Chill)</option>--}}
-{{--                    </select>--}}
-{{--                </div>--}}
+                <div>
+                    <x-input-label for="theme" :value="__('Interface Theme')" class="text-xs uppercase text-cpr-teal" />
+                    <select id="theme" name="theme" class="cyber-select-field mt-1 text-base">
+                        <option value="night" {{ old('theme', $config->theme) == 'night' ? 'selected' : '' }} class="cyber-select-option">Night Mode (Classic)</option>
+                        <option value="day" {{ old('theme', $config->theme) == 'day' ? 'selected' : '' }} class="cyber-select-option">Day Mode (High Contrast)</option>
+                        <option value="bartmoss" {{ old('theme', $config->theme) == 'bartmoss' ? 'selected' : '' }} class="cyber-select-option">Rache Bartmoss (90s Hacker)</option>
+                        <option value="corpo" {{ old('theme', $config->theme) == 'corpo' ? 'selected' : '' }} class="cyber-select-option">Corpo (Minimalist)</option>
+                        <option value="medtech" {{ old('theme', $config->theme) == 'medtech' ? 'selected' : '' }} class="cyber-select-option">Med Tech (Clinical)</option>
+                        <option value="blind" {{ old('theme', $config->theme) == 'blind' ? 'selected' : '' }} class="cyber-select-option">Colour Blind Mode</option>
+                    </select>
+                </div>
 
                 <button type="submit" class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black w-full uppercase font-bold py-2">
                     Update Core Settings

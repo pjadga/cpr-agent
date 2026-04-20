@@ -3,17 +3,17 @@
         <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-border shadow-2xl" @click.stop>
             <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-border bg-cpr-black/40">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Adjust {{ resourceLabel }}</span>
-                <button class="text-cpr-text-muted hover:text-white" @click="$emit('close')"><i v-icon data-lucide="x" class="w-4 h-4"></i></button>
+                <button class="text-cpr-text-muted hover:text-cpr-yellow" @click="$emit('close')"><i v-icon data-lucide="x" class="w-4 h-4"></i></button>
             </div>
             <div class="p-4 space-y-4">
                 <div class="flex items-center justify-center gap-3">
-                    <button class="w-10 h-10 bg-cpr-black-deep border border-cpr-border text-white font-bold hover:bg-cpr-red-dark/40" @click="$emit('step', -1)">-</button>
+                    <button class="w-10 h-10 bg-cpr-black-deep border border-cpr-border text-cpr-yellow font-bold hover:bg-cpr-red-dark/40" @click="$emit('step', -1)">-</button>
                     <div class="text-center">
                         <div class="text-xs text-cpr-text-dim uppercase font-bold tracking-widest">Current</div>
                         <div class="text-4xl font-black font-numbers" :class="resourceColor">{{ resourceValue }}</div>
                         <div class="text-xs text-cpr-text-dim font-numbers">/ {{ resourceMax }}</div>
                     </div>
-                    <button class="w-10 h-10 bg-cpr-black-deep border border-cpr-border text-white font-bold hover:bg-green-900/40" @click="$emit('step', 1)">+</button>
+                    <button class="w-10 h-10 bg-cpr-black-deep border border-cpr-border text-cpr-yellow font-bold hover:bg-green-900/40" @click="$emit('step', 1)">+</button>
                 </div>
 
                 <div class="space-y-2">
@@ -28,9 +28,9 @@
                                     @click="$emit('update:bulkSign', '-')">-</button>
                         </div>
                         <input type="number" inputmode="numeric" pattern="[0-9]*" min="0"
-                               class="flex-1 min-w-0 bg-cpr-black border border-cpr-border px-3 py-2 text-white placeholder-gray-600"
+                               class="flex-1 min-w-0 bg-cpr-black border border-cpr-border px-3 py-2 text-cpr-yellow placeholder-gray-600"
                                :value="bulkAmount" @input="$emit('update:bulkAmount', $event.target.value)" placeholder="Amount"/>
-                        <button class="shrink-0 px-4 py-3 bg-cpr-black-deep border border-cpr-border text-white text-base hover:bg-cpr-black-elevated"
+                        <button class="shrink-0 px-4 py-3 bg-cpr-black-deep border border-cpr-border text-cpr-yellow text-base hover:bg-cpr-black-elevated"
                                 @click="$emit('applyBulk')">Apply</button>
                     </div>
                 </div>

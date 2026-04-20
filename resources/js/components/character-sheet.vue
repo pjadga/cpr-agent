@@ -47,13 +47,13 @@
             <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-cpr-black/80">
                 <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]" @click.stop>
                     <div class="absolute top-0 right-0 m-4 mt-[calc(1rem+env(safe-area-inset-top))] mr-[calc(1rem+env(safe-area-inset-right))]">
-                        <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-cpr-black/50 rounded-full p-2">
+                        <button @click="showImagePopup = false" class="text-cpr-yellow/70 hover:text-cpr-yellow transition-colors bg-cpr-black/50 rounded-full p-2">
                             <i v-icon data-lucide="x" class="w-6 h-6"></i>
                         </button>
                     </div>
                     <img v-cpr-img:cpr-red="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
                     <div class="mt-4 text-center">
-                        <h2 class="text-white font-bold uppercase tracking-widest text-lg">
+                        <h2 class="text-cpr-yellow font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
                         </h2>
                         <div v-if="!isWssConnected" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
@@ -108,18 +108,18 @@
                             <span v-else class="text-xl font-bold text-cpr-yellow">{{ charData.data.name[0] }}</span>
                         </div>
                         <div class="absolute inset-0 bg-cpr-yellow/0 group-hover:bg-cpr-yellow/20 transition-colors duration-300 flex items-center justify-center">
-                            <i v-icon data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            <i v-icon data-lucide="maximize-2" class="w-4 h-4 text-cpr-yellow opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 v-if="!isWssConnected" class="text-xl font-bold uppercase truncate leading-none text-white">
+                            <h1 v-if="!isWssConnected" class="text-xl font-bold uppercase truncate leading-none text-cpr-yellow">
                                 <span class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
                                     Offline
                                 </span>
                                 {{ charData.data.name }}
                             </h1>
-                            <h1 v-else class="text-xl font-bold uppercase truncate leading-none text-white">
+                            <h1 v-else class="text-xl font-bold uppercase truncate leading-none text-cpr-yellow">
                                 {{ charData.data.name }}
                             </h1>
                         </div>
@@ -128,7 +128,7 @@
                             }}</span>
                     </div>
                     <div class="shrink-0 flex items-center gap-2">
-                        <button @click="() => refreshSheet({ force: true })" class="p-2 border border-cpr-border text-cpr-text-muted hover:text-white hover:border-cpr-yellow transition-colors" title="Refresh Sheet">
+                        <button @click="() => refreshSheet({ force: true })" class="p-2 border border-cpr-border text-cpr-text-muted hover:text-cpr-yellow hover:border-cpr-yellow transition-colors" title="Refresh Sheet">
                             <i v-icon data-lucide="refresh-ccw" class="w-5 h-5 [margin-top:-3px]"></i>
                         </button>
                         <button @click="rollInitiative" class="group relative flex items-center gap-2 px-2.5 py-2.5 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]" title="Initiative Roll">
@@ -272,12 +272,12 @@
                      @click.stop>
                     <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-red-dark/30 bg-cpr-red-dark/10">
                         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-red">System Notification</span>
-                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showPopup = false">
+                        <button class="text-cpr-text-muted hover:text-cpr-yellow transition-colors" @click="showPopup = false">
                             <i v-icon data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="p-6 text-center space-y-4">
-                        <div class="text-lg font-black font-mono text-white tracking-tight leading-tight">
+                        <div class="text-lg font-black font-mono text-cpr-yellow tracking-tight leading-tight">
                             {{ popupMessage }}
                         </div>
                         <button
@@ -297,12 +297,12 @@
                      @click.stop>
                     <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-yellow-dark/30 bg-cpr-yellow-dark/10">
                         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-yellow">Consume Item</span>
-                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showConsumeModal = false">
+                        <button class="text-cpr-text-muted hover:text-cpr-yellow transition-colors" @click="showConsumeModal = false">
                             <i v-icon data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="p-6 text-center space-y-4">
-                        <div v-if="consumingItem" class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
+                        <div v-if="consumingItem" class="text-lg font-black font-mono text-cpr-yellow tracking-tight leading-tight mb-4">
                             {{ consumingItem.name }}
                         </div>
                         <div class="text-sm text-cpr-text-muted mb-6">
@@ -316,7 +316,7 @@
                             </button>
                         </div>
                         <button
-                            class="w-full py-2 mt-4 bg-cpr-black-elevated border border-cpr-border text-cpr-text-muted text-[10px] font-bold uppercase tracking-widest hover:text-white transition-all"
+                            class="w-full py-2 mt-4 bg-cpr-black-elevated border border-cpr-border text-cpr-text-muted text-[10px] font-bold uppercase tracking-widest hover:text-cpr-yellow transition-all"
                             @click="showConsumeModal = false">
                             Cancel
                         </button>
@@ -332,25 +332,25 @@
                      @click.stop>
                     <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-teal-dark/30 bg-cpr-teal-dark/10">
                         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-teal">Update Equipment State</span>
-                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showEquipModal = false">
+                        <button class="text-cpr-text-muted hover:text-cpr-yellow transition-colors" @click="showEquipModal = false">
                             <i v-icon data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="p-6 text-center space-y-4">
-                        <div v-if="editingItem" class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
+                        <div v-if="editingItem" class="text-lg font-black font-mono text-cpr-yellow tracking-tight leading-tight mb-4">
                             {{ editingItem.name }}
                         </div>
                         <div class="grid grid-cols-1 gap-2">
                             <button v-for="state in ['owned', 'carried', 'equipped']" :key="state"
                                     @click="updateEquipState(state)"
                                     class="w-full py-3 border transition-all flex items-center justify-center gap-3 uppercase font-bold tracking-widest text-xs"
-                                    :class="editingItem?.system.equipped === state ? 'bg-cpr-teal text-black border-cpr-teal' : 'bg-cpr-black-deep border-cpr-border text-cpr-text-dim hover:text-white hover:border-cpr-teal-dark'">
+                                    :class="editingItem?.system.equipped === state ? 'bg-cpr-teal text-black border-cpr-teal' : 'bg-cpr-black-deep border-cpr-border text-cpr-text-dim hover:text-cpr-yellow hover:border-cpr-teal-dark'">
                                 <i v-icon :data-lucide="getEquipIconForState(state)" class="w-5 h-5 pointer-events-none"></i>
                                 {{ state }}
                             </button>
                         </div>
                         <button
-                            class="w-full py-2 mt-4 bg-cpr-black-elevated border border-cpr-border text-cpr-text-muted text-[10px] font-bold uppercase tracking-widest hover:text-white transition-all"
+                            class="w-full py-2 mt-4 bg-cpr-black-elevated border border-cpr-border text-cpr-text-muted text-[10px] font-bold uppercase tracking-widest hover:text-cpr-yellow transition-all"
                             @click="showEquipModal = false">
                             Cancel
                         </button>

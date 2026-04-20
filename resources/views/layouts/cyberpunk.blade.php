@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html class="theme-{{ Auth::user()?->config?->theme ?? 'night' }}" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0">
@@ -24,7 +24,7 @@
             };
         </script>
     </head>
-    <body class="bg-cpr-black-deep text-cpr-text-main font-sans antialiased nativephp-safe-area {{ (Auth::user()?->config?->theme ?? 'night') === 'day' ? 'theme-day' : '' }}">
+    <body class="font-sans antialiased nativephp-safe-area">
         @yield('content')
 
         <script @cspNonce>

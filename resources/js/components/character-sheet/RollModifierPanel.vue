@@ -7,10 +7,10 @@
                     <span class="text-[10px] font-black uppercase tracking-widest text-cpr-red">Dice Roller & Mods</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button @click="$emit('refresh')" class="p-1 text-cpr-text-main hover:text-white">
+                    <button @click="$emit('refresh')" class="p-1 text-cpr-text-main hover:text-cpr-yellow">
                         <i v-icon data-lucide="refresh-cw" class="w-4 h-4"></i>
                     </button>
-                    <button @click="$emit('close')" class="p-1 text-cpr-text-main hover:text-white">
+                    <button @click="$emit('close')" class="p-1 text-cpr-text-main hover:text-cpr-yellow">
                         <i v-icon data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -26,7 +26,7 @@
 
                             <div class="relative z-10">
                                 <div class="text-[8px] text-cpr-red uppercase font-black tracking-[0.2em] mb-1 animate-bounce">Uplink Confirmed</div>
-                                <div class="text-4xl font-black text-white font-numbers drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">{{ lastResult?.total }}</div>
+                                <div class="text-4xl font-black text-cpr-yellow font-numbers drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">{{ lastResult?.total }}</div>
                                 <div class="text-[10px] text-cpr-lime font-numbers uppercase tracking-widest">{{ lastResult?.formula }}</div>
 
                                 <button @click="showResultPopup = false" class="mt-4 px-4 py-1 bg-cpr-red text-black text-[10px] font-black uppercase hover:bg-white transition-colors">Acknowledge</button>
@@ -46,7 +46,7 @@
                                 :key="die"
                                 @click="addDie(die)"
                                 class="flex flex-col items-center justify-center p-1.5 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
-                            <span class="text-[10px] font-bold text-cpr-text-main group-hover:text-white uppercase">{{ die }}</span>
+                            <span class="text-[10px] font-bold text-cpr-text-main group-hover:text-cpr-yellow uppercase">{{ die }}</span>
                         </button>
                         <button @click="clearFormula"
                                 class="flex items-center justify-center p-1.5 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
@@ -78,7 +78,7 @@
                 <div v-if="data" class="space-y-2">
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Actor</div>
-                        <div class="text-white font-bold text-xs">{{ data.actorName || 'Character' }}</div>
+                        <div class="text-cpr-yellow font-bold text-xs">{{ data.actorName || 'Character' }}</div>
                     </div>
 
                     <div v-if="hasWeapon" class="bg-cpr-black-deep border border-cpr-border p-2">
@@ -99,7 +99,7 @@
                         <div v-else class="space-y-1">
                             <div v-for="(inj, idx) in data.injuries" :key="idx" class="border border-cpr-border p-1.5 bg-cpr-black/40">
                                 <div class="flex items-center justify-between">
-                                    <div class="text-[10px] font-bold text-white">{{ inj.title }}</div>
+                                    <div class="text-[10px] font-bold text-cpr-yellow">{{ inj.title }}</div>
                                     <div :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}" class="text-[10px] font-numbers">{{ inj.penalty }}</div>
                                 </div>
                             </div>
@@ -129,7 +129,7 @@
                 <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1.5 flex items-center gap-2">
                     <i v-icon data-lucide="eye" class="w-2.5 h-2.5"></i> Roll Privacy
                 </div>
-                <select v-model="rollMode" class="w-full bg-cpr-black-deep border border-cpr-border text-white text-[11px] p-2 focus:border-cpr-red outline-none appearance-none hover:border-cpr-red/50 transition-colors">
+                <select v-model="rollMode" class="w-full bg-cpr-black-deep border border-cpr-border text-cpr-yellow text-[11px] p-2 focus:border-cpr-red outline-none appearance-none hover:border-cpr-red/50 transition-colors">
                     <option value="publicroll">Public Roll</option>
                     <option value="gmroll">Private GM Roll</option>
                     <option value="blindroll">Blind GM Roll</option>
