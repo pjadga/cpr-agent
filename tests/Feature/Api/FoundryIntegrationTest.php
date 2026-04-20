@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Api;
 
+use App\Events\FoundryResponse;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
-use App\Events\FoundryResponse;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -17,8 +17,11 @@ class FoundryIntegrationTest extends TestCase
     use RefreshDatabase;
 
     protected User $player;
+
     protected User $gm;
+
     protected string $playerToken;
+
     protected string $gmToken;
 
     protected function setUp(): void

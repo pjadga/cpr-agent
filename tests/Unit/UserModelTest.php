@@ -221,7 +221,7 @@ class UserModelTest extends TestCase
     #[Test]
     public function user_fillable_attributes_are_correct()
     {
-        $user = new User();
+        $user = new User;
 
         $fillable = $user->getFillable();
 

@@ -17,6 +17,7 @@ class ApiConnectionTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected string $token;
 
     protected function setUp(): void
@@ -150,7 +151,7 @@ class ApiConnectionTest extends TestCase
                 'skills' => array_fill(0, 50, ['value' => 3]),
             ],
             'items' => array_fill(0, 100, [
-                '_id' => 'item-' . uniqid('', true),
+                '_id' => 'item-'.uniqid('', true),
                 'name' => 'Test Item',
                 'type' => 'gear',
             ]),
@@ -182,9 +183,9 @@ class ApiConnectionTest extends TestCase
             $responses[] = $this->withToken($this->token)
                 ->postJson('/api/foundry/callback', [
                     'type' => 'ROLL_RESULT',
-                    'requestId' => 'concurrent-' . $i,
+                    'requestId' => 'concurrent-'.$i,
                     'total' => 10 + $i,
-                    'label' => 'Concurrent Roll ' . $i,
+                    'label' => 'Concurrent Roll '.$i,
                 ]);
         }
 

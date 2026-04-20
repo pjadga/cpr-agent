@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\CheckProfileSetup;
+use App\Http\Middleware\EnsureAppIsConfigured;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,8 +18,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
         $middleware->alias([
-            'profile.setup' => \App\Http\Middleware\CheckProfileSetup::class,
-            'app.configured' => \App\Http\Middleware\EnsureAppIsConfigured::class,
+            'profile.setup' => CheckProfileSetup::class,
+            'app.configured' => EnsureAppIsConfigured::class,
         ]);
     })
     ->withMiddleware(function (Middleware $middleware) {

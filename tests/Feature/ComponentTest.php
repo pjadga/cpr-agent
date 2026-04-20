@@ -13,5 +13,5 @@ class ComponentTest extends TestCase
         $view->assertSee('Test content');
     }
 
-    //Cyberpunk blade loads the Vue, so no template.
+    // Cyberpunk blade loads the Vue, so no template.
 }

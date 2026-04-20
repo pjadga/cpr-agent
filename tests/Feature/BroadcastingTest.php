@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Events\FoundryResponse;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
@@ -77,7 +77,7 @@ class BroadcastingTest extends TestCase
     {
         $response = $this->actingAs($this->user)
             ->postJson('/broadcasting/auth', [
-                'channel_name' => 'private-cpr-agent.' . $this->user->channel_id,
+                'channel_name' => 'private-cpr-agent.'.$this->user->channel_id,
                 'socket_id' => '1234.5678',
             ]);
 
@@ -103,7 +103,7 @@ class BroadcastingTest extends TestCase
 
         FoundryResponse::dispatch($payload);
 
-        Event::assertDispatched(FoundryResponse::class, function ($event) use ($payload) {
+        Event::assertDispatched(FoundryResponse::class, function ($event) {
             return $event->payload['type'] === 'ROLL_RESULT'
                 && $event->payload['requestId'] === 'req-123'
                 && $event->payload['total'] === 18

@@ -1,7 +1,7 @@
 <?php
 
-use Spatie\Csp\Directive;
-use Spatie\Csp\Keyword;
+use App\Support\Csp\Policy;
+use Spatie\Csp\Nonce\RandomString;
 
 return [
 
@@ -10,7 +10,7 @@ return [
      * any class that implements `Spatie\Csp\Preset`
      */
     'presets' => [
-        App\Support\Csp\Policy::class
+        Policy::class,
     ],
 
     /**
@@ -32,7 +32,7 @@ return [
      * Register additional global report-only CSP directives here.
      */
     'report_only_directives' => [
-     //   [Directive::IMG, [Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE]],
+        //   [Directive::IMG, [Keyword::UNSAFE_EVAL, Keyword::UNSAFE_INLINE]],
     ],
 
     /*
@@ -54,7 +54,7 @@ return [
     /*
      * The class responsible for generating the nonces used in inline tags and headers.
      */
-    'nonce_generator' => Spatie\Csp\Nonce\RandomString::class,
+    'nonce_generator' => RandomString::class,
 
     /*
      * Set false to disable automatic nonce generation and handling.

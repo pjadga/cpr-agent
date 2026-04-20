@@ -2,19 +2,20 @@
 
 namespace Tests\Feature\Api;
 
+use App\Events\FoundryResponse;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
-use App\Events\FoundryResponse;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use App\Http\Controllers\Api\FoundryController;
 
 class FoundryCallbackTest extends TestCase
 {
     use RefreshDatabase;
 
     protected User $user;
+
     protected string $token;
 
     protected function setUp(): void
@@ -323,7 +324,7 @@ class FoundryCallbackTest extends TestCase
 
         $response->assertStatus(200);
 
-        $cached = \Illuminate\Support\Facades\Cache::get('foundry_response_' . $requestId);
+        $cached = Cache::get('foundry_response_'.$requestId);
         $this->assertNotNull($cached);
         $this->assertEquals('ROLL_RESULT', $cached['type']);
         $this->assertEquals(20, $cached['total']);

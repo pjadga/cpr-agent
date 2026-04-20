@@ -22,7 +22,7 @@ return [
     'allowed_origins' => [
         'http://localhost:30000', // Your Foundry URL
         'http://localhost:30001', // Alternative Foundry port
-        '*'                       // OR use wildcard for dev (careful in prod)
+        '*',                       // OR use wildcard for dev (careful in prod)
     ],
 
     'allowed_origins_patterns' => [],

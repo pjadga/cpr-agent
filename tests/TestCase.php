@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -11,6 +12,6 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        \RyanChandler\LaravelCloudflareTurnstile\Facades\Turnstile::fake();
+        Turnstile::fake();
     }
 }

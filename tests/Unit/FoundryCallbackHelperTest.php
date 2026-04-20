@@ -2,9 +2,9 @@
 
 namespace Tests\Unit;
 
+use App\Http\Controllers\Api\FoundryController;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
-use App\Http\Controllers\Api\FoundryController;
 
 /**
  * Unit tests for Foundry callback helper methods
@@ -16,7 +16,7 @@ class FoundryCallbackHelperTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->controller = new FoundryController();
+        $this->controller = new FoundryController;
     }
 
     #[Test]

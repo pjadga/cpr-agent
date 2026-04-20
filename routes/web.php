@@ -3,34 +3,35 @@
 use App\Http\Controllers\Cyberdeck\InstallProgram;
 use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
-use App\Http\Controllers\Item\ConsumeItem;
 use App\Http\Controllers\Data\ActorSheet;
-use App\Http\Controllers\Data\GetActors;
 use App\Http\Controllers\Data\GetActor;
-use App\Http\Controllers\Data\ItemEquip;
+use App\Http\Controllers\Data\GetActors;
 use App\Http\Controllers\Data\GetRollModifiers;
+use App\Http\Controllers\Data\ImageProxy;
+use App\Http\Controllers\Data\ItemEquip;
+use App\Http\Controllers\Item\ConsumeItem;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Rolls\AttackRoll;
 use App\Http\Controllers\Rolls\DamageRoll;
 use App\Http\Controllers\Rolls\DeathSave;
+use App\Http\Controllers\Rolls\DiceRoller;
 use App\Http\Controllers\Rolls\FaceDown;
 use App\Http\Controllers\Rolls\InitiativeRoll;
 use App\Http\Controllers\Rolls\ProgramRoll;
 use App\Http\Controllers\Rolls\RoleRollRequest;
 use App\Http\Controllers\Rolls\SkillRollRequest;
 use App\Http\Controllers\Rolls\StatRollRequest;
-use App\Http\Controllers\Rolls\DiceRoller;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Token\GetVisibleTokens;
-use App\Http\Controllers\Token\MoveToken;
 use App\Http\Controllers\Token\ListVisibleTokens;
+use App\Http\Controllers\Token\MoveToken;
 use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
-use App\Http\Controllers\Values\UpdateStat;
 use App\Http\Controllers\Values\UpdateNotes;
-use App\Http\Controllers\SettingsController;
-use App\Events\CyberpunkAgentChannel;
+use App\Http\Controllers\Values\UpdateStat;
+use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
 
 /*
  * This is creating the problem of ownership. Each user will need their own Client ID - which is linked to their foundry instance.
@@ -84,37 +85,37 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
     Route::get('/getbaseurl', [SettingsController::class, 'getFoundryUrl']);
-    Route::post("/statrollrequest", [StatRollRequest::class, "rollStat"]);
-    Route::post("/skillrollrequest", [SkillRollRequest::class, "rollSkill"]);
-    Route::post("/rolerollrequest", [RoleRollRequest::class, "rollRole"]);
-    Route::post("/updatestat", [UpdateStat::class, "updateStat"]);
-    Route::post("/updatenotes", [UpdateNotes::class, "updateNotes"]);
-    Route::post("/actorsheet", [ActorSheet::class, "getCleanData"]);
-    Route::post("/getactor", [GetActor::class, "getActor"]);
-    Route::post("/getactors", [GetActors::class, "getActors"]);
-    Route::post("/movetoken", [MoveToken::class, "moveToken"]);
-    Route::post("/getvisibletokens", [GetVisibleTokens::class, "getVisibleTokens"]);
-    Route::post("/listvisibletokens", [ListVisibleTokens::class, "listVisibleTokens"]);
-    Route::post("/targettokens", [TargetTokens::class, "targetTokens"]);
-    Route::post("/attackroll", [AttackRoll::class, "attackRoll"]);
-    Route::post("/damageroll", [DamageRoll::class, "damageRoll"]);
-    Route::post("/make-roll", [DiceRoller::class, "makeRoll"]);
-    Route::get("/get-rolls", [DiceRoller::class, "getRolls"]);
-    Route::post("/reloadweapon", [ReloadWeapon::class, "reloadWeapon"]);
-    Route::post("/getrollmodifiers", [GetRollModifiers::class, "getRollModifiers"]);
-    Route::post("/deathsave", [DeathSave::class, "getDeathSave"]);
-    Route::post("/facedown", [FaceDown::class, "getFaceDown"]);
-    Route::post("/initiativeroll", [InitiativeRoll::class, "rollInitiative"]);
-    Route::post("/item-equip", [ItemEquip::class, "updateState"]);
-    Route::post("/consume-item", [ConsumeItem::class, "consume"]);
-    Route::post("/installprogram", [InstallProgram::class, "installProgram"]);
-    Route::post("/uninstallprogram", [RemoveProgram::class, "removeProgram"]);
-    Route::post("/toggleprogramrez", [ToggleRez::class, "toggleRez"]);
-    Route::post("/programroll", [ProgramRoll::class, "programRoll"]);
-    Route::get("/proxy-image", [\App\Http\Controllers\Data\ImageProxy::class, "proxy"])->name('proxy-image');
+    Route::post('/statrollrequest', [StatRollRequest::class, 'rollStat']);
+    Route::post('/skillrollrequest', [SkillRollRequest::class, 'rollSkill']);
+    Route::post('/rolerollrequest', [RoleRollRequest::class, 'rollRole']);
+    Route::post('/updatestat', [UpdateStat::class, 'updateStat']);
+    Route::post('/updatenotes', [UpdateNotes::class, 'updateNotes']);
+    Route::post('/actorsheet', [ActorSheet::class, 'getCleanData']);
+    Route::post('/getactor', [GetActor::class, 'getActor']);
+    Route::post('/getactors', [GetActors::class, 'getActors']);
+    Route::post('/movetoken', [MoveToken::class, 'moveToken']);
+    Route::post('/getvisibletokens', [GetVisibleTokens::class, 'getVisibleTokens']);
+    Route::post('/listvisibletokens', [ListVisibleTokens::class, 'listVisibleTokens']);
+    Route::post('/targettokens', [TargetTokens::class, 'targetTokens']);
+    Route::post('/attackroll', [AttackRoll::class, 'attackRoll']);
+    Route::post('/damageroll', [DamageRoll::class, 'damageRoll']);
+    Route::post('/make-roll', [DiceRoller::class, 'makeRoll']);
+    Route::get('/get-rolls', [DiceRoller::class, 'getRolls']);
+    Route::post('/reloadweapon', [ReloadWeapon::class, 'reloadWeapon']);
+    Route::post('/getrollmodifiers', [GetRollModifiers::class, 'getRollModifiers']);
+    Route::post('/deathsave', [DeathSave::class, 'getDeathSave']);
+    Route::post('/facedown', [FaceDown::class, 'getFaceDown']);
+    Route::post('/initiativeroll', [InitiativeRoll::class, 'rollInitiative']);
+    Route::post('/item-equip', [ItemEquip::class, 'updateState']);
+    Route::post('/consume-item', [ConsumeItem::class, 'consume']);
+    Route::post('/installprogram', [InstallProgram::class, 'installProgram']);
+    Route::post('/uninstallprogram', [RemoveProgram::class, 'removeProgram']);
+    Route::post('/toggleprogramrez', [ToggleRez::class, 'toggleRez']);
+    Route::post('/programroll', [ProgramRoll::class, 'programRoll']);
+    Route::get('/proxy-image', [ImageProxy::class, 'proxy'])->name('proxy-image');
 });
 
-//API Key registration
+// API Key registration
 
 Route::middleware('auth')->post('/settings/api-token', function (Request $request) {
     // Delete old tokens if you want them to only have one active connection
@@ -123,7 +124,7 @@ Route::middleware('auth')->post('/settings/api-token', function (Request $reques
     $token = $request->user()->createToken('FoundryClient')->plainTextToken;
 
     // Save it to the users config
-    $config = $request->user()->config ?: new \App\Models\Config(['user_id' => $request->user()->id]);
+    $config = $request->user()->config ?: new Config(['user_id' => $request->user()->id]);
     $config->api_key = $token;
     $config->save();
 
