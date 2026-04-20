@@ -1,5 +1,6 @@
 <template>
-    <div v-if="activeTab === 'stats'" key="stats" class="space-y-5 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+    <div v-if="activeTab === 'stats'" key="stats"
+         class="space-y-5 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
         <div class="grid grid-cols-2 gap-3">
             <resource-counter label="HIT POINTS"
@@ -42,7 +43,8 @@
             </adjustable-stat>
         </div>
 
-        <div class="bg-[var(--cpr-black-soft)] border border-cpr-border p-3 flex justify-between divide-x divide-gray-800">
+        <div
+            class="bg-[var(--cpr-black-soft)] border border-cpr-border p-3 flex justify-between divide-x divide-gray-800">
             <div class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
                 <div class="text-cpr-yellow font-bold"><span class="font-numbers">{{
@@ -56,14 +58,16 @@
                     {{ charData.data.system.improvementPoints.value }}
                 </div>
             </div>
-            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors" @click="$emit('facedown')">
+            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
+                 @click="$emit('facedown')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Reputation</div>
                 <div class="text-white font-numbers font-bold">{{
                         charData.data.system.reputation.value
                     }}
                 </div>
             </div>
-            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors" @click="$emit('deathsave')">
+            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
+                 @click="$emit('deathsave')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Death Save</div>
                 <div class="text-cpr-red font-numbers font-bold">
                     {{ charData.data.system.derivedStats.deathSave.penalty }}
@@ -72,11 +76,14 @@
         </div>
 
         <div v-if="groupedInjuries && (groupedInjuries.head.length > 0 || groupedInjuries.body.length > 0)">
-            <h3 @click="$emit('toggle-category', 'criticalInjury')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'criticalInjury')"
+                class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i> <span class="group-hover:text-cpr-red transition-colors">Critical Injuries</span>
+                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i>
+                    <span class="group-hover:text-cpr-red transition-colors">Critical Injuries</span>
                 </div>
-                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['criticalInjury'] }">
+                <div class="transition-transform duration-200"
+                     :class="{ 'rotate-180': collapsedCategories['criticalInjury'] }">
                     <i v-icon data-lucide="chevron-down"
                        class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i>
                 </div>
@@ -128,7 +135,8 @@
 
             <div v-for="(items, category) in groupedEquipped" :key="category">
                 <div v-if="items.length > 0" class="mb-4">
-                    <h4 class="text-[10px] font-bold text-cpr-text-dim uppercase mb-2 tracking-widest pl-1">{{ formatCategory(category) }}</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-text-dim uppercase mb-2 tracking-widest pl-1">
+                        {{ formatCategory(category) }}</h4>
                     <div class="space-y-2">
                         <div v-for="item in items" :key="item._id">
                             <item-row
@@ -139,17 +147,25 @@
                                 @equip-click="$emit('equip-click', $event)"
                                 @consume-click="$emit('consume-click', $event)">
                             </item-row>
-                            <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
-                                 class="ml-6 mt-1 space-y-1 border-l border-cpr-red-dark/50 pl-2">
+                            <div
+                                v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
+                                class="ml-6 mt-1 space-y-1 border-l border-cpr-red-dark/50 pl-2">
                                 <div v-for="childId in item.system.installedItems.list" :key="childId">
-                                    <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)" @consume-click="$emit('consume-click', $event)"></item-row>
+                                    <item-row v-if="charData.data.items.find(i => i._id === childId)"
+                                              :item="charData.data.items.find(i => i._id === childId)"
+                                              :category="charData.data.items.find(i => i._id === childId).type"
+                                              :all-items="charData.data.items"
+                                              @click="$emit('item-click', charData.data.items.find(i => i._id === childId))"
+                                              @equip-click="$emit('equip-click', $event)"
+                                              @consume-click="$emit('consume-click', $event)"></item-row>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div v-if="Object.values(groupedEquipped).flat().length === 0" class="text-cpr-text-dim text-sm italic p-2 text-center">
+            <div v-if="Object.values(groupedEquipped).flat().length === 0"
+                 class="text-cpr-text-dim text-sm italic p-2 text-center">
                 No items equipped.
             </div>
         </div>
@@ -157,21 +173,21 @@
 </template>
 
 <script>
-import { vIcon } from '../../directives/icon';
+import {vIcon} from '../../directives/icon';
 import ResourceCounter from './ResourceCounter.vue';
 import SimpleStat from './SimpleStat.vue';
 import AdjustableStat from './AdjustableStat.vue';
 import ItemRow from './ItemRow.vue';
-import { formatCategoryName } from '../../utils/helpers';
+import {formatCategoryName} from '../../utils/helpers';
 
 export default {
     name: 'StatsTab',
     props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll'],
-    components: { ResourceCounter, SimpleStat, AdjustableStat, ItemRow },
-    directives: { icon: vIcon },
+    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow},
+    directives: {icon: vIcon},
     emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'consume-click', 'toggle-category'],
     setup() {
-        return { formatCategory: formatCategoryName };
+        return {formatCategory: formatCategoryName};
     }
 }
 </script>

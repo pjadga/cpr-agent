@@ -1,7 +1,10 @@
 <template>
-    <div v-if="visible" class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm" @click="close">
+    <div v-if="visible"
+         class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
+         @click="close">
         <div class="w-full max-w-sm bg-cpr-black-deep border-2" :class="borderColor" @click.stop>
-            <div class="flex items-center justify-between px-4 py-2 border-b" :class="headerBorderColor + ' ' + headerBgColor">
+            <div class="flex items-center justify-between px-4 py-2 border-b"
+                 :class="headerBorderColor + ' ' + headerBgColor">
                 <span class="text-xs font-black uppercase tracking-[0.2em] text-white">{{ title }}</span>
                 <button class="text-white/70 hover:text-white transition-colors" @click="close">
                     <i v-icon data-lucide="x" class="w-5 h-5"></i>
@@ -9,7 +12,8 @@
             </div>
 
             <div class="p-6 text-center space-y-6">
-                <div v-if="flavor" class="text-[10px] text-cpr-text-dim uppercase font-bold tracking-[0.3em] leading-tight">
+                <div v-if="flavor"
+                     class="text-[10px] text-cpr-text-dim uppercase font-bold tracking-[0.3em] leading-tight">
                     {{ flavor }}
                 </div>
 
@@ -17,21 +21,23 @@
                     <div class="text-6xl font-black font-numbers tracking-tighter" :class="resultColor">
                         {{ result }}
                     </div>
-                    <div v-if="isCriticalSuccess" class="absolute -top-4 -right-8 bg-green-600 text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-tighter rotate-12 shadow-lg">
+                    <div v-if="isCriticalSuccess"
+                         class="absolute -top-4 -right-8 bg-green-600 text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-tighter rotate-12 shadow-lg">
                         Critical
                     </div>
-                    <div v-if="isCriticalFailure" class="absolute -top-4 -right-8 bg-cpr-red text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-tighter rotate-12 shadow-lg">
+                    <div v-if="isCriticalFailure"
+                         class="absolute -top-4 -right-8 bg-cpr-red text-black text-[8px] font-black px-2 py-0.5 uppercase tracking-tighter rotate-12 shadow-lg">
                         Fail
                     </div>
                 </div>
 
                 <!-- Apply Damage Button (for damage rolls) -->
-<!--                <div v-if="type==='damage'" class="flex justify-center mb-2">-->
-<!--                    <button @click="applyDamage" class="flex items-center gap-2 px-4 py-2 border-2 border-cpr-red text-cpr-red hover:bg-cpr-red hover:text-black transition-all font-black uppercase text-xs tracking-[0.2em]">-->
-<!--                        <i v-icon data-lucide="droplet" class="w-5 h-5"></i>-->
-<!--                        Apply Damage-->
-<!--                    </button>-->
-<!--                </div>-->
+                <!--                <div v-if="type==='damage'" class="flex justify-center mb-2">-->
+                <!--                    <button @click="applyDamage" class="flex items-center gap-2 px-4 py-2 border-2 border-cpr-red text-cpr-red hover:bg-cpr-red hover:text-black transition-all font-black uppercase text-xs tracking-[0.2em]">-->
+                <!--                        <i v-icon data-lucide="droplet" class="w-5 h-5"></i>-->
+                <!--                        Apply Damage-->
+                <!--                    </button>-->
+                <!--                </div>-->
 
                 <!-- Dice Breakdown -->
                 <div v-if="diceResults.length" class="flex justify-center gap-2">
@@ -47,7 +53,8 @@
                 </div>
 
                 <!-- Modifiers Breakdown -->
-                <div v-if="modifiers.length || luck > 0 || statValue > 0 || skillValue > 0" class="text-[10px] space-y-1 font-mono uppercase tracking-wider text-cpr-text-dim border-t border-cpr-border/20 pt-4">
+                <div v-if="modifiers.length || luck > 0 || statValue > 0 || skillValue > 0"
+                     class="text-[10px] space-y-1 font-mono uppercase tracking-wider text-cpr-text-dim border-t border-cpr-border/20 pt-4">
                     <div v-if="statValue" class="flex justify-between">
                         <span>Base Stat</span>
                         <span class="text-white font-numbers">+{{ statValue }}</span>
@@ -68,11 +75,13 @@
                     </div>
                 </div>
 
-                <div v-if="formula" class="font-mono text-xs text-cpr-text-dim bg-cpr-black/40 py-1 px-3 rounded-full inline-block">
+                <div v-if="formula"
+                     class="font-mono text-xs text-cpr-text-dim bg-cpr-black/40 py-1 px-3 rounded-full inline-block">
                     {{ formula }}
                 </div>
 
-                <div v-if="details" class="text-xs text-cpr-text-main font-medium uppercase tracking-widest border-t border-cpr-border/30 pt-4">
+                <div v-if="details"
+                     class="text-xs text-cpr-text-main font-medium uppercase tracking-widest border-t border-cpr-border/30 pt-4">
                     {{ details }}
                 </div>
             </div>
@@ -90,11 +99,11 @@
 </template>
 
 <script>
-import { vIcon } from '../directives/icon';
+import {vIcon} from '../directives/icon';
 
 export default {
     name: 'RollResultPopup',
-    directives: { icon: vIcon },
+    directives: {icon: vIcon},
     data() {
         return {
             visible: false,

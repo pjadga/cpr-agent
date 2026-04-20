@@ -3,7 +3,7 @@
  * Tests for the Foundry VTT module integration (test.js)
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {describe, it, expect, beforeEach, vi} from 'vitest';
 
 describe('Foundry Bridge', () => {
     let bridge;
@@ -37,7 +37,7 @@ describe('Foundry Bridge', () => {
                     name: 'Test Actor',
                     type: 'character',
                     system: {
-                        stats: { body: { value: 8 } },
+                        stats: {body: {value: 8}},
                     },
                 })),
             },
@@ -60,7 +60,7 @@ describe('Foundry Bridge', () => {
             activeRequests: new Map(),
             requestAgentLinks: new Map(),
             sendResponse: vi.fn(async (data) => {
-                return { success: true, agent_link: 'agent-link-123' };
+                return {success: true, agent_link: 'agent-link-123'};
             }),
             syncPlayerLink: vi.fn(),
         };
@@ -122,12 +122,12 @@ describe('Foundry Bridge', () => {
         await bridge.sendResponse(rollData);
 
         expect(bridge.sendResponse).toHaveBeenCalledWith(
-            expect.objectContaining({ agentLink: 'agent-link-123' })
+            expect.objectContaining({agentLink: 'agent-link-123'})
         );
     });
 
     it('should handle character assignment changes', async () => {
-        const newCharacter = { id: 'Actor.xyz789', name: 'Johnny' };
+        const newCharacter = {id: 'Actor.xyz789', name: 'Johnny'};
 
         await bridge.sendResponse({
             type: 'LINK_PLAYER_CHARACTER',

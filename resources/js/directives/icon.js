@@ -1,4 +1,4 @@
-import { nextTick } from 'vue';
+import {nextTick} from 'vue';
 
 export const vIcon = {
     mounted(el) {
@@ -26,7 +26,7 @@ function renderIcon(el) {
 
         // Manage the icon as a child of the element Vue is tracking.
         el.innerHTML = `<i data-lucide="${name}" style="width: 100%; height: 100%; display: block;"></i>`;
-        window.lucide.createIcons({ root: el });
+        window.lucide.createIcons({root: el});
         el._renderedIcon = name;
 
         // Ensure the container element is visible and properly sized.

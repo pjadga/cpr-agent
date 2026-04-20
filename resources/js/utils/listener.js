@@ -1,5 +1,5 @@
-import { onMounted, onUnmounted } from 'vue';
-import { isMyRequest } from './requests';
+import {onMounted, onUnmounted} from 'vue';
+import {isMyRequest} from './requests';
 
 /**
  * Hook to listen for Echo events on a private channel

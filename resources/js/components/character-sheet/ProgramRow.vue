@@ -8,17 +8,25 @@
         <div class="p-3 pl-4 flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer flex-1" @click="$emit('toggle-details')">
                 <div class="relative">
-                    <img v-cpr-img:cpr-teal="getImageUrl(prog.img)" class="w-9 h-9 object-cover border border-cpr-border bg-cpr-black" :class="{'grayscale opacity-60': !isEffectivelyRezzed(prog)}">
-                    <div v-if="isEffectivelyRezzed(prog)" class="absolute -bottom-1 -right-1 w-3 h-3 bg-cpr-teal rounded-full border-2 border-black animate-pulse"></div>
+                    <img v-cpr-img:cpr-teal="getImageUrl(prog.img)"
+                         class="w-9 h-9 object-cover border border-cpr-border bg-cpr-black"
+                         :class="{'grayscale opacity-60': !isEffectivelyRezzed(prog)}">
+                    <div v-if="isEffectivelyRezzed(prog)"
+                         class="absolute -bottom-1 -right-1 w-3 h-3 bg-cpr-teal rounded-full border-2 border-black animate-pulse"></div>
                 </div>
                 <div>
-                    <div class="text-xs font-bold text-white uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
+                    <div
+                        class="text-xs font-bold text-white uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
                         {{ prog.name }}
-                        <i v-icon data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300" :class="{'rotate-180': isExpanded}"></i>
+                        <i v-icon data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300"
+                           :class="{'rotate-180': isExpanded}"></i>
                     </div>
                     <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5" v-if="isEffectivelyRezzed(prog)">
-                        <span class="text-[9px] font-mono text-cpr-text-dim uppercase">{{ prog.system.class || 'Generic' }}</span>
-                        <span v-if="prog.system.rez && !['Anti-Personnel', 'Anti-Program'].includes(category)" class="text-[9px]" :class="prog.system.rez.value < 5 ? 'text-cpr-red' : 'text-cpr-teal'">
+                        <span class="text-[9px] font-mono text-cpr-text-dim uppercase">{{
+                                prog.system.class || 'Generic'
+                            }}</span>
+                        <span v-if="prog.system.rez && !['Anti-Personnel', 'Anti-Program'].includes(category)"
+                              class="text-[9px]" :class="prog.system.rez.value < 5 ? 'text-cpr-red' : 'text-cpr-teal'">
                             REZ: <span class="font-numbers">{{ prog.system.rez.value }}/{{ prog.system.rez.max }}</span>
                         </span>
                         <span v-if="prog.system.atk" class="text-[9px] text-cpr-teal">
@@ -57,22 +65,27 @@
 
         <!-- Expanded Details -->
         <div v-if="isExpanded" class="px-4 pb-3 border-t border-cpr-border/50 pt-2 bg-cpr-black/40">
-            <div class="text-[10px] text-cpr-text-muted font-mono mb-3 leading-relaxed" v-html="prog.system.description.value"></div>
+            <div class="text-[10px] text-cpr-text-muted font-mono mb-3 leading-relaxed"
+                 v-html="prog.system.description.value"></div>
             <div class="grid grid-cols-2 gap-2">
                 <div v-if="prog.system.damage" class="space-y-1">
                     <div class="text-[8px] text-cpr-text-dim uppercase font-bold">Damage</div>
                     <div class="flex gap-2">
-                        <div v-if="prog.system.damage.standard" class="text-[9px] bg-cpr-red-dark/30 border border-cpr-red-dark/50 px-1.5 py-0.5 text-cpr-red">
+                        <div v-if="prog.system.damage.standard"
+                             class="text-[9px] bg-cpr-red-dark/30 border border-cpr-red-dark/50 px-1.5 py-0.5 text-cpr-red">
                             STD: <span class="font-numbers">{{ prog.system.damage.standard }}</span>
                         </div>
-                        <div v-if="prog.system.damage.blackIce" class="text-[9px] bg-cpr-yellow-dark/30 border border-cpr-yellow-dark/50 px-1.5 py-0.5 text-cpr-yellow">
+                        <div v-if="prog.system.damage.blackIce"
+                             class="text-[9px] bg-cpr-yellow-dark/30 border border-cpr-yellow-dark/50 px-1.5 py-0.5 text-cpr-yellow">
                             B.ICE: <span class="font-numbers">{{ prog.system.damage.blackIce }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="space-y-1 text-right">
                     <div class="text-[8px] text-cpr-text-dim uppercase font-bold">Cost</div>
-                    <div class="text-[10px] text-cpr-teal font-bold"><span class="font-numbers">{{ prog.system.price?.market }}</span>eb</div>
+                    <div class="text-[10px] text-cpr-teal font-bold"><span
+                        class="font-numbers">{{ prog.system.price?.market }}</span>eb
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,17 +99,17 @@
 </template>
 
 <script>
-import { vIcon } from '../../directives/icon';
-import { useCharacterData } from '../../composables/useCharacterData';
-import { stripHtmlTags } from '../../utils/helpers';
+import {vIcon} from '../../directives/icon';
+import {useCharacterData} from '../../composables/useCharacterData';
+import {stripHtmlTags} from '../../utils/helpers';
 
 export default {
     name: 'ProgramRow',
     props: ['prog', 'category', 'isExpanded'],
-    directives: { icon: vIcon },
+    directives: {icon: vIcon},
     emits: ['toggle-details', 'toggle-rez', 'execute'],
     setup() {
-        const { getImageUrl } = useCharacterData();
+        const {getImageUrl} = useCharacterData();
 
         const isEffectivelyRezzed = (prog) => {
             if (prog.system.isRezzed) return true;
@@ -108,10 +121,10 @@ export default {
             const cls = (prog.system.class || '').toLowerCase();
             const name = (prog.name || '').toLowerCase();
             return ['defender', 'booster', 'blackice'].some(c => cls.includes(c)) ||
-                   ['shield', 'armor'].some(n => name.includes(n));
+                ['shield', 'armor'].some(n => name.includes(n));
         };
 
-        return { getImageUrl, isEffectivelyRezzed, canBeRezzed, stripHtmlTags };
+        return {getImageUrl, isEffectivelyRezzed, canBeRezzed, stripHtmlTags};
     }
 }
 </script>

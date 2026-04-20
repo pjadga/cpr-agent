@@ -7,11 +7,11 @@
 </template>
 
 <script>
-import { vIcon } from '../../directives/icon';
+import {vIcon} from '../../directives/icon';
 
 export default {
     name: 'NavBtn',
     props: ['icon', 'label', 'active'],
-    directives: { icon: vIcon }
+    directives: {icon: vIcon}
 };
 </script>

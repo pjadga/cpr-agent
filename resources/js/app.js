@@ -1,5 +1,5 @@
 import './bootstrap';
-import { setupAxiosInterceptors } from './utils/requests';
+import {setupAxiosInterceptors} from './utils/requests';
 import Alpine from 'alpinejs';
 import {createApp} from "vue";
 import CharacterSheet from "./components/character-sheet.vue";
@@ -20,7 +20,7 @@ import LifepathTab from "./components/character-sheet/LifepathTab.vue";
 import NavBtn from "./components/character-sheet/NavBtn.vue";
 import RollResultPopup from "./components/RollResultPopup.vue";
 import DiceHistory from "./components/DiceHistory.vue";
-import { vCprImg } from "./directives/cpr-img";
+import {vCprImg} from "./directives/cpr-img";
 import mitt from 'mitt';
 
 window.emitter = mitt();

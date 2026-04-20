@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 window.axios = axios;
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
@@ -8,8 +9,9 @@ window.Pusher = Pusher;
 // 1. Check if we are using HTTPS
 const isSecure = window.location.protocol === 'https:';
 
-import { useCharacterData } from './composables/useCharacterData';
-const { isWssConnected } = useCharacterData();
+import {useCharacterData} from './composables/useCharacterData';
+
+const {isWssConnected} = useCharacterData();
 
 window.Echo = new Echo({
     broadcaster: 'reverb',

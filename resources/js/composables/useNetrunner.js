@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import {computed, ref} from 'vue';
 
 export function useNetrunner(charData, sendRequest, throwError) {
     const showCyberdeckConfig = ref(false);
@@ -15,7 +15,7 @@ export function useNetrunner(charData, sendRequest, throwError) {
             return charData.value.data.items.find(i => i._id === id && i.type === 'program');
         }).filter(Boolean);
 
-        return { ...deck, installedPrograms: enrichedPrograms };
+        return {...deck, installedPrograms: enrichedPrograms};
     });
 
     // 2. Get Uninstalled Programs (Inventory)
@@ -70,7 +70,7 @@ export function useNetrunner(charData, sendRequest, throwError) {
         const cls = (prog.system.class || '').toLowerCase();
         const name = (prog.name || '').toLowerCase();
         return ['defender', 'booster', 'blackice'].some(c => cls.includes(c)) ||
-               ['shield', 'armor'].some(n => name.includes(n));
+            ['shield', 'armor'].some(n => name.includes(n));
     };
 
     const installProgram = (program) => {
@@ -81,16 +81,16 @@ export function useNetrunner(charData, sendRequest, throwError) {
             throwError("Cyberdeck memory full.");
             return;
         }
-        sendRequest({ deckId: activeCyberdeck.value._id, programId: program._id }, '/installprogram');
+        sendRequest({deckId: activeCyberdeck.value._id, programId: program._id}, '/installprogram');
     };
 
     const uninstallProgram = (program) => {
         if (!activeCyberdeck.value) return;
-        sendRequest({ deckId: activeCyberdeck.value._id, programId: program._id }, '/uninstallprogram');
+        sendRequest({deckId: activeCyberdeck.value._id, programId: program._id}, '/uninstallprogram');
     };
 
     const toggleRez = (program) => {
-        sendRequest({ programId: program._id, isRezzed: !program.system.isRezzed }, '/toggleprogramrez');
+        sendRequest({programId: program._id, isRezzed: !program.system.isRezzed}, '/toggleprogramrez');
     };
 
     const rollProgram = (program, activeDeck, controlState) => {
@@ -100,7 +100,7 @@ export function useNetrunner(charData, sendRequest, throwError) {
             programId: program._id,
             programName: program.name,
             type: program.type,
-            executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk" ),
+            executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk"),
         }, '/programroll');
     };
 

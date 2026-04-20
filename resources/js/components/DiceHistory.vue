@@ -16,7 +16,8 @@
                 <div class="absolute inset-0 bg-cpr-red/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
                 <div class="flex flex-col">
-                    <div class="text-[9px] text-cpr-red font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
+                    <div
+                        class="text-[9px] text-cpr-red font-black uppercase tracking-[0.2em] mb-1 flex items-center gap-2">
                         <span class="w-1.5 h-1.5 bg-cpr-red animate-pulse"></span>
                         {{ roll.playerName }}
                     </div>
@@ -25,13 +26,15 @@
                         <div class="text-3xl font-black text-white font-numbers leading-none tracking-tighter">
                             {{ roll.total }}
                         </div>
-                        <div v-if="roll.flavor" class="text-[8px] text-cpr-text-dim uppercase font-bold tracking-widest max-w-[100px] truncate pb-0.5">
+                        <div v-if="roll.flavor"
+                             class="text-[8px] text-cpr-text-dim uppercase font-bold tracking-widest max-w-[100px] truncate pb-0.5">
                             {{ roll.flavor }}
                         </div>
                     </div>
 
                     <!-- Progress bar for timeout -->
-                    <div class="absolute bottom-0 left-0 h-0.5 bg-cpr-red/40 animate-[timeout-bar_3s_linear_forwards]"></div>
+                    <div
+                        class="absolute bottom-0 left-0 h-0.5 bg-cpr-red/40 animate-[timeout-bar_3s_linear_forwards]"></div>
                 </div>
             </div>
         </transition-group>
@@ -39,8 +42,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useEchoListener } from '../utils/listener';
+import {ref, onMounted, onUnmounted} from 'vue';
+import {useEchoListener} from '../utils/listener';
 
 const activeRolls = ref([]);
 let rollId = 0;
@@ -86,8 +89,12 @@ onUnmounted(() => {
 
 <style scoped>
 @keyframes timeout-bar {
-    from { width: 100%; }
-    to { width: 0%; }
+    from {
+        width: 100%;
+    }
+    to {
+        width: 0%;
+    }
 }
 
 .roll-fade-move {

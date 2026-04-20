@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+
 @tailwind utilities;
 
 @theme {
@@ -6,7 +7,6 @@
     --font-numbers: 'Repetition Scrolling', sans-serif;
 
     --color-white: #e5e5e5; /* Dimmed from pure white */
-
     /* Strict Palette */
     --color-cpr-red: var(--cpr-red);
     --color-cpr-red-dark: var(--cpr-red-dark);
@@ -68,16 +68,46 @@ body {
 }
 
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--cpr-black-soft); border-radius: 10px; }
-::-webkit-scrollbar-thumb { background: var(--cpr-yellow-dark); border-radius: 10px; border: 2px solid var(--cpr-black-soft);}
-::-webkit-scrollbar-thumb:hover { background: var(--cpr-yellow-dark); }
-* { scrollbar-width: auto; scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);}
-.modal-scroll-content::-webkit-scrollbar-thumb { background: var(--cpr-yellow-dark);}
-.modal-scroll-content { scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);}
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
 
-.font-mono { font-family: 'Hack', monospace; }
-.font-numbers { font-family: 'Repetition Scrolling', sans-serif; }
+::-webkit-scrollbar-track {
+    background: var(--cpr-black-soft);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--cpr-yellow-dark);
+    border-radius: 10px;
+    border: 2px solid var(--cpr-black-soft);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cpr-yellow-dark);
+}
+
+* {
+    scrollbar-width: auto;
+    scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);
+}
+
+.modal-scroll-content::-webkit-scrollbar-thumb {
+    background: var(--cpr-yellow-dark);
+}
+
+.modal-scroll-content {
+    scrollbar-color: var(--cpr-yellow-dark) var(--cpr-black-soft);
+}
+
+.font-mono {
+    font-family: 'Hack', monospace;
+}
+
+.font-numbers {
+    font-family: 'Repetition Scrolling', sans-serif;
+}
 
 .cpr-panel {
     background-color: var(--cpr-panel);
@@ -92,8 +122,13 @@ body {
     transition: color 0.2s;
 }
 
-.cpr-panel.cpr-stat-box { border-bottom: 2px solid var(--cpr-red) !important; }
-.cpr-panel.cpr-equipped-box { border-left: 3px solid var(--cpr-red) !important; }
+.cpr-panel.cpr-stat-box {
+    border-bottom: 2px solid var(--cpr-red) !important;
+}
+
+.cpr-panel.cpr-equipped-box {
+    border-left: 3px solid var(--cpr-red) !important;
+}
 
 .cpr-corner-square {
     position: absolute;
@@ -105,12 +140,25 @@ body {
     clip-path: polygon(100% 0, 0 100%, 100% 100%);
 }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.15s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 0.15s ease;
+}
 
-.glow-red { text-shadow: 0 0 8px rgba(218, 0, 0, 0.4); }
-.glow-teal { text-shadow: 0 0 8px rgba(20, 184, 166, 0.4); }
-.glow-yellow { text-shadow: 0 0 8px rgba(184, 181, 20, 0.4); }
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
+
+.glow-red {
+    text-shadow: 0 0 8px rgba(218, 0, 0, 0.4);
+}
+
+.glow-teal {
+    text-shadow: 0 0 8px rgba(20, 184, 166, 0.4);
+}
+
+.glow-yellow {
+    text-shadow: 0 0 8px rgba(184, 181, 20, 0.4);
+}
 
 .cyber-input-field, .cyber-textarea-field, .cyber-select-field {
     @apply block w-full p-3 border rounded-md shadow-sm text-base;
@@ -118,7 +166,11 @@ body {
     @apply focus:ring-2 focus:ring-cpr-yellow focus:border-cpr-yellow placeholder-cpr-text-dim;
     font-size: 16px;
 }
-.cyber-textarea-field { @apply min-h-[70px] leading-relaxed; }
+
+.cyber-textarea-field {
+    @apply min-h-[70px] leading-relaxed;
+}
+
 .cyber-select-field {
     @apply appearance-none bg-no-repeat;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
@@ -126,4 +178,7 @@ body {
     background-size: 1.5em 1.5em;
     padding-right: 2.5rem;
 }
-.cyber-select-option { @apply bg-cpr-black-soft text-cpr-text-main p-2; }
+
+.cyber-select-option {
+    @apply bg-cpr-black-soft text-cpr-text-main p-2;
+}

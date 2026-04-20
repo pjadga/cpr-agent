@@ -16,12 +16,12 @@
     data-sitekey="{{ config('services.turnstile.key') }}"
     @if ($model)
         wire:ignore
-        data-callback="{{ $id }}Callback"
-        data-expired-callback="{{ $id }}ExpiredCallback"
-        data-timeout-callback="{{ $id }}ExpiredCallback"
-        {{ $attributes->filter(fn($value, $key) => ! in_array($key, ['data-callback', 'data-expired-callback', 'data-timeout-callback', 'wire:model', 'id']))->class(['cf-turnstile']) }}
-    @else
-        {{ $attributes->class(['cf-turnstile']) }}
+    data-callback="{{ $id }}Callback"
+    data-expired-callback="{{ $id }}ExpiredCallback"
+    data-timeout-callback="{{ $id }}ExpiredCallback"
+    {{ $attributes->filter(fn($value, $key) => ! in_array($key, ['data-callback', 'data-expired-callback', 'data-timeout-callback', 'wire:model', 'id']))->class(['cf-turnstile']) }}
+@else
+    {{ $attributes->class(['cf-turnstile']) }}
     @endif
 ></div>
 
@@ -33,7 +33,8 @@
             const expiredKey = {{ json_encode($id . 'ExpiredCallback') }};
 
             window[callbackKey] = function (token) {
-                @this.set({{ json_encode($model) }}, token);
+            @this.set({{ json_encode($model) }}, token)
+
             };
 
             window[expiredKey] = function () {
@@ -51,7 +52,7 @@
                 unwatch();
                 delete window[callbackKey];
                 delete window[expiredKey];
-            }, { once: true });
+            }, {once: true});
         });
     </script>
 @endif

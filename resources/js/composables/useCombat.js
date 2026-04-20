@@ -1,13 +1,14 @@
-import { ref, watch } from 'vue';
-import { debounce, throttle } from '../utils/helpers';
-import { cachedPost } from '../utils/api';
-import { useEchoListener } from '../utils/listener';
-import { useCharacterData } from './useCharacterData';
+import {ref, watch} from 'vue';
+import {debounce, throttle} from '../utils/helpers';
+import {cachedPost} from '../utils/api';
+import {useEchoListener} from '../utils/listener';
+import {useCharacterData} from './useCharacterData';
+
 /**
  * Composable for combat-related logic (movement, target selection, rolls)
  */
 export function useCombat(controlState, charData, fetchCharacterData, throwError) {
-    const { rollMode } = useCharacterData();
+    const {rollMode} = useCharacterData();
     const mockEnemies = ref([]);
     const dvInfo = ref(null);
     const dvLoading = ref(false);
@@ -115,7 +116,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (now - lastMoveTime < 300) return;
 
         lastMoveTime = now;
-        window.axios.post("/movetoken", { direction, weaponId, actorId, tokenId });
+        window.axios.post("/movetoken", {direction, weaponId, actorId, tokenId});
 
         // Refresh visible tokens after movement.
         debouncedGetVisibleTokens();

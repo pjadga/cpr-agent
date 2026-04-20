@@ -3,6 +3,7 @@
 namespace Tests\Feature\Frontend;
 
 use App\Models\User;
+use Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -207,7 +208,7 @@ class AuthenticationFlowTest extends TestCase
 
         $response->assertSessionHasNoErrors();
 
-        $this->assertTrue(\Hash::check('new-password', $user->fresh()->password));
+        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
     }
 
     #[Test]

@@ -1,6 +1,6 @@
-import { ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef } from 'vue';
-import { isDeepEqual } from '../utils/helpers';
-import { isMyRequest } from '../utils/requests';
+import {ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef} from 'vue';
+import {isDeepEqual} from '../utils/helpers';
+import {isMyRequest} from '../utils/requests';
 
 // Shared state to prevent multiple fetches/intervals
 const charData = shallowRef(null);
@@ -74,7 +74,7 @@ export function useCharacterData() {
     /**
      * Applies a focused delta update to the local character data.
      */
-    const applyDelta = (delta = {}, { tab } = {}) => {
+    const applyDelta = (delta = {}, {tab} = {}) => {
         if (!charData.value || !delta) return;
 
         // Verify character ID consistency
@@ -207,7 +207,7 @@ export function useCharacterData() {
             // Replace charData.value to ensure reactivity
             charData.value = {
                 ...charData.value,
-                data: { ...charData.value.data }
+                data: {...charData.value.data}
             };
         }
 
@@ -220,14 +220,14 @@ export function useCharacterData() {
      * Unified refresh orchestrator. If 'paths' provided, does a targeted fetch and merge.
      * If 'force' is true or no delta can be resolved, falls back to full fetch.
      */
-    const refreshSheet = async ({ paths = null, tab = null, force = false } = {}) => {
+    const refreshSheet = async ({paths = null, tab = null, force = false} = {}) => {
         if (force || !paths) {
             await fetchCharacterData(false, force);
             return;
         }
         // Minimal targeted refresh: ask server for current mirror and only merge requested paths
         try {
-            const response = await window.axios.post('/actorsheet', { actorUuid });
+            const response = await window.axios.post('/actorsheet', {actorUuid});
             const latest = response.data;
             if (!latest || !latest.data) return;
             const extract = (obj, path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
@@ -239,7 +239,7 @@ export function useCharacterData() {
                     deltas[p] = newVal; // keep incoming key form (Foundry-like)
                 }
             });
-            applyDelta(deltas, { tab });
+            applyDelta(deltas, {tab});
         } catch (e) {
             console.error('refreshSheet targeted fetch failed, falling back to full fetch', e);
             await fetchCharacterData(false, force);
@@ -308,7 +308,7 @@ export function useCharacterData() {
                 //Only trigger this when asked to refresh
                 console.log("Triggering background refresh from Foundry...");
                 if (actorUuid) {
-                    await window.axios.post("/getactor", { "actorId": actorUuid });
+                    await window.axios.post("/getactor", {"actorId": actorUuid});
                 }
 
                 // Safety fallback: if no event lands quickly, unstick the UI
@@ -403,7 +403,7 @@ export function useCharacterData() {
                                     localStorage.setItem('cpr_actor_uuid', actorUuid);
                                 }
 
-                                applyDelta(payload.delta, { tab: payload.tab });
+                                applyDelta(payload.delta, {tab: payload.tab});
                             }
                         });
                 } else {

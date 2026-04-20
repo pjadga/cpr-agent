@@ -1,10 +1,13 @@
 <template>
     <transition name="slide-right">
-        <aside v-if="show" class="fixed top-0 right-0 h-full w-[18rem] max-w-[85vw] z-[60] bg-cpr-black/95 border-l border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.35)] flex flex-col">
-            <div class="flex items-center justify-between p-2 pt-[calc(0.5rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">
+        <aside v-if="show"
+               class="fixed top-0 right-0 h-full w-[18rem] max-w-[85vw] z-[60] bg-cpr-black/95 border-l border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.35)] flex flex-col">
+            <div
+                class="flex items-center justify-between p-2 pt-[calc(0.5rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="dice-6" class="w-3 h-3 text-cpr-red"></i>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-cpr-red">Dice Roller & Mods</span>
+                    <span
+                        class="text-[10px] font-black uppercase tracking-widest text-cpr-red">Dice Roller & Mods</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <button @click="$emit('refresh')" class="p-1 text-cpr-text-main hover:text-white">
@@ -15,21 +18,36 @@
                     </button>
                 </div>
             </div>
-            <div class="p-2 space-y-2 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.5rem+env(safe-area-inset-right))] relative">
+            <div
+                class="p-2 space-y-2 overflow-y-auto flex-1 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pr-[calc(0.5rem+env(safe-area-inset-right))] relative">
                 <!-- Roll Result Popup -->
                 <transition name="fade">
-                    <div v-if="showResultPopup" class="absolute inset-0 z-[70] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-sm">
-                        <div class="bg-cpr-black border-2 border-cpr-red shadow-[0_0_50px_rgba(220,38,38,0.5)] p-4 text-center relative overflow-hidden group">
+                    <div v-if="showResultPopup"
+                         class="absolute inset-0 z-[70] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-sm">
+                        <div
+                            class="bg-cpr-black border-2 border-cpr-red shadow-[0_0_50px_rgba(220,38,38,0.5)] p-4 text-center relative overflow-hidden group">
                             <!-- Background Glitch Effect -->
                             <div class="absolute inset-0 bg-cpr-red/5 animate-pulse"></div>
-                            <div class="absolute -inset-full bg-gradient-to-r from-transparent via-cpr-red/10 to-transparent rotate-45 translate-x-[-100%] animate-[shimmer_2s_infinite]"></div>
+                            <div
+                                class="absolute -inset-full bg-gradient-to-r from-transparent via-cpr-red/10 to-transparent rotate-45 translate-x-[-100%] animate-[shimmer_2s_infinite]"></div>
 
                             <div class="relative z-10">
-                                <div class="text-[8px] text-cpr-red uppercase font-black tracking-[0.2em] mb-1 animate-bounce">Uplink Confirmed</div>
-                                <div class="text-4xl font-black text-white font-numbers drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">{{ lastResult?.total }}</div>
-                                <div class="text-[10px] text-cpr-lime font-numbers uppercase tracking-widest">{{ lastResult?.formula }}</div>
+                                <div
+                                    class="text-[8px] text-cpr-red uppercase font-black tracking-[0.2em] mb-1 animate-bounce">
+                                    Uplink Confirmed
+                                </div>
+                                <div
+                                    class="text-4xl font-black text-white font-numbers drop-shadow-[0_0_15px_rgba(255,255,255,0.5)] mb-2">
+                                    {{ lastResult?.total }}
+                                </div>
+                                <div class="text-[10px] text-cpr-lime font-numbers uppercase tracking-widest">
+                                    {{ lastResult?.formula }}
+                                </div>
 
-                                <button @click="showResultPopup = false" class="mt-4 px-4 py-1 bg-cpr-red text-black text-[10px] font-black uppercase hover:bg-white transition-colors">Acknowledge</button>
+                                <button @click="showResultPopup = false"
+                                        class="mt-4 px-4 py-1 bg-cpr-red text-black text-[10px] font-black uppercase hover:bg-white transition-colors">
+                                    Acknowledge
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -37,7 +55,8 @@
 
                 <!-- Die Roller Section (Always Visible) -->
                 <div class="bg-cpr-black-deep border border-cpr-red/30 p-2 space-y-2 mb-2">
-                    <div class="text-[9px] text-cpr-red uppercase font-bold tracking-wider mb-1 flex items-center gap-2">
+                    <div
+                        class="text-[9px] text-cpr-red uppercase font-bold tracking-wider mb-1 flex items-center gap-2">
                         <i v-icon data-lucide="dice-5" class="w-2 h-2"></i> Quick Dice
                     </div>
 
@@ -46,11 +65,14 @@
                                 :key="die"
                                 @click="addDie(die)"
                                 class="flex flex-col items-center justify-center p-1.5 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
-                            <span class="text-[10px] font-bold text-cpr-text-main group-hover:text-white uppercase">{{ die }}</span>
+                            <span class="text-[10px] font-bold text-cpr-text-main group-hover:text-white uppercase">{{
+                                    die
+                                }}</span>
                         </button>
                         <button @click="clearFormula"
                                 class="flex items-center justify-center p-1.5 bg-cpr-black border border-cpr-border hover:border-cpr-red hover:bg-cpr-red/10 transition-all group">
-                            <i v-icon data-lucide="trash-2" class="w-3 h-3 text-cpr-text-dim group-hover:text-cpr-red"></i>
+                            <i v-icon data-lucide="trash-2"
+                               class="w-3 h-3 text-cpr-text-dim group-hover:text-cpr-red"></i>
                         </button>
                     </div>
 
@@ -66,12 +88,18 @@
                     </div>
                 </div>
 
-                <div v-if="loading && !data" class="text-center py-8 text-cpr-text-muted text-xs font-mono animate-pulse">Initializing Modifiers...</div>
+                <div v-if="loading && !data"
+                     class="text-center py-8 text-cpr-text-muted text-xs font-mono animate-pulse">Initializing
+                    Modifiers...
+                </div>
 
                 <div v-else-if="error" class="border border-cpr-red-dark bg-cpr-red-dark/20 text-cpr-red text-xs p-3">
                     {{ error }}
                     <div class="mt-2">
-                        <button @click="$emit('go-to-control')" class="text-[10px] uppercase font-bold border border-cpr-red text-cpr-red px-2 py-1 hover:bg-cpr-red hover:text-black transition-colors">Go to Control</button>
+                        <button @click="$emit('go-to-control')"
+                                class="text-[10px] uppercase font-bold border border-cpr-red text-cpr-red px-2 py-1 hover:bg-cpr-red hover:text-black transition-colors">
+                            Go to Control
+                        </button>
                     </div>
                 </div>
 
@@ -87,20 +115,32 @@
                             <div class="text-cpr-lime font-numbers font-bold text-xs">+{{ data.baseBonus }}</div>
                         </div>
                         <div v-if="data.breakdown" class="mt-1 text-[10px] text-cpr-text-main font-numbers space-y-0.5">
-                            <div class="flex justify-between"><span>{{ (data.breakdown.statName || 'STAT').toUpperCase() }}</span><span>+{{ data.breakdown.statValue }}</span></div>
-                            <div class="flex justify-between"><span>{{ data.breakdown.skillName }}</span><span>+{{ data.breakdown.skillLevel }}</span></div>
-                            <div class="flex justify-between"><span>Weapon Acc</span><span>+{{ data.breakdown.weaponAcc }}</span></div>
+                            <div class="flex justify-between"><span>{{
+                                    (data.breakdown.statName || 'STAT').toUpperCase()
+                                }}</span><span>+{{ data.breakdown.statValue }}</span></div>
+                            <div class="flex justify-between"><span>{{
+                                    data.breakdown.skillName
+                                }}</span><span>+{{ data.breakdown.skillLevel }}</span></div>
+                            <div class="flex justify-between"><span>Weapon Acc</span><span>+{{
+                                    data.breakdown.weaponAcc
+                                }}</span></div>
                         </div>
                     </div>
 
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1">Injuries & Effects</div>
-                        <div v-if="!data.injuries || data.injuries.length === 0" class="text-[10px] text-cpr-text-dim italic">No injuries.</div>
+                        <div v-if="!data.injuries || data.injuries.length === 0"
+                             class="text-[10px] text-cpr-text-dim italic">No injuries.
+                        </div>
                         <div v-else class="space-y-1">
-                            <div v-for="(inj, idx) in data.injuries" :key="idx" class="border border-cpr-border p-1.5 bg-cpr-black/40">
+                            <div v-for="(inj, idx) in data.injuries" :key="idx"
+                                 class="border border-cpr-border p-1.5 bg-cpr-black/40">
                                 <div class="flex items-center justify-between">
                                     <div class="text-[10px] font-bold text-white">{{ inj.title }}</div>
-                                    <div :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}" class="text-[10px] font-numbers">{{ inj.penalty }}</div>
+                                    <div
+                                        :class="{'text-cpr-red': inj.penalty < 0, 'text-cpr-text-main': inj.penalty === 0, 'text-cpr-lime': inj.penalty > 0}"
+                                        class="text-[10px] font-numbers">{{ inj.penalty }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -109,14 +149,22 @@
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
                             <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
-                            <div :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}" class="font-numbers font-bold text-xs">{{ data.totalPenalty }}</div>
+                            <div
+                                :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}"
+                                class="font-numbers font-bold text-xs">{{ data.totalPenalty }}
+                            </div>
                         </div>
                     </div>
 
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
-                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">{{ hasWeapon ? 'Final Modifier' : 'Global Modifier' }}</div>
-                            <div :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}" class="font-numbers font-bold text-xs">{{ data.finalModifier }}</div>
+                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">
+                                {{ hasWeapon ? 'Final Modifier' : 'Global Modifier' }}
+                            </div>
+                            <div
+                                :class="{'text-cpr-lime': data.finalModifier >= 0, 'text-cpr-red': data.finalModifier < 0}"
+                                class="font-numbers font-bold text-xs">{{ data.finalModifier }}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -125,11 +173,13 @@
             </div>
 
             <!-- Privacy Setting -->
-            <div class="p-3 border-t border-cpr-red-dark bg-cpr-black/90 sticky bottom-0 shrink-0 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+            <div
+                class="p-3 border-t border-cpr-red-dark bg-cpr-black/90 sticky bottom-0 shrink-0 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
                 <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1.5 flex items-center gap-2">
                     <i v-icon data-lucide="eye" class="w-2.5 h-2.5"></i> Roll Privacy
                 </div>
-                <select v-model="rollMode" class="w-full bg-cpr-black-deep border border-cpr-border text-white text-[11px] p-2 focus:border-cpr-red outline-none appearance-none hover:border-cpr-red/50 transition-colors">
+                <select v-model="rollMode"
+                        class="w-full bg-cpr-black-deep border border-cpr-border text-white text-[11px] p-2 focus:border-cpr-red outline-none appearance-none hover:border-cpr-red/50 transition-colors">
                     <option value="publicroll">Public Roll</option>
                     <option value="gmroll">Private GM Roll</option>
                     <option value="blindroll">Blind GM Roll</option>
@@ -141,18 +191,18 @@
 </template>
 
 <script>
-import { ref, onMounted, watch } from 'vue';
-import { vIcon } from '../../directives/icon';
+import {ref, onMounted, watch} from 'vue';
+import {vIcon} from '../../directives/icon';
 import axios from 'axios';
-import { useCharacterData } from '../../composables/useCharacterData';
+import {useCharacterData} from '../../composables/useCharacterData';
 
 export default {
     name: 'RollModifierPanel',
     props: ['show', 'loading', 'error', 'data', 'hasWeapon'],
-    directives: { icon: vIcon },
+    directives: {icon: vIcon},
     emits: ['close', 'refresh', 'go-to-control'],
     setup(props) {
-        const { rollMode } = useCharacterData();
+        const {rollMode} = useCharacterData();
         const formula = ref('');
         const diceCounts = ref({});
         const rolling = ref(false);
@@ -230,8 +280,12 @@ export default {
 <style scoped>
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(200%) rotate(45deg); }
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(200%) rotate(45deg);
+    }
 }
 
 </style>

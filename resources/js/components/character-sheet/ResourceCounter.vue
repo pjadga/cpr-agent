@@ -1,5 +1,6 @@
 <template>
-    <div class="cpr-panel p-2 bg-[var(--cpr-black-soft)] flex flex-col items-center cursor-pointer relative" @click="$emit('edit')">
+    <div class="cpr-panel p-2 bg-[var(--cpr-black-soft)] flex flex-col items-center cursor-pointer relative"
+         @click="$emit('edit')">
         <span class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{ label }}</span>
         <div class="flex items-baseline gap-1">
             <span class="text-2xl font-black font-numbers" :class="color">{{ current }}</span>

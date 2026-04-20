@@ -11,18 +11,21 @@ global.Echo = {
     connector: {
         pusher: {
             connection: {
-                bind: () => {},
+                bind: () => {
+                },
             },
         },
     },
-    disconnect: () => {},
+    disconnect: () => {
+    },
 };
 
 // Mock window.Pusher
 global.Pusher = class Pusher {
     constructor() {
         this.connection = {
-            bind: () => {},
+            bind: () => {
+            },
         };
     }
 };
@@ -30,9 +33,12 @@ global.Pusher = class Pusher {
 // Mock localStorage
 const localStorageMock = {
     getItem: (key) => null,
-    setItem: (key, value) => {},
-    removeItem: (key) => {},
-    clear: () => {},
+    setItem: (key, value) => {
+    },
+    removeItem: (key) => {
+    },
+    clear: () => {
+    },
 };
 global.localStorage = localStorageMock;
 
@@ -44,7 +50,7 @@ global.fetch = async (url, options) => {
     return {
         ok: true,
         status: 200,
-        json: async () => ({ success: true }),
+        json: async () => ({success: true}),
         text: async () => 'OK',
     };
 };

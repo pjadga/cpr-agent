@@ -3,7 +3,7 @@
  * Tests for real-time communication via Laravel Echo and Reverb
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {describe, it, expect, beforeEach, vi} from 'vitest';
 
 describe('Laravel Echo Broadcasting', () => {
     let echo;
@@ -16,7 +16,7 @@ describe('Laravel Echo Broadcasting', () => {
         echo = {
             private: vi.fn((channelName) => ({
                 listen: vi.fn((eventName, callback) => {
-                    return { eventName, callback };
+                    return {eventName, callback};
                 }),
             })),
             connector: {
@@ -132,9 +132,9 @@ describe('Laravel Echo Broadcasting', () => {
         channel.listen('.GameUpdate', handler);
 
         // Simulate multiple events
-        handler({ payload: { type: 'ROLL_RESULT', total: 15 } });
-        handler({ payload: { type: 'SHEET_DELTA', delta: {} } });
-        handler({ payload: { type: 'CONFIRMATION', success: true } });
+        handler({payload: {type: 'ROLL_RESULT', total: 15}});
+        handler({payload: {type: 'SHEET_DELTA', delta: {}}});
+        handler({payload: {type: 'CONFIRMATION', success: true}});
 
         expect(events).toHaveLength(3);
         expect(events[0].type).toBe('ROLL_RESULT');
@@ -161,7 +161,7 @@ describe('Laravel Echo Broadcasting', () => {
                     _id: 'Actor.abc123',
                     name: 'V',
                     system: {
-                        stats: { body: { value: 8 } },
+                        stats: {body: {value: 8}},
                     },
                 },
             },
@@ -213,13 +213,13 @@ describe('Laravel Echo Broadcasting', () => {
         channel.listen('.GameUpdate', handler);
 
         // Event for me
-        handler({ payload: { type: 'ROLL_RESULT', agentLink: 'agent-link-123', total: 15 } });
+        handler({payload: {type: 'ROLL_RESULT', agentLink: 'agent-link-123', total: 15}});
 
         // Event for someone else
-        handler({ payload: { type: 'ROLL_RESULT', agentLink: 'agent-link-456', total: 12 } });
+        handler({payload: {type: 'ROLL_RESULT', agentLink: 'agent-link-456', total: 12}});
 
         // Broadcast event (no agent link)
-        handler({ payload: { type: 'REFRESH_SIGNAL', target: 'TOKENS' } });
+        handler({payload: {type: 'REFRESH_SIGNAL', target: 'TOKENS'}});
 
         expect(receivedEvents).toHaveLength(2);
         expect(receivedEvents[0].agentLink).toBe('agent-link-123');

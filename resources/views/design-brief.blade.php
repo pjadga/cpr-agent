@@ -8,7 +8,8 @@
                     <div>
                         <h1 class="text-xl font-black uppercase tracking-tight text-white">
                             Design Brief
-                            <span class="ml-2 text-[10px] font-mono font-bold text-cpr-yellow uppercase tracking-[0.3em]">CPR UI</span>
+                            <span
+                                class="ml-2 text-[10px] font-mono font-bold text-cpr-yellow uppercase tracking-[0.3em]">CPR UI</span>
                         </h1>
                         <p class="mt-1 text-xs text-cpr-text-muted">
                             A living reference for colours, surfaces, and UI components used across the app UI.
@@ -56,7 +57,8 @@
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xs font-black uppercase tracking-widest text-white">Brand / Primary</h3>
-                            <span class="text-[10px] font-mono text-cpr-text-dim">Red + Yellow drive most “action” UI</span>
+                            <span
+                                class="text-[10px] font-mono text-cpr-text-dim">Red + Yellow drive most “action” UI</span>
                         </div>
 
                         <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -74,7 +76,8 @@
                                     <div class="h-10 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
                                     <div class="mt-2 flex items-center justify-between">
-                                        <div class="text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
+                                        <div
+                                            class="text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
                                     </div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
@@ -104,7 +107,8 @@
                                 <div class="border border-cpr-border bg-cpr-black p-3">
                                     <div class="h-8 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
-                                    <div class="mt-2 text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
+                                    <div
+                                        class="mt-2 text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
                                         <div class="text-cpr-text-main">{{ $c['hex'] }}</div>
@@ -118,7 +122,8 @@
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xs font-black uppercase tracking-widest text-white">Neutrals / Surfaces</h3>
-                            <span class="text-[10px] font-mono text-cpr-text-dim">Base theme supports night + day modes</span>
+                            <span
+                                class="text-[10px] font-mono text-cpr-text-dim">Base theme supports night + day modes</span>
                         </div>
 
                         @php
@@ -141,7 +146,8 @@
                                 <div class="border border-cpr-border bg-cpr-black p-3">
                                     <div class="h-8 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
-                                    <div class="mt-2 text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
+                                    <div
+                                        class="mt-2 text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
                                         <div class="text-cpr-text-main">{{ $c['value'] }}</div>
@@ -179,12 +185,15 @@
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <h3 class="text-xs font-black uppercase tracking-widest text-white">Resource Counter</h3>
                         <p class="mt-2 text-xs text-cpr-text-muted">
-                            Compact stat tile (label + large mono number). Colour is passed as a class (commonly red/cyan).
+                            Compact stat tile (label + large mono number). Colour is passed as a class (commonly
+                            red/cyan).
                         </p>
 
                         <div class="mt-4 grid grid-cols-2 gap-3">
-                            <resource-counter label="HIT POINTS" :current="32" :max="40" color="text-cpr-red"></resource-counter>
-                            <resource-counter label="HUMANITY" :current="58" :max="70" color="text-cpr-teal"></resource-counter>
+                            <resource-counter label="HIT POINTS" :current="32" :max="40"
+                                              color="text-cpr-red"></resource-counter>
+                            <resource-counter label="HUMANITY" :current="58" :max="70"
+                                              color="text-cpr-teal"></resource-counter>
                         </div>
                     </div>
 
@@ -201,7 +210,8 @@
                     </div>
 
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-cpr-teal">Program Row (Netspace)</h3>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-cpr-teal">Program Row
+                            (Netspace)</h3>
                         <p class="mt-2 text-xs text-cpr-text-muted">
                             Teal is the “netrunner/tech online” signal. Rows often show a left accent bar + active glow.
                         </p>
@@ -238,7 +248,9 @@
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
                             <li><span class="text-white font-bold">Base:</span> deep black backgrounds.</li>
                             <li><span class="text-white font-bold">Panels:</span> clipped corner + border.</li>
-                            <li><span class="text-white font-bold">Elevated:</span> subtle lighter “device glass” surface.</li>
+                            <li><span class="text-white font-bold">Elevated:</span> subtle lighter “device glass”
+                                surface.
+                            </li>
                         </ul>
                     </div>
 
@@ -255,36 +267,53 @@
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <h3 class="text-xs font-black uppercase tracking-widest text-white">Colour Semantics</h3>
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
-                            <li><span class="text-cpr-red font-bold">Red:</span> primary action, danger, combat, top-level titles.</li>
-                            <li><span class="text-cpr-yellow font-bold">Yellow:</span> role, currency, highlight, second-level titles.</li>
-                            <li><span class="text-cpr-teal font-bold">Teal:</span> tech/netspace, active systems, secondary elements.</li>
+                            <li><span class="text-cpr-red font-bold">Red:</span> primary action, danger, combat,
+                                top-level titles.
+                            </li>
+                            <li><span class="text-cpr-yellow font-bold">Yellow:</span> role, currency, highlight,
+                                second-level titles.
+                            </li>
+                            <li><span class="text-cpr-teal font-bold">Teal:</span> tech/netspace, active systems,
+                                secondary elements.
+                            </li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-white">Common UI Blocks (quick checklist)</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-white">Common UI Blocks (quick
+                        checklist)</h3>
 
                     <div class="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                         <div class="border border-cpr-border bg-cpr-black p-3">
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Modal header</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Modal
+                                header
+                            </div>
                             <div class="mt-2 border border-cpr-border bg-cpr-black/40 p-2 flex justify-between">
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Title</span>
+                                <span
+                                    class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Title</span>
                                 <span class="text-cpr-text-muted">×</span>
                             </div>
                         </div>
 
                         <div class="border border-cpr-border bg-cpr-black p-3">
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Primary CTA</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Primary CTA
+                            </div>
                             <div class="mt-2">
-                                <button class="w-full py-2 bg-cpr-red text-black text-xs font-black uppercase">Execute</button>
+                                <button class="w-full py-2 bg-cpr-red text-black text-xs font-black uppercase">Execute
+                                </button>
                             </div>
                         </div>
 
                         <div class="border border-cpr-border bg-cpr-black p-3">
-                            <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Secondary / Outline</div>
+                            <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Secondary /
+                                Outline
+                            </div>
                             <div class="mt-2">
-                                <button class="w-full py-2 border-2 border-cpr-red text-cpr-red text-xs font-black uppercase">Roll Damage</button>
+                                <button
+                                    class="w-full py-2 border-2 border-cpr-red text-cpr-red text-xs font-black uppercase">
+                                    Roll Damage
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -293,15 +322,18 @@
 
             <section class="mt-8">
                 <h2 class="text-sm font-black uppercase tracking-[0.2em] text-cpr-red">Character Sheet Components</h2>
-                <p class="mt-2 text-xs text-cpr-text-muted">Overview of UI components used in the Character Sheet. Colors follow Red (top-level), Yellow (second-level), Teal (secondary/tech) hierarchy.</p>
+                <p class="mt-2 text-xs text-cpr-text-muted">Overview of UI components used in the Character Sheet.
+                    Colors follow Red (top-level), Yellow (second-level), Teal (secondary/tech) hierarchy.</p>
                 <div class="mt-6 space-y-12">
                     {{-- Stats & Resources --}}
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">Stats & Resources</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">
+                            Stats & Resources</h3>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="space-y-2">
                                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Resource Counter</div>
-                                <resource-counter label="HIT POINTS" :current="25" :max="40" color="text-cpr-red"></resource-counter>
+                                <resource-counter label="HIT POINTS" :current="25" :max="40"
+                                                  color="text-cpr-red"></resource-counter>
                             </div>
                             <div class="space-y-2">
                                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Simple Stat</div>
@@ -316,7 +348,8 @@
 
                     {{-- Items & Rows --}}
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">Items & Inventory</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">
+                            Items & Inventory</h3>
                         <div class="space-y-4">
                             <div class="space-y-2">
                                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Weapon Item Row</div>
@@ -355,10 +388,12 @@
 
                     {{-- Netrunner --}}
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">Netrunner Systems</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">
+                            Netrunner Systems</h3>
                         <div class="space-y-4">
                             <div class="space-y-2">
-                                <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Program Row (Rezzed)</div>
+                                <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Program Row (Rezzed)
+                                </div>
                                 <program-row
                                     :prog="{
                                         name: 'Armor',
@@ -380,12 +415,15 @@
 
                     {{-- Tab Components --}}
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">Tab Layouts</h3>
-                        <p class="text-[10px] text-cpr-text-dim italic">These are the top-level tab components. They require a full character data object.</p>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">
+                            Tab Layouts</h3>
+                        <p class="text-[10px] text-cpr-text-dim italic">These are the top-level tab components. They
+                            require a full character data object.</p>
                         <div class="space-y-8">
                             <div class="space-y-2">
                                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Stats Tab Example</div>
-                                <div class="border border-cpr-border bg-cpr-black-deep h-[400px] overflow-y-auto relative p-2">
+                                <div
+                                    class="border border-cpr-border bg-cpr-black-deep h-[400px] overflow-y-auto relative p-2">
                                     <stats-tab
                                         active-tab="stats"
                                         :char-data="{
@@ -418,7 +456,8 @@
 
                     {{-- Utility --}}
                     <div class="space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">Navigation & Utility</h3>
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-cpr-yellow border-b border-cpr-border pb-1">
+                            Navigation & Utility</h3>
                         <div class="flex gap-8">
                             <div class="space-y-2">
                                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Nav Button</div>

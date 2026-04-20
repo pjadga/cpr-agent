@@ -1,5 +1,6 @@
 <template>
-    <div v-if="activeTab === 'lifepath'" key="lifepath" class="space-y-5 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+    <div v-if="activeTab === 'lifepath'" key="lifepath"
+         class="space-y-5 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
 
         <!-- Notes Section -->
         <div class="cpr-panel bg-[var(--cpr-black-elevated)] p-4 border border-cpr-border relative">
@@ -20,27 +21,32 @@
                 <i v-icon data-lucide="users" class="w-4 h-4 text-cpr-red"></i> Lifepath
             </h3>
 
-            <div v-for="(value, key) in lifepathData" :key="key" class="bg-[var(--cpr-black-soft)] border border-cpr-border/30 p-3 relative group">
-                <div class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{ formatLabel(key) }}</div>
+            <div v-for="(value, key) in lifepathData" :key="key"
+                 class="bg-[var(--cpr-black-soft)] border border-cpr-border/30 p-3 relative group">
+                <div class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{
+                        formatLabel(key)
+                    }}
+                </div>
                 <div class="text-sm text-cpr-text-main leading-relaxed">
                     {{ value || '---' }}
                 </div>
-                <div class="absolute top-0 right-0 w-1 h-full bg-cpr-red/10 group-hover:bg-cpr-red/30 transition-colors"></div>
+                <div
+                    class="absolute top-0 right-0 w-1 h-full bg-cpr-red/10 group-hover:bg-cpr-red/30 transition-colors"></div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { ref, watch, computed } from 'vue';
-import { vIcon } from '../../directives/icon';
+import {ref, watch, computed} from 'vue';
+import {vIcon} from '../../directives/icon';
 
 export default {
     name: 'LifepathTab',
     props: ['activeTab', 'charData'],
-    directives: { icon: vIcon },
+    directives: {icon: vIcon},
     emits: ['update-notes'],
-    setup(props, { emit }) {
+    setup(props, {emit}) {
         const localNotes = ref('');
 
         // Strip HTML tags from Foundry notes if present, or just use as is
@@ -52,7 +58,7 @@ export default {
 
         watch(() => props.charData?.data?.system?.information?.notes, (newNotes) => {
             localNotes.value = cleanNotes(newNotes);
-        }, { immediate: true });
+        }, {immediate: true});
 
         const lifepathData = computed(() => props.charData?.data?.system?.lifepath || {});
 

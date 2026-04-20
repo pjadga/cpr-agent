@@ -14,7 +14,8 @@
             </button>
         </div>
 
-        <div v-if="(controlState.spaceMode === 'meatspace' || !hasNetspaceOptions)" class="space-y-6 animate-in fade-in duration-300">
+        <div v-if="(controlState.spaceMode === 'meatspace' || !hasNetspaceOptions)"
+             class="space-y-6 animate-in fade-in duration-300">
             <div>
                 <h3 class="text-xs font-black text-cpr-text-dim uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                     <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Target Acquisition
@@ -24,15 +25,21 @@
                             class="w-full p-3 bg-cpr-black border border-cpr-border flex items-center justify-between text-left transition-colors hover:border-cpr-border-muted">
                         <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
 
-                            <span class="text-xs font-bold text-white uppercase">{{ controlState.selectedTarget.name }}</span>
-                            <span class="text-[9px] text-cpr-text-dim">(<span class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
+                            <span class="text-xs font-bold text-white uppercase">{{
+                                    controlState.selectedTarget.name
+                                }}</span>
+                            <span class="text-[9px] text-cpr-text-dim">(<span
+                                class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
                         </div>
                         <span v-else class="text-xs text-cpr-text-dim uppercase italic font-mono">No Hostile Signal Locked</span>
-                        <i v-icon data-lucide="chevron-down" class="w-4 h-4 text-cpr-text-dim transition-transform duration-200" :class="{'rotate-180': showTargetDropdown}"></i>
+                        <i v-icon data-lucide="chevron-down"
+                           class="w-4 h-4 text-cpr-text-dim transition-transform duration-200"
+                           :class="{'rotate-180': showTargetDropdown}"></i>
                     </button>
 
                     <transition name="expand">
-                        <div v-if="showTargetDropdown" class="absolute z-50 w-full mt-1 bg-cpr-black-deep border border-cpr-border shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
+                        <div v-if="showTargetDropdown"
+                             class="absolute z-50 w-full mt-1 bg-cpr-black-deep border border-cpr-border shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
                             <div v-for="enemy in mockEnemies" :key="enemy.id"
                                  @click="controlState.selectedTarget = enemy; showTargetDropdown = false"
                                  class="p-3 flex items-center justify-between cursor-pointer hover:bg-cpr-red-dark/20 transition-colors">
@@ -40,7 +47,9 @@
 
                                     <div>
                                         <div class="text-xs font-bold text-white uppercase">{{ enemy.name }}</div>
-                                        <div class="text-[9px] text-cpr-text-dim"><span class="font-numbers">{{ enemy.distanceM }}</span>m away</div>
+                                        <div class="text-[9px] text-cpr-text-dim"><span
+                                            class="font-numbers">{{ enemy.distanceM }}</span>m away
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-cpr-red">
@@ -75,18 +84,27 @@
                         </div>
 
                         <div class="flex items-center gap-3">
-                            <img v-cpr-img:cpr-red="getImageUrl(weapon.img)" class="w-10 h-10 object-cover border border-cpr-border">
+                            <img v-cpr-img:cpr-red="getImageUrl(weapon.img)"
+                                 class="w-10 h-10 object-cover border border-cpr-border">
                             <div>
                                 <div class="text-xs font-bold  uppercase">{{ weapon.name }}</div>
                                 <div class="flex items-center gap-2 mt-0.5">
                                     <span class="text-[10px] text-cpr-text-muted">
                                         <template v-if="!isMeleeOrUnarmed(weapon) && weapon.system.magazine">
 
-                                            <span class="font-numbers">{{ weapon.system.magazine.value }}</span> <span class="text-cpr-text-dim">/</span> <span class="font-numbers">{{ weapon.system.magazine.max }}</span>
-                                            <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{ getAmmoName(weapon) }}]</span>
+                                            <span class="font-numbers">{{ weapon.system.magazine.value }}</span> <span
+                                            class="text-cpr-text-dim">/</span> <span
+                                            class="font-numbers">{{ weapon.system.magazine.max }}</span>
+                                            <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{
+                                                    getAmmoName(weapon)
+                                                }}]</span>
                                         </template>
-                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}" class="text-cpr-red font-bold font-numbers">{{ weapon.system.damage }}</span>
-                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span class="font-numbers">{{ weapon.system.rof }}</span></span>
+                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}"
+                                              class="text-cpr-red font-bold font-numbers">{{
+                                                weapon.system.damage
+                                            }}</span>
+                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span
+                                            class="font-numbers">{{ weapon.system.rof }}</span></span>
                                     </span>
                                 </div>
                             </div>
@@ -102,31 +120,41 @@
             <div class="fixed bottom-24 right-6 z-[60]">
                 <button @click="$emit('open-combat-panel')"
                         class="w-16 h-16 bg-cpr-red text-black rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(220,38,38,0.5)] active:scale-95 transition-all border-4 border-black group">
-                    <i v-icon data-lucide="crosshair" class="w-8 h-8 group-hover:rotate-90 transition-transform duration-500"></i>
-                    <div class="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border-2 border-black" v-if="controlState.selectedWeapon">
+                    <i v-icon data-lucide="crosshair"
+                       class="w-8 h-8 group-hover:rotate-90 transition-transform duration-500"></i>
+                    <div
+                        class="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center border-2 border-black"
+                        v-if="controlState.selectedWeapon">
                         <div class="w-2 h-2 bg-cpr-red rounded-full animate-ping"></div>
                     </div>
                 </button>
             </div>
         </div>
 
-        <div v-else-if="controlState.spaceMode === 'netspace' && hasNetspaceOptions" class="space-y-6 animate-in fade-in duration-300">
+        <div v-else-if="controlState.spaceMode === 'netspace' && hasNetspaceOptions"
+             class="space-y-6 animate-in fade-in duration-300">
             <div v-if="activeCyberdeck" class="relative">
                 <div class="cpr-panel p-4 bg-cpr-black-deep/20 border border-cpr-teal/30 mb-4 overflow-hidden group">
                     <div class="relative z-10 flex justify-between items-start mb-4">
                         <div>
-                            <h3 class="text-lg font-black text-white uppercase tracking-tighter">{{ activeCyberdeck.name }}</h3>
+                            <h3 class="text-lg font-black text-white uppercase tracking-tighter">{{
+                                    activeCyberdeck.name
+                                }}</h3>
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-[9px] px-1.5 py-0.5 bg-cpr-teal text-black font-black uppercase">Active Deck</span>
-                                <span class="text-[9px] text-cpr-teal font-mono font-bold uppercase">{{ activeCyberdeck.system.quality }} Quality</span>
+                                <span class="text-[9px] text-cpr-teal font-mono font-bold uppercase">{{
+                                        activeCyberdeck.system.quality
+                                    }} Quality</span>
                             </div>
                         </div>
-                        <button @click="$emit('open-cyberdeck-config')" class="flex items-center gap-1.5 px-3 py-1.5 bg-cpr-teal-dark/40 border border-cpr-teal/50 text-[10px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black transition-all shadow-[0_0_10px_rgba(20,184,166,0.2)]">
+                        <button @click="$emit('open-cyberdeck-config')"
+                                class="flex items-center gap-1.5 px-3 py-1.5 bg-cpr-teal-dark/40 border border-cpr-teal/50 text-[10px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black transition-all shadow-[0_0_10px_rgba(20,184,166,0.2)]">
                             <i v-icon data-lucide="settings" class="w-3 h-3"></i> Config
                         </button>
                     </div>
 
-                    <h4 class="text-[10px] font-bold text-cpr-teal uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Quick Actions</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-teal uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">
+                        Quick Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10 mb-2">
                         <button v-for="action in ['Jack In', 'Breach', 'Quickhack']"
                                 :key="action"
@@ -136,12 +164,14 @@
                         </button>
                     </div>
 
-                    <h4 class="text-[10px] font-bold text-cpr-teal uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">Interface Actions</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-teal uppercase tracking-[0.2em] mb-2 pl-1 relative z-10">
+                        Interface Actions</h4>
                     <div class="grid grid-cols-3 gap-2 relative z-10">
-                        <button v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap', 'Defense', 'Speed']"
-                                :key="action"
-                                @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
-                                class="py-3 bg-cpr-teal-dark/20 border border-cpr-teal/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black hover:border-cpr-teal transition-all">
+                        <button
+                            v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap', 'Defense', 'Speed']"
+                            :key="action"
+                            @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
+                            class="py-3 bg-cpr-teal-dark/20 border border-cpr-teal/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black hover:border-cpr-teal transition-all">
                             {{ action }}
                         </button>
                     </div>
@@ -152,7 +182,8 @@
                         <div v-if="programs.length > 0">
                             <h3 class="text-xs font-black text-white uppercase tracking-widest border-l-4 border-cpr-teal pl-2 mb-3 flex items-center justify-between">
                                 {{ category }}
-                                <span class="text-[9px] text-cpr-text-dim font-normal"><span class="font-numbers">{{ programs.length }}</span> Installed</span>
+                                <span class="text-[9px] text-cpr-text-dim font-normal"><span
+                                    class="font-numbers">{{ programs.length }}</span> Installed</span>
                             </h3>
 
                             <div class="space-y-3">
@@ -170,15 +201,17 @@
                     </div>
                 </div>
 
-                <div v-if="!activeCyberdeck" class="cpr-panel p-8 bg-cpr-red-dark/10 border border-cpr-red/30 text-center space-y-4">
+                <div v-if="!activeCyberdeck"
+                     class="cpr-panel p-8 bg-cpr-red-dark/10 border border-cpr-red/30 text-center space-y-4">
                     <i v-icon data-lucide="alert-triangle" class="w-12 h-12 text-cpr-red/40 mx-auto"></i>
                     <div>
-                        <h4 class="text-cpr-red font-black uppercase tracking-tighter text-lg">No Cyberdeck Detected</h4>
-                        <p class="text-[10px] text-cpr-red/60 font-mono uppercase tracking-widest mt-2">Equip a Cyberdeck in Gear to access Netspace.</p>
+                        <h4 class="text-cpr-red font-black uppercase tracking-tighter text-lg">No Cyberdeck
+                            Detected</h4>
+                        <p class="text-[10px] text-cpr-red/60 font-mono uppercase tracking-widest mt-2">Equip a
+                            Cyberdeck in Gear to access Netspace.</p>
                     </div>
                 </div>
             </div>
-
 
 
         </div>
@@ -192,17 +225,21 @@
             </div>
             <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-4">
                 <div></div>
-                <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'up')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-up" class="w-6 h-6 pointer-events-none"></i>
                 </button>
                 <div></div>
-                <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'left')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
                 </button>
-                <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'down')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-down" class="w-6 h-6 pointer-events-none"></i>
                 </button>
-                <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'right')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-white flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i>
                 </button>
             </div>
@@ -211,9 +248,9 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
-import { vIcon } from '../../directives/icon';
-import { useCharacterData } from '../../composables/useCharacterData';
+import {ref, computed} from 'vue';
+import {vIcon} from '../../directives/icon';
+import {useCharacterData} from '../../composables/useCharacterData';
 import ProgramRow from './ProgramRow.vue';
 import ItemRow from './ItemRow.vue';
 
@@ -225,15 +262,15 @@ export default {
         'availableFireModes', 'dvLoading', 'dvError', 'dvInfo',
         'activeCyberdeck', 'programCategories', 'expandedPrograms', 'refreshAll'
     ],
-    components: { ProgramRow, ItemRow },
-    directives: { icon: vIcon },
+    components: {ProgramRow, ItemRow},
+    directives: {icon: vIcon},
     emits: [
         'roll-hit', 'roll-damage', 'reload', 'move',
         'open-cyberdeck-config', 'open-combat-panel', 'program-roll-request',
         'toggle-program-details', 'toggle-rez', 'roll-program'
     ],
     setup(props) {
-        const { getImageUrl, charData } = useCharacterData();
+        const {getImageUrl, charData} = useCharacterData();
         const showTargetDropdown = ref(false);
 
         const isMeleeOrUnarmed = (item) => {
@@ -296,7 +333,15 @@ export default {
             return !!props.activeCyberdeck;
         });
 
-        return { getImageUrl, showTargetDropdown, isMeleeOrUnarmed, getAmmoTotal, getAmmoName, getStatusLine, hasNetspaceOptions };
+        return {
+            getImageUrl,
+            showTargetDropdown,
+            isMeleeOrUnarmed,
+            getAmmoTotal,
+            getAmmoName,
+            getStatusLine,
+            hasNetspaceOptions
+        };
     }
 }
 </script>
@@ -308,6 +353,7 @@ export default {
     max-height: 500px;
     opacity: 1;
 }
+
 .expand-enter-from,
 .expand-leave-to {
     max-height: 0;

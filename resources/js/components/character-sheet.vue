@@ -7,7 +7,9 @@
                 <div class="w-64 h-1 bg-cpr-black-deep overflow-hidden relative border border-cpr-border">
                     <div class="absolute inset-0 bg-cpr-red animate-[loading-bar_2s_infinite]"></div>
                 </div>
-                <div class="mt-4 text-[10px] text-cpr-text-dim font-mono uppercase tracking-[0.3em] italic">Initializing Headless Session</div>
+                <div class="mt-4 text-[10px] text-cpr-text-dim font-mono uppercase tracking-[0.3em] italic">Initializing
+                    Headless Session
+                </div>
             </div>
         </div>
 
@@ -22,10 +24,12 @@
                         {{ error }}
                     </div>
                     <div class="flex gap-4">
-                        <button @click="reloadPage" class="flex-1 py-2 bg-cpr-red text-black font-bold uppercase text-xs hover:bg-cpr-red transition-colors">
+                        <button @click="reloadPage"
+                                class="flex-1 py-2 bg-cpr-red text-black font-bold uppercase text-xs hover:bg-cpr-red transition-colors">
                             Retry Connection
                         </button>
-                        <button @click="goToSettings" class="flex-1 py-2 border border-cpr-red text-cpr-red font-bold uppercase text-xs hover:bg-cpr-red/10 transition-colors">
+                        <button @click="goToSettings"
+                                class="flex-1 py-2 border border-cpr-red text-cpr-red font-bold uppercase text-xs hover:bg-cpr-red/10 transition-colors">
                             Agent Config
                         </button>
                     </div>
@@ -44,19 +48,27 @@
                 @uninstall="uninstallProgram">
             </cyberdeck-config>
 
-            <div v-if="showImagePopup" @click="showImagePopup = false" class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-cpr-black/80">
-                <div class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]" @click.stop>
-                    <div class="absolute top-0 right-0 m-4 mt-[calc(1rem+env(safe-area-inset-top))] mr-[calc(1rem+env(safe-area-inset-right))]">
-                        <button @click="showImagePopup = false" class="text-white/70 hover:text-white transition-colors bg-cpr-black/50 rounded-full p-2">
+            <div v-if="showImagePopup" @click="showImagePopup = false"
+                 class="fixed inset-0 z-[110] flex items-center justify-center p-4 backdrop-blur-md bg-cpr-black/80">
+                <div
+                    class="relative max-w-2xl w-full max-h-[90vh] flex flex-col items-center justify-center animate-in fade-in zoom-in duration-200 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]"
+                    @click.stop>
+                    <div
+                        class="absolute top-0 right-0 m-4 mt-[calc(1rem+env(safe-area-inset-top))] mr-[calc(1rem+env(safe-area-inset-right))]">
+                        <button @click="showImagePopup = false"
+                                class="text-white/70 hover:text-white transition-colors bg-cpr-black/50 rounded-full p-2">
                             <i v-icon data-lucide="x" class="w-6 h-6"></i>
                         </button>
                     </div>
-                    <img v-cpr-img:cpr-red="getImageUrl(charData.data.img)" class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]" :alt="charData.data.name">
+                    <img v-cpr-img:cpr-red="getImageUrl(charData.data.img)"
+                         class="max-w-full max-h-[85vh] object-contain border-2 border-cpr-red shadow-[0_0_30px_rgba(220,38,38,0.4)]"
+                         :alt="charData.data.name">
                     <div class="mt-4 text-center">
                         <h2 class="text-white font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
                         </h2>
-                        <div v-if="!isWssConnected" class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
+                        <div v-if="!isWssConnected"
+                             class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
                             Offline Mode - Agent Synced via Local Cache
                         </div>
                     </div>
@@ -99,22 +111,29 @@
                 @update:fireMode="controlState.fireMode = $event">
             </combat-panel>
 
-            <header class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-yellow-dark backdrop-blur-md">
+            <header
+                class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-yellow-dark backdrop-blur-md">
                 <div class="pt-3 flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
                             class="absolute inset-0 border border-[var(--cpr-yellow)] bg-cpr-black-deep flex items-center justify-center overflow-hidden">
-                            <img v-if="charData.data.img" v-cpr-img:cpr-teal="getImageUrl(charData.data.img)" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" :alt="charData.data.name">
+                            <img v-if="charData.data.img" v-cpr-img:cpr-teal="getImageUrl(charData.data.img)"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                 :alt="charData.data.name">
                             <span v-else class="text-xl font-bold text-cpr-yellow">{{ charData.data.name[0] }}</span>
                         </div>
-                        <div class="absolute inset-0 bg-cpr-yellow/0 group-hover:bg-cpr-yellow/20 transition-colors duration-300 flex items-center justify-center">
-                            <i v-icon data-lucide="maximize-2" class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        <div
+                            class="absolute inset-0 bg-cpr-yellow/0 group-hover:bg-cpr-yellow/20 transition-colors duration-300 flex items-center justify-center">
+                            <i v-icon data-lucide="maximize-2"
+                               class="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
                         </div>
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 v-if="!isWssConnected" class="text-xl font-bold uppercase truncate leading-none text-white">
-                                <span class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
+                            <h1 v-if="!isWssConnected"
+                                class="text-xl font-bold uppercase truncate leading-none text-white">
+                                <span
+                                    class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
                                     Offline
                                 </span>
                                 {{ charData.data.name }}
@@ -128,17 +147,25 @@
                             }}</span>
                     </div>
                     <div class="shrink-0 flex items-center gap-2">
-                        <button @click="() => refreshSheet({ force: true })" class="p-2 border border-cpr-border text-cpr-text-muted hover:text-white hover:border-cpr-yellow transition-colors" title="Refresh Sheet">
+                        <button @click="() => refreshSheet({ force: true })"
+                                class="p-2 border border-cpr-border text-cpr-text-muted hover:text-white hover:border-cpr-yellow transition-colors"
+                                title="Refresh Sheet">
                             <i v-icon data-lucide="refresh-ccw" class="w-5 h-5 [margin-top:-3px]"></i>
                         </button>
-                        <button @click="rollInitiative" class="group relative flex items-center gap-2 px-2.5 py-2.5 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]" title="Initiative Roll">
+                        <button @click="rollInitiative"
+                                class="group relative flex items-center gap-2 px-2.5 py-2.5 border border-cpr-red bg-cpr-black text-cpr-red hover:bg-cpr-red hover:text-black transition-all shadow-[0_0_15px_rgba(220,38,38,0.2)] hover:shadow-[0_0_25px_rgba(220,38,38,0.5)]"
+                                title="Initiative Roll">
                             <i v-icon data-lucide="swords" class="w-5 h-5 animate-pulse group-hover:animate-none"></i>
-                            <span class="text-xs font-black uppercase tracking-widest hidden sm:inline">Initiative</span>
+                            <span
+                                class="text-xs font-black uppercase tracking-widest hidden sm:inline">Initiative</span>
                             <!-- Spooky Glow Overlay -->
-                            <div class="absolute inset-0 bg-cpr-red/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <div
+                                class="absolute inset-0 bg-cpr-red/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </button>
 
-                        <button @click="openRollPanel" class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors" title="Die Roller">
+                        <button @click="openRollPanel"
+                                class="p-2 border border-cpr-yellow text-cpr-yellow hover:bg-cpr-yellow hover:text-black transition-colors"
+                                title="Die Roller">
                             <i v-icon data-lucide="dice-6" class="w-5 h-5 [margin-top:-3px]"></i>
                         </button>
                     </div>
@@ -268,11 +295,15 @@
             <div v-if="showPopup"
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showPopup = false">
-                <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.2)]"
-                     @click.stop>
-                    <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-red-dark/30 bg-cpr-red-dark/10">
-                        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-red">System Notification</span>
-                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showPopup = false">
+                <div
+                    class="w-full max-w-xs bg-cpr-black-deep border border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.2)]"
+                    @click.stop>
+                    <div
+                        class="flex items-center justify-between px-3 py-2 border-b border-cpr-red-dark/30 bg-cpr-red-dark/10">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-red">System Notification</span>
+                        <button class="text-cpr-text-muted hover:text-white transition-colors"
+                                @click="showPopup = false">
                             <i v-icon data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -293,16 +324,21 @@
             <div v-if="showConsumeModal"
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showConsumeModal = false">
-                <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-yellow shadow-[0_0_30px_rgba(234,179,8,0.2)]"
-                     @click.stop>
-                    <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-yellow-dark/30 bg-cpr-yellow-dark/10">
-                        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-yellow">Consume Item</span>
-                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showConsumeModal = false">
+                <div
+                    class="w-full max-w-xs bg-cpr-black-deep border border-cpr-yellow shadow-[0_0_30px_rgba(234,179,8,0.2)]"
+                    @click.stop>
+                    <div
+                        class="flex items-center justify-between px-3 py-2 border-b border-cpr-yellow-dark/30 bg-cpr-yellow-dark/10">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-yellow">Consume Item</span>
+                        <button class="text-cpr-text-muted hover:text-white transition-colors"
+                                @click="showConsumeModal = false">
                             <i v-icon data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="p-6 text-center space-y-4">
-                        <div v-if="consumingItem" class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
+                        <div v-if="consumingItem"
+                             class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
                             {{ consumingItem.name }}
                         </div>
                         <div class="text-sm text-cpr-text-muted mb-6">
@@ -328,16 +364,20 @@
             <div v-if="showEquipModal"
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showEquipModal = false">
-                <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-teal shadow-[0_0_30px_rgba(20,184,166,0.2)]"
-                     @click.stop>
-                    <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-teal-dark/30 bg-cpr-teal-dark/10">
+                <div
+                    class="w-full max-w-xs bg-cpr-black-deep border border-cpr-teal shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+                    @click.stop>
+                    <div
+                        class="flex items-center justify-between px-3 py-2 border-b border-cpr-teal-dark/30 bg-cpr-teal-dark/10">
                         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-teal">Update Equipment State</span>
-                        <button class="text-cpr-text-muted hover:text-white transition-colors" @click="showEquipModal = false">
+                        <button class="text-cpr-text-muted hover:text-white transition-colors"
+                                @click="showEquipModal = false">
                             <i v-icon data-lucide="x" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <div class="p-6 text-center space-y-4">
-                        <div v-if="editingItem" class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
+                        <div v-if="editingItem"
+                             class="text-lg font-black font-mono text-white tracking-tight leading-tight mb-4">
                             {{ editingItem.name }}
                         </div>
                         <div class="grid grid-cols-1 gap-2">
@@ -345,7 +385,8 @@
                                     @click="updateEquipState(state)"
                                     class="w-full py-3 border transition-all flex items-center justify-center gap-3 uppercase font-bold tracking-widest text-xs"
                                     :class="editingItem?.system.equipped === state ? 'bg-cpr-teal text-black border-cpr-teal' : 'bg-cpr-black-deep border-cpr-border text-cpr-text-dim hover:text-white hover:border-cpr-teal-dark'">
-                                <i v-icon :data-lucide="getEquipIconForState(state)" class="w-5 h-5 pointer-events-none"></i>
+                                <i v-icon :data-lucide="getEquipIconForState(state)"
+                                   class="w-5 h-5 pointer-events-none"></i>
                                 {{ state }}
                             </button>
                         </div>
@@ -369,7 +410,7 @@
  * Handles character data fetching, stat updates, skills, gear, and combat controls.
  */
 
-import { computed, ref, triggerRef, watch } from "vue";
+import {computed, ref, triggerRef, watch} from "vue";
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
@@ -386,22 +427,34 @@ import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
 
 // --- COMPOSABLES ---
-import { useCharacterData } from '../composables/useCharacterData';
-import { useCombat } from '../composables/useCombat';
-import { useRollModifiers } from '../composables/useRollModifiers';
-import { useResources } from '../composables/useResources';
-import { useNetrunner } from '../composables/useNetrunner';
-import { useEchoListener } from '../utils/listener';
+import {useCharacterData} from '../composables/useCharacterData';
+import {useCombat} from '../composables/useCombat';
+import {useRollModifiers} from '../composables/useRollModifiers';
+import {useResources} from '../composables/useResources';
+import {useNetrunner} from '../composables/useNetrunner';
+import {useEchoListener} from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
-import { vIcon } from '../directives/icon';
-import { debounce, findItemInList, formatCategoryName } from '../utils/helpers';
-import { isMyRequest } from '../utils/requests';
+import {vIcon} from '../directives/icon';
+import {debounce, findItemInList, formatCategoryName} from '../utils/helpers';
+import {isMyRequest} from '../utils/requests';
 
 export default {
     name: 'CharacterSheet',
-    components: {CyberdeckConfig, NavBtn, CombatPanel, ControlTab, GearTab, LifepathTab, ResourceModal, RollModifierPanel, SkillsTab, DiceHistory, RollResultPopup },
-    directives: { icon: vIcon },
+    components: {
+        CyberdeckConfig,
+        NavBtn,
+        CombatPanel,
+        ControlTab,
+        GearTab,
+        LifepathTab,
+        ResourceModal,
+        RollModifierPanel,
+        SkillsTab,
+        DiceHistory,
+        RollResultPopup
+    },
+    directives: {icon: vIcon},
     setup() {
         // --- COMPOSABLES ---
         const {
@@ -437,7 +490,7 @@ export default {
         };
 
         const sendRequest = (data, url) => {
-            const payload = { ...data, rollMode: rollMode.value };
+            const payload = {...data, rollMode: rollMode.value};
             window.axios.post(url, payload).then(response => {
                 // Automatic refresh removed as requested.
                 if (response.data && response.data.data) {
@@ -471,7 +524,7 @@ export default {
                     triggerRef(charData);
                 }
             }
-            sendRequest({ label: stat, value: numericValue }, "/updatestat");
+            sendRequest({label: stat, value: numericValue}, "/updatestat");
         };
 
         const openEquipModal = (item) => {
@@ -486,10 +539,14 @@ export default {
 
         const getEquipIconForState = (state) => {
             switch (state) {
-                case 'equipped': return 'hand';
-                case 'carried': return 'briefcase';
-                case 'owned': return 'circle';
-                default: return 'help-circle';
+                case 'equipped':
+                    return 'hand';
+                case 'carried':
+                    return 'briefcase';
+                case 'owned':
+                    return 'circle';
+                default:
+                    return 'help-circle';
             }
         };
 
@@ -544,7 +601,7 @@ export default {
                 }
                 charData.value.data.system.information.notes = notes;
             }
-            sendRequest({ notes: notes }, "/updatenotes");
+            sendRequest({notes: notes}, "/updatenotes");
         };
 
         // --- CONTROL PANEL STATE ---
@@ -608,7 +665,7 @@ export default {
             } else if (newVal === 'Meatspace') {
                 controlState.value.spaceMode = 'meatspace';
             }
-        }, { immediate: true });
+        }, {immediate: true});
 
         const {
             mockEnemies,
@@ -660,7 +717,7 @@ export default {
                 programId: program._id,
                 programName: program.name,
                 type: program.type,
-                executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk" ),
+                executionType: (['defender', 'booster', 'blackice'].some(c => program.system.class.includes(c)) ? "def" : "atk"),
                 rollMode: rollMode.value
             }).then(response => {
                 // Automatic refresh removed as requested.
@@ -725,12 +782,12 @@ export default {
 
         const stats = computed(() => {
             if (!charData.value) return {};
-            const { luck, emp, ...rest } = charData.value.data.system.stats;
+            const {luck, emp, ...rest} = charData.value.data.system.stats;
             return rest;
         });
 
-        const luck = computed(() => charData.value?.data.system.stats.luck || { value: 0, max: 0 });
-        const emp = computed(() => charData.value?.data.system.stats.emp || { value: 0, max: 0 });
+        const luck = computed(() => charData.value?.data.system.stats.luck || {value: 0, max: 0});
+        const emp = computed(() => charData.value?.data.system.stats.emp || {value: 0, max: 0});
 
         const roleItem = computed(() => {
             if (!charData.value) return null;
@@ -765,9 +822,9 @@ export default {
         });
 
         const groupedInjuries = computed(() => {
-            if (!charData.value) return { head: [], body: [] };
+            if (!charData.value) return {head: [], body: []};
             const injuries = charData.value.data.items.filter(i => i.type === 'criticalInjury');
-            const groups = { head: [], body: [] };
+            const groups = {head: [], body: []};
             injuries.forEach(injury => {
                 const location = injury.system.location || 'body';
                 if (groups[location]) groups[location].push(injury);
@@ -778,7 +835,7 @@ export default {
 
         const groupedGear = computed(() => {
             if (!charData.value) return {};
-            const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [] };
+            const groups = {weapon: [], armor: [], ammo: [], gear: [], drug: []};
             const items = charData.value.data.items.filter(i =>
                 ['weapon', 'armor', 'gear', 'ammo', 'drug'].includes(i.type) &&
                 !installedIds.value.has(i._id)
@@ -793,7 +850,7 @@ export default {
         const groupedEquipped = computed(() => {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
-            const groups = { weapon: [], armor: [], ammo: [], gear: [], drug: [], installedPrograms: [] };
+            const groups = {weapon: [], armor: [], ammo: [], gear: [], drug: [], installedPrograms: []};
             const items = allItems.filter(i => {
                 const isEquipped = i.system.equipped === 'equipped' || i.system.equipped === 'carried';
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
@@ -849,10 +906,14 @@ export default {
         const formatCategory = formatCategoryName;
 
         // --- REQUEST WRAPPERS ---
-        const sendStatRequest = (stat) => sendRequest({ label: stat }, "/statrollrequest");
-        const sendSkillRequest = (skill) => sendRequest({ label: skill }, "/skillrollrequest");
-        const sendRoleRequest = (role) => sendRequest({ label: role, role: role, isAbility: false  }, "/rolerollrequest");
-        const sendRoleAbilityRequest = (role, ability) => sendRequest({ label: ability, role: role, isAbility: true }, "/rolerollrequest");
+        const sendStatRequest = (stat) => sendRequest({label: stat}, "/statrollrequest");
+        const sendSkillRequest = (skill) => sendRequest({label: skill}, "/skillrollrequest");
+        const sendRoleRequest = (role) => sendRequest({label: role, role: role, isAbility: false}, "/rolerollrequest");
+        const sendRoleAbilityRequest = (role, ability) => sendRequest({
+            label: ability,
+            role: role,
+            isAbility: true
+        }, "/rolerollrequest");
         const sendDeathSave = () => sendRequest({}, "/deathsave");
         const sendFaceDown = () => sendRequest({}, "/facedown");
 
@@ -872,17 +933,17 @@ export default {
 
         const availableFireModes = computed(() => {
             const modes = [
-                { id: 'Single', label: 'Single', icon: 'locate' },
-                { id: 'Aimed', label: 'Aimed', icon: 'locate-fixed' }
+                {id: 'Single', label: 'Single', icon: 'locate'},
+                {id: 'Aimed', label: 'Aimed', icon: 'locate-fixed'}
             ];
             const weapon = controlState.value.selectedWeapon;
             if (weapon && weapon.system && weapon.system.fireModes) {
                 const fm = weapon.system.fireModes;
                 if (typeof fm.autoFire === 'number' && fm.autoFire !== 0) {
-                    modes.push({ id: 'Auto', label: `Auto (${fm.autoFire})`, icon: 'zap' });
+                    modes.push({id: 'Auto', label: `Auto (${fm.autoFire})`, icon: 'zap'});
                 }
                 if (fm.suppressiveFire) {
-                    modes.push({ id: 'Suppress', label: 'Suppress', icon: 'shield-alert' });
+                    modes.push({id: 'Suppress', label: 'Suppress', icon: 'shield-alert'});
                 }
             }
             return modes;
@@ -915,7 +976,7 @@ export default {
             }
             // Refresh roll modifiers whether we have a weapon or not
             fetchRollModifiers();
-        }, { deep: true });
+        }, {deep: true});
 
         watch(() => charData.value, (newData, oldData) => {
             if (newData && controlState.value.selectedWeapon) {
@@ -936,7 +997,7 @@ export default {
                     fetchRollModifiers();
                 }
             }
-        }, { deep: true });
+        }, {deep: true});
 
         const refreshAll = () => {
             fetchCharacterData();
@@ -957,35 +1018,114 @@ export default {
 
         return {
             // State
-            charData, loading, error, activeTab,
-            stats, luck, emp, roleItem,
-            groupedSkills, groupedCyberware, groupedGear, groupedInjuries, groupedEquipped,
+            charData,
+            loading,
+            error,
+            activeTab,
+            stats,
+            luck,
+            emp,
+            roleItem,
+            groupedSkills,
+            groupedCyberware,
+            groupedGear,
+            groupedInjuries,
+            groupedEquipped,
 
             // Netrunner specific
-            activeCyberdeck, availablePrograms, programCategories, showCyberdeckConfig,
-            installProgram, uninstallProgram, toggleRez, rollProgram, canBeRezzed, isEffectivelyRezzed,
-            expandedPrograms, toggleProgramDetails,
+            activeCyberdeck,
+            availablePrograms,
+            programCategories,
+            showCyberdeckConfig,
+            installProgram,
+            uninstallProgram,
+            toggleRez,
+            rollProgram,
+            canBeRezzed,
+            isEffectivelyRezzed,
+            expandedPrograms,
+            toggleProgramDetails,
 
             // UI Helpers
-            calculateBase, findItem, formatCategory, getImageUrl, skillsDescriptions,
-            showPopup, showImagePopup, showCombatPanel, popupMessage, collapsedCategories, toggleCategory, toggleRoleExpansion, toggleSkillExpansion, expandedRoleItems, expandedSkills,
+            calculateBase,
+            findItem,
+            formatCategory,
+            getImageUrl,
+            skillsDescriptions,
+            showPopup,
+            showImagePopup,
+            showCombatPanel,
+            popupMessage,
+            collapsedCategories,
+            toggleCategory,
+            toggleRoleExpansion,
+            toggleSkillExpansion,
+            expandedRoleItems,
+            expandedSkills,
             handleItemClick,
 
             // Actions
-            sendStatRequest, sendSkillRequest, sendRoleRequest, sendRoleAbilityRequest, updateStat, updateNotes, rollInitiative,
-            sendDeathSave, sendFaceDown, sendRequest, refreshIcons, logout, close, goToSettings, refreshSheet,
-            isWssConnected, reloadPage,
+            sendStatRequest,
+            sendSkillRequest,
+            sendRoleRequest,
+            sendRoleAbilityRequest,
+            updateStat,
+            updateNotes,
+            rollInitiative,
+            sendDeathSave,
+            sendFaceDown,
+            sendRequest,
+            refreshIcons,
+            logout,
+            close,
+            goToSettings,
+            refreshSheet,
+            isWssConnected,
+            reloadPage,
 
             // Combat
-            mockEnemies, controlState, moveToken, rollHit, rollDamage, reloadWeapon, availableFireModes,
-            dvInfo, dvLoading, dvError, fetchDVForSelectedWeapon, refreshAll,
+            mockEnemies,
+            controlState,
+            moveToken,
+            rollHit,
+            rollDamage,
+            reloadWeapon,
+            availableFireModes,
+            dvInfo,
+            dvLoading,
+            dvError,
+            fetchDVForSelectedWeapon,
+            refreshAll,
 
             // Modals
-            showRollPanel, rollModsLoading, rollModsError, rollModsData, openRollPanel, closeRollPanel, fetchRollModifiers,
-            showResourceModal, resourceLabel, resourceValue, resourceMax, resourceColor, bulkSign, bulkAmount,
-            openResourceModal, closeResourceModal, stepResource, applyBulkChange, commitResourceValue,
-            showEquipModal, editingItem, openEquipModal, updateEquipState, getEquipIconForState,
-            showConsumeModal, consumingItem, openConsumeModal, confirmConsume
+            showRollPanel,
+            rollModsLoading,
+            rollModsError,
+            rollModsData,
+            openRollPanel,
+            closeRollPanel,
+            fetchRollModifiers,
+            showResourceModal,
+            resourceLabel,
+            resourceValue,
+            resourceMax,
+            resourceColor,
+            bulkSign,
+            bulkAmount,
+            openResourceModal,
+            closeResourceModal,
+            stepResource,
+            applyBulkChange,
+            commitResourceValue,
+            showEquipModal,
+            editingItem,
+            openEquipModal,
+            updateEquipState,
+            getEquipIconForState,
+            showConsumeModal,
+            consumingItem,
+            openConsumeModal,
+            confirmConsume
         };
     }
 };
@@ -1001,6 +1141,7 @@ export default {
     max-height: 500px;
     opacity: 1;
 }
+
 .expand-enter-from,
 .expand-leave-to {
     max-height: 0;
@@ -1013,6 +1154,7 @@ export default {
 .slide-right-leave-active {
     transition: transform 0.2s ease, opacity 0.2s ease;
 }
+
 .slide-right-enter-from,
 .slide-right-leave-to {
     transform: translateX(100%);
@@ -1023,6 +1165,7 @@ export default {
 .cpr-description p {
     margin-bottom: 0.5rem;
 }
+
 .cpr-description strong {
     color: var(--cpr-red);
 }
@@ -1033,11 +1176,13 @@ export default {
 .mode-list-leave-active {
     transition: all 0.3s ease;
 }
+
 .mode-list-enter-from,
 .mode-list-leave-to {
     opacity: 0;
     transform: scale(0.8);
 }
+
 .mode-list-leave-active {
     position: absolute;
     opacity: 0;

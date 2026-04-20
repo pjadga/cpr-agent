@@ -1,7 +1,8 @@
-import { ref } from 'vue';
-import { debounce, isDeepEqual } from '../utils/helpers';
-import { cachedPost } from '../utils/api';
-import { useEchoListener } from '../utils/listener';
+import {ref} from 'vue';
+import {debounce, isDeepEqual} from '../utils/helpers';
+import {cachedPost} from '../utils/api';
+import {useEchoListener} from '../utils/listener';
+
 /**
  * Composable for fetching and managing die rolls and modifiers
  */
@@ -28,7 +29,7 @@ export function useRollModifiers(controlState) {
                 console.warn('Foundry response timeout for roll modifiers.');
                 rollModsLoading.value = false;
                 if (!rollModsData.value) {
-                    rollModsData.value = { injuries: [], totalPenalty: 0, finalModifier: 0 };
+                    rollModsData.value = {injuries: [], totalPenalty: 0, finalModifier: 0};
                 }
             }
         }, 5000);

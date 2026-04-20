@@ -1,6 +1,7 @@
 <template>
     <transition name="slide-up">
-        <div v-if="show" class="fixed inset-x-0 bottom-0 z-[70] bg-cpr-black/95 border-t border-cpr-red-dark shadow-[0_-10px_30px_rgba(220,38,38,0.3)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
+        <div v-if="show"
+             class="fixed inset-x-0 bottom-0 z-[70] bg-cpr-black/95 border-t border-cpr-red-dark shadow-[0_-10px_30px_rgba(220,38,38,0.3)] pb-[calc(1rem+env(safe-area-inset-bottom))]">
             <!-- Header/Handle -->
             <div class="flex items-center justify-between p-3 border-b border-cpr-red-dark/50 bg-cpr-black-deep/10">
                 <div class="flex items-center gap-2">
@@ -15,7 +16,8 @@
             <div class="p-4 space-y-6 max-h-[70vh] overflow-y-auto">
                 <!-- Weapon & Fire Mode -->
                 <div v-if="selectedWeapon" class="space-y-4">
-                    <div class="flex items-center justify-between bg-cpr-black/40 border border-cpr-border p-3 rounded-sm">
+                    <div
+                        class="flex items-center justify-between bg-cpr-black/40 border border-cpr-border p-3 rounded-sm">
                         <div class="flex-1">
                             <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-2">Select Fire Mode</div>
                             <div class="grid grid-cols-2 gap-2">
@@ -29,9 +31,13 @@
                         </div>
                         <div class="text-right pl-4 border-l border-cpr-border ml-4">
                             <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-1">Target DV</div>
-                            <div v-if="dvLoading" class="text-cpr-yellow-dark animate-pulse font-mono font-bold">CALC...</div>
+                            <div v-if="dvLoading" class="text-cpr-yellow-dark animate-pulse font-mono font-bold">
+                                CALC...
+                            </div>
                             <div v-else-if="dvError" class="text-cpr-red font-mono text-xs">ERR</div>
-                            <div v-else class="text-3xl font-black text-cpr-yellow font-numbers leading-none">{{ dvInfo || '--' }}</div>
+                            <div v-else class="text-3xl font-black text-cpr-yellow font-numbers leading-none">
+                                {{ dvInfo || '--' }}
+                            </div>
                         </div>
                     </div>
 
@@ -57,7 +63,8 @@
                 </div>
 
                 <div v-else class="text-center py-6 border border-dashed border-cpr-border rounded-sm">
-                    <span class="text-xs text-cpr-text-dim uppercase font-bold tracking-widest">No Weapon Selected</span>
+                    <span
+                        class="text-xs text-cpr-text-dim uppercase font-bold tracking-widest">No Weapon Selected</span>
                 </div>
 
                 <!-- Tactical Movement -->
@@ -69,17 +76,21 @@
                     </div>
                     <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-2">
                         <div></div>
-                        <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                        <button @click="$emit('move', 'up')"
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                             <i v-icon data-lucide="chevron-up" class="w-6 h-6"></i>
                         </button>
                         <div></div>
-                        <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                        <button @click="$emit('move', 'left')"
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                             <i v-icon data-lucide="chevron-left" class="w-6 h-6"></i>
                         </button>
-                        <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                        <button @click="$emit('move', 'down')"
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                             <i v-icon data-lucide="chevron-down" class="w-6 h-6"></i>
                         </button>
-                        <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                        <button @click="$emit('move', 'right')"
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                             <i v-icon data-lucide="chevron-right" class="w-6 h-6"></i>
                         </button>
                     </div>
@@ -91,7 +102,7 @@
 </template>
 
 <script>
-import { vIcon } from '../../directives/icon';
+import {vIcon} from '../../directives/icon';
 
 export default {
     name: 'CombatPanel',
@@ -99,7 +110,7 @@ export default {
         'show', 'selectedWeapon', 'availableFireModes', 'fireMode',
         'dvLoading', 'dvError', 'dvInfo', 'reloadRequired'
     ],
-    directives: { icon: vIcon },
+    directives: {icon: vIcon},
     emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'move', 'update:fireMode']
 }
 </script>
@@ -109,6 +120,7 @@ export default {
 .slide-up-leave-active {
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .slide-up-enter-from,
 .slide-up-leave-to {
     transform: translateY(100%);

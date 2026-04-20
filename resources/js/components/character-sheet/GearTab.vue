@@ -2,13 +2,15 @@
     <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
 
 
-
         <div>
-            <h3 @click="$emit('toggle-category', 'cyberware')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'cyberware')"
+                class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="zap" class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i> <span class="group-hover:text-cpr-teal transition-colors">Cyberware</span>
+                    <i v-icon data-lucide="zap" class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i> <span
+                    class="group-hover:text-cpr-teal transition-colors">Cyberware</span>
                 </div>
-                <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
+                <div class="transition-transform duration-200"
+                     :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
                     <i v-icon data-lucide="chevron-down"
                        class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i>
                 </div>
@@ -31,10 +33,17 @@
                                     @equip-click="$emit('equip-click', $event)"
                                     @consume-click="$emit('consume-click', $event)">
                                 </item-row>
-                                <div v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
-                                     class="ml-6 mt-1 space-y-1 border-l border-cpr-teal-dark/50 pl-2">
+                                <div
+                                    v-if="cw.system.installedItems && cw.system.installedItems.list && cw.system.installedItems.list.length > 0"
+                                    class="ml-6 mt-1 space-y-1 border-l border-cpr-teal-dark/50 pl-2">
                                     <div v-for="childId in cw.system.installedItems.list" :key="childId">
-                                        <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" category="cyberware" :all-items="charData.data.items" :active-tab="activeTab" :refresh-all="refreshAll" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)" @consume-click="$emit('consume-click', $event)"></item-row>
+                                        <item-row v-if="charData.data.items.find(i => i._id === childId)"
+                                                  :item="charData.data.items.find(i => i._id === childId)"
+                                                  category="cyberware" :all-items="charData.data.items"
+                                                  :active-tab="activeTab" :refresh-all="refreshAll"
+                                                  @click="$emit('item-click', charData.data.items.find(i => i._id === childId))"
+                                                  @equip-click="$emit('equip-click', $event)"
+                                                  @consume-click="$emit('consume-click', $event)"></item-row>
                                     </div>
                                 </div>
                             </div>
@@ -45,9 +54,11 @@
         </div>
 
         <div>
-            <h3 @click="$emit('toggle-category', 'gear')" class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'gear')"
+                class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="package" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i> <span class="group-hover:text-cpr-teal transition-colors">Gear & Equipment</span>
+                    <i v-icon data-lucide="package" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i>
+                    <span class="group-hover:text-cpr-teal transition-colors">Gear & Equipment</span>
                 </div>
                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['gear'] }">
                     <i v-icon data-lucide="chevron-down"
@@ -73,10 +84,18 @@
                                         @equip-click="$emit('equip-click', $event)"
                                         @consume-click="$emit('consume-click', $event)">
                                     </item-row>
-                                    <div v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
-                                         class="ml-6 mt-1 space-y-1 border-l border-cpr-border pl-2">
+                                    <div
+                                        v-if="item.system.installedItems && item.system.installedItems.list && item.system.installedItems.list.length > 0"
+                                        class="ml-6 mt-1 space-y-1 border-l border-cpr-border pl-2">
                                         <div v-for="childId in item.system.installedItems.list" :key="childId">
-                                            <item-row v-if="charData.data.items.find(i => i._id === childId)" :item="charData.data.items.find(i => i._id === childId)" :category="charData.data.items.find(i => i._id === childId).type" :all-items="charData.data.items" :active-tab="activeTab" :refresh-all="refreshAll" @click="$emit('item-click', charData.data.items.find(i => i._id === childId))" @equip-click="$emit('equip-click', $event)" @consume-click="$emit('consume-click', $event)"></item-row>
+                                            <item-row v-if="charData.data.items.find(i => i._id === childId)"
+                                                      :item="charData.data.items.find(i => i._id === childId)"
+                                                      :category="charData.data.items.find(i => i._id === childId).type"
+                                                      :all-items="charData.data.items" :active-tab="activeTab"
+                                                      :refresh-all="refreshAll"
+                                                      @click="$emit('item-click', charData.data.items.find(i => i._id === childId))"
+                                                      @equip-click="$emit('equip-click', $event)"
+                                                      @consume-click="$emit('consume-click', $event)"></item-row>
                                         </div>
                                     </div>
                                 </div>
@@ -90,18 +109,18 @@
 </template>
 
 <script>
-import { vIcon } from '../../directives/icon';
+import {vIcon} from '../../directives/icon';
 import ItemRow from './ItemRow.vue';
-import { formatCategoryName } from '../../utils/helpers';
+import {formatCategoryName} from '../../utils/helpers';
 
 export default {
     name: 'GearTab',
     props: ['activeTab', 'collapsedCategories', 'groupedCyberware', 'groupedGear', 'charData', 'refreshAll'],
-    components: { ItemRow },
-    directives: { icon: vIcon },
+    components: {ItemRow},
+    directives: {icon: vIcon},
     emits: ['toggle-category', 'item-click', 'equip-click', 'consume-click'],
     setup() {
-        return { formatCategory: formatCategoryName };
+        return {formatCategory: formatCategoryName};
     }
 }
 </script>
