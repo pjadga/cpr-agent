@@ -8,6 +8,7 @@ use App\Jobs\SyncCharacterDataToDb;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Log;
 
 class FoundryController extends Controller
 {
@@ -91,7 +92,7 @@ class FoundryController extends Controller
                 if ($targetUser) {
                     $user = $targetUser;
                 } else {
-                    \Log::info("GM tried to sync character for Foundry User but no Laravel user found with identifier [{$userIdentifier}].");
+                    Log::info("GM tried to sync character for Foundry User but no Laravel user found with identifier [{$userIdentifier}].");
 
                     return response()->json(['success' => false, 'message' => 'Target user not found']);
                 }
@@ -105,7 +106,7 @@ class FoundryController extends Controller
 
             $user->save();
 
-            \Log::info("Character link updated for User [{$user->id}] (Actor: {$user->default_actor_id}) via {$type}");
+            Log::info("Character link updated for User [{$user->id}] (Actor: {$user->default_actor_id}) via {$type}");
 
             return response()->json([
                 'success' => true,
@@ -118,7 +119,7 @@ class FoundryController extends Controller
             if ($user->is_gm !== (bool) $validated['isGM']) {
                 $user->is_gm = $validated['isGM'];
                 $user->save();
-                \Log::info("User [{$user->id}] is_gm status updated to [{$user->is_gm}] via {$type}");
+                Log::info("User [{$user->id}] is_gm status updated to [{$user->is_gm}] via {$type}");
             }
         }
 
@@ -177,7 +178,7 @@ class FoundryController extends Controller
         }
 
         $duration = round((microtime(true) - $start) * 1000, 2);
-        \Log::info("Foundry Callback [{$type}] processed in {$duration}ms", [
+        Log::info("Foundry Callback [{$type}] processed in {$duration}ms", [
             'requestId' => $validated['requestId'] ?? 'N/A',
         ]);
 

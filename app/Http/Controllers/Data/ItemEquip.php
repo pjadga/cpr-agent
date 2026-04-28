@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Data;
 
 use App\Events\CyberpunkAgentChannel;
 use App\Http\HasConfiguration;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -56,7 +57,7 @@ class ItemEquip extends Controller
                 'result' => true,
                 'requestId' => $requestId,
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage(),
