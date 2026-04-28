@@ -1108,9 +1108,9 @@ export default {
 };
 </script>
 
-<style scoped src="../../css/components/character-sheet.css"></style>
+<style @cspNonce scoped src="../../css/components/character-sheet.css"></style>
 
-<style scoped>
+<style @cspNonce scoped>
 /* Expansion Animation */
 .expand-enter-active,
 .expand-leave-active {

@@ -149,8 +149,7 @@
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4"
                      x-transition:enter-end="opacity-100 translate-y-0"
-                     class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6"
-                     style="display: none;">
+                     class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6 hidden-none">
                     <div
                         class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
@@ -244,8 +243,7 @@
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0 translate-y-4"
                                  x-transition:enter-end="opacity-100 translate-y-0"
-                                 class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6"
-                                 style="display: none;">
+                                 class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6 hidden-none">
                                 <div
                                     class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
@@ -312,8 +310,7 @@
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0 translate-y-4"
                                  x-transition:enter-end="opacity-100 translate-y-0"
-                                 class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6"
-                                 style="display: none;">
+                                 class="absolute z-50 top-full mt-4 left-0 w-full bg-cpr-black border-2 border-cpr-teal shadow-[0_0_20px_rgba(0,255,159,0.3)] p-6 hidden-none">
                                 <div
                                     class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 

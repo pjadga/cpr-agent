@@ -36,11 +36,17 @@ class Policy implements Preset
                 Keyword::UNSAFE_EVAL,
                 'https://fonts.googleapis.com',
                 'https://fonts.bunny.net',
+                'https://cdn.jsdelivr.net',
+                'https://fonts.cdnfonts.com',
+                Keyword::UNSAFE_HASHES,
+
             ])
             ->add(Directive::FONT, [
                 Keyword::SELF,
                 'https://fonts.gstatic.com',
                 'https://fonts.bunny.net',
+                'https://cdn.jsdelivr.net',
+                'https://fonts.cdnfonts.com'
             ])
             ->add(Directive::FRAME, [
                 'https://challenges.cloudflare.com',

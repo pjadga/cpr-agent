@@ -164,3 +164,7 @@ body {
 .cyber-select-option {
     @apply bg-cpr-black-soft text-cpr-text-main p-2;
 }
+
+.hidden-none {
+    display: none !important;
+}

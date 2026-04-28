@@ -335,7 +335,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style @cspNonce scoped>
 .expand-enter-active,
 .expand-leave-active {
     transition: all 0.2s ease-out;

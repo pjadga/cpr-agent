@@ -87,7 +87,7 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped>
+<style @cspNonce scoped>
 @keyframes timeout-bar {
     from {
         width: 100%;

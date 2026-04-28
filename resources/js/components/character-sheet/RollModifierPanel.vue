@@ -263,7 +263,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style @cspNonce scoped>
 
 @keyframes shimmer {
     0% {
