@@ -15,8 +15,7 @@
                          class="absolute -bottom-1 -right-1 w-3 h-3 bg-cpr-teal rounded-full border-2 border-black animate-pulse"></div>
                 </div>
                 <div>
-                    <div
-                        class="text-xs font-bold text-white uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
+                    <div class="text-xs font-bold text-cpr-yellow uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
                         {{ prog.name }}
                         <i v-icon data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300"
                            :class="{'rotate-180': isExpanded}"></i>

@@ -3,10 +3,9 @@
          class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
          @click="close">
         <div class="w-full max-w-sm bg-cpr-black-deep border-2" :class="borderColor" @click.stop>
-            <div class="flex items-center justify-between px-4 py-2 border-b"
-                 :class="headerBorderColor + ' ' + headerBgColor">
-                <span class="text-xs font-black uppercase tracking-[0.2em] text-white">{{ title }}</span>
-                <button class="text-white/70 hover:text-white transition-colors" @click="close">
+            <div class="flex items-center justify-between px-4 py-2 border-b" :class="headerBorderColor + ' ' + headerBgColor">
+                <span class="text-xs font-black uppercase tracking-[0.2em] text-cpr-yellow">{{ title }}</span>
+                <button class="text-cpr-yellow/70 hover:text-cpr-yellow transition-colors" @click="close">
                     <i v-icon data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -57,11 +56,11 @@
                      class="text-[10px] space-y-1 font-mono uppercase tracking-wider text-cpr-text-dim border-t border-cpr-border/20 pt-4">
                     <div v-if="statValue" class="flex justify-between">
                         <span>Base Stat</span>
-                        <span class="text-white font-numbers">+{{ statValue }}</span>
+                        <span class="text-cpr-yellow font-numbers">+{{ statValue }}</span>
                     </div>
                     <div v-if="skillValue" class="flex justify-between">
                         <span>Skill Level</span>
-                        <span class="text-white font-numbers">+{{ skillValue }}</span>
+                        <span class="text-cpr-yellow font-numbers">+{{ skillValue }}</span>
                     </div>
                     <div v-for="(mod, idx) in modifiers" :key="idx" class="flex justify-between">
                         <span class="truncate pr-4">{{ mod.source || 'Modifier' }}</span>

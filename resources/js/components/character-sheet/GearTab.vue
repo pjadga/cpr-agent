@@ -3,8 +3,7 @@
 
 
         <div>
-            <h3 @click="$emit('toggle-category', 'cyberware')"
-                class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'cyberware')" class="text-sm font-bold text-cpr-yellow uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="zap" class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i> <span
                     class="group-hover:text-cpr-teal transition-colors">Cyberware</span>
@@ -54,8 +53,7 @@
         </div>
 
         <div>
-            <h3 @click="$emit('toggle-category', 'gear')"
-                class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'gear')" class="text-sm font-bold text-cpr-yellow uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="package" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i>
                     <span class="group-hover:text-cpr-teal transition-colors">Gear & Equipment</span>

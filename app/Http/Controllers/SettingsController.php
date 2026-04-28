@@ -118,7 +118,7 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'api_key' => 'nullable|string',
             'foundry_url' => 'nullable|string',
-            'theme' => 'nullable|string|in:night,day',
+            'theme' => 'nullable|string|in:night,day,bartmoss,corpo,medtech,blind',
         ]);
 
         $user = Auth::user();

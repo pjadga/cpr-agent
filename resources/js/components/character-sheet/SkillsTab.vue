@@ -15,9 +15,7 @@
                                 {{ roleItem.system.mainRoleAbility }}</p>
                         </div>
                         <div class="flex flex-col items-end shrink-0">
-                            <span class="text-2xl font-black text-white leading-none font-numbers">{{
-                                    roleItem.system.rank
-                                }}</span>
+                            <span class="text-2xl font-black text-cpr-yellow leading-none font-numbers">{{ roleItem.system.rank }}</span>
                             <span class="text-[8px] text-cpr-yellow/50 uppercase font-bold">Rank</span>
                         </div>
                     </div>
@@ -53,11 +51,8 @@
                                         }}</p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-lg font-black text-white/80 font-numbers">{{
-                                            ability.rank
-                                        }}</span>
-                                    <div
-                                        class="w-1 h-8 bg-cpr-yellow/20 group-hover/ability:bg-cpr-yellow/40 transition-colors"></div>
+                                    <span class="text-lg font-black text-cpr-yellow/80 font-numbers">{{ ability.rank }}</span>
+                                    <div class="w-1 h-8 bg-cpr-yellow/20 group-hover/ability:bg-cpr-yellow/40 transition-colors"></div>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +77,7 @@
             <div
                 @click="$emit('toggle-category', categoryKey)"
                 class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-teal-dark/30 transition-colors group">
-                <span class="text-white font-bold text-sm uppercase group-hover:text-cpr-teal transition-colors">{{
+                <span class="text-cpr-yellow font-bold text-sm uppercase group-hover:text-cpr-teal transition-colors">{{
                         formatCategory(categoryKey)
                     }}</span>
                 <div class="transition-transform duration-200"

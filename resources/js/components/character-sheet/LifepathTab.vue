@@ -17,16 +17,12 @@
 
         <!-- Lifepath Section -->
         <div class="space-y-4">
-            <h3 class="text-sm font-bold text-white uppercase border-b border-cpr-red-dark pb-1 flex items-center gap-2">
+            <h3 class="text-sm font-bold text-cpr-yellow uppercase border-b border-cpr-red-dark pb-1 flex items-center gap-2">
                 <i v-icon data-lucide="users" class="w-4 h-4 text-cpr-red"></i> Lifepath
             </h3>
 
-            <div v-for="(value, key) in lifepathData" :key="key"
-                 class="bg-[var(--cpr-black-soft)] border border-cpr-border/30 p-3 relative group">
-                <div class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{
-                        formatLabel(key)
-                    }}
-                </div>
+            <div v-for="(value, key) in lifepathData" :key="key" class="border border-cpr-border/30 p-3 relative group">
+                <div class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{ formatLabel(key) }}</div>
                 <div class="text-sm text-cpr-text-main leading-relaxed">
                     {{ value || '---' }}
                 </div>

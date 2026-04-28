@@ -6,7 +6,7 @@
             <div class="mx-auto max-w-5xl px-4 py-4">
                 <div class="flex items-start justify-between gap-4">
                     <div>
-                        <h1 class="text-xl font-black uppercase tracking-tight text-white">
+                        <h1 class="text-xl font-black uppercase tracking-tight text-cpr-yellow">
                             Design Brief
                             <span
                                 class="ml-2 text-[10px] font-mono font-bold text-cpr-yellow uppercase tracking-[0.3em]">CPR UI</span>
@@ -18,15 +18,15 @@
 
                     <div class="flex items-center gap-2">
                         <a href="#palette"
-                           class="border border-cpr-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-cpr-text-main hover:border-cpr-border-muted hover:text-white">
+                           class="border border-cpr-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-cpr-text-main hover:border-cpr-border-muted hover:text-cpr-yellow">
                             Palette
                         </a>
                         <a href="#components"
-                           class="border border-cpr-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-cpr-text-main hover:border-cpr-border-muted hover:text-white">
+                           class="border border-cpr-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-cpr-text-main hover:border-cpr-border-muted hover:text-cpr-yellow">
                             Components
                         </a>
                         <a href="#patterns"
-                           class="border border-cpr-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-cpr-text-main hover:border-cpr-border-muted hover:text-white">
+                           class="border border-cpr-border px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-cpr-text-main hover:border-cpr-border-muted hover:text-cpr-yellow">
                             Patterns
                         </a>
                     </div>
@@ -41,7 +41,7 @@
             <section id="palette" class="space-y-4">
                 <div class="flex items-end justify-between gap-3">
                     <div>
-                        <h2 class="text-sm font-black uppercase tracking-[0.2em] text-white">Colour Palette</h2>
+                        <h2 class="text-sm font-black uppercase tracking-[0.2em] text-cpr-yellow">Colour Palette</h2>
                         <p class="mt-1 text-xs text-cpr-text-dim">
                             These swatches map directly to the CSS variables used in the app.
                         </p>
@@ -56,9 +56,8 @@
                     {{-- Brand --}}
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xs font-black uppercase tracking-widest text-white">Brand / Primary</h3>
-                            <span
-                                class="text-[10px] font-mono text-cpr-text-dim">Red + Yellow drive most “action” UI</span>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Brand / Primary</h3>
+                            <span class="text-[10px] font-mono text-cpr-text-dim">Red + Yellow drive most “action” UI</span>
                         </div>
 
                         <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -76,8 +75,7 @@
                                     <div class="h-10 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
                                     <div class="mt-2 flex items-center justify-between">
-                                        <div
-                                            class="text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
+                                        <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
                                     </div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
@@ -107,8 +105,7 @@
                                 <div class="border border-cpr-border bg-cpr-black p-3">
                                     <div class="h-8 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
-                                    <div
-                                        class="mt-2 text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
+                                    <div class="mt-2 text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
                                         <div class="text-cpr-text-main">{{ $c['hex'] }}</div>
@@ -121,9 +118,8 @@
                     {{-- Neutrals --}}
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xs font-black uppercase tracking-widest text-white">Neutrals / Surfaces</h3>
-                            <span
-                                class="text-[10px] font-mono text-cpr-text-dim">Base theme supports night + day modes</span>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Neutrals / Surfaces</h3>
+                            <span class="text-[10px] font-mono text-cpr-text-dim">Base theme supports night + day modes</span>
                         </div>
 
                         @php
@@ -146,8 +142,7 @@
                                 <div class="border border-cpr-border bg-cpr-black p-3">
                                     <div class="h-8 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
-                                    <div
-                                        class="mt-2 text-[10px] font-bold uppercase tracking-widest text-white">{{ $c['name'] }}</div>
+                                    <div class="mt-2 text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
                                         <div class="text-cpr-text-main">{{ $c['value'] }}</div>
@@ -163,7 +158,7 @@
                  Components
             ========================== --}}
             <section id="components" class="space-y-4">
-                <h2 class="text-sm font-black uppercase tracking-[0.2em] text-white">Components</h2>
+                <h2 class="text-sm font-black uppercase tracking-[0.2em] text-cpr-yellow">Components</h2>
 
                 <div class="grid md:grid-cols-2 gap-4">
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
@@ -183,7 +178,7 @@
                     </div>
 
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-white">Resource Counter</h3>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Resource Counter</h3>
                         <p class="mt-2 text-xs text-cpr-text-muted">
                             Compact stat tile (label + large mono number). Colour is passed as a class (commonly
                             red/cyan).
@@ -240,32 +235,30 @@
                  Patterns & States
             ========================== --}}
             <section id="patterns" class="space-y-4">
-                <h2 class="text-sm font-black uppercase tracking-[0.2em] text-white">Patterns & States</h2>
+                <h2 class="text-sm font-black uppercase tracking-[0.2em] text-cpr-yellow">Patterns & States</h2>
 
                 <div class="grid lg:grid-cols-3 gap-4">
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-white">Surfaces</h3>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Surfaces</h3>
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
-                            <li><span class="text-white font-bold">Base:</span> deep black backgrounds.</li>
-                            <li><span class="text-white font-bold">Panels:</span> clipped corner + border.</li>
-                            <li><span class="text-white font-bold">Elevated:</span> subtle lighter “device glass”
-                                surface.
-                            </li>
+                            <li><span class="text-cpr-yellow font-bold">Base:</span> deep black backgrounds.</li>
+                            <li><span class="text-cpr-yellow font-bold">Panels:</span> clipped corner + border.</li>
+                            <li><span class="text-cpr-yellow font-bold">Elevated:</span> subtle lighter “device glass” surface.</li>
                         </ul>
                     </div>
 
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-white">Motion</h3>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Motion</h3>
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
-                            <li><span class="text-white font-bold">fade</span> for tab transitions.</li>
-                            <li><span class="text-white font-bold">expand</span> for disclosure/accordion rows.</li>
-                            <li><span class="text-white font-bold">slide-right</span> for side panels.</li>
-                            <li><span class="text-white font-bold">slide-up</span> for bottom combat panel.</li>
+                            <li><span class="text-cpr-yellow font-bold">fade</span> for tab transitions.</li>
+                            <li><span class="text-cpr-yellow font-bold">expand</span> for disclosure/accordion rows.</li>
+                            <li><span class="text-cpr-yellow font-bold">slide-right</span> for side panels.</li>
+                            <li><span class="text-cpr-yellow font-bold">slide-up</span> for bottom combat panel.</li>
                         </ul>
                     </div>
 
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                        <h3 class="text-xs font-black uppercase tracking-widest text-white">Colour Semantics</h3>
+                        <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Colour Semantics</h3>
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
                             <li><span class="text-cpr-red font-bold">Red:</span> primary action, danger, combat,
                                 top-level titles.
@@ -281,8 +274,7 @@
                 </div>
 
                 <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-white">Common UI Blocks (quick
-                        checklist)</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Common UI Blocks (quick checklist)</h3>
 
                     <div class="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                         <div class="border border-cpr-border bg-cpr-black p-3">

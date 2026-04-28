@@ -43,8 +43,7 @@
             </adjustable-stat>
         </div>
 
-        <div
-            class="bg-[var(--cpr-black-soft)] border border-cpr-border p-3 flex justify-between divide-x divide-gray-800">
+        <div class="cpr-box border-cpr-red p-3 flex justify-between divide-x divide-gray-800">
             <div class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
                 <div class="text-cpr-yellow font-bold"><span class="font-numbers">{{
@@ -54,14 +53,14 @@
             </div>
             <div class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">IP</div>
-                <div class="text-white font-numbers font-bold">
+                <div class="text-cpr-yellow font-numbers font-bold">
                     {{ charData.data.system.improvementPoints.value }}
                 </div>
             </div>
             <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
                  @click="$emit('facedown')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Reputation</div>
-                <div class="text-white font-numbers font-bold">{{
+                <div class="text-cpr-yellow font-numbers font-bold">{{
                         charData.data.system.reputation.value
                     }}
                 </div>
@@ -76,8 +75,7 @@
         </div>
 
         <div v-if="groupedInjuries && (groupedInjuries.head.length > 0 || groupedInjuries.body.length > 0)">
-            <h3 @click="$emit('toggle-category', 'criticalInjury')"
-                class="text-sm font-bold text-white uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
+            <h3 @click="$emit('toggle-category', 'criticalInjury')" class="text-sm font-bold text-cpr-yellow uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
                 <div class="flex items-center gap-2">
                     <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i>
                     <span class="group-hover:text-cpr-red transition-colors">Critical Injuries</span>
@@ -129,7 +127,7 @@
         </div>
 
         <div>
-            <h3 class="text-sm font-bold text-white uppercase mb-4 border-b border-cpr-red-dark pb-1 flex items-center gap-2">
+            <h3 class="text-sm font-bold text-cpr-yellow uppercase mb-4 border-b border-cpr-red-dark pb-1 flex items-center gap-2">
                 <i v-icon data-lucide="crosshair" class="w-4 h-4 text-cpr-red"></i> Currently Equipped
             </h3>
 

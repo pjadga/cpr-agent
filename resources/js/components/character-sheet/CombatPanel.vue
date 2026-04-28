@@ -8,7 +8,7 @@
                     <i v-icon data-lucide="crosshair" class="w-4 h-4 text-cpr-red"></i>
                     <span class="text-xs font-black uppercase tracking-[0.2em] text-cpr-red">Combat Systems</span>
                 </div>
-                <button @click="$emit('close')" class="p-2 text-cpr-text-muted hover:text-white transition-colors">
+                <button @click="$emit('close')" class="p-2 text-cpr-text-muted hover:text-cpr-yellow transition-colors">
                     <i v-icon data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -57,7 +57,7 @@
 
                     <button v-if="selectedWeapon.system.magazine"
                             @click="$emit('reload')"
-                            class="w-full py-3 bg-cpr-black-deep border border-cpr-teal-dark text-cpr-text-muted font-bold uppercase text-xs tracking-[0.2em] hover:bg-cpr-black-elevated hover:text-white transition-all rounded-sm flex items-center justify-center gap-2">
+                            class="w-full py-3 bg-cpr-black-deep border border-cpr-teal-dark text-cpr-text-muted font-bold uppercase text-xs tracking-[0.2em] hover:bg-cpr-black-elevated hover:text-cpr-yellow transition-all rounded-sm flex items-center justify-center gap-2">
                         <i v-icon data-lucide="rotate-cw" class="w-4 h-4"></i> Reload Systems
                     </button>
                 </div>
