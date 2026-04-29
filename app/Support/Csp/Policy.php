@@ -64,8 +64,6 @@ class Policy implements Preset
                 'wss:',
                 'https://unpkg.com/lucide.min.js.map',
                 'https://challenges.cloudflare.com',
-            ])
-            ->addNonce(Directive::SCRIPT)
-            ->addNonce(Directive::STYLE);
+            ]);
     }
 }
