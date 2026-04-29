@@ -6,6 +6,7 @@ use App\Http\Controllers\Cyberdeck\ToggleRez;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActor;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Data\GetNetPool;
 use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Data\ImageProxy;
 use App\Http\Controllers\Data\ItemEquip;
@@ -93,6 +94,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post('/actorsheet', [ActorSheet::class, 'getCleanData']);
     Route::post('/getactor', [GetActor::class, 'getActor']);
     Route::post('/getactors', [GetActors::class, 'getActors']);
+    Route::post('/get-net-pool', [GetNetPool::class, 'getNetPool']);
     Route::post('/movetoken', [MoveToken::class, 'moveToken']);
     Route::post('/getvisibletokens', [GetVisibleTokens::class, 'getVisibleTokens']);
     Route::post('/listvisibletokens', [ListVisibleTokens::class, 'listVisibleTokens']);
