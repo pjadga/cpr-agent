@@ -35,7 +35,7 @@ export function setupAxiosInterceptors() {
                 const requestId = data.requestId || (data.data && data.data.requestId);
                 console.log(`[Agent] Response: ${requestId}`);
                 if (requestId) {
-                    console.log(`[Agent] Incoming Request: ${requestId}`);
+                    console.log(`[Agent] Incoming Request: ${requestId}`, response);
                     registerMyRequest(requestId);
                 }
                 return response;

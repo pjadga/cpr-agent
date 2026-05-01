@@ -26,5 +26,4 @@ Thumbs.db
 yarn-error.log
 /composer.lock
 
-.env.template
 package-lock.json
