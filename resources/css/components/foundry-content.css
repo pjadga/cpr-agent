@@ -1,0 +1,224 @@
+.foundry-html {
+    --cpr-font-primary: var(--cpr-font-sans, 'Hack', monospace);
+    --cpr-text-normal: var(--cpr-text-main, #b0b0b0);
+    --cpr-background-dialog-border: var(--cpr-border, #333333);
+    --cpr-text-journal-table-header: var(--cpr-text-bright, #e5e5e5);
+    --cpr-background-progress: var(--cpr-yellow, #fcee0a);
+    --cpr-background-row-even: var(--cpr-black-soft, rgba(35, 35, 35, 0.51));
+    --cpr-background-row-odd: var(--cpr-black-elevated, rgba(50, 50, 50, 0.73));
+    --cpr-text-chat-normal: var(--cpr-text-main, #b0b0b0);
+    --cpr-font-journal-header: var(--cpr-font-sans, 'Hack', monospace);
+    --cpr-text-header-line: var(--cpr-red, #da0000);
+    --cpr-text-header-line-box: var(--cpr-red-dark, #a30000);
+    --cpr-text-header-arrow: var(--cpr-yellow, #fcee0a);
+    --cpr-background-journal-blockquote: var(--cpr-black-soft, rgba(35, 35, 35, 0.51));
+    --cpr-background-journal-info: var(--cpr-black-elevated, rgba(50, 50, 50, 0.73));
+    --cpr-background-code: var(--cpr-black-deep, #141414);
+    --cpr-background-content-link: var(--cpr-black-elevated, rgba(50, 50, 50, 0.73));
+    --cpr-background-journal-secret-hidden-background: rgba(0, 0, 0, 0.3);
+    --cpr-background-journal-secret-hidden-border: var(--cpr-border, #333333);
+    --cpr-background-box: var(--cpr-panel, rgba(28, 28, 28, 0.85));
+
+    code {
+        background-color: var(--cpr-background-code);
+        padding: 0.125rem;
+    }
+
+    .content-link {
+        background: var(--cpr-background-content-link) !important;
+        color: var(--cpr-text-normal);
+        padding: 0 4px;
+        border-radius: 3px;
+        text-decoration: none;
+
+        i::before {
+            color: var(--cpr-text-normal);
+        }
+    }
+
+    font-family: var(--cpr-font-primary);
+    color: var(--cpr-text-normal) !important;
+
+    strong {
+        font-weight: 550;
+    }
+
+    hr {
+        border-bottom: 0.125rem solid var(--cpr-background-dialog-border);
+        margin: 1rem 0;
+    }
+
+    img {
+        border: none;
+        max-width: 100%;
+        height: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+
+        tr, td, th {
+            border: 0.313rem solid var(--cpr-background-dialog-border) !important;
+            padding: 0.313rem !important;
+        }
+
+        tr:first-of-type {
+            color: var(--cpr-text-journal-table-header);
+            background: var(--cpr-background-dialog-border);
+            font-weight: 550;
+            text-align: left;
+            text-shadow: none;
+        }
+
+        thead + tbody tr:first-of-type {
+            background-color: var(--cpr-background-progress);
+            color: black;
+        }
+
+        tbody tr:nth-of-type(even):not(:first-of-type),
+        thead + tbody tr:nth-of-type(2n) {
+            color: var(--cpr-text-normal);
+            background: var(--cpr-background-row-even);
+        }
+
+        tbody tr:nth-of-type(odd):not(:first-of-type),
+        thead + tbody tr:nth-of-type(2n + 1) {
+            color: var(--cpr-text-normal);
+            background: var(--cpr-background-row-odd);
+            font-weight: 400;
+        }
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: var(--cpr-text-chat-normal) !important;
+        font-family: var(--cpr-font-journal-header);
+        font-weight: 800;
+        font-variant: small-caps;
+        line-height: 1.2;
+    }
+
+    h1 {
+        position: relative;
+        border-bottom: 1.57rem solid var(--cpr-text-header-line);
+        font-size: 2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+
+        &::first-letter {
+            float: left;
+            font-size: 4.688rem;
+            line-height: 3.75rem;
+            padding-top: 0.625rem;
+            text-transform: capitalize;
+            margin-right: 0.5rem;
+        }
+
+        &::after {
+            content: "";
+            display: inline-block;
+            width: 1.57rem;
+            height: 1.57rem;
+            position: absolute;
+            bottom: -1.57rem;
+            right: -0.063rem;
+            background-color: var(--cpr-text-header-line-box);
+        }
+    }
+
+    h2 {
+        position: relative;
+        border-bottom: 0.313rem solid var(--cpr-text-header-line);
+        font-size: 1.75rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.25rem;
+
+        &::after {
+            content: "";
+            display: inline-block;
+            width: 1.57rem;
+            height: 1.57rem;
+            position: absolute;
+            bottom: -0.87rem;
+            right: -0.063rem;
+            background-color: var(--cpr-text-header-line);
+        }
+    }
+
+    h3 {
+        border-bottom: none;
+        font-size: 1.5rem;
+        margin-top: 1.25rem;
+        margin-bottom: 1rem;
+
+        &::before {
+            content: "▶ ";
+            color: var(--cpr-text-header-arrow);
+        }
+    }
+
+    h4 {
+        text-align: center;
+        border-bottom: none;
+        font-size: 1.4rem;
+        margin-top: 1.25rem;
+        margin-bottom: 1rem;
+
+        &::before {
+            content: "▶ ";
+            color: var(--cpr-text-header-arrow);
+        }
+
+        &::after {
+            content: " ◀";
+            color: var(--cpr-text-header-arrow);
+        }
+    }
+
+    h5, h6 {
+        text-align: center;
+        border-bottom: none;
+        font-size: 1.25rem;
+        margin-top: 1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    blockquote {
+        padding: 0.5rem 0.5rem 0.5rem 1.25rem;
+        background: var(--cpr-background-journal-blockquote);
+        border-left: 4px solid var(--cpr-text-header-line);
+        margin: 1.5rem 0;
+        font-style: italic;
+    }
+
+    .secret {
+        border: 0.125rem dashed var(--cpr-background-journal-secret-hidden-border);
+        background-color: var(--cpr-background-journal-secret-hidden-background);
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+
+    section.secret.revealed {
+        border: 0;
+        background: var(--cpr-background-box);
+    }
+
+    section.info {
+        padding: 0.5rem 0.5rem 0.5rem 2.5rem;
+        background: var(--cpr-background-journal-info);
+        border-radius: 0.313rem;
+        margin: 1rem 0;
+        position: relative;
+
+        &::before {
+            content: "ℹ️";
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    }
+}

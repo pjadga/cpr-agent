@@ -44,7 +44,7 @@
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-6 text-cpr-text-main font-mono text-sm leading-relaxed custom-scrollbar bg-[radial-gradient(circle_at_50%_50%,rgba(234,179,8,0.03)_0%,transparent_100%)]">
-                    <div v-if="activeEntry.type === 'html'" v-html="activeEntry.htmlContent" class="foundry-html prose prose-invert max-w-none prose-yellow prose-sm
+                    <div v-if="activeEntry.type === 'html'" v-html="activeEntry.htmlContent" class="foundry-html editor-content prose prose-invert max-w-none prose-yellow prose-sm
                         prose-headings:uppercase prose-headings:tracking-widest prose-headings:text-cpr-yellow
                         prose-a:text-cpr-yellow prose-a:no-underline hover:prose-a:underline
                         prose-strong:text-cpr-yellow"></div>
@@ -67,7 +67,7 @@
     </div>
 </template>
 
-<script>
+<script @cspNonce>
 import { ref } from 'vue';
 import { vIcon } from '../../directives/icon';
 
@@ -105,7 +105,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style @cspNonce scoped>
 .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
 }
@@ -119,8 +119,4 @@ export default {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #facc15;
 }
-</style>
-
-<style>
-@import "../../../css/components/foundry.css";
 </style>

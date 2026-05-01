@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./themes.css";
+@import "./components/foundry-content.css";
 
 @theme {
     --font-sans: var(--cpr-font-sans, 'Hack', monospace);
