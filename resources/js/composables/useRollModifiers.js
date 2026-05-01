@@ -2,11 +2,13 @@ import {ref} from 'vue';
 import {debounce, isDeepEqual} from '../utils/helpers';
 import {cachedPost} from '../utils/api';
 import {useEchoListener} from '../utils/listener';
+import {useCharacterData} from './useCharacterData';
 
 /**
  * Composable for fetching and managing die rolls and modifiers
  */
 export function useRollModifiers(controlState) {
+    const {isWssConnected} = useCharacterData();
     const showRollPanel = ref(false);
     const rollModsLoading = ref(false);
     const rollModsError = ref(null);
@@ -28,6 +30,7 @@ export function useRollModifiers(controlState) {
             if (rollModsLoading.value) {
                 console.warn('Foundry response timeout for roll modifiers.');
                 rollModsLoading.value = false;
+                isWssConnected.value = false;
                 if (!rollModsData.value) {
                     rollModsData.value = {injuries: [], totalPenalty: 0, finalModifier: 0};
                 }
