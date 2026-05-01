@@ -22,7 +22,7 @@ export function useRollModifiers(controlState) {
     const fetchRollModifiers = async () => {
         rollModsError.value = null;
         rollModsLoading.value = true;
-
+        isWssConnected.value = true;
         if (fetchTimeout) clearTimeout(fetchTimeout);
 
         // Safety timeout to ensure loading doesn't get stuck if Foundry doesn't respond
