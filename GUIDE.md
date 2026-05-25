@@ -168,7 +168,25 @@ At this point, providing all the settings are correct (including API Key and Cha
 If you're like me and require control over every digital aspect of your life, then read on.
 
 1. Follow the Installation Steps above. Once you've got a local instance running on a browser you can access, read on.
-2.
+2. Follow the tuturial for creating a Tailscale Funnel for your Foundry Instance (above). Once you can access that from the Magic URL, continue.
+3. Create a Reusable [Tailscale Auth token](https://login.tailscale.com/admin/settings/keys). Then, in the Agent installation folder, where DDEV should be running:
+
+   ```bash
+   export TS_AUTHKEY= //Your Auth token
+   ```
+   ```bash
+   ddev tailscale login
+   ddev tailscale share --public
+   ```
+   Now you should have a Funnel set up with it's own Magic URL. Lets call it ```https://cyberpunk.random-words.ts.net```. We need to make sure that it's got a TLS Cert, so run:
+   ```bash ddev tailscale cert cyberpunk.random-words.ts.net``` where 'cyberpunk.random-words.ts.net' is your Tailscale Funnel.
+   Try logging on. If you've been logged on already, locally, you may need to clear your cookies. It doesn't cross site track, but it will keep a session.
+   Make sure Reverb is started (see Installation), it needs it's own console tab (I currently have 3 open, Reverb, Foundry Funnel and Agent Funnel).
+   
+4. Point the Foundry Bridge Module at the Agent funnel, and your now accessible Agent at the Foundry funnel.
+    **Foundry Agent Bridge->Agent URL**: https://cyberpunk.random-words.ts.net
+    **Agent->Agent Config->
+
 
 ## Settings Reference
 
