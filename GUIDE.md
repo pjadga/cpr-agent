@@ -165,28 +165,20 @@ At this point, providing all the settings are correct (including API Key and Cha
 
 #### Using a Local Agent
 
-If you're like me and require control over every digital aspect of your life, then read on.
+If you're like me and require control over every digital aspect of your life, then read on. We'll be leveraging DDEVs portmapping + Tailscales very annoying port limit.
 
 1. Follow the Installation Steps above. Once you've got a local instance running on a browser you can access, read on.
 2. Follow the tuturial for creating a Tailscale Funnel for your Foundry Instance (above). Once you can access that from the Magic URL, continue.
-3. Create a Reusable [Tailscale Auth token](https://login.tailscale.com/admin/settings/keys). Then, in the Agent installation folder, where DDEV should be running:
-
-   ```bash
-   export TS_AUTHKEY= //Your Auth token
-   ```
-   ```bash
-   ddev tailscale login
-   ddev tailscale share --public
-   ```
-   Now you should have a Funnel set up with it's own Magic URL. Lets call it ```https://cyberpunk.random-words.ts.net```. We need to make sure that it's got a TLS Cert, so run:
-   ```bash ddev tailscale cert cyberpunk.random-words.ts.net``` where 'cyberpunk.random-words.ts.net' is your Tailscale Funnel.
-   Try logging on. If you've been logged on already, locally, you may need to clear your cookies. It doesn't cross site track, but it will keep a session.
-   Make sure Reverb is started (see Installation), it needs it's own console tab (I currently have 3 open, Reverb, Foundry Funnel and Agent Funnel).
-   
-4. Point the Foundry Bridge Module at the Agent funnel, and your now accessible Agent at the Foundry funnel.
-    **Foundry Agent Bridge->Agent URL**: https://cyberpunk.random-words.ts.net
-    **Agent->Agent Config->
-
+3. Run ddev describe. We need the port numbers that are mapped to web:80 and web:8080 (they tend to be above 32000). Remember those.
+4. We will now be setting up two more Funnels, one for each port:
+   tailscale serve --bg --https 10000 http://127.0.0.1:80 (where 80 is the port number your :80 was mapped to)
+   tailscale serve --bg --https 8443 http://127.0.0.1:8080 (Replace 8080 with the DDEV :8080 mapping)
+5. This adds ports 10000 and 8443 to your Magic URL for your computer. If you go to ```https://foundry.random-words.ts.net:10000``` you should end up on your agent! Remember to make sure Reverb is still running.
+6. In Foundry, in the CPR Bridge settings:
+   **Agent URL:** ```https://foundry.random-words.ts.net:10000```
+   **Reverb Port:** 8443
+7. Press save. A Bridge Online message should pop up, and that is connected!
+8. Go to your Agent to test everything out. Sharing the ```https://foundry.random-words.ts.net:10000``` will give your players the Agent app.
 
 ## Settings Reference
 
