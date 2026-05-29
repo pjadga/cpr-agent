@@ -1,4 +1,4 @@
-# https://ddev.com/blog/tailscale-router-ddev-addon/CPR Agent Guide
+# CPR Agent Guide
 
 This guide provides detailed instructions on how to set up, self-host, and connect the CPR Agent with Foundry VTT.
 
@@ -7,11 +7,12 @@ This guide provides detailed instructions on how to set up, self-host, and conne
 1. [Getting Started](#getting-started)
 2. [Self-Hosting Guide](#self-hosting-guide)
 3. [Connecting Foundry VTT](#connecting-foundry-vtt)
-   - [Local Instance](#local-instance)
-   - [Shared via NGROK](#shared-via-ngrok)
-   - [Shared via Cloudflare Tunnel](#shared-via-cloudflare-tunnel)
-4. [Settings Reference](#settings-reference)
-5. [Technical Deep Dive: The Bridge](#technical-deep-dive-the-bridge)
+4. [Sharing is Caring](#sharing-is-caring)
+   - [Sharing Via Tailscale](#sharing-via-tailscale)
+5. [Settings Reference](#settings-reference)
+6. [Technical Deep Dive: The Bridge](#technical-deep-dive-the-bridge)
+7. [The Delta System](#the-delta-system)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -48,7 +49,7 @@ The CPR Agent is a companion app designed to bridge the gap between players and 
 2. Assign a playable character to each player who has linked their API key.
 3. Once assigned, the player's **Agent Link** will appear.
    - *Note*: Players must be online in Foundry for the link to appear. If it doesn't show up immediately, ask the player to refresh.
-4. Players are now synced! Stats and rolls will flow in real-time. Once synced, only the GMs instance of Foundry is required to be open for this to work.
+4. Players are now synced! Stats and rolls will flow in real-time. Once synced, only the GM's instance of Foundry is required to be open for this to work.
 
 ### 5. Extras
 
@@ -104,11 +105,11 @@ If you prefer to host your own instance of the CPR Agent, follow these steps.
    ```
 
 At this point, the Agent should be locally available and run without any severe Laravel/PHP errors (fingers crossed).
-For sharing locally, please see the NGROK or Cloudflare info below.
+For sharing locally, please see the Sharing is Caring section below.
 
 **Note** The DDEV setup I have created uses Redis as the caching system instead of the database. This makes it incredibly
 responsive. During DDEV startup, check 'ddev describe' to list the containers, and check that redis exists.
-If it doesnt:
+If it doesn't:
 
 ```bash
 ddev add-on get ddev/ddev-redis
@@ -135,7 +136,7 @@ If both Foundry and the Agent are running on the same machine then the Bridge (F
 - **API Key**: Your API key, generated within your Agent.
 - **Channel ID**: Your Channel ID, also found within your Agent.
 
-If you are using the my [hosted Agent service](https://agent.surrealdisco.co.uk) and you are sharing your Foundry Instance online, then the defaults in the CPR Agent Bridge module should work (aside from the API Key and Channel ID). If you hit trouble, check the Debug mode in the module settings and check the Dev console for some hints. Otherwise come and let me know on the Discord :)
+If you are using my [hosted Agent service](https://agent.surrealdisco.co.uk) and you are sharing your Foundry instance online, then the defaults in the CPR Agent Bridge module should work (aside from the API Key and Channel ID). If you hit trouble, check the Debug mode in the module settings and check the Dev console for some hints. Otherwise come and let me know on the Discord :)
 
 **NOTE: I've found that when I've entered these, Foundry usually needs a refresh OR a restart.**
 
@@ -143,11 +144,11 @@ If you are using the my [hosted Agent service](https://agent.surrealdisco.co.uk)
 
 Originally I was using (and suggesting) NGROK to share Foundry and connect with local Agent installations. However, after the technical choice to use Reverb and rely on other ports, this has become a REALLY unreliable and painful way of sharing (for free). Using **Cloudflared Tunnels** is a much better alternative to sharing. The simplest way to use Agent is via my hosted version, it's free, and only relies on you sharing your local Foundry instance.
 
-There's a few decent ways - I have my instance on an Unraid server, tunneled out behind SWAG (or an Nginx Proxy Manager), through Cloudflare to a domain I own. It works amazingly, but it's complex and way out of scope for this. If you want to learn more, search for IBRACORP on youtube.
+There's a few decent ways - I have my instance on an Unraid server, tunneled out behind SWAG (or an Nginx Proxy Manager), through Cloudflare to a domain I own. It works amazing, but it's complex and way out of scope for this. If you want to learn more, search for IBRACORP on youtube.
 
-Another more friendly way is Tailscale. I find this to be used instead of messing around with Port Forwarding and Firewalls. Check [this](https://foundryvtt.wiki/en/setup/hosting/tailscale) tutorial out. By the end you should have an idea on how to share your Foundry instance.
+Another more friendly way is Tailscale. I find this to be easier to use instead of messing around with Port Forwarding and Firewalls. Check [this](https://foundryvtt.wiki/en/setup/hosting/tailscale) tutorial out. By the end you should have an idea on how to share your Foundry instance over a Tailscale Funnel.
 
-Whilst writing this part, I had been looking for 'easier' ways to suggest sharing, and came across a [DDEV plugin](https://ddev.com/blog/tailscale-router-ddev-addon/) for tailscale. I have since updated the DDEV install to use said plugin. For this section, I am going to assume Tailscale is installed on the system you are hosting Foundry on.
+Whilst writing this part, I had been looking for 'easier' ways to suggest sharing, and came across a [DDEV add-on](https://ddev.com/blog/tailscale-router-ddev-addon/) for Tailscale. I have since updated the DDEV install to use said add-on, and whilst useful for a quick share, I found it cumbersome to allow for specific ports. So, for this section, I am going to assume Tailscale is installed on the operating system you are hosting Foundry on.
 
 ### Sharing Via Tailscale
 
@@ -165,14 +166,19 @@ At this point, providing all the settings are correct (including API Key and Cha
 
 #### Using a Local Agent
 
-If you're like me and require control over every digital aspect of your life, then read on. We'll be leveraging DDEVs portmapping + Tailscales very annoying port limit.
+If you're like me and require control over every digital aspect of your life, then read on. We'll be leveraging DDEV's portmapping + Tailscale's very annoying port limit.
 
 1. Follow the Installation Steps above. Once you've got a local instance running on a browser you can access, read on.
-2. Follow the tuturial for creating a Tailscale Funnel for your Foundry Instance (above). Once you can access that from the Magic URL, continue.
-3. Run ddev describe. We need the port numbers that are mapped to web:80 and web:8080 (they tend to be above 32000). Remember those.
+2. Follow the tutorial for creating a Tailscale Funnel for your Foundry Instance (above). Once you can access that from the Magic URL, continue.
+3. Run `ddev describe`. We need the port numbers that are mapped to `web:80` and `web:8080` (they tend to be above 32000). Remember those.
 4. We will now be setting up two more Funnels, one for each port:
-   tailscale serve --bg --https 10000 http://127.0.0.1:80 (where 80 is the port number your :80 was mapped to)
-   tailscale serve --bg --https 8443 http://127.0.0.1:8080 (Replace 8080 with the DDEV :8080 mapping)
+   ```bash
+   tailscale serve --bg --https 10000 http://127.0.0.1:80
+   tailscale serve --bg --https 8443 http://127.0.0.1:8080
+   ```
+
+***(Note: Replace 80 and 8080 with the actual port numbers from `ddev describe`)***
+
 5. This adds ports 10000 and 8443 to your Magic URL for your computer. If you go to ```https://foundry.random-words.ts.net:10000``` you should end up on your agent! Remember to make sure Reverb is still running.
 6. In Foundry, in the CPR Bridge settings:
    **Agent URL:** ```https://foundry.random-words.ts.net:10000```
@@ -212,7 +218,7 @@ If you're like me and require control over every digital aspect of your life, th
 ## Technical Deep Dive: The Bridge
 
 The Bridge module is the heart of the Foundry VTT integration. It acts as a bridge between the Foundry environment and the Laravel-based Agent.
-It can be found at this (repository)[] or on the Foundry package manager.
+It can be found at this [repository](https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge) or on the Foundry package manager.
 
 ### How it Works
 
