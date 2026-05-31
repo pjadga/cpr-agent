@@ -70,6 +70,15 @@
                 </div>
             </div>
 
+            <eurobucks-panel
+                v-if="showEurobucksModal"
+                :value="charData.data.system.wealth.value"
+                :transactions="charData.data.system.transactions"
+                class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-cpr-black/70 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]"
+                @updated="handleEurobucksUpdated"
+                @click.self="showEurobucksModal = false">
+            </eurobucks-panel>
+
             <resource-modal
                 :show="showResourceModal"
                 :resource-label="resourceLabel"
@@ -184,6 +193,7 @@
                         @equip-click="openEquipModal"
                         @consume-click="openConsumeModal"
                         @toggle-category="toggleCategory"
+                        @open-eurobucks="showEurobucksModal = true"
                     ></stats-tab>
 
                     <skills-tab
@@ -408,6 +418,7 @@ import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
 import NetTab from './character-sheet/NetTab.vue';
+import EurobucksPanel from './character-sheet/EurobucksPanel.vue';
 import DiceHistory from './DiceHistory.vue';
 import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
@@ -439,6 +450,7 @@ export default {
         RollModifierPanel,
         SkillsTab,
         NetTab,
+        EurobucksPanel,
         DiceHistory,
         RollResultPopup
     },
@@ -474,6 +486,7 @@ export default {
         const consumingItem = ref(null);
         const showImagePopup = ref(false);
         const showCombatPanel = ref(false);
+        const showEurobucksModal = ref(false);
         const popupMessage = ref('');
         const error = computed(() => dataError.value);
 
@@ -1015,6 +1028,11 @@ export default {
             }
         };
 
+        const handleEurobucksUpdated = () => {
+            showEurobucksModal.value = false;
+            refreshSheet();
+        };
+
         return {
             // State
             charData,
@@ -1062,6 +1080,7 @@ export default {
             expandedRoleItems,
             expandedSkills,
             handleItemClick,
+            handleEurobucksUpdated,
 
             // Actions
             sendStatRequest,
@@ -1125,7 +1144,8 @@ export default {
             showConsumeModal,
             consumingItem,
             openConsumeModal,
-            confirmConsume
+            confirmConsume,
+            showEurobucksModal
         };
     }
 };

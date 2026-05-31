@@ -173,7 +173,7 @@ If you're like me and require control over every digital aspect of your life, th
 3. Run `ddev describe`. We need the port numbers that are mapped to `web:80` and `web:8080` (they tend to be above 32000). Remember those.
 4. We will now be setting up two more Funnels, one for each port:
    ```bash
-   tailscale serve --bg --https 10000 http://127.0.0.1:80
+   tailscale serve --bg --https 10000 http://127.0.0.1:80 
    tailscale serve --bg --https 8443 http://127.0.0.1:8080
    ```
 

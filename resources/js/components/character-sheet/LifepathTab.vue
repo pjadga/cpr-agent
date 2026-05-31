@@ -4,8 +4,8 @@
 
         <!-- Notes Section -->
         <div class="cpr-panel bg-[var(--cpr-black-elevated)] p-4 border border-cpr-border relative">
-            <h3 class="text-sm font-bold text-cpr-yellow uppercase mb-3 flex items-center gap-2">
-                <i v-icon data-lucide="sticky-note" class="w-4 h-4"></i> Notes
+            <h3 class="flex items-center justify-between mb-3 mt-2 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase">Notes</span>
             </h3>
             <textarea
                 v-model="localNotes"
@@ -17,8 +17,8 @@
 
         <!-- Lifepath Section -->
         <div class="space-y-4">
-            <h3 class="text-sm font-bold text-cpr-yellow uppercase border-b border-cpr-red-dark pb-1 flex items-center gap-2">
-                <i v-icon data-lucide="users" class="w-4 h-4 text-cpr-red"></i> Lifepath
+            <h3 class="flex items-center justify-between mb-4 mt-2 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase">Lifepath</span>
             </h3>
 
             <div v-for="(value, key) in lifepathData" :key="key" class="border border-cpr-border/30 p-3 relative group">

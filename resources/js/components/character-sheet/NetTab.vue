@@ -1,12 +1,11 @@
 <template>
     <div class="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div v-for="pool in netPoolData" :key="pool.pageId" class="space-y-4">
-            <div class="flex items-center gap-2 border-b border-cpr-yellow/30 pb-2">
-                <i v-icon data-lucide="network" class="w-4 h-4 text-cpr-yellow"></i>
-                <h3 class="text-cpr-yellow font-black uppercase tracking-widest text-xs">
+            <h3 class="flex items-center justify-between mb-4 mt-2 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase">
                     {{ pool.pageName }}
-                </h3>
-            </div>
+                </span>
+            </h3>
 
             <div class="grid grid-cols-3 sm:grid-cols-4 gap-4">
                 <div v-for="entry in pool.entries" :key="entry.id"
@@ -57,7 +56,7 @@
                 </div>
 
                 <div class="px-4 py-3 border-t border-cpr-yellow/30 bg-cpr-black-elevated flex justify-between items-center">
-                    <span class="text-[10px] font-mono text-cpr-text-dim uppercase tracking-widest">Protocol: {{ activeEntry.type === 'pdf' ? 'DOCUMENT_VIEWER' : 'HTML_RENDERER' }}</span>
+                    <span class="text-[10px] font-mono text-cpr-text-dim uppercase tracking-widest">Page View: {{ activeEntry.type === 'pdf' ? 'DOCUMENT_VIEWER' : 'HTML_RENDERER' }}</span>
                     <button @click="activeEntry = null" class="px-6 py-2 bg-cpr-yellow text-black font-black uppercase text-xs hover:bg-cpr-yellow-dark transition-colors shadow-[0_0_15px_rgba(234,179,8,0.2)]">
                         Close Terminal
                     </button>

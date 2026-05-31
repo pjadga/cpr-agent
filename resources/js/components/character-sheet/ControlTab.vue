@@ -17,8 +17,8 @@
         <div v-if="(controlState.spaceMode === 'meatspace' || !hasNetspaceOptions)"
              class="space-y-6 animate-in fade-in duration-300">
             <div>
-                <h3 class="text-xs font-black text-cpr-text-dim uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                    <i v-icon data-lucide="crosshair" class="w-3.5 h-3.5"></i> Target Acquisition
+                <h3 class="flex items-center justify-between mb-3 mt-2 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                    <span class="text-cpr-yellow font-bold text-sm uppercase">Target Acquisition</span>
                 </h3>
                 <div class="relative">
                     <button @click="showTargetDropdown = !showTargetDropdown"
@@ -60,8 +60,8 @@
             </div>
 
             <div>
-                <h3 class="text-xs font-black text-cpr-text-dim uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                    <i v-icon data-lucide="zap" class="w-3.5 h-3.5"></i> Weapon Systems
+                <h3 class="flex items-center justify-between mb-3 mt-2 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                    <span class="text-cpr-yellow font-bold text-sm uppercase">Weapon Systems</span>
                 </h3>
                 <div class="space-y-2">
                     <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
@@ -173,8 +173,8 @@
                 <div v-if="activeCyberdeck" class="space-y-6">
                     <div v-for="(programs, category) in programCategories" :key="category">
                         <div v-if="programs.length > 0">
-                            <h3 class="text-xs font-black text-cpr-yellow uppercase tracking-widest border-l-4 border-cpr-teal pl-2 mb-3 flex items-center justify-between">
-                                {{ category }}
+                            <h3 class="flex items-center justify-between mb-3 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                                <span class="text-cpr-yellow font-bold text-sm uppercase">{{ category }}</span>
                                 <span class="text-[9px] text-cpr-text-dim font-normal"><span
                                     class="font-numbers">{{ programs.length }}</span> Installed</span>
                             </h3>

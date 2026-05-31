@@ -521,6 +521,9 @@ class CyberpunkBridge {
             });
         };
 
+        //dropActorSheetData
+        //
+
         // Hook into Actor updates (stats, derived stats, etc.)
         this.hookIds.updateActor = Hooks.on('updateActor', (actor, changes, options, userId) => {
             // Ignore updates triggered by the Agent itself to avoid loops (though Agent updates usually go through API)
@@ -1321,6 +1324,8 @@ class CyberpunkBridge {
             }
 
             case 'MOVE_TOKEN': {
+                if (game.paused)
+                    break;
 
                 const token = canvas.tokens.get(tokenId);
                 if (token) {
@@ -1734,6 +1739,12 @@ class CyberpunkBridge {
             }
 
             case 'LIST_VISIBLE_TOKENS': {
+
+                const tokens = canvas.tokens.placeables.filter(t => t.actor?.id === actorId);
+                if (tokenId === null) {
+                    tokenId = tokens[0]?.id ?? null;
+                }
+
                 const jim = canvas.tokens.get(tokenId);
                 let nearbyTokens = [];
                 if (jim) {
@@ -1831,6 +1842,11 @@ class CyberpunkBridge {
 
                 if (!targetUser) targetUser = game.user;
 
+                function getTokenFromActor(actorId) {
+                    let tokens = canvas.tokens.placeables.filter(t => t.actor?.id === actorId);
+                    return tokens[0]?.id ?? null;
+                }
+
                 let actors = [];
                 // If the target user is a Game Master, we always return ALL characters and mooks.
                 // We check targetUser.isGM instead of game.user.isGM.
@@ -1848,7 +1864,7 @@ class CyberpunkBridge {
                             return {
                                 name: a.name,
                                 actorId: a.id,
-                                tokenId: null,
+                                tokenId: getTokenFromActor(a.id),
                                 agentLink: (ownerId ? game.users.get(ownerId)?.getFlag(MODULE_ID, 'agent-link') : null) || (ownerId || targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id)
                             };
                         });
@@ -1867,7 +1883,7 @@ class CyberpunkBridge {
                             return {
                                 name: t.name,
                                 actorId: t.actor.id,
-                                tokenId: t.id,
+                                tokenId: getTokenFromActor(t.actor.id),
                                 agentLink: (ownerId ? game.users.get(ownerId)?.getFlag(MODULE_ID, 'agent-link') : null) || ownerId || null
                             };
                         });
@@ -1879,7 +1895,7 @@ class CyberpunkBridge {
                             actors.push({
                                 name: targetUser.character.name,
                                 actorId: targetUser.character.id,
-                                tokenId: null,
+                                tokenId: getTokenFromActor(targetUser.character.id),
                                 agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id
                             });
                         }
@@ -1950,6 +1966,37 @@ class CyberpunkBridge {
                 break;
             }
 
+            case 'UPDATE_EB': {
+                if (actorId == null) {
+                    if (debug) console.log("[Bridge] Actor ID Not set:");
+                    break;
+                }
+
+                let actor = game.actors.get(actorId)
+
+                if (data.action == null || data.value == null) {
+                    if (debug) console.log("[Bridge] EuroBucks data error");
+                }
+
+                switch (data.action) {
+                    case 'add':
+                        actor.deltaLedgerProperty("wealth", data.value, data.reason)
+                        break;
+                    case 'subtract':
+                        actor.deltaLedgerProperty("wealth", '-' + data.value, data.reason)
+                        break;
+                    case 'set':
+                        actor.setLedgerProperty("wealth", data.value, data.reason)
+                        break;
+                }
+
+                if (actor) {
+                    await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { 'system.wealth': actor.system.wealth }, tab: 'stats', success: true, requestId });
+                }
+                break;
+            }
+
+
             default:
                 console.log("Unknown DataType: " + type);
                 break;
@@ -1966,63 +2013,39 @@ class CyberpunkBridge {
 // BOOT SEQUENCE & VITE ASYNC FAILSAFE
 // ==================================================================
 
-// Helper to safely register the Data Pool without duplicating
-function registerDataPool() {
-    // Check if it's already registered to prevent Hot-Reload errors
-    if (CONFIG.JournalEntryPage.dataModels["cpr-agent.datapool"]) return;
-
-    console.log("%c [Bridge] Registering Data Pool Journal...", 'background: #222; color: #bada55');
-
-    Object.assign(CONFIG.JournalEntryPage.dataModels, {
-        "cpr-agent.datapool": DataPoolPageModel
-    });
-
-    DocumentSheetConfig.registerSheet(JournalEntryPage, "cpr-agent", DataPoolPageSheet, {
-        types: ["cpr-agent.datapool"],
-        makeDefault: true,
-        label: "Agent Data Pool"
-    });
-}
 
 if (window.cyberpunkBridge) {
     window.cyberpunkBridge.destroy();
 }
 window.cyberpunkBridge = new CyberpunkBridge();
 
-// Helper to safely register settings without duplicating
+Hooks.once('init', () => {
+    ensureSettingsRegistered();
+
+    if (!CONFIG.JournalEntryPage.dataModels["cpr-agent.datapool"]) {
+        CONFIG.JournalEntryPage.dataModels["cpr-agent.datapool"] = DataPoolPageModel;
+        console.log("[Bridge] Registered DataPool DataModel.");
+    }
+    DocumentSheetConfig.registerSheet(JournalEntryPage, "cpr-agent", DataPoolPageSheet, {
+        types: ["cpr-agent.datapool"],
+        makeDefault: true,
+        label: "Agent Data Pool"
+    });
+    console.log("[Bridge] Registered DataPool Journal Page Sheet.");
+});
+
+Hooks.once('ready', () => {
+    if (game.user.isGM) {
+        window.cyberpunkBridge.connect();
+    }
+    window.cyberpunkBridge.syncPlayerLink();
+    window.cyberpunkBridge.registerGlobalHooks();
+    console.log("[Bridge] Cyberpunk Bridge Fully Online.");
+});
+
 function ensureSettingsRegistered() {
     if (!game.settings.settings.has(`${MODULE_ID}.apiUrl`)) {
         console.log("[Bridge] Registering Module Settings...");
         window.cyberpunkBridge.registerSettings();
     }
-}
-
-// If Foundry is completely loaded (Hot Reloading / Very Late Load)
-if (game.ready) {
-    ensureSettingsRegistered();
-    registerDataPool();
-    if (game.user.isGM) window.cyberpunkBridge.connect();
-    window.cyberpunkBridge.syncPlayerLink();
-    window.cyberpunkBridge.registerGlobalHooks();
-}
-// Standard Foundry Boot Sequence
-else {
-    // Try to catch the normal init hook
-    Hooks.once('init', () => {
-        ensureSettingsRegistered();
-        registerDataPool();
-    });
-
-    // When Foundry is ready to play
-    Hooks.once('ready', () => {
-        // FAILSAFE: If Vite caused us to miss the 'init' hook, do it right now!
-        ensureSettingsRegistered();
-        registerDataPool();
-
-        if (game.user.isGM) {
-            window.cyberpunkBridge.connect();
-        }
-        window.cyberpunkBridge.syncPlayerLink();
-        window.cyberpunkBridge.registerGlobalHooks();
-    });
 }
