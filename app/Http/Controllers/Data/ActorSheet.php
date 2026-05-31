@@ -83,6 +83,7 @@ class ActorSheet extends FormRequest
                     'derivedStats' => $characterData['system']['derivedStats'] ?? [],
                     'reputation' => $characterData['system']['reputation'] ?? ['value' => 0],
                     'wealth' => $characterData['system']['wealth'] ?? ['value' => 0],
+                    'transactions' => $characterData['system']['wealth']['transactions'] ?? [],
                     'improvementPoints' => $characterData['system']['improvementPoints'] ?? ['value' => 0],
                     'roleInfo' => $characterData['system']['roleInfo'] ?? [],
                     'lifepath' => $characterData['system']['lifepath'] ?? [],
@@ -175,6 +176,7 @@ class ActorSheet extends FormRequest
                 // Critical Injury Specifics
                 'quickFix' => $sys['quickFix'] ?? null,
                 'treatment' => $sys['treatment'] ?? null,
+
             ],
         ];
     }

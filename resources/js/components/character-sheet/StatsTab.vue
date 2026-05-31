@@ -44,7 +44,8 @@
         </div>
 
         <div class="cpr-box border-cpr-red p-3 flex justify-between divide-x divide-gray-800">
-            <div class="px-2 text-center w-1/4">
+            <div class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
+                 @click="$emit('open-eurobucks')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
                 <div class="text-cpr-yellow font-bold"><span class="font-numbers">{{
                         charData.data.system.wealth.value
@@ -75,11 +76,9 @@
         </div>
 
         <div v-if="groupedInjuries && (groupedInjuries.head.length > 0 || groupedInjuries.body.length > 0)">
-            <h3 @click="$emit('toggle-category', 'criticalInjury')" class="text-sm font-bold text-cpr-yellow uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-red-dark/20 p-1 transition-colors">
-                <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-red group-hover:text-cpr-red"></i>
-                    <span class="group-hover:text-cpr-red transition-colors">Critical Injuries</span>
-                </div>
+            <h3 @click="$emit('toggle-category', 'criticalInjury')"
+                class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-red-dark/20 transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase group-hover:text-cpr-red transition-colors">Critical Injuries</span>
                 <div class="transition-transform duration-200"
                      :class="{ 'rotate-180': collapsedCategories['criticalInjury'] }">
                     <i v-icon data-lucide="chevron-down"
@@ -127,8 +126,8 @@
         </div>
 
         <div>
-            <h3 class="text-sm font-bold text-cpr-yellow uppercase mb-4 border-b border-cpr-red-dark pb-1 flex items-center gap-2">
-                <i v-icon data-lucide="crosshair" class="w-4 h-4 text-cpr-red"></i> Currently Equipped
+            <h3 class="flex items-center justify-between mb-4 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase">Currently Equipped</span>
             </h3>
 
             <div v-for="(items, category) in groupedEquipped" :key="category">
@@ -183,7 +182,7 @@ export default {
     props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll'],
     components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow},
     directives: {icon: vIcon},
-    emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'consume-click', 'toggle-category'],
+    emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'consume-click', 'toggle-category', 'open-eurobucks'],
     setup() {
         return {formatCategory: formatCategoryName};
     }

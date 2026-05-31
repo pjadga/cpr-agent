@@ -3,11 +3,9 @@
 
 
         <div>
-            <h3 @click="$emit('toggle-category', 'cyberware')" class="text-sm font-bold text-cpr-yellow uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
-                <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="zap" class="w-4 h-4 text-cpr-teal group-hover:text-cpr-teal"></i> <span
-                    class="group-hover:text-cpr-teal transition-colors">Cyberware</span>
-                </div>
+            <h3 @click="$emit('toggle-category', 'cyberware')" 
+                class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-teal-dark/20 transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase group-hover:text-cpr-teal transition-colors">Cyberware</span>
                 <div class="transition-transform duration-200"
                      :class="{ 'rotate-180': collapsedCategories['cyberware'] }">
                     <i v-icon data-lucide="chevron-down"
@@ -53,11 +51,9 @@
         </div>
 
         <div>
-            <h3 @click="$emit('toggle-category', 'gear')" class="text-sm font-bold text-cpr-yellow uppercase mb-2 flex items-center justify-between cursor-pointer group hover:bg-cpr-teal-dark/20 p-1 transition-colors">
-                <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="package" class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i>
-                    <span class="group-hover:text-cpr-teal transition-colors">Gear & Equipment</span>
-                </div>
+            <h3 @click="$emit('toggle-category', 'gear')" 
+                class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-teal-dark/20 transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase group-hover:text-cpr-teal transition-colors">Gear & Equipment</span>
                 <div class="transition-transform duration-200" :class="{ 'rotate-180': collapsedCategories['gear'] }">
                     <i v-icon data-lucide="chevron-down"
                        class="w-4 h-4 text-cpr-text-dim group-hover:text-cpr-teal"></i>

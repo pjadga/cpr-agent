@@ -70,6 +70,15 @@
                 </div>
             </div>
 
+            <eurobucks-panel
+                v-if="showEurobucksModal"
+                :value="charData.data.system.wealth.value"
+                :transactions="charData.data.system.transactions"
+                class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-cpr-black/70 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]"
+                @updated="handleEurobucksUpdated"
+                @click.self="showEurobucksModal = false">
+            </eurobucks-panel>
+
             <resource-modal
                 :show="showResourceModal"
                 :resource-label="resourceLabel"
@@ -184,6 +193,7 @@
                         @equip-click="openEquipModal"
                         @consume-click="openConsumeModal"
                         @toggle-category="toggleCategory"
+                        @open-eurobucks="showEurobucksModal = true"
                     ></stats-tab>
 
                     <skills-tab
@@ -250,6 +260,12 @@
                         @toggle-rez="toggleRez"
                         @roll-program="rollProgram"
                     ></control-tab>
+
+                    <net-tab
+                        v-else-if="activeTab === 'net'"
+                        :net-pool-data="netPoolData"
+                        :get-image-url="getImageUrl"
+                    ></net-tab>
                 </transition>
             </main>
 
@@ -265,6 +281,8 @@
                          @click="activeTab = 'lifepath'"></nav-btn>
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
+                <nav-btn v-if="netPoolData.length > 0" icon="globe" label="CitiNet" :active="activeTab === 'net'"
+                         @click="activeTab = 'net'"></nav-btn>
                 <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
                          @click="goToSettings"></nav-btn>
             </nav>
@@ -399,6 +417,8 @@ import LifepathTab from './character-sheet/LifepathTab.vue';
 import ResourceModal from './character-sheet/ResourceModal.vue';
 import RollModifierPanel from './character-sheet/RollModifierPanel.vue';
 import SkillsTab from './character-sheet/SkillsTab.vue';
+import NetTab from './character-sheet/NetTab.vue';
+import EurobucksPanel from './character-sheet/EurobucksPanel.vue';
 import DiceHistory from './DiceHistory.vue';
 import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
@@ -409,6 +429,7 @@ import {useCombat} from '../composables/useCombat';
 import {useRollModifiers} from '../composables/useRollModifiers';
 import {useResources} from '../composables/useResources';
 import {useNetrunner} from '../composables/useNetrunner';
+import {useNetPool} from '../composables/useNetPool';
 import {useEchoListener} from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
@@ -428,6 +449,8 @@ export default {
         ResourceModal,
         RollModifierPanel,
         SkillsTab,
+        NetTab,
+        EurobucksPanel,
         DiceHistory,
         RollResultPopup
     },
@@ -449,6 +472,12 @@ export default {
             rollMode
         } = useCharacterData();
 
+        const {
+            netPoolData,
+            fetchNetPool,
+            handleNetPoolData
+        } = useNetPool();
+
         const activeTab = ref('stats');
         const showPopup = ref(false);
         const showEquipModal = ref(false);
@@ -457,8 +486,12 @@ export default {
         const consumingItem = ref(null);
         const showImagePopup = ref(false);
         const showCombatPanel = ref(false);
+        const showEurobucksModal = ref(false);
         const popupMessage = ref('');
         const error = computed(() => dataError.value);
+
+        // --- INITIAL DATA LOAD ---
+        fetchNetPool();
 
         // --- UTILS & HELPERS ---
         const throwError = (message) => {
@@ -594,6 +627,8 @@ export default {
         // Listen for responses from Foundry
         const handleFoundryResponse = (e) => {
             const payload = e.payload || e;
+
+            handleNetPoolData(payload);
 
             if (payload.type === 'DICE_ROLL_EVENT' || payload.type === 'ROLL_RESULT') {
                 const incomingLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '').toLowerCase();
@@ -993,6 +1028,11 @@ export default {
             }
         };
 
+        const handleEurobucksUpdated = () => {
+            showEurobucksModal.value = false;
+            refreshSheet();
+        };
+
         return {
             // State
             charData,
@@ -1040,6 +1080,7 @@ export default {
             expandedRoleItems,
             expandedSkills,
             handleItemClick,
+            handleEurobucksUpdated,
 
             // Actions
             sendStatRequest,
@@ -1059,6 +1100,7 @@ export default {
             refreshSheet,
             isWssConnected,
             reloadPage,
+            netPoolData,
 
             // Combat
             mockEnemies,
@@ -1102,7 +1144,8 @@ export default {
             showConsumeModal,
             consumingItem,
             openConsumeModal,
-            confirmConsume
+            confirmConsume,
+            showEurobucksModal
         };
     }
 };

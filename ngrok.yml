@@ -1,9 +1,0 @@
-version: 2
-authtoken: 37ntfvZKgbIUILcgzo6EMwv8g6r_2PCArGncYVXJ5JnLNfeVL
-tunnels:
-  first:
-    proto: http
-    addr: http://127.0.0.1:32773
-  second:
-    proto: http
-    addr: 8080

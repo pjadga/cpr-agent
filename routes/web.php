@@ -6,6 +6,7 @@ use App\Http\Controllers\Cyberdeck\ToggleRez;
 use App\Http\Controllers\Data\ActorSheet;
 use App\Http\Controllers\Data\GetActor;
 use App\Http\Controllers\Data\GetActors;
+use App\Http\Controllers\Data\GetNetPool;
 use App\Http\Controllers\Data\GetRollModifiers;
 use App\Http\Controllers\Data\ImageProxy;
 use App\Http\Controllers\Data\ItemEquip;
@@ -27,6 +28,7 @@ use App\Http\Controllers\Token\ListVisibleTokens;
 use App\Http\Controllers\Token\MoveToken;
 use App\Http\Controllers\Token\ReloadWeapon;
 use App\Http\Controllers\Token\TargetTokens;
+use App\Http\Controllers\Values\UpdateEuroBucks;
 use App\Http\Controllers\Values\UpdateNotes;
 use App\Http\Controllers\Values\UpdateStat;
 use App\Models\Config;
@@ -93,6 +95,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post('/actorsheet', [ActorSheet::class, 'getCleanData']);
     Route::post('/getactor', [GetActor::class, 'getActor']);
     Route::post('/getactors', [GetActors::class, 'getActors']);
+    Route::post('/get-net-pool', [GetNetPool::class, 'getNetPool']);
     Route::post('/movetoken', [MoveToken::class, 'moveToken']);
     Route::post('/getvisibletokens', [GetVisibleTokens::class, 'getVisibleTokens']);
     Route::post('/listvisibletokens', [ListVisibleTokens::class, 'listVisibleTokens']);
@@ -112,6 +115,7 @@ Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function (
     Route::post('/uninstallprogram', [RemoveProgram::class, 'removeProgram']);
     Route::post('/toggleprogramrez', [ToggleRez::class, 'toggleRez']);
     Route::post('/programroll', [ProgramRoll::class, 'programRoll']);
+    Route::post('/update-eb', [UpdateEuroBucks::class, 'updateEuroBucks']);
     Route::get('/proxy-image', [ImageProxy::class, 'proxy'])->name('proxy-image');
 });
 

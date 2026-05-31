@@ -36,6 +36,7 @@ window.Echo = new Echo({
 
 if (window.Echo.connector.pusher) {
     window.Echo.connector.pusher.connection.bind('connected', () => {
+        console.log('Pusher connection established');
         isWssConnected.value = true;
     });
 
