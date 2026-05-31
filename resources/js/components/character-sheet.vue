@@ -281,7 +281,7 @@
                          @click="activeTab = 'lifepath'"></nav-btn>
                 <nav-btn icon="gamepad-2" label="Control" :active="activeTab === 'control'"
                          @click="activeTab = 'control'"></nav-btn>
-                <nav-btn v-if="netPoolData.length > 0" icon="globe" label="Net" :active="activeTab === 'net'"
+                <nav-btn v-if="netPoolData.length > 0" icon="globe" label="CitiNet" :active="activeTab === 'net'"
                          @click="activeTab = 'net'"></nav-btn>
                 <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
                          @click="goToSettings"></nav-btn>

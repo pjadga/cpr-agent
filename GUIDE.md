@@ -7,12 +7,13 @@ This guide provides detailed instructions on how to set up, self-host, and conne
 1. [Getting Started](#getting-started)
 2. [Self-Hosting Guide](#self-hosting-guide)
 3. [Connecting Foundry VTT](#connecting-foundry-vtt)
-4. [Sharing is Caring](#sharing-is-caring)
+4. [Data Pools](#data-pools)
+5. [Sharing is Caring](#sharing-is-caring)
    - [Sharing Via Tailscale](#sharing-via-tailscale)
-5. [Settings Reference](#settings-reference)
-6. [Technical Deep Dive: The Bridge](#technical-deep-dive-the-bridge)
-7. [The Delta System](#the-delta-system)
-8. [Troubleshooting](#troubleshooting)
+6. [Settings Reference](#settings-reference)
+7. [Technical Deep Dive: The Bridge](#technical-deep-dive-the-bridge)
+8. [The Delta System](#the-delta-system)
+9. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -59,6 +60,15 @@ The CPR Agent is a companion app designed to bridge the gap between players and 
   To the right of the address bar, tap More More and then Add to home screen and then Create shortcut."
 
 ---
+
+
+## Data Pools
+
+I always liked the 'classifieds' vibe of 2077's terminals, and whilst the Red is fairly unconnected (and rightfully so), there is still local area networks called CitiNets thankls to Ziggurat (hmu if I've misunderstood the lore :D ).
+
+To imitate this, I've leveraged Foundry's Journal system and added a new type of Journal page. This creates a dynamic row form that gives you freedom to upload PDFs and RichText as 'pages' of a Data Pool. You can set the Icons for each 'link', and these will be displayed in a similar fashion to the 2077 terminal 'net' page on the agent.
+
+The CitiNet icon won't appear in the Agent until you've setup a Data Pool Journal. If it refuses to appear, give the Agent a refresh. 
 
 ## Self-Hosting Guide
 
