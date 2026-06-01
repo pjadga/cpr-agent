@@ -61,14 +61,13 @@ The CPR Agent is a companion app designed to bridge the gap between players and 
 
 ---
 
-
 ## Data Pools
 
 I always liked the 'classifieds' vibe of 2077's terminals, and whilst the Red is fairly unconnected (and rightfully so), there is still local area networks called CitiNets thankls to Ziggurat (hmu if I've misunderstood the lore :D ).
 
 To imitate this, I've leveraged Foundry's Journal system and added a new type of Journal page. This creates a dynamic row form that gives you freedom to upload PDFs and RichText as 'pages' of a Data Pool. You can set the Icons for each 'link', and these will be displayed in a similar fashion to the 2077 terminal 'net' page on the agent.
 
-The CitiNet icon won't appear in the Agent until you've setup a Data Pool Journal. If it refuses to appear, give the Agent a refresh. 
+The CitiNet icon won't appear in the Agent until you've setup a Data Pool Journal. If it refuses to appear, give the Agent a refresh.
 
 ## Self-Hosting Guide
 
@@ -82,39 +81,45 @@ If you prefer to host your own instance of the CPR Agent, follow these steps.
 ### Installation Steps
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://gitlab.com/surrealtech/cyberpunk-red-agent
    cd cyberpunk-red-agent
    ```
 2. **Start DDEV**:
+
    ```bash
    ddev start
    ```
-
 3. **Environment Configuration**:
+
    Note: If installing on Windows, unzipping into WSL may cause many errors due to .Zone.Identifiers added to files. Please run this command to fix:
+
    ```bash find . -name "*:Zone.Identifier" -type f -delete ```
 
-   Copy `.env.template` to `.env` and configure your settings. If .env does not exist, please create the file and copy the env.template. Key variables include:
+   Rename `.env.template` to `.env`. Key variables include:
 
-- `APP_URL`: Your local or public URL.
-- `REVERB_HOST`: The hostname for the websocket server.
+- `APP_URL`: Your local or public URL. For simplicity, leave it as cyberpunk.ddev.set
+- `REVERB_HOST`: The hostname for the websocket server. Generally the same as above.
 - `REVERB_PORT`: Typically 8080 for local development.
 
 4. **Install Dependencies**:
+
    ```bash
    ddev composer install
    ddev npm install
    ```
-
 5. **Setup Database & Assets**:
+
    ```bash
    ddev artisan migrate:fresh
    ddev npm run build
    ```
 6. **Turn on Reverb**
+
    This is a requisite for running the app. Reverb works through port 8080 for http (ws) or 8081 (wss) for https,
    so when creating sharing tunnels later this will need to be taken into account.
+
    ```bash
    ddev artisan reverb:start
    ```
@@ -188,8 +193,8 @@ If you're like me and require control over every digital aspect of your life, th
 3. Run `ddev describe`. We need the port numbers that are mapped to `web:80` and `web:8080` (they tend to be above 32000). Remember those.
 4. We will now be setting up two more Funnels, one for each port:
    ```bash
-   tailscale serve --bg --https 10000 http://127.0.0.1:80 
-   tailscale serve --bg --https 8443 http://127.0.0.1:8080
+   tailscale funnel --bg --https 10000 http://127.0.0.1:80 
+   tailscale funnel --bg --https 8443 http://127.0.0.1:8080
    ```
 
 ***(Note: Replace 80 and 8080 with the actual port numbers from `ddev describe`)***
@@ -200,6 +205,20 @@ If you're like me and require control over every digital aspect of your life, th
    **Reverb Port:** 8443
 7. Press save. A Bridge Online message should pop up, and that is connected!
 8. Go to your Agent to test everything out. Sharing the ```https://foundry.random-words.ts.net:10000``` will give your players the Agent app.
+
+#### Good Luck
+
+Setting this up locally is fairly complex, if you've got this far and you're sat infront of a shared Foundry & Agent, congrats choom! Kick back with some skop & kopi kadal.
+
+If not, well, I hope you can debug! The dev console on browsers in your best friend. After checking the 'shit list' off:
+
+* Refresh/hard refresh the page
+* Re-save the character in config
+* Flush/wipe all session data and cookies from browser (related to the Agent).
+
+If not, hit f12 when in the browser and see if there's any red errors kicking around. Ones to look out for would be 500 errors, cant connect, 404 errors, lost connection etc. If you see those chances are that the Agent and Foundry are not talking to each other, usually due to a port or URL misconfiguration (or my inability to write good documentation).
+
+If you're super stuck, come and say hi on the CPRed Discord, I'm in the Content Share section.
 
 ## Settings Reference
 
