@@ -90,17 +90,22 @@ If you prefer to host your own instance of the CPR Agent, follow these steps.
    ```bash
    ddev start
    ```
-3. **Install Dependencies**:
-   ```bash
-   ddev composer install
-   ddev npm install
-   ```
-4. **Environment Configuration**:
+
+3. **Environment Configuration**:
+   Note: If installing on Windows, unzipping into WSL may cause many errors due to .Zone.Identifiers added to files. Please run this command to fix:
+   ```bash find . -name "*:Zone.Identifier" -type f -delete ```
+
    Copy `.env.template` to `.env` and configure your settings. If .env does not exist, please create the file and copy the env.template. Key variables include:
 
 - `APP_URL`: Your local or public URL.
 - `REVERB_HOST`: The hostname for the websocket server.
 - `REVERB_PORT`: Typically 8080 for local development.
+
+4. **Install Dependencies**:
+   ```bash
+   ddev composer install
+   ddev npm install
+   ```
 
 5. **Setup Database & Assets**:
    ```bash
