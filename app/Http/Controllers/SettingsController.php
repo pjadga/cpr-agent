@@ -148,7 +148,7 @@ class SettingsController extends Controller
     {
         $user = Auth::user();
         if ($user->default_actor_id) {
-            $this->refreshCharacterData($user);
+            $this->refreshCharacterData($user, null, false);
 
             return redirect()->route('settings')->with('success', 'Character data refreshed from Foundry!');
         }
@@ -171,7 +171,7 @@ class SettingsController extends Controller
         return response()->json(['success' => true]);
     }
 
-    protected function refreshCharacterData($user, $actorId = null)
+    protected function refreshCharacterData($user, $actorId = null, $saveToUser = true)
     {
         $requestId = $this->createRequestId();
         $payload = [
@@ -191,6 +191,9 @@ class SettingsController extends Controller
             $key = 'foundry_response_'.$requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
+                if (!$saveToUser) {
+                    break;
+                }
                 if (! empty($foundryData['actor'])) {
                     $actor = $foundryData['actor'];
                     if (isset($actor['_id']) && $actor['_id'] !== $user->default_actor_id) {
