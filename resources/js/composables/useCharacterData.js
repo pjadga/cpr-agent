@@ -1,6 +1,7 @@
 import {ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef} from 'vue';
 import {isDeepEqual} from '../utils/helpers';
 import {isMyRequest} from '../utils/requests';
+import {useNetPool} from './useNetPool'
 
 // Shared state to prevent multiple fetches/intervals
 const charData = shallowRef(null);
@@ -222,6 +223,8 @@ export function useCharacterData() {
      */
     const refreshSheet = async ({paths = null, tab = null, force = false} = {}) => {
         if (force || !paths) {
+            const { fetchNetPool } = useNetPool();
+            await fetchNetPool();
             await fetchCharacterData(false, force);
             return;
         }

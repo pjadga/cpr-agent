@@ -35,7 +35,7 @@ export function useRollModifiers(controlState) {
                     rollModsData.value = {injuries: [], totalPenalty: 0, finalModifier: 0};
                 }
             }
-        }, 5000);
+        }, 10000);
 
         try {
             // We don't block if no weapon is selected anymore, we want to see penalties
