@@ -220,7 +220,7 @@ export default {
 
             rolling.value = true;
             try {
-                const response = await axios.post('/make-roll', {
+                const response = await axios.post('/api/make-roll', {
                     formula: formula.value,
                     flavor: 'Manual Roll',
                     createChatMessage: true,

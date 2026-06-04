@@ -60,7 +60,7 @@ export default {
     emits: ['click', 'equip-click', 'consume-click'],
     setup(props, {emit}) {
         console.log(`ArmourRow setup: ${props.item.name} (${props.category})`);
-        const {getImageUrl, fetchCharacterData} = useCharacterData();
+        const {getImageUrl, fetchCharacterData, charData, isPlayer} = useCharacterData();
         const expanded = ref(false);
         const showReloadPopup = ref(false);
 
@@ -71,7 +71,7 @@ export default {
         const reloadWithAmmo = async (ammoId) => {
             try {
                 // The /reloadweapon expects controlState which includes selectedWeapon
-                await window.axios.post("/reloadweapon", {
+                await window.axios.post("/api/reloadweapon", {
                     weaponId: props.item._id,
                     ammoId: ammoId // Passing ammoId as well
                 });
@@ -98,11 +98,13 @@ export default {
             return 'syringe'; // 'syringe' is the Lucide icon for a needle/injector
         });
 
-        const equipIcon = computed(() =>
-            getEquipIconForState(props.item.system.equipped)
-        );
+        const equipIcon = computed(() => {
+            if (!isPlayer.value) return 'hand';
+            return getEquipIconForState(props.item.system.equipped);
+        });
 
         const equipStateLabel = computed(() => {
+            if (!isPlayer.value) return 'Equipped';
             switch (props.item.system.equipped) {
                 case 'equipped':
                     return 'Equipped';
@@ -190,8 +192,8 @@ export default {
                 });
             }
 
-            if (sys.isHeadLocation && sys['armor-head'] && sys['armor-head'].sp > 0) {
-                const head = sys['armor-head'];
+            if (sys.isHeadLocation && sys['headLocation'] && sys['headLocation'].sp > 0) {
+                const head = sys['headLocation'];
                 results.push({
                     label: 'Head',
                     current: head.sp - head.ablation,
@@ -200,8 +202,8 @@ export default {
                 });
             }
 
-            if (sys.isBodyLocation && sys['armor-body'] && sys['armor-body'].sp > 0) {
-                const body = sys['armor-body'];
+            if (sys.isBodyLocation && sys['bodyLocation'] && sys['bodyLocation'].sp > 0) {
+                const body = sys['bodyLocation'];
                 results.push({
                     label: 'Body',
                     current: body.sp - body.ablation,
@@ -227,14 +229,14 @@ export default {
                     let currentSp = 0;
                     let count = 0;
 
-                    if (sys['armor-head'] && sys['armor-head'].sp > 0) {
-                        totalSp += sys['armor-head'].sp;
-                        currentSp += (sys['armor-head'].sp - sys['armor-head'].ablation);
+                    if (sys['headLocation'] && sys['headLocation'].sp > 0) {
+                        totalSp += sys['headLocation'].sp;
+                        currentSp += (sys['headLocation'].sp - sys['headLocation'].ablation);
                         count++;
                     }
-                    if (sys['armor-body'] && sys['armor-body'].sp > 0) {
-                        totalSp += sys['armor-body'].sp;
-                        currentSp += (sys['armor-body'].sp - sys['armor-body'].ablation);
+                    if (sys['bodyLocation'] && sys['bodyLocation'].sp > 0) {
+                        totalSp += sys['bodyLocation'].sp;
+                        currentSp += (sys['bodyLocation'].sp - sys['bodyLocation'].ablation);
                         count++;
                     }
 
@@ -297,7 +299,8 @@ export default {
             equipIcon,
             equipStateLabel,
             getEquipIconForState,
-            categoryColor
+            categoryColor,
+            isPlayer
         };
     }
 };

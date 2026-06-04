@@ -24,7 +24,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
         try {
             dvLoading.value = true;
-            const response = await window.axios.post('/getvisibletokens', {
+            const response = await window.axios.post('/api/getvisibletokens', {
                 selectedWeapon: controlState.value.selectedWeapon,
                 selectedTarget: controlState.value.selectedTarget
             });
@@ -79,7 +79,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
      * Get list of visible tokens (enemies) from the server
      */
     const getVisibleTokens = () => {
-        window.axios.post("/listvisibletokens", {}).then(response => {
+        window.axios.post("/api/listvisibletokens", {}).then(response => {
             if (response.data && response.data.success && response.data.data) {
                 updateMockEnemies(response.data.data);
             }
@@ -116,7 +116,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
         if (now - lastMoveTime < 300) return;
 
         lastMoveTime = now;
-        window.axios.post("/movetoken", {direction, weaponId, actorId, tokenId});
+        window.axios.post("/api/movetoken", {direction, weaponId, actorId, tokenId});
 
         // Refresh visible tokens after movement.
         debouncedGetVisibleTokens();
@@ -131,7 +131,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             actorId: charData.value?.uuid,
             tokenId: charData.value?.tokenId
         };
-        window.axios.post("/targettokens", payload).then(() => {
+        window.axios.post("/api/targettokens", payload).then(() => {
             // Automatic refresh removed as requested.
         });
     };
@@ -151,7 +151,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             rollMode: rollMode.value
         };
 
-        window.axios.post("/attackroll", payload).then((response) => {
+        window.axios.post("/api/attackroll", payload).then((response) => {
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
                 // Handle list of rolls from getRolls(limit: 5)
@@ -175,7 +175,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             tokenId: charData.value?.tokenId,
             rollMode: rollMode.value
         };
-        window.axios.post("/damageroll", payload).then((response) => {
+        window.axios.post("/api/damageroll", payload).then((response) => {
             // debouncedFetchCharacterData();
             if (response.data && response.data.data) {
                 let rollData = response.data.data;
@@ -212,7 +212,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
                 actorId: charData.value?.uuid,
                 tokenId: charData.value?.tokenId
             };
-            window.axios.post("/reloadweapon", payload);
+            window.axios.post("/api/reloadweapon", payload);
         }
     };
 

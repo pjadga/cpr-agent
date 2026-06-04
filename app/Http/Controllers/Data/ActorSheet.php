@@ -163,8 +163,8 @@ class ActorSheet extends FormRequest
                 'spd' => $sys['spd'] ?? 0,
 
                 // Armor Specifics
-                'armor-head' => $sys['headLocation'] ?? [],
-                'armor-body' => $sys['bodyLocation'] ?? [],
+                'headLocation' => $sys['headLocation'] ?? [],
+                'bodyLocation' => $sys['bodyLocation'] ?? [],
                 'isHeadLocation' => $sys['isHeadLocation'] ?? [],
                 'isBodyLocation' => $sys['isBodyLocation'] ?? [],
                 'isShield' => $sys['isShield'] ?? false,

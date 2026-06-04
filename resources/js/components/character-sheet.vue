@@ -502,7 +502,8 @@ export default {
 
         const sendRequest = (data, url) => {
             const payload = {...data, rollMode: rollMode.value};
-            window.axios.post(url, payload).then(response => {
+            const apiUrl = url.startsWith('/') ? `/api${url}` : `/api/${url}`;
+            window.axios.post(apiUrl, payload).then(response => {
                 // Automatic refresh removed as requested.
                 if (response.data && response.data.data) {
                     let rollData = response.data.data;
@@ -570,7 +571,7 @@ export default {
             editingItem.value = null;
 
             try {
-                await window.axios.post('/item-equip', {
+                await window.axios.post('/api/item-equip', {
                     itemId: itemId,
                     state: state
                 });
@@ -591,7 +592,7 @@ export default {
             consumingItem.value = null;
 
             try {
-                await window.axios.post("/consume-item", {
+                await window.axios.post("/api/consume-item", {
                     itemId: itemId
                 });
                 refreshAll();
@@ -725,7 +726,7 @@ export default {
 
         const rollProgram = (program, activeDeck) => {
             if (controlState) controlState.value.selectedProgram = program;
-            window.axios.post('/programroll', {
+            window.axios.post('/api/programroll', {
                 cyberdeckId: activeDeck._id,
                 programId: program._id,
                 programName: program.name,
@@ -881,6 +882,7 @@ export default {
                     groups["hasArmour"] = true
                 }
             })
+            console.log(groups)
             return groups;
         });
 

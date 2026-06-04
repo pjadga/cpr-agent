@@ -1,4 +1,4 @@
-import {ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef} from 'vue';
+import {ref, onMounted, onUnmounted, shallowRef, nextTick, triggerRef, computed} from 'vue';
 import {isDeepEqual} from '../utils/helpers';
 import {isMyRequest} from '../utils/requests';
 import {useNetPool} from './useNetPool'
@@ -51,7 +51,7 @@ export function useCharacterData() {
 
         // If it's an external URL (e.g. pointing to Ngrok), proxy it
         if (fullUrl.includes('ngrok-free.dev') || fullUrl.includes('ngrok.dev')) {
-            return `/proxy-image?url=${encodeURIComponent(fullUrl)}`;
+            return `/api/proxy-image?url=${encodeURIComponent(fullUrl)}`;
         }
 
         return fullUrl;
@@ -63,7 +63,7 @@ export function useCharacterData() {
     const fetchBaseUrl = async () => {
 //        if (baseUrl.value) return; // Use cached value if available
         try {
-            const response = await window.axios.get("/getbaseurl");
+            const response = await window.axios.get("/api/getbaseurl");
             const url = response.data.replace(/\/$/, ''); // Remove trailing slash if any
             baseUrl.value = url;
             localStorage.setItem('cpr_base_url', baseUrl.value);
@@ -230,7 +230,7 @@ export function useCharacterData() {
         }
         // Minimal targeted refresh: ask server for current mirror and only merge requested paths
         try {
-            const response = await window.axios.post('/actorsheet', {actorUuid});
+            const response = await window.axios.post('/api/actorsheet', {actorUuid});
             const latest = response.data;
             if (!latest || !latest.data) return;
             const extract = (obj, path) => path.split('.').reduce((o, k) => (o ? o[k] : undefined), obj);
@@ -261,7 +261,7 @@ export function useCharacterData() {
         try {
             if (!actorUuid) {
                 // If we don't have a UUID, trigger a fetch from the backend
-                const getActors = await window.axios.post("/getactors");
+                const getActors = await window.axios.post("/api/getactors");
                 if (getActors.data?.actors?.[0]?.actorId) {
                     actorUuid = String(getActors.data.actors[0].actorId).replace(/^Actor\./, '');
                     localStorage.setItem('cpr_actor_uuid', actorUuid);
@@ -274,7 +274,7 @@ export function useCharacterData() {
 
             if (!forceFresh) {
                 try {
-                    const dbResponse = await window.axios.post("/actorsheet");
+                    const dbResponse = await window.axios.post("/api/actorsheet");
                     if (dbResponse.data && dbResponse.data.data) {
                         if (dbResponse.data.agentLink) {
                             const normalizedLink = dbResponse.data.agentLink.replace(/\/$/, '');
@@ -311,7 +311,7 @@ export function useCharacterData() {
                 //Only trigger this when asked to refresh
                 console.log("Triggering background refresh from Foundry...");
                 if (actorUuid) {
-                    await window.axios.post("/getactor", {"actorId": actorUuid});
+                    await window.axios.post("/api/getactor", {"actorId": actorUuid});
                 }
 
                 // Safety fallback: if no event lands quickly, unstick the UI
@@ -319,7 +319,7 @@ export function useCharacterData() {
                     if (loading.value) {
                         console.warn('[Agent] Refresh timed out. Falling back to local cache.');
                         try {
-                            const dbResponse = await window.axios.post('/actorsheet');
+                            const dbResponse = await window.axios.post('/api/actorsheet');
                             if (dbResponse.data && dbResponse.data.data) {
                                 charData.value = dbResponse.data;
                                 loading.value = false;
@@ -433,6 +433,11 @@ export function useCharacterData() {
         localStorage.setItem('cpr_roll_mode', mode);
     };
 
+    const isPlayer = computed(() => {
+        console.log("is player", charData.value?.type)
+        return charData.value?.type === 'character';
+    });
+
     return {
         charData,
         loading,
@@ -441,6 +446,7 @@ export function useCharacterData() {
         agentLink,
         isGM,
         rollMode,
+        isPlayer,
         setRollMode,
         getImageUrl,
         fetchCharacterData,

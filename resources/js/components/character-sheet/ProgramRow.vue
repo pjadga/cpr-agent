@@ -17,6 +17,9 @@
                 <div>
                     <div class="text-xs font-bold text-cpr-yellow uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
                         {{ prog.name }}
+                        <span v-if="!isPlayer" class="text-cpr-teal/60 ml-1" title="Equipped (Locked)">
+                            <i v-icon data-lucide="hand" class="w-3 h-3 inline"></i>
+                        </span>
                         <i v-icon data-lucide="chevron-down" class="w-3 h-3 transition-transform duration-300"
                            :class="{'rotate-180': isExpanded}"></i>
                     </div>
@@ -98,6 +101,7 @@
 </template>
 
 <script>
+import {computed} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {stripHtmlTags} from '../../utils/helpers';
@@ -108,22 +112,24 @@ export default {
     directives: {icon: vIcon},
     emits: ['toggle-details', 'toggle-rez', 'execute'],
     setup() {
-        const {getImageUrl} = useCharacterData();
+        const {getImageUrl, charData, isPlayer} = useCharacterData();
 
         const isEffectivelyRezzed = (prog) => {
+            if (!isPlayer.value) return true;
             if (prog.system.isRezzed) return true;
             const cls = (prog.system.class || '').toLowerCase();
             return ['antipersonnel', 'antiprogram', 'attacker'].some(c => cls.includes(c));
         };
 
         const canBeRezzed = (prog) => {
+            if (!isPlayer.value) return false;
             const cls = (prog.system.class || '').toLowerCase();
             const name = (prog.name || '').toLowerCase();
             return ['defender', 'booster', 'blackice'].some(c => cls.includes(c)) ||
                 ['shield', 'armor'].some(n => name.includes(n));
         };
 
-        return {getImageUrl, isEffectivelyRezzed, canBeRezzed, stripHtmlTags};
+        return {getImageUrl, isEffectivelyRezzed, canBeRezzed, stripHtmlTags, isPlayer};
     }
 }
 </script>

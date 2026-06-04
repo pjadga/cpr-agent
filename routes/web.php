@@ -63,9 +63,11 @@ Route::get('/how-to-use', function () {
 
 Route::view('/design-brief', 'design-brief');
 
-Route::get('/dashboard', function () {
-    return view('api');
-})->middleware(['auth', 'verified', 'app.configured', 'profile.setup'])->name('dashboard');
+Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
+    Route::get('/dashboard', function () {
+        return view('api');
+    })->name('dashboard');
+});
 
 Route::middleware(['auth', 'app.configured'])->group(function () {
     Route::get('/settings/refresh', [SettingsController::class, 'refresh'])->name('settings.refresh');
@@ -85,39 +87,6 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
 });
 
-Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
-    Route::get('/getbaseurl', [SettingsController::class, 'getFoundryUrl']);
-    Route::post('/statrollrequest', [StatRollRequest::class, 'rollStat']);
-    Route::post('/skillrollrequest', [SkillRollRequest::class, 'rollSkill']);
-    Route::post('/rolerollrequest', [RoleRollRequest::class, 'rollRole']);
-    Route::post('/updatestat', [UpdateStat::class, 'updateStat']);
-    Route::post('/updatenotes', [UpdateNotes::class, 'updateNotes']);
-    Route::post('/actorsheet', [ActorSheet::class, 'getCleanData']);
-    Route::post('/getactor', [GetActor::class, 'getActor']);
-    Route::post('/getactors', [GetActors::class, 'getActors']);
-    Route::post('/get-net-pool', [GetNetPool::class, 'getNetPool']);
-    Route::post('/movetoken', [MoveToken::class, 'moveToken']);
-    Route::post('/getvisibletokens', [GetVisibleTokens::class, 'getVisibleTokens']);
-    Route::post('/listvisibletokens', [ListVisibleTokens::class, 'listVisibleTokens']);
-    Route::post('/targettokens', [TargetTokens::class, 'targetTokens']);
-    Route::post('/attackroll', [AttackRoll::class, 'attackRoll']);
-    Route::post('/damageroll', [DamageRoll::class, 'damageRoll']);
-    Route::post('/make-roll', [DiceRoller::class, 'makeRoll']);
-    Route::get('/get-rolls', [DiceRoller::class, 'getRolls']);
-    Route::post('/reloadweapon', [ReloadWeapon::class, 'reloadWeapon']);
-    Route::post('/getrollmodifiers', [GetRollModifiers::class, 'getRollModifiers']);
-    Route::post('/deathsave', [DeathSave::class, 'getDeathSave']);
-    Route::post('/facedown', [FaceDown::class, 'getFaceDown']);
-    Route::post('/initiativeroll', [InitiativeRoll::class, 'rollInitiative']);
-    Route::post('/item-equip', [ItemEquip::class, 'updateState']);
-    Route::post('/consume-item', [ConsumeItem::class, 'consume']);
-    Route::post('/installprogram', [InstallProgram::class, 'installProgram']);
-    Route::post('/uninstallprogram', [RemoveProgram::class, 'removeProgram']);
-    Route::post('/toggleprogramrez', [ToggleRez::class, 'toggleRez']);
-    Route::post('/programroll', [ProgramRoll::class, 'programRoll']);
-    Route::post('/update-eb', [UpdateEuroBucks::class, 'updateEuroBucks']);
-    Route::get('/proxy-image', [ImageProxy::class, 'proxy'])->name('proxy-image');
-});
 
 // API Key registration
 

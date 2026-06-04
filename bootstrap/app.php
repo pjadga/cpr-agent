@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckProfileSetup;
 use App\Http\Middleware\EnsureAppIsConfigured;
+use App\Http\Middleware\FixTailscaleContentType;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,13 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->trustProxies(at: '*');
+        $middleware->append(AddCspHeaders::class);
+        $middleware->api(append: [
+            FixTailscaleContentType::class,
+        ]);
         $middleware->alias([
             'profile.setup' => CheckProfileSetup::class,
             'app.configured' => EnsureAppIsConfigured::class,
         ]);
-    })
-    ->withMiddleware(function (Middleware $middleware) {
-        $middleware->append(AddCspHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

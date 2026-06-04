@@ -100,6 +100,9 @@
                                             }}</span>
                                         <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span
                                             class="font-numbers">{{ weapon.system.rof }}</span></span>
+                                        <span v-if="!isPlayer" class="ml-2 text-cpr-yellow/60" title="Equipped">
+                                            <i v-icon data-lucide="hand" class="w-3 h-3 inline"></i>
+                                        </span>
                                     </span>
                                 </div>
                             </div>
@@ -259,7 +262,7 @@ export default {
         'toggle-program-details', 'toggle-rez', 'roll-program'
     ],
     setup(props) {
-        const {getImageUrl, charData} = useCharacterData();
+        const {getImageUrl, charData, isPlayer} = useCharacterData();
         const showTargetDropdown = ref(false);
 
         const isMeleeOrUnarmed = (item) => {
@@ -329,7 +332,8 @@ export default {
             getAmmoTotal,
             getAmmoName,
             getStatusLine,
-            hasNetspaceOptions
+            hasNetspaceOptions,
+            isPlayer
         };
     }
 }

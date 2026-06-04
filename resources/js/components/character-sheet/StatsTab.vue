@@ -23,6 +23,7 @@
                     :key="armour._id"
                     :item="armour"
                     category="armor"
+                    :isPlayer=isPlayer
                     :all-items="charData.data.items"
                     :active-tab="activeTab"
                     :refresh-all="refreshAll"

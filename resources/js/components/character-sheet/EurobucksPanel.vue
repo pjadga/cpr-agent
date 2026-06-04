@@ -31,7 +31,7 @@ async function submit(action) {
     error.value = '';
     busy.value = true;
     try {
-        await axios.post('/update-eb', {
+        await axios.post('/api/update-eb', {
             action,
             value: Number(amount.value),
             reason: reason.value,

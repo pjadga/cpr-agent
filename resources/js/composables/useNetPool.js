@@ -5,7 +5,7 @@ const netPoolData = ref([]);
 export function useNetPool() {
     const fetchNetPool = async () => {
         try {
-            await window.axios.post('/get-net-pool');
+            await window.axios.post('/api/get-net-pool');
         } catch (err) {
             console.error('Error fetching net pool:', err);
         }

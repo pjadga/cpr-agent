@@ -124,7 +124,7 @@
             </div>
 
             <div
-                v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug' && category !== 'gear'"
+                v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug' && category !== 'gear' && isPlayer"
                 class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"
@@ -135,7 +135,15 @@
                 </button>
             </div>
 
-            <div v-if="category === 'drug' || category === 'gear'"
+            <div v-if="(!isPlayer && (category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'))"
+                 class="flex items-center gap-1 shrink-0 relative mr-1">
+                <div class="p-2 text-cpr-yellow/60 flex items-center justify-center relative z-10"
+                     title="Equipped (Locked)">
+                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <div v-if="(category === 'drug' || category === 'gear') && isPlayer"
                  class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     v-if="category === 'drug'"
@@ -284,7 +292,7 @@ export default {
     emits: ['click', 'equip-click', 'consume-click'],
     setup(props, {emit}) {
         console.log(`ItemRow setup: ${props.item.name} (${props.category})`);
-        const {getImageUrl, fetchCharacterData} = useCharacterData();
+        const {getImageUrl, fetchCharacterData, charData, isPlayer} = useCharacterData();
         const expanded = ref(false);
         const showReloadPopup = ref(false);
 
@@ -295,7 +303,7 @@ export default {
         const reloadWithAmmo = async (ammoId) => {
             try {
                 // The /reloadweapon expects controlState which includes selectedWeapon
-                await window.axios.post("/reloadweapon", {
+                await window.axios.post("/api/reloadweapon", {
                     weaponId: props.item._id,
                     ammoId: ammoId // Passing ammoId as well
                 });
@@ -322,11 +330,13 @@ export default {
             return 'syringe'; // 'syringe' is the Lucide icon for a needle/injector
         });
 
-        const equipIcon = computed(() =>
-            getEquipIconForState(props.item.system.equipped)
-        );
+        const equipIcon = computed(() => {
+            if (!isPlayer.value) return 'hand';
+            return getEquipIconForState(props.item.system.equipped);
+        });
 
         const equipStateLabel = computed(() => {
+            if (!isPlayer.value) return 'Equipped';
             switch (props.item.system.equipped) {
                 case 'equipped':
                     return 'Equipped';
@@ -405,6 +415,8 @@ export default {
             const sys = props.item.system;
             const results = [];
 
+            console.log("SYS", sys)
+
             if (sys.isShield && sys.shieldHitPoints) {
                 results.push({
                     label: 'Shield HP',
@@ -413,8 +425,8 @@ export default {
                 });
             }
 
-            if (sys['armor-head'] && sys['armor-head'].sp > 0) {
-                const head = sys['armor-head'];
+            if (sys['headLocation'] && sys['headLocation'].sp > 0) {
+                const head = sys['headLocation'];
                 results.push({
                     label: 'Head',
                     value: `${head.sp - head.ablation} / ${head.sp}`,
@@ -422,8 +434,8 @@ export default {
                 });
             }
 
-            if (sys['armor-body'] && sys['armor-body'].sp > 0) {
-                const body = sys['armor-body'];
+            if (sys['bodyLocation'] && sys['bodyLocation'].sp > 0) {
+                const body = sys['bodyLocation'];
                 results.push({
                     label: 'Body',
                     value: `${body.sp - body.ablation} / ${body.sp}`,
@@ -441,6 +453,7 @@ export default {
             if (props.category === 'weapon' && sys.magazine && sys.magazine.max > 0 && !isMeleeOrUnarmed.value) {
                 percent = (sys.magazine.value / sys.magazine.max) * 100;
             } else if (props.category === 'armor') {
+                console.log("PROPS", props)
                 if (sys.isShield && sys.shieldHitPoints && sys.shieldHitPoints.max > 0) {
                     percent = (sys.shieldHitPoints.value / sys.shieldHitPoints.max) * 100;
                 } else {
@@ -448,14 +461,14 @@ export default {
                     let currentSp = 0;
                     let count = 0;
 
-                    if (sys['armor-head'] && sys['armor-head'].sp > 0) {
-                        totalSp += sys['armor-head'].sp;
-                        currentSp += (sys['armor-head'].sp - sys['armor-head'].ablation);
+                    if (sys['headLocation'] && sys['headLocation'].sp > 0) {
+                        totalSp += sys['headLocation'].sp;
+                        currentSp += (sys['headLocation'].sp - sys['headLocation'].ablation);
                         count++;
                     }
-                    if (sys['armor-body'] && sys['armor-body'].sp > 0) {
-                        totalSp += sys['armor-body'].sp;
-                        currentSp += (sys['armor-body'].sp - sys['armor-body'].ablation);
+                    if (sys['bodyLocation'] && sys['bodyLocation'].sp > 0) {
+                        totalSp += sys['bodyLocation'].sp;
+                        currentSp += (sys['bodyLocation'].sp - sys['bodyLocation'].ablation);
                         count++;
                     }
 
@@ -518,7 +531,8 @@ export default {
             equipIcon,
             equipStateLabel,
             getEquipIconForState,
-            categoryColor
+            categoryColor,
+            isPlayer
         };
     }
 };

@@ -15,6 +15,17 @@ export function registerMyRequest(requestId) {
 }
 
 /**
+ * Check if an actorId belongs to the current user.
+ * @param {string} actorId
+ * @returns {boolean}
+ */
+export function isMyActor(actorId) {
+    if (!actorId) return false;
+    const myActorId = (localStorage.getItem('cpr_actor_uuid') || '').replace(/^Actor\./, '');
+    return String(actorId).replace(/^Actor\./, '') === myActorId;
+}
+
+/**
  * Check if a requestId was initiated by the current client instance.
  * @param {string} requestId
  * @returns {boolean}

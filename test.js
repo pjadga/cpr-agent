@@ -829,7 +829,7 @@ class CyberpunkBridge {
                     if (item) {
                         const path = `items.${data.itemId}.system.equipped`;
                         await item.update({'system.equipped': data.state});
-                        await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { [path]: data.state }, success: true, requestId });
+                        await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta: { [path]: data.state }, success: true, requestId });
                     }
                 }
                 break;
@@ -865,13 +865,13 @@ class CyberpunkBridge {
 
                 await this.sendResponse({
                     type: 'SHEET_DELTA',
-                    actorId,
+                    actorId: actorId,
                     delta: {
                         [`items.${data.cyberdeckId}.system.installedItems.list`]: newList,
                         [`items.${data.cyberdeckId}.system.installedItems.usedSlots`]: newUsedSlots
                     },
                     success: true,
-                    requestId
+                    requestId: requestId
                 });
                 break;
             }

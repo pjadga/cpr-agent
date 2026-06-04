@@ -5,10 +5,7 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
-
-// 1. Check if we are using HTTPS
-const isSecure = window.location.protocol === 'https:';
-
+window.axios.defaults.withCredentials = true;
 import {useCharacterData} from './composables/useCharacterData';
 
 const {isWssConnected} = useCharacterData();
@@ -28,10 +25,27 @@ window.Echo = new Echo({
     auth: {
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json',
             'Accept': 'application/json',
             'ngrok-skip-browser-warning': 'true'
         }
-    }
+    },
+    authorizer: (channel, options) => {
+        return {
+            authorize: (socketId, callback) => {
+                axios.post('/api/broadcasting/auth', {
+                    socket_id: socketId,
+                    channel_name: channel.name
+                })
+                    .then(response => {
+                        callback(false, response.data);
+                    })
+                    .catch(error => {
+                        callback(true, error);
+                    });
+            }
+        };
+    },
 });
 
 if (window.Echo.connector.pusher) {

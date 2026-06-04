@@ -1,5 +1,8 @@
 import {onMounted, onUnmounted} from 'vue';
 import {isMyRequest} from './requests';
+import {isMyActor} from "./requests";
+
+const sharedListeners = new Map();
 
 /**
  * Hook to listen for Echo events on a private channel
@@ -20,10 +23,6 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
         const rollerLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '');
         const isMe = rollerLink && myAgentLink && rollerLink === myAgentLink;
 
-        console.log(`%c[Agent] Incoming Response: ${payload.type}`, "color: #00ff00; font-weight: bold;", payload);
-
-        console.log("RollMode: ", rollMode)
-
         // Synchronize public events with useCharacterData.js
         let isPublicEvent = ['ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
 
@@ -39,7 +38,7 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
             }
         }
 
-        if (isPublicEvent || isMyRequest(requestId)) {
+        if (isPublicEvent || isMyRequest(requestId) || isMyActor(payload.actorId)) {
             handler(e);
         } else {
             console.log(`Listener Ignoring FoundryResponse with type [${payload.type}] and requestId [${requestId}] - privacy settings or initiated by another agent.`);
@@ -48,15 +47,48 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
 
     onMounted(() => {
         if (window.Echo && effectiveChannel) {
-            window.Echo.private(effectiveChannel)
-                .listen(event, wrappedHandler);
+            const channelKey = `${effectiveChannel}:${event}`;
+
+            if (!sharedListeners.has(channelKey)) {
+                const masterHandler = (e) => {
+                    const payload = e.payload || e;
+                    console.log(`%c[Agent] Incoming Response: ${payload.type}`, "color: #00ff00; font-weight: bold;", payload);
+                    console.log("RollMode: ", payload.rollMode || 'publicroll');
+
+                    // Dispatch to all registered handlers for this channel/event
+                    const listeners = sharedListeners.get(channelKey);
+                    if (listeners) {
+                        listeners.handlers.forEach(h => h(e));
+                    }
+                };
+
+                sharedListeners.set(channelKey, {
+                    masterHandler,
+                    handlers: new Set([wrappedHandler])
+                });
+
+                window.Echo.private(effectiveChannel)
+                    .listen(event, masterHandler);
+            } else {
+                sharedListeners.get(channelKey).handlers.add(wrappedHandler);
+            }
         }
     });
 
     onUnmounted(() => {
         if (window.Echo && effectiveChannel) {
-            window.Echo.private(effectiveChannel)
-                .stopListening(event, wrappedHandler);
+            const channelKey = `${effectiveChannel}:${event}`;
+            const listenerData = sharedListeners.get(channelKey);
+
+            if (listenerData) {
+                listenerData.handlers.delete(wrappedHandler);
+
+                if (listenerData.handlers.size === 0) {
+                    window.Echo.private(effectiveChannel)
+                        .stopListening(event, listenerData.masterHandler);
+                    sharedListeners.delete(channelKey);
+                }
+            }
         }
     });
 }

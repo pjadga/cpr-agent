@@ -39,7 +39,7 @@ export function useRollModifiers(controlState) {
 
         try {
             // We don't block if no weapon is selected anymore, we want to see penalties
-            await window.axios.post('/getrollmodifiers', {
+            await window.axios.post('/api/getrollmodifiers', {
                 selectedWeapon: controlState.value.selectedWeapon
             });
             // Result will come back via Echo FoundryResponse
