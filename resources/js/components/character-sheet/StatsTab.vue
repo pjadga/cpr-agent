@@ -16,7 +16,20 @@
                               @edit="$emit('open-resource', 'HUMANITY', charData.data.system.derivedStats.humanity.value, charData.data.system.derivedStats.humanity.max, 'text-cpr-teal')">
             </resource-counter>
         </div>
-
+        <div v-if="groupedArmour.hasArmour" class="grid grid-cols-1 gap-2">
+            <template v-for="location in ['head', 'body', 'shield']">
+                <armour-row
+                    v-for="armour in groupedArmour[location]"
+                    :key="armour._id"
+                    :item="armour"
+                    category="armor"
+                    :all-items="charData.data.items"
+                    :active-tab="activeTab"
+                    :refresh-all="refreshAll"
+                >
+                </armour-row>
+            </template>
+        </div>
         <div class="grid grid-cols-4 gap-2">
             <simple-stat label="INT" :value="stats.int?.value" @click="$emit('stat-request', 'INT')"></simple-stat>
             <simple-stat label="REF" :value="stats.ref?.value" @click="$emit('stat-request', 'REF')"></simple-stat>
@@ -176,11 +189,12 @@ import SimpleStat from './SimpleStat.vue';
 import AdjustableStat from './AdjustableStat.vue';
 import ItemRow from './ItemRow.vue';
 import {formatCategoryName} from '../../utils/helpers';
+import ArmourRow from "./ArmourRow.vue";
 
 export default {
     name: 'StatsTab',
-    props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll'],
-    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow},
+    props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll', 'groupedArmour'],
+    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow, ArmourRow},
     directives: {icon: vIcon},
     emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'consume-click', 'toggle-category', 'open-eurobucks'],
     setup() {

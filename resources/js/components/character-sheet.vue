@@ -184,6 +184,7 @@
                         :grouped-injuries="groupedInjuries"
                         :collapsed-categories="collapsedCategories"
                         :refresh-all="refreshAll"
+                        :grouped-armour="groupedArmour"
                         @open-resource="openResourceModal"
                         @stat-request="sendStatRequest"
                         @update-stat="updateStat"
@@ -859,6 +860,30 @@ export default {
             return groups;
         });
 
+        const groupedArmour = computed(() => {
+            if (!charData.value) return {head: [], body: [], shield: [], hasArmour: false};
+            const allArmour = charData.value.data.items.filter(i => i.type === 'armor');
+            const groups = {head: [], body: [], shield: [], hasArmour: false}
+            allArmour.forEach( armour => {
+                if (armour.system.equipped !== "equipped") {
+                    return;
+                }
+                if (armour.system.isHeadLocation === true) {
+                    groups['head'].push(armour)
+                    groups["hasArmour"] = true
+                }
+                if (armour.system.isBodyLocation === true) {
+                    groups['body'].push(armour)
+                    groups["hasArmour"] = true
+                }
+                if (armour.system.isShield === true) {
+                    groups['shield'].push(armour)
+                    groups["hasArmour"] = true
+                }
+            })
+            return groups;
+        });
+
         const groupedEquipped = computed(() => {
             if (!charData.value) return {};
             const allItems = charData.value.data.items;
@@ -1048,6 +1073,7 @@ export default {
             groupedGear,
             groupedInjuries,
             groupedEquipped,
+            groupedArmour,
 
             // Netrunner specific
             activeCyberdeck,
