@@ -75,6 +75,8 @@ npm:
     - docker-php-ext-install pdo_sqlite zip bcmath gd
     - cp .env.example .env 2>/dev/null || cp .env.template .env 2>/dev/null || touch .env
     - grep -q "^APP_KEY=" .env || echo "APP_KEY=" >> .env
+    - pecl install redis
+    - docker-php-ext-enable redis
     - php artisan key:generate --no-interaction
     - php artisan config:clear
     - npm install
