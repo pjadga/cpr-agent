@@ -1,6 +1,5 @@
 import {ref} from 'vue';
 import {debounce, isDeepEqual} from '../utils/helpers';
-import {cachedPost} from '../utils/api';
 import {useEchoListener} from '../utils/listener';
 import {useCharacterData} from './useCharacterData';
 

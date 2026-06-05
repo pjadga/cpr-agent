@@ -15,7 +15,9 @@
                                 {{ roleItem.system.mainRoleAbility }}</p>
                         </div>
                         <div class="flex flex-col items-end shrink-0">
-                            <span class="text-2xl font-black text-cpr-yellow leading-none font-numbers">{{ roleItem.system.rank }}</span>
+                            <span class="text-2xl font-black text-cpr-yellow leading-none font-numbers">{{
+                                    roleItem.system.rank
+                                }}</span>
                             <span class="text-[8px] text-cpr-yellow/50 uppercase font-bold">Rank</span>
                         </div>
                     </div>
@@ -51,8 +53,11 @@
                                         }}</p>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-lg font-black text-cpr-yellow/80 font-numbers">{{ ability.rank }}</span>
-                                    <div class="w-1 h-8 bg-cpr-yellow/20 group-hover/ability:bg-cpr-yellow/40 transition-colors"></div>
+                                    <span class="text-lg font-black text-cpr-yellow/80 font-numbers">{{
+                                            ability.rank
+                                        }}</span>
+                                    <div
+                                        class="w-1 h-8 bg-cpr-yellow/20 group-hover/ability:bg-cpr-yellow/40 transition-colors"></div>
                                 </div>
                             </div>
                         </div>

@@ -1,24 +1,68 @@
 /* Cyberpunk Prettify CSS - No frameworks, just pure CSS */
 
 /* Glow Text Effects */
-.glow-cyan { text-shadow: 0 0 5px #22d3ee, 0 0 10px #06b6d4, 0 0 15px #0891b2; }
-.glow-pink { text-shadow: 0 0 5px #f472b6, 0 0 10px #ec4899, 0 0 15px #db2777; }
-.glow-lime { text-shadow: 0 0 5px #a3e635, 0 0 10px #84cc16, 0 0 15px #65a30d; }
-.glow-purple { text-shadow: 0 0 5px #c084fc, 0 0 10px #a855f7, 0 0 15px #9333ea; }
-.glow-red { text-shadow: 0 0 5px #f87171, 0 0 10px #ef4444, 0 0 15px #dc2626; }
-.glow-orange { text-shadow: 0 0 5px #fb923c, 0 0 10px #f97316, 0 0 15px #ea580c; }
-.glow-teal { text-shadow: 0 0 5px #2dd4bf, 0 0 10px #14b8a6, 0 0 15px #0d9488; }
+.glow-cyan {
+    text-shadow: 0 0 5px #22d3ee, 0 0 10px #06b6d4, 0 0 15px #0891b2;
+}
+
+.glow-pink {
+    text-shadow: 0 0 5px #f472b6, 0 0 10px #ec4899, 0 0 15px #db2777;
+}
+
+.glow-lime {
+    text-shadow: 0 0 5px #a3e635, 0 0 10px #84cc16, 0 0 15px #65a30d;
+}
+
+.glow-purple {
+    text-shadow: 0 0 5px #c084fc, 0 0 10px #a855f7, 0 0 15px #9333ea;
+}
+
+.glow-red {
+    text-shadow: 0 0 5px #f87171, 0 0 10px #ef4444, 0 0 15px #dc2626;
+}
+
+.glow-orange {
+    text-shadow: 0 0 5px #fb923c, 0 0 10px #f97316, 0 0 15px #ea580c;
+}
+
+.glow-teal {
+    text-shadow: 0 0 5px #2dd4bf, 0 0 10px #14b8a6, 0 0 15px #0d9488;
+}
 
 /* Custom Scrollbar */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #1f2937; border-radius: 10px; }
-::-webkit-scrollbar-thumb { background: #db2777; border-radius: 10px; border: 2px solid #1f2937;}
-::-webkit-scrollbar-thumb:hover { background: #ec4899; }
-* { scrollbar-width: auto; scrollbar-color: #db2777 #1f2937;}
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1f2937;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #db2777;
+    border-radius: 10px;
+    border: 2px solid #1f2937;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #ec4899;
+}
+
+* {
+    scrollbar-width: auto;
+    scrollbar-color: #db2777 #1f2937;
+}
 
 /* Modal Scrollbar */
-.modal-scroll-content::-webkit-scrollbar-thumb { background: #84cc16;}
-.modal-scroll-content { scrollbar-color: #84cc16 #1f2937;}
+.modal-scroll-content::-webkit-scrollbar-thumb {
+    background: #84cc16;
+}
+
+.modal-scroll-content {
+    scrollbar-color: #84cc16 #1f2937;
+}
 
 /* JSON Response Styling */
 .json-response-wrapper {
@@ -63,8 +107,8 @@
     border-radius: 0 0 0.375rem 0.375rem;
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 0 8px rgba(0, 0, 0, 0.5);
     background-image: linear-gradient(to bottom,
-        rgba(0, 255, 255, 0.03),
-        rgba(0, 0, 0, 0.2)
+    rgba(0, 255, 255, 0.03),
+    rgba(0, 0, 0, 0.2)
     );
     padding: 1rem;
     font-family: monospace;
@@ -179,10 +223,22 @@
 }
 
 @keyframes fade-in-out {
-    0% { opacity: 0; transform: translateX(-50%) translateY(0px); }
-    10% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
-    90% { opacity: 1; transform: translateX(-50%) translateY(-5px); }
-    100% { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    0% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(0px);
+    }
+    10% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-5px);
+    }
+    90% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-5px);
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-10px);
+    }
 }
 
 /* Smooth scrolling for the whole page */

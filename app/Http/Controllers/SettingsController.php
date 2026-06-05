@@ -191,7 +191,7 @@ class SettingsController extends Controller
             $key = 'foundry_response_'.$requestId;
             if (Cache::has($key)) {
                 $foundryData = Cache::pull($key);
-                if (!$saveToUser) {
+                if (! $saveToUser) {
                     break;
                 }
                 if (! empty($foundryData['actor'])) {

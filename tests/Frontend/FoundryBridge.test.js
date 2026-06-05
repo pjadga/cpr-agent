@@ -3,7 +3,7 @@
  * Tests for the Foundry VTT module integration (test.js)
  */
 
-import {describe, it, expect, beforeEach, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 describe('Foundry Bridge', () => {
     let bridge;

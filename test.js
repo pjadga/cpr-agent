@@ -1,7 +1,7 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
-import { DataPoolPageModel } from "./data-pool-model.js";
-import { DataPoolPageSheet } from "./data-pool-sheet.js";
+import {DataPoolPageModel} from "./data-pool-model.js";
+import {DataPoolPageSheet} from "./data-pool-sheet.js";
 
 // Make Pusher available globally (required for Echo)
 window.Pusher = Pusher;
@@ -91,7 +91,7 @@ class CharacterAssignmentMenu extends FormApplication {
             name: a.name
         }));
 
-        return { users, characters };
+        return {users, characters};
     }
 
     // This forces Foundry to listen to our specific button click
@@ -115,7 +115,7 @@ class CharacterAssignmentMenu extends FormApplication {
                     const currentCharId = user.character?.id || null;
 
                     if (currentCharId !== newCharId) {
-                        updates.push({ _id: user.id, character: newCharId });
+                        updates.push({_id: user.id, character: newCharId});
                         updatedCount++;
                     }
                 }
@@ -179,6 +179,7 @@ class CharacterAssignmentMenu extends FormApplication {
         });
     }
 }
+
 // ==================================================================
 
 class CyberpunkBridge {
@@ -207,7 +208,7 @@ class CyberpunkBridge {
             let rollFound = false;
             const originalRender = renderTemplate;
 
-            const spyRender = function(path, data) {
+            const spyRender = function (path, data) {
                 if (path && typeof path === 'string' && path.includes('rollcard')) {
                     console.log(`%c[Bridge] Intercepted Render: ${path}`, "color: #00ff00;", data);
                     rollFound = true;
@@ -235,7 +236,7 @@ class CyberpunkBridge {
                     renderTemplate = originalRender;
                     console.warn("[Bridge] ❌ Interceptor timed out. No rollcard rendered.");
                     //await restoreRollMode();
-                    resolve({ success: false, error: "Timed out waiting for render" });
+                    resolve({success: false, error: "Timed out waiting for render"});
                 }
             }, 5000);
 
@@ -244,7 +245,7 @@ class CyberpunkBridge {
             } catch (e) {
                 renderTemplate = originalRender;
                 //await restoreRollMode();
-                resolve({ success: false, error: "Trigger failed" });
+                resolve({success: false, error: "Trigger failed"});
             }
         });
     }
@@ -373,8 +374,11 @@ class CyberpunkBridge {
         }
 
         let baseUrl;
-        try { baseUrl = new URL(apiUrl); }
-        catch (e) { return; }
+        try {
+            baseUrl = new URL(apiUrl);
+        } catch (e) {
+            return;
+        }
 
         const wsHost = reverbHostOverride || baseUrl.hostname;
         const inferredSecure = baseUrl.protocol === 'https:';
@@ -407,7 +411,7 @@ class CyberpunkBridge {
         this.echo.connector.pusher.connection.bind('connected', () => {
             this.isConnected = true;
             ui.notifications.info("Cyberpunk Bridge: Online");
-            if(debug) console.log("Cyberpunk Bridge: Connection Established");
+            if (debug) console.log("Cyberpunk Bridge: Connection Established");
         });
 
         this.echo.connector.pusher.connection.bind('disconnected', () => {
@@ -464,7 +468,7 @@ class CyberpunkBridge {
                 const response = await this.sendResponse({
                     type: 'LINK_PLAYER_CHARACTER',
                     actorId: char ? char.id : null,
-                    character: char ? { id: char.id, name: char.name } : null,
+                    character: char ? {id: char.id, name: char.name} : null,
                     actorName: char ? char.name : null,
                     agentLink: currentAgentLink || game.user.id,
                     foundryUserId: game.user.id,
@@ -631,7 +635,7 @@ class CyberpunkBridge {
     }
 
     broadcastRefresh(type) {
-        this.sendResponse({ type: 'REFRESH_SIGNAL', target: type });
+        this.sendResponse({type: 'REFRESH_SIGNAL', target: type});
     }
 
     broadcastRoll(message) {
@@ -805,7 +809,13 @@ class CyberpunkBridge {
                 }
                 await actor.update(data.changes);
                 ui.notifications.info(`💾 Sync: ${actor.name} updated.`);
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, success: true, requestId });
+                await this.sendResponse({
+                    type: 'CONFIRMATION',
+                    action: type,
+                    actorId: actorId,
+                    success: true,
+                    requestId
+                });
                 break;
             }
 
@@ -822,7 +832,13 @@ class CyberpunkBridge {
                 }
                 await item.snort();
                 ui.notifications.info(`Sync: ${item.name} consumed.`);
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, success: true, requestId });
+                await this.sendResponse({
+                    type: 'CONFIRMATION',
+                    action: type,
+                    actorId: actorId,
+                    success: true,
+                    requestId
+                });
                 break;
             }
 
@@ -833,7 +849,13 @@ class CyberpunkBridge {
                     if (item) {
                         const path = `items.${data.itemId}.system.equipped`;
                         await item.update({'system.equipped': data.state});
-                        await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta: { [path]: data.state }, success: true, requestId });
+                        await this.sendResponse({
+                            type: 'SHEET_DELTA',
+                            actorId: actorId,
+                            delta: {[path]: data.state},
+                            success: true,
+                            requestId
+                        });
                     }
                 }
                 break;
@@ -907,11 +929,11 @@ class CyberpunkBridge {
                 };
 
                 if (program && program.system.isRezzed) {
-                    await program.update({ 'system.isRezzed': false });
+                    await program.update({'system.isRezzed': false});
                     delta[`items.${data.programId}.system.isRezzed`] = false;
                 }
 
-                await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta, success: true, requestId });
+                await this.sendResponse({type: 'SHEET_DELTA', actorId: actorId, delta, success: true, requestId});
                 break;
             }
 
@@ -924,7 +946,7 @@ class CyberpunkBridge {
                         await this.sendResponse({
                             type: 'SHEET_DELTA',
                             actorId: actorId,
-                            delta: { [`items.${data.programId}.system.isRezzed`]: data.targetState },
+                            delta: {[`items.${data.programId}.system.isRezzed`]: data.targetState},
                             success: true,
                             requestId
                         });
@@ -1022,7 +1044,7 @@ class CyberpunkBridge {
                         await this.sendResponse({
                             type: 'SHEET_DELTA',
                             actorId: actorId,
-                            delta: { 'system.derivedStats.deathsave': deathSaves },
+                            delta: {'system.derivedStats.deathsave': deathSaves},
                             tab: 'stats',
                             success: true
                         });
@@ -1299,7 +1321,7 @@ class CyberpunkBridge {
             }
 
             case 'DICE_ROLL': {
-                if (requestId) this.activeRequests.set(requestId, { actorId: actorId, timestamp: Date.now() });
+                if (requestId) this.activeRequests.set(requestId, {actorId: actorId, timestamp: Date.now()});
                 const roll = new Roll(data.formula);
                 await roll.evaluate();
                 await roll.toMessage({
@@ -1340,10 +1362,25 @@ class CyberpunkBridge {
                     else if (data.direction === "right") newPos.x = token.document.x + canvas.grid.size;
                     await token.document.update(newPos);
 
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, tokenId, success: true, requestId });
+                    await this.sendResponse({
+                        type: 'CONFIRMATION',
+                        action: type,
+                        actorId: actorId,
+                        tokenId,
+                        success: true,
+                        requestId
+                    });
                 } else {
                     console.warn(`MOVE_TOKEN: Token ID ${tokenId} not found.`);
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, tokenId, success: false, message: 'Token not found', requestId });
+                    await this.sendResponse({
+                        type: 'CONFIRMATION',
+                        action: type,
+                        actorId: actorId,
+                        tokenId,
+                        success: false,
+                        message: 'Token not found',
+                        requestId
+                    });
                 }
                 break;
             }
@@ -1386,7 +1423,13 @@ class CyberpunkBridge {
                         // we can either refresh all items or just let standard delta handle it.
                         // But for now, ensuring weapon.magazine and weapon.installedItems is a good start.
 
-                        await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta, success: true, requestId });
+                        await this.sendResponse({
+                            type: 'SHEET_DELTA',
+                            actorId: actorId,
+                            delta,
+                            success: true,
+                            requestId
+                        });
                     };
 
                     if (selectedAmmo) {
@@ -1394,7 +1437,7 @@ class CyberpunkBridge {
                         if (currentAmmo && currentAmmo.length > 0) {
                             weapon.uninstallItems(currentAmmo);
                         }
-                        setTimeout(function(){
+                        setTimeout(function () {
                             weapon.installItems([selectedAmmo]);
                         }, 500);
                         setTimeout(async () => {
@@ -1410,8 +1453,15 @@ class CyberpunkBridge {
             case 'TARGET_TOKEN': {
                 const token = canvas.tokens.get(data.targetTokenId);
                 if (token) {
-                    token.setTarget(true, { releaseOthers: true, groupSelection: true });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, tokenId: data.targetTokenId, success: true, requestId });
+                    token.setTarget(true, {releaseOthers: true, groupSelection: true});
+                    await this.sendResponse({
+                        type: 'CONFIRMATION',
+                        action: type,
+                        actorId: actorId,
+                        tokenId: data.targetTokenId,
+                        success: true,
+                        requestId
+                    });
                 }
                 break;
             }
@@ -1435,9 +1485,16 @@ class CyberpunkBridge {
                         // Check if value is a string or number
                         newValue = (typeof data.value === 'string') ? data.value : (Number(data.value) || 0);
                     }
-                    await actor.update({ [path]: newValue });
+                    await actor.update({[path]: newValue});
                     // Send a focused sheet delta back to Agent and persist via API
-                    await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta: { [path]: newValue }, tab: 'stats', success: true, requestId });
+                    await this.sendResponse({
+                        type: 'SHEET_DELTA',
+                        actorId: actorId,
+                        delta: {[path]: newValue},
+                        tab: 'stats',
+                        success: true,
+                        requestId
+                    });
                 }
                 break;
             }
@@ -1454,17 +1511,23 @@ class CyberpunkBridge {
                     let flagValue = '';
 
                     switch (fireMode) {
-                        case 'Auto': flagValue = 'autofire'; break;
-                        case 'Suppress': flagValue = 'suppressive'; break;
+                        case 'Auto':
+                            flagValue = 'autofire';
+                            break;
+                        case 'Suppress':
+                            flagValue = 'suppressive';
+                            break;
                         case 'Aimed':
                             flagValue = 'aimed';
                             await actor.setFlag(scope, 'aimedLocation', 'head');
                             break;
-                        default: flagValue = ''; break;
+                        default:
+                            flagValue = '';
+                            break;
                     }
 
                     if (targetToken) {
-                        targetToken.setTarget(true, { releaseOthers: true, groupSelection: true });
+                        targetToken.setTarget(true, {releaseOthers: true, groupSelection: true});
                     }
 
                     if (flagValue === '') {
@@ -1480,10 +1543,11 @@ class CyberpunkBridge {
 
                     const trigger = async () => {
                         await actor.sheet._onRoll({
-                            preventDefault: () => {},
+                            preventDefault: () => {
+                            },
                             currentTarget: dummyBtn,
                             type: 'click'
-                        }, { showDialog: true });
+                        }, {showDialog: true});
                     };
 
                     // Compute DV against current target if available
@@ -1492,20 +1556,20 @@ class CyberpunkBridge {
                         const shooter = canvas.tokens.get(tokenId) || actor.getActiveTokens()?.[0] || canvas.tokens.placeables.find(t => t.actor?.id === actor.id);
                         if (shooter) {
                             const RANGE_DV_TABLE = {
-                                'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
-                                'SMG':              [15, 13, 15, 20, 25, 25, 30, 99],
-                                'Shotgun (Slug)':   [13, 15, 20, 25, 30, 35, 99, 99],
-                                'Assault Rifle':    [17, 16, 15, 13, 15, 20, 25, 30],
-                                'Sniper Rifle':     [30, 25, 25, 20, 15, 16, 17, 20],
-                                'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
+                                'Pistol': [13, 15, 20, 25, 30, 30, 99, 99],
+                                'SMG': [15, 13, 15, 20, 25, 25, 30, 99],
+                                'Shotgun (Slug)': [13, 15, 20, 25, 30, 35, 99, 99],
+                                'Assault Rifle': [17, 16, 15, 13, 15, 20, 25, 30],
+                                'Sniper Rifle': [30, 25, 25, 20, 15, 16, 17, 20],
+                                'Bows & Crossbow': [15, 13, 15, 17, 20, 22, 99, 99],
                                 'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
-                                'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
+                                'Rocket Launcher': [17, 16, 15, 15, 20, 20, 25, 30],
                                 'Martial Arts': ['VS'],
                                 'Unarmed': ['VS'],
-                                'Light Melee Weapon' : ['VS'],
-                                'Medium Melee Weapon' : ['VS'],
-                                'Heavy Melee Weapon' : ['VS'],
-                                'Very Heavy Melee Weapon' : ['VS']
+                                'Light Melee Weapon': ['VS'],
+                                'Medium Melee Weapon': ['VS'],
+                                'Heavy Melee Weapon': ['VS'],
+                                'Very Heavy Melee Weapon': ['VS']
                             };
                             const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
                             const distX = targetToken.center.x - shooter.center.x;
@@ -1520,14 +1584,14 @@ class CyberpunkBridge {
                                 'smg': 'SMG',
                                 'shotgun': 'Shotgun (Slug)',
                                 'sniperRifle': 'Sniper Rifle',
-                                'unarmed' : 'Unarmed',
-                                'martialArts' : 'Martial Arts',
-                                'grenade' : 'Grenade Launcher',
+                                'unarmed': 'Unarmed',
+                                'martialArts': 'Martial Arts',
+                                'grenade': 'Grenade Launcher',
                                 'thrownWeapon': 'Grenade Launcher',
-                                'lightMelee' : 'Light Melee Weapon',
-                                'mediumMelee' : 'Medium Melee Weapon',
-                                'heavyMelee' : 'Heavy Melee Weapon',
-                                'vHeavyMelee' : 'Very Heavy Melee Weapon'
+                                'lightMelee': 'Light Melee Weapon',
+                                'mediumMelee': 'Medium Melee Weapon',
+                                'heavyMelee': 'Heavy Melee Weapon',
+                                'vHeavyMelee': 'Very Heavy Melee Weapon'
                             };
                             const category = (typeMap[weaponData?.system?.weaponType] || typeMap[weaponData?.system?.variety]) || 'Pistol';
                             const bracketIndex = DISTANCE_BRACKETS.findIndex(limit => distanceM <= limit);
@@ -1592,7 +1656,7 @@ class CyberpunkBridge {
                 if (weapon) {
                     weaponSkillName = weapon.system.weaponSkill;
                     const skillItem = actor.items.find(i => i.type === 'skill' && i.name === weaponSkillName);
-                    skillLevel = skillItem ? (Number(skillItem.system.level)||0) : 0;
+                    skillLevel = skillItem ? (Number(skillItem.system.level) || 0) : 0;
                     statName = skillItem ? (skillItem.system.stat || 'ref') : 'ref';
                     statValue = Number(actor.system.stats[statName]?.value) || 0;
                     weaponAcc = Number(weapon.system.attackmod) || 0;
@@ -1608,7 +1672,7 @@ class CyberpunkBridge {
 
                 if (hp <= 0) {
                     totalPenalty -= 4;
-                    effectList.push({ title: 'Mortally Wounded', penalty: -4, description: 'All actions at -4.' });
+                    effectList.push({title: 'Mortally Wounded', penalty: -4, description: 'All actions at -4.'});
                 } else if (hp <= seriouslyThreshold) {
                     const penaltyValue = stimEnabled ? 0 : -2;
                     totalPenalty += penaltyValue;
@@ -1646,7 +1710,7 @@ class CyberpunkBridge {
                     }
 
                     totalPenalty += injuryPenalty;
-                    effectList.push({ title, description, penalty: injuryPenalty });
+                    effectList.push({title, description, penalty: injuryPenalty});
                 });
 
                 const result = {
@@ -1663,7 +1727,7 @@ class CyberpunkBridge {
                     finalModifier: statValue + skillLevel + weaponAcc + totalPenalty,
                     injuries: effectList
                 };
-                await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', actorId: actorId, result, requestId });
+                await this.sendResponse({type: 'ROLL_MODIFIERS_DATA', actorId: actorId, result, requestId});
                 break;
             }
 
@@ -1675,20 +1739,20 @@ class CyberpunkBridge {
 
                 if (jim && target) {
                     const RANGE_DV_TABLE = {
-                        'Pistol':           [13, 15, 20, 25, 30, 30, 99, 99],
-                        'SMG':              [15, 13, 15, 20, 25, 25, 30, 99],
-                        'Shotgun (Slug)':   [13, 15, 20, 25, 30, 35, 99, 99],
-                        'Assault Rifle':    [17, 16, 15, 13, 15, 20, 25, 30],
-                        'Sniper Rifle':     [30, 25, 25, 20, 15, 16, 17, 20],
-                        'Bows & Crossbow':  [15, 13, 15, 17, 20, 22, 99, 99],
+                        'Pistol': [13, 15, 20, 25, 30, 30, 99, 99],
+                        'SMG': [15, 13, 15, 20, 25, 25, 30, 99],
+                        'Shotgun (Slug)': [13, 15, 20, 25, 30, 35, 99, 99],
+                        'Assault Rifle': [17, 16, 15, 13, 15, 20, 25, 30],
+                        'Sniper Rifle': [30, 25, 25, 20, 15, 16, 17, 20],
+                        'Bows & Crossbow': [15, 13, 15, 17, 20, 22, 99, 99],
                         'Grenade Launcher': [16, 15, 15, 17, 20, 22, 25, 99],
-                        'Rocket Launcher':  [17, 16, 15, 15, 20, 20, 25, 30],
+                        'Rocket Launcher': [17, 16, 15, 15, 20, 20, 25, 30],
                         'Martial Arts': ['VS'],
                         'Unarmed': ['VS'],
-                        'Light Melee Weapon' : ['VS'],
-                        'Medium Melee Weapon' : ['VS'],
-                        'Heavy Melee Weapon' : ['VS'],
-                        'Very Heavy Melee Weapon' : ['VS']
+                        'Light Melee Weapon': ['VS'],
+                        'Medium Melee Weapon': ['VS'],
+                        'Heavy Melee Weapon': ['VS'],
+                        'Very Heavy Melee Weapon': ['VS']
                     };
                     const DISTANCE_BRACKETS = [6, 12, 25, 50, 100, 200, 400, 800];
 
@@ -1700,7 +1764,7 @@ class CyberpunkBridge {
                     const weaponData = jim.actor.items.get(weaponId);
                     if (!weaponData) {
                         console.warn(`GET_DV_INFO: Weapon ID ${weaponId} not found on actor ${jim.actor.name}.`);
-                        await this.sendResponse({ type: 'DV_INFO_DATA', actorId: actorId, result: null, requestId });
+                        await this.sendResponse({type: 'DV_INFO_DATA', actorId: actorId, result: null, requestId});
                         break;
                     }
 
@@ -1710,14 +1774,14 @@ class CyberpunkBridge {
                         'smg': 'SMG',
                         'shotgun': 'Shotgun (Slug)',
                         'sniperRifle': 'Sniper Rifle',
-                        'unarmed' : 'Unarmed',
-                        'martialArts' : 'Martial Arts',
-                        'grenade' : 'Grenade Launcher',
+                        'unarmed': 'Unarmed',
+                        'martialArts': 'Martial Arts',
+                        'grenade': 'Grenade Launcher',
                         'thrownWeapon': 'Grenade Launcher',
-                        'lightMelee' : 'Light Melee Weapon',
-                        'mediumMelee' : 'Medium Melee Weapon',
-                        'heavyMelee' : 'Heavy Melee Weapon',
-                        'vHeavyMelee' : 'Very Heavy Melee Weapon'
+                        'lightMelee': 'Light Melee Weapon',
+                        'mediumMelee': 'Medium Melee Weapon',
+                        'heavyMelee': 'Heavy Melee Weapon',
+                        'vHeavyMelee': 'Very Heavy Melee Weapon'
                     };
                     const category = (typeMap[weaponData.system.weaponType] || typeMap[weaponData.system.variety]) || 'Pistol';
 
@@ -1734,10 +1798,10 @@ class CyberpunkBridge {
                         weaponCategory: category,
                         dv: targetDV === 99 ? 'Out of Range' : targetDV
                     };
-                    await this.sendResponse({ type: 'DV_INFO_DATA', actorId: actorId, result, requestId });
+                    await this.sendResponse({type: 'DV_INFO_DATA', actorId: actorId, result, requestId});
                 } else {
                     console.warn(`GET_DV_INFO: Token(s) not found. Jim: ${!!jim}, Target: ${!!target}`);
-                    await this.sendResponse({ type: 'DV_INFO_DATA', actorId: actorId, result: null, requestId });
+                    await this.sendResponse({type: 'DV_INFO_DATA', actorId: actorId, result: null, requestId});
                 }
                 break;
             }
@@ -1781,7 +1845,12 @@ class CyberpunkBridge {
                 } else {
                     console.warn(`LIST_VISIBLE_TOKENS: Token ID ${tokenId} not found.`);
                 }
-                await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', actorId: actorId, tokens: nearbyTokens, requestId });
+                await this.sendResponse({
+                    type: 'VISIBLE_TOKENS_DATA',
+                    actorId: actorId,
+                    tokens: nearbyTokens,
+                    requestId
+                });
                 break;
             }
 
@@ -1823,13 +1892,27 @@ class CyberpunkBridge {
                                 img: i.img,
                                 system: i.system
                             })),
-                            flags: obj.flags && obj.flags['cyberpunk-red-core'] ? { 'cyberpunk-red-core': obj.flags['cyberpunk-red-core'] } : {}
+                            flags: obj.flags && obj.flags['cyberpunk-red-core'] ? {'cyberpunk-red-core': obj.flags['cyberpunk-red-core']} : {}
                         };
-                        await this.sendResponse({ type: 'ACTOR_DATA', actorId: actorId, actor: slim, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
+                        await this.sendResponse({
+                            type: 'ACTOR_DATA',
+                            actorId: actorId,
+                            actor: slim,
+                            requestId,
+                            isGM: targetUser.isGM,
+                            agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id
+                        });
                         break;
                     }
                 }
-                await this.sendResponse({ type: 'ACTOR_DATA', actorId: actorId, actor: false, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
+                await this.sendResponse({
+                    type: 'ACTOR_DATA',
+                    actorId: actorId,
+                    actor: false,
+                    requestId,
+                    isGM: targetUser.isGM,
+                    agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id
+                });
                 break;
             }
 
@@ -1911,7 +1994,14 @@ class CyberpunkBridge {
                     }
                 }
 
-                await this.sendResponse({ type: 'ACTORS_DATA', actorId: actorId, actors: actors, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
+                await this.sendResponse({
+                    type: 'ACTORS_DATA',
+                    actorId: actorId,
+                    actors: actors,
+                    requestId,
+                    isGM: targetUser.isGM,
+                    agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id
+                });
                 break;
             }
 
@@ -1934,7 +2024,7 @@ class CyberpunkBridge {
 
                             // If it's HTML, resolve Foundry's internal @UUID and @Roll links into standard HTML
                             if (entry.type === 'html' && content) {
-                                content = await TextEditor.enrichHTML(content, { async: true });
+                                content = await TextEditor.enrichHTML(content, {async: true});
                             }
 
                             processedEntries.push({
@@ -1996,7 +2086,14 @@ class CyberpunkBridge {
                 }
 
                 if (actor) {
-                    await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta: { 'system.wealth': actor.system.wealth }, tab: 'stats', success: true, requestId });
+                    await this.sendResponse({
+                        type: 'SHEET_DELTA',
+                        actorId: actorId,
+                        delta: {'system.wealth': actor.system.wealth},
+                        tab: 'stats',
+                        success: true,
+                        requestId
+                    });
                 }
                 break;
             }
@@ -2014,6 +2111,7 @@ class CyberpunkBridge {
         }
     }
 }
+
 // ==================================================================
 // BOOT SEQUENCE & VITE ASYNC FAILSAFE
 // ==================================================================

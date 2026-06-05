@@ -1,11 +1,11 @@
 <script setup>
-import { ref, computed } from 'vue';
+import {computed, ref} from 'vue';
 import axios from 'axios';
-import { vIcon } from '../../directives/icon';
+import {vIcon} from '../../directives/icon';
 
 const props = defineProps({
-    value: { type: Number, default: 0 },
-    transactions: { type: Array, default: () => [] },
+    value: {type: Number, default: 0},
+    transactions: {type: Array, default: () => []},
 });
 
 const sortedTransactions = computed(() => {
@@ -111,16 +111,22 @@ function formatAmount(t) {
                 <p v-if="error" class="text-cpr-red text-[10px] uppercase font-bold text-center italic">{{ error }}</p>
 
                 <div class="eb-ledger border-t border-cpr-border pt-3">
-                    <h4 class="text-[10px] font-bold text-cpr-text-dim uppercase mb-2 tracking-widest">Transaction History</h4>
+                    <h4 class="text-[10px] font-bold text-cpr-text-dim uppercase mb-2 tracking-widest">Transaction
+                        History</h4>
                     <ul v-if="sortedTransactions && sortedTransactions.length" class="space-y-1">
-                        <li v-for="(t, i) in sortedTransactions" :key="i" class="flex justify-between items-baseline gap-2">
-                            <span class="font-numbers text-sm" :class="parseFloat(Array.isArray(t) ? t[0] : (t.value ?? t.amount)) < 0 ? 'text-cpr-red' : 'text-cpr-lime'">
+                        <li v-for="(t, i) in sortedTransactions" :key="i"
+                            class="flex justify-between items-baseline gap-2">
+                            <span class="font-numbers text-sm"
+                                  :class="parseFloat(Array.isArray(t) ? t[0] : (t.value ?? t.amount)) < 0 ? 'text-cpr-red' : 'text-cpr-lime'">
                                 {{ formatAmount(t) }}
                             </span>
-                            <span class="text-[10px] text-cpr-text-dim truncate flex-1 text-right">{{ (Array.isArray(t) ? t[1] : t.reason) || '—' }}</span>
+                            <span class="text-[10px] text-cpr-text-dim truncate flex-1 text-right">{{
+                                    (Array.isArray(t) ? t[1] : t.reason) || '—'
+                                }}</span>
                         </li>
                     </ul>
-                    <p v-else class="text-[10px] text-cpr-text-dim italic text-center py-2">No transactions recorded.</p>
+                    <p v-else class="text-[10px] text-cpr-text-dim italic text-center py-2">No transactions
+                        recorded.</p>
                 </div>
             </div>
         </div>
@@ -137,12 +143,15 @@ function formatAmount(t) {
 .eb-ledger::-webkit-scrollbar {
     width: 2px;
 }
+
 .eb-ledger::-webkit-scrollbar-track {
     background: transparent;
 }
+
 .eb-ledger::-webkit-scrollbar-thumb {
     background: #444;
 }
+
 .eb-ledger::-webkit-scrollbar-thumb:hover {
     background: #666;
 }

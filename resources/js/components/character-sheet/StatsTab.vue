@@ -58,7 +58,8 @@
         </div>
 
         <div class="cpr-box border-cpr-red p-3 flex justify-between divide-x divide-gray-800">
-            <div v-if="charData.type === 'character'" class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
+            <div v-if="charData.type === 'character'"
+                 class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
                  @click="$emit('open-eurobucks')">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">Eurobucks</div>
                 <div class="text-cpr-yellow font-bold"><span class="font-numbers">{{
@@ -66,7 +67,7 @@
                     }}</span>eb
                 </div>
             </div>
-            <div v-if="charData.type === 'character'"  class="px-2 text-center w-1/4">
+            <div v-if="charData.type === 'character'" class="px-2 text-center w-1/4">
                 <div class="text-[10px] text-cpr-text-dim uppercase font-bold">IP</div>
                 <div class="text-cpr-yellow font-numbers font-bold">
                     {{ charData.data.system.improvementPoints.value }}

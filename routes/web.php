@@ -1,36 +1,7 @@
 <?php
 
-use App\Http\Controllers\Cyberdeck\InstallProgram;
-use App\Http\Controllers\Cyberdeck\RemoveProgram;
-use App\Http\Controllers\Cyberdeck\ToggleRez;
-use App\Http\Controllers\Data\ActorSheet;
-use App\Http\Controllers\Data\GetActor;
-use App\Http\Controllers\Data\GetActors;
-use App\Http\Controllers\Data\GetNetPool;
-use App\Http\Controllers\Data\GetRollModifiers;
-use App\Http\Controllers\Data\ImageProxy;
-use App\Http\Controllers\Data\ItemEquip;
-use App\Http\Controllers\Item\ConsumeItem;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Rolls\AttackRoll;
-use App\Http\Controllers\Rolls\DamageRoll;
-use App\Http\Controllers\Rolls\DeathSave;
-use App\Http\Controllers\Rolls\DiceRoller;
-use App\Http\Controllers\Rolls\FaceDown;
-use App\Http\Controllers\Rolls\InitiativeRoll;
-use App\Http\Controllers\Rolls\ProgramRoll;
-use App\Http\Controllers\Rolls\RoleRollRequest;
-use App\Http\Controllers\Rolls\SkillRollRequest;
-use App\Http\Controllers\Rolls\StatRollRequest;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\Token\GetVisibleTokens;
-use App\Http\Controllers\Token\ListVisibleTokens;
-use App\Http\Controllers\Token\MoveToken;
-use App\Http\Controllers\Token\ReloadWeapon;
-use App\Http\Controllers\Token\TargetTokens;
-use App\Http\Controllers\Values\UpdateEuroBucks;
-use App\Http\Controllers\Values\UpdateNotes;
-use App\Http\Controllers\Values\UpdateStat;
 use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -86,7 +57,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/config', [SettingsController::class, 'show'])->name('config.index');
     Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
 });
-
 
 // API Key registration
 

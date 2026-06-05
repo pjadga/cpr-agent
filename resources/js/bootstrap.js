@@ -1,12 +1,12 @@
 import axios from 'axios';
-
-window.axios = axios;
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
+import {useCharacterData} from './composables/useCharacterData';
+
+window.axios = axios;
 
 window.Pusher = Pusher;
 window.axios.defaults.withCredentials = true;
-import {useCharacterData} from './composables/useCharacterData';
 
 const {isWssConnected} = useCharacterData();
 

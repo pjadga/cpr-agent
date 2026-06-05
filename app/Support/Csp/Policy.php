@@ -46,7 +46,7 @@ class Policy implements Preset
                 'https://fonts.gstatic.com',
                 'https://fonts.bunny.net',
                 'https://cdn.jsdelivr.net',
-                'https://fonts.cdnfonts.com'
+                'https://fonts.cdnfonts.com',
             ])
             ->add(Directive::FRAME, [
                 'https://challenges.cloudflare.com',

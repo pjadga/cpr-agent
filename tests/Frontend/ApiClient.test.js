@@ -3,7 +3,7 @@
  * Tests for API communication from the frontend
  */
 
-import {describe, it, expect, beforeEach, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 describe('API Client', () => {
     let apiUrl;

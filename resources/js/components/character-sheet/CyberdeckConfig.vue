@@ -23,8 +23,12 @@
                         <div>
                             <h3 class="text-md font-black text-cpr-yellow uppercase">{{ activeCyberdeck.name }}</h3>
                             <div class="text-[10px] font-bold uppercase text-cpr-teal">
-                                Memory Slots: <span :class="activeCyberdeck.system.installedItems.usedSlots >= activeCyberdeck.system.installedItems.slots ? 'text-cpr-red' : 'text-cpr-yellow'" class="font-numbers">
-                                    {{ activeCyberdeck.system.installedItems.usedSlots }} / {{ activeCyberdeck.system.installedItems.slots }}
+                                Memory Slots: <span
+                                :class="activeCyberdeck.system.installedItems.usedSlots >= activeCyberdeck.system.installedItems.slots ? 'text-cpr-red' : 'text-cpr-yellow'"
+                                class="font-numbers">
+                                    {{
+                                    activeCyberdeck.system.installedItems.usedSlots
+                                }} / {{ activeCyberdeck.system.installedItems.slots }}
                                 </span>
                             </div>
                         </div>
@@ -72,8 +76,13 @@
                                 <img v-cpr-img:cpr-teal="getImageUrl(program.img)"
                                      class="w-8 h-8 opacity-50 grayscale group-hover:grayscale-0 transition-all">
                                 <div>
-                                    <div class="text-xs font-bold text-cpr-text-muted group-hover:text-cpr-yellow uppercase">{{ program.name }}</div>
-                                    <div class="text-[9px] text-cpr-text-dim font-mono uppercase">{{ program.system.class || 'Program' }}</div>
+                                    <div
+                                        class="text-xs font-bold text-cpr-text-muted group-hover:text-cpr-yellow uppercase">
+                                        {{ program.name }}
+                                    </div>
+                                    <div class="text-[9px] text-cpr-text-dim font-mono uppercase">
+                                        {{ program.system.class || 'Program' }}
+                                    </div>
                                 </div>
                             </div>
                             <button @click="$emit('install', program)"

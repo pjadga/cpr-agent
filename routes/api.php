@@ -39,10 +39,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-//// Protect any broadcast EPs via Sanctum
-//Route::get('/broadcasting/auth', function (Request $request) {
+// // Protect any broadcast EPs via Sanctum
+// Route::get('/broadcasting/auth', function (Request $request) {
 //    return $request->user();
-//})->middleware('auth:sanctum');
+// })->middleware('auth:sanctum');
 
 // Callback API routes
 Route::post('/foundry/callback', [FoundryController::class, 'handle'])

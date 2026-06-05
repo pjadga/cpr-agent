@@ -1,6 +1,5 @@
 import {onMounted, onUnmounted} from 'vue';
-import {isMyRequest} from './requests';
-import {isMyActor} from "./requests";
+import {isMyActor, isMyRequest} from './requests';
 
 const sharedListeners = new Map();
 

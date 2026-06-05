@@ -16,7 +16,7 @@ class FixTailscaleContentType
     public function handle($request, Closure $next)
     {
         // If it is a POST to the API and the header was stripped by the proxy
-        if ($request->isMethod('POST') && !$request->hasHeader('Content-Type')) {
+        if ($request->isMethod('POST') && ! $request->hasHeader('Content-Type')) {
             $request->headers->set('Content-Type', 'application/json');
         }
 

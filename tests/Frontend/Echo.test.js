@@ -3,7 +3,7 @@
  * Tests for real-time communication via Laravel Echo and Reverb
  */
 
-import {describe, it, expect, beforeEach, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 describe('Laravel Echo Broadcasting', () => {
     let echo;

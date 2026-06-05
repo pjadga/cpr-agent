@@ -66,7 +66,7 @@ class FoundryController extends Controller
                 ->first();
         }
 
-        if (!$user && $actorId) {
+        if (! $user && $actorId) {
             $cleanActorId = str_replace('Actor.', '', $actorId);
             $user = User::where('default_actor_id', $actorId)
                 ->orWhere('default_actor_id', $cleanActorId)
@@ -74,7 +74,7 @@ class FoundryController extends Controller
         }
 
         // Fallback to the user associated with the API token
-        if (!$user) {
+        if (! $user) {
             $user = $request->user();
         }
 
@@ -83,12 +83,12 @@ class FoundryController extends Controller
             $targetUser = null;
             $userIdentifier = $validated['agentLink'] ?? $validated['agent_link'] ?? $validated['foundryUserId'] ?? null;
 
-            if (!$user) {
+            if (! $user) {
                 $user = $request->user();
             }
 
             // If it's a GM-initiated link, find the target user by agentLink or foundryUserId
-            if ($type === 'GM_LINK_PLAYER_CHARACTER' && !empty($userIdentifier)) {
+            if ($type === 'GM_LINK_PLAYER_CHARACTER' && ! empty($userIdentifier)) {
                 $targetUser = User::where('agent_link', $userIdentifier)->first();
                 if ($targetUser) {
                     $user = $targetUser;
@@ -135,19 +135,19 @@ class FoundryController extends Controller
             }
 
             $current = Cache::get("user_char_{$user->id}");
-            //Fetch from DB if no Foundry call
-            if (!$current) {
+            // Fetch from DB if no Foundry call
+            if (! $current) {
                 $current = $user->character_data ?? [];
             }
 
-            //TODO This should throw error
-            if (!is_array($current)) {
+            // TODO This should throw error
+            if (! is_array($current)) {
                 $current = [];
             }
 
-            if ($type === 'ACTOR_DATA' && !empty($validated['actor'])) {
+            if ($type === 'ACTOR_DATA' && ! empty($validated['actor'])) {
                 $current = $validated['actor'];
-            } elseif ($type === 'SHEET_DELTA' && !empty($validated['delta'])) {
+            } elseif ($type === 'SHEET_DELTA' && ! empty($validated['delta'])) {
                 foreach ($validated['delta'] as $path => $value) {
                     $this->arraySetDot($current, $path, $value);
                 }
@@ -177,7 +177,7 @@ class FoundryController extends Controller
         FoundryResponse::dispatch($broadcastPayload);
 
         // Put in cache for synchronous polling
-        if (!empty($validated['requestId'])) {
+        if (! empty($validated['requestId'])) {
             Cache::put('foundry_response_'.$validated['requestId'], $request->all(), 10);
         }
 
@@ -211,7 +211,7 @@ class FoundryController extends Controller
                 }
             }
 
-            if (!$found) {
+            if (! $found) {
                 $array['items'][] = $value;
             }
 
@@ -252,7 +252,7 @@ class FoundryController extends Controller
                 }
             }
 
-            if (!$found) {
+            if (! $found) {
                 // Item not found, can't update
                 return;
             }
@@ -284,7 +284,7 @@ class FoundryController extends Controller
                         break;
                     }
                 }
-                if (!$found) {
+                if (! $found) {
                     $array['items'][] = $value;
                 }
             }
@@ -302,7 +302,7 @@ class FoundryController extends Controller
                     $ref[$key] = $value;
                 }
             } else {
-                if (!isset($ref[$key]) || ! is_array($ref[$key])) {
+                if (! isset($ref[$key]) || ! is_array($ref[$key])) {
                     $ref[$key] = [];
                 }
                 $ref = &$ref[$key];

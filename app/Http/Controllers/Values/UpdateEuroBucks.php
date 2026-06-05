@@ -24,13 +24,13 @@ class UpdateEuroBucks extends FormRequest
         $actorId = $user->getActorId();
         $requestId = $this->createRequestId();
         $userName = $user->name ?? 'user';
-        $reason = trim(($validated['reason'] ?? '') . ' - ' . $userName, ' -');
+        $reason = trim(($validated['reason'] ?? '').' - '.$userName, ' -');
 
         $payload = [
             'type' => 'UPDATE_EB',
             'actorId' => $actorId,
             'action' => $validated['action'],   // add | subtract | set
-            'value' => (int)$validated['value'],
+            'value' => (int) $validated['value'],
             'reason' => $reason,
             'requestId' => $requestId,
         ];

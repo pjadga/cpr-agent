@@ -25,8 +25,11 @@
                             class="w-full p-3 bg-cpr-black border border-cpr-border flex items-center justify-between text-left transition-colors hover:border-cpr-border-muted">
                         <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
 
-                            <span class="text-xs font-bold text-cpr-yellow uppercase">{{ controlState.selectedTarget.name }}</span>
-                            <span class="text-[9px] text-cpr-text-dim">(<span class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
+                            <span class="text-xs font-bold text-cpr-yellow uppercase">{{
+                                    controlState.selectedTarget.name
+                                }}</span>
+                            <span class="text-[9px] text-cpr-text-dim">(<span
+                                class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
                         </div>
                         <span v-else class="text-xs text-cpr-text-dim uppercase italic font-mono">No Hostile Signal Locked</span>
                         <i v-icon data-lucide="chevron-down"
@@ -44,7 +47,9 @@
 
                                     <div>
                                         <div class="text-xs font-bold text-cpr-yellow uppercase">{{ enemy.name }}</div>
-                                        <div class="text-[9px] text-cpr-text-dim"><span class="font-numbers">{{ enemy.distanceM }}</span>m away</div>
+                                        <div class="text-[9px] text-cpr-text-dim"><span
+                                            class="font-numbers">{{ enemy.distanceM }}</span>m away
+                                        </div>
                                     </div>
                                 </div>
                                 <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-cpr-red">
@@ -135,7 +140,8 @@
                 <div class="cpr-panel p-4 bg-cpr-black-deep/20 border border-cpr-teal/30 mb-4 overflow-hidden group">
                     <div class="relative z-10 flex justify-between items-start mb-4">
                         <div>
-                            <h3 class="text-lg font-black text-cpr-yellow uppercase tracking-tighter">{{ activeCyberdeck.name }}</h3>
+                            <h3 class="text-lg font-black text-cpr-yellow uppercase tracking-tighter">
+                                {{ activeCyberdeck.name }}</h3>
                             <div class="flex items-center gap-2 mt-1">
                                 <span class="text-[9px] px-1.5 py-0.5 bg-cpr-teal text-black font-black uppercase">Active Deck</span>
                                 <span class="text-[9px] text-cpr-teal font-mono font-bold uppercase">{{
@@ -221,17 +227,21 @@
             </div>
             <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-4">
                 <div></div>
-                <button @click="$emit('move', 'up')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'up')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-up" class="w-6 h-6 pointer-events-none"></i>
                 </button>
                 <div></div>
-                <button @click="$emit('move', 'left')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'left')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
                 </button>
-                <button @click="$emit('move', 'down')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'down')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-down" class="w-6 h-6 pointer-events-none"></i>
                 </button>
-                <button @click="$emit('move', 'right')" class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                <button @click="$emit('move', 'right')"
+                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
                     <i v-icon data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i>
                 </button>
             </div>
@@ -240,7 +250,7 @@
 </template>
 
 <script>
-import {ref, computed} from 'vue';
+import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import ProgramRow from './ProgramRow.vue';

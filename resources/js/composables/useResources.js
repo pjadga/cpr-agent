@@ -1,5 +1,4 @@
-import {ref} from 'vue';
-import {triggerRef} from 'vue';
+import {ref, triggerRef} from 'vue';
 
 /**
  * Composable for managing resource adjustment modals (HP, Humanity)

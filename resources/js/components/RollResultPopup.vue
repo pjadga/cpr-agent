@@ -3,7 +3,8 @@
          class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
          @click="close">
         <div class="w-full max-w-sm bg-cpr-black-deep border-2" :class="borderColor" @click.stop>
-            <div class="flex items-center justify-between px-4 py-2 border-b" :class="headerBorderColor + ' ' + headerBgColor">
+            <div class="flex items-center justify-between px-4 py-2 border-b"
+                 :class="headerBorderColor + ' ' + headerBgColor">
                 <span class="text-xs font-black uppercase tracking-[0.2em] text-cpr-yellow">{{ title }}</span>
                 <button class="text-cpr-yellow/70 hover:text-cpr-yellow transition-colors" @click="close">
                     <i v-icon data-lucide="x" class="w-5 h-5"></i>

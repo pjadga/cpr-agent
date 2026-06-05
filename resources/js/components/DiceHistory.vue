@@ -42,8 +42,7 @@
 </template>
 
 <script setup>
-import {ref, onMounted, onUnmounted} from 'vue';
-import {useEchoListener} from '../utils/listener';
+import {onMounted, onUnmounted, ref} from 'vue';
 
 const activeRolls = ref([]);
 let rollId = 0;

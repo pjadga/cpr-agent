@@ -15,7 +15,8 @@
                          class="absolute -bottom-1 -right-1 w-3 h-3 bg-cpr-teal rounded-full border-2 border-black animate-pulse"></div>
                 </div>
                 <div>
-                    <div class="text-xs font-bold text-cpr-yellow uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
+                    <div
+                        class="text-xs font-bold text-cpr-yellow uppercase tracking-tight group-hover:text-cpr-teal transition-colors flex items-center gap-2">
                         {{ prog.name }}
                         <span v-if="!isPlayer" class="text-cpr-teal/60 ml-1" title="Equipped (Locked)">
                             <i v-icon data-lucide="hand" class="w-3 h-3 inline"></i>
@@ -101,7 +102,6 @@
 </template>
 
 <script>
-import {computed} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {stripHtmlTags} from '../../utils/helpers';

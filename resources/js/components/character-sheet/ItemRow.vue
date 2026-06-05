@@ -135,8 +135,9 @@
                 </button>
             </div>
 
-            <div v-if="(!isPlayer && (category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'))"
-                 class="flex items-center gap-1 shrink-0 relative mr-1">
+            <div
+                v-if="(!isPlayer && (category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'))"
+                class="flex items-center gap-1 shrink-0 relative mr-1">
                 <div class="p-2 text-cpr-yellow/60 flex items-center justify-center relative z-10"
                      title="Equipped (Locked)">
                     <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
@@ -191,7 +192,9 @@
                         <span class="text-[9px] text-cpr-teal uppercase font-bold">Quick Fix</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.quickFix.type }}</span>
-                            <span class="text-cpr-yellow font-numbers">DV{{ item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic }}</span>
+                            <span class="text-cpr-yellow font-numbers">DV{{
+                                    item.system.quickFix.dvFirstAid || item.system.quickFix.dvParamedic
+                                }}</span>
                         </div>
                     </div>
                     <div
@@ -200,7 +203,9 @@
                         <span class="text-[9px] text-cpr-red uppercase font-bold">Treatment</span>
                         <div class="flex justify-between items-center text-[10px]">
                             <span class="text-cpr-text-dim capitalize">{{ item.system.treatment.type }}</span>
-                            <span class="text-cpr-yellow font-numbers">DV{{ item.system.treatment.dvParamedic || item.system.treatment.dvSurgery }}</span>
+                            <span class="text-cpr-yellow font-numbers">DV{{
+                                    item.system.treatment.dvParamedic || item.system.treatment.dvSurgery
+                                }}</span>
                         </div>
                     </div>
                 </div>
@@ -280,7 +285,7 @@
 </template>
 
 <script>
-import {ref, computed} from 'vue';
+import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {findItemInList, formatCategoryName} from '../../utils/helpers';

@@ -56,8 +56,10 @@
                     {{-- Brand --}}
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Brand / Primary</h3>
-                            <span class="text-[10px] font-mono text-cpr-text-dim">Red + Yellow drive most “action” UI</span>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Brand /
+                                Primary</h3>
+                            <span
+                                class="text-[10px] font-mono text-cpr-text-dim">Red + Yellow drive most “action” UI</span>
                         </div>
 
                         <div class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -75,7 +77,8 @@
                                     <div class="h-10 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
                                     <div class="mt-2 flex items-center justify-between">
-                                        <div class="text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
+                                        <div
+                                            class="text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
                                     </div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
@@ -105,7 +108,8 @@
                                 <div class="border border-cpr-border bg-cpr-black p-3">
                                     <div class="h-8 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
-                                    <div class="mt-2 text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
+                                    <div
+                                        class="mt-2 text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
                                         <div class="text-cpr-text-main">{{ $c['hex'] }}</div>
@@ -118,8 +122,10 @@
                     {{-- Neutrals --}}
                     <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Neutrals / Surfaces</h3>
-                            <span class="text-[10px] font-mono text-cpr-text-dim">Base theme supports night + day modes</span>
+                            <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Neutrals /
+                                Surfaces</h3>
+                            <span
+                                class="text-[10px] font-mono text-cpr-text-dim">Base theme supports night + day modes</span>
                         </div>
 
                         @php
@@ -142,7 +148,8 @@
                                 <div class="border border-cpr-border bg-cpr-black p-3">
                                     <div class="h-8 border border-cpr-border"
                                          style="background: var({{ $c['var'] }});"></div>
-                                    <div class="mt-2 text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
+                                    <div
+                                        class="mt-2 text-[10px] font-bold uppercase tracking-widest text-cpr-yellow">{{ $c['name'] }}</div>
                                     <div class="mt-1 text-[10px] font-mono text-cpr-text-dim">
                                         <div>{{ $c['var'] }}</div>
                                         <div class="text-cpr-text-main">{{ $c['value'] }}</div>
@@ -243,7 +250,9 @@
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
                             <li><span class="text-cpr-yellow font-bold">Base:</span> deep black backgrounds.</li>
                             <li><span class="text-cpr-yellow font-bold">Panels:</span> clipped corner + border.</li>
-                            <li><span class="text-cpr-yellow font-bold">Elevated:</span> subtle lighter “device glass” surface.</li>
+                            <li><span class="text-cpr-yellow font-bold">Elevated:</span> subtle lighter “device glass”
+                                surface.
+                            </li>
                         </ul>
                     </div>
 
@@ -251,7 +260,8 @@
                         <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Motion</h3>
                         <ul class="mt-3 space-y-2 text-xs text-cpr-text-muted">
                             <li><span class="text-cpr-yellow font-bold">fade</span> for tab transitions.</li>
-                            <li><span class="text-cpr-yellow font-bold">expand</span> for disclosure/accordion rows.</li>
+                            <li><span class="text-cpr-yellow font-bold">expand</span> for disclosure/accordion rows.
+                            </li>
                             <li><span class="text-cpr-yellow font-bold">slide-right</span> for side panels.</li>
                             <li><span class="text-cpr-yellow font-bold">slide-up</span> for bottom combat panel.</li>
                         </ul>
@@ -274,7 +284,8 @@
                 </div>
 
                 <div class="cpr-panel bg-[var(--cpr-black-soft)] p-4">
-                    <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Common UI Blocks (quick checklist)</h3>
+                    <h3 class="text-xs font-black uppercase tracking-widest text-cpr-yellow">Common UI Blocks (quick
+                        checklist)</h3>
 
                     <div class="mt-4 grid md:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                         <div class="border border-cpr-border bg-cpr-black p-3">

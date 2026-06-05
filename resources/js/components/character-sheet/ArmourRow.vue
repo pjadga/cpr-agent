@@ -21,7 +21,8 @@
                  @click="console.log('Row clicked:', item.name); $emit('click', item)">
                 <div class="flex justify-between items-center mt-[6px] ">
                     <div class="flex flex-col">
-                    <span class="text-sm text-cpr-text-main group-hover:text-cpr-teal transition-colors uppercase tracking-wider">
+                    <span
+                        class="text-sm text-cpr-text-main group-hover:text-cpr-teal transition-colors uppercase tracking-wider">
                         {{ item.name }}
                     </span
                     >
@@ -33,7 +34,9 @@
                                  class="flex items-center gap-2">
                                 <div class="flex flex-col items-end">
                                     <div class="flex items-baseline gap-1">
-                                        <span class="font-numbers font-bold text-2xl text-cpr-teal leading-none">{{ stat.current }}</span>
+                                        <span class="font-numbers font-bold text-2xl text-cpr-teal leading-none">{{
+                                                stat.current
+                                            }}</span>
                                         <span class="text-cpr-text-dim font-numbers text-sm">/</span>
                                         <span class="text-cpr-text-dim font-numbers text-sm">{{ stat.max }}</span>
                                     </div>
@@ -48,7 +51,7 @@
 </template>
 
 <script>
-import {ref, computed} from 'vue';
+import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {findItemInList, formatCategoryName} from '../../utils/helpers';

@@ -22,7 +22,10 @@
             </h3>
 
             <div v-for="(value, key) in lifepathData" :key="key" class="border border-cpr-border/30 p-3 relative group">
-                <div class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{ formatLabel(key) }}</div>
+                <div class="text-[10px] font-bold text-cpr-text-dim uppercase tracking-widest mb-1">{{
+                        formatLabel(key)
+                    }}
+                </div>
                 <div class="text-sm text-cpr-text-main leading-relaxed">
                     {{ value || '---' }}
                 </div>
@@ -34,7 +37,7 @@
 </template>
 
 <script>
-import {ref, watch, computed} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {vIcon} from '../../directives/icon';
 
 export default {

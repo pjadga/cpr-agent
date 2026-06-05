@@ -1,6 +1,5 @@
 import {ref, watch} from 'vue';
-import {debounce, throttle} from '../utils/helpers';
-import {cachedPost} from '../utils/api';
+import {debounce} from '../utils/helpers';
 import {useEchoListener} from '../utils/listener';
 import {useCharacterData} from './useCharacterData';
 

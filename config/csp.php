@@ -1,7 +1,7 @@
 <?php
 
 use App\Support\Csp\Policy;
-use Spatie\Csp\Nonce\RandomString;
+use App\Support\LaravelViteNonceGenerator;
 
 return [
 
@@ -54,7 +54,7 @@ return [
     /*
      * The class responsible for generating the nonces used in inline tags and headers.
      */
-    'nonce_generator' => App\Support\LaravelViteNonceGenerator::class,
+    'nonce_generator' => LaravelViteNonceGenerator::class,
 
     /*
      * Set false to disable automatic nonce generation and handling.

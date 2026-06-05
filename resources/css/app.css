@@ -106,8 +106,13 @@ body {
     transition: color 0.2s;
 }
 
-.cpr-panel.cpr-stat-box { border-bottom: 2px solid var(--cpr-red) !important; }
-.cpr-panel.cpr-equipped-box { border-left: 3px solid var(--cpr-red) !important; }
+.cpr-panel.cpr-stat-box {
+    border-bottom: 2px solid var(--cpr-red) !important;
+}
+
+.cpr-panel.cpr-equipped-box {
+    border-left: 3px solid var(--cpr-red) !important;
+}
 
 .cpr-panel.cpr-equipped-box {
     border-left: 3px solid var(--cpr-red) !important;
