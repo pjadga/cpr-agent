@@ -31,7 +31,7 @@ export function isMyActor(actorId) {
  * @returns {boolean}
  */
 export function isMyRequest(requestId) {
-    if (!requestId) return true; // Unsolicited updates are for everyone
+    if (!requestId) return false; // Unsolicited updates are for specifics. Like weapon drops etc
     return pendingRequestIds.has(requestId);
 }
 

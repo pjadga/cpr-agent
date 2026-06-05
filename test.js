@@ -134,6 +134,7 @@ class CharacterAssignmentMenu extends FormApplication {
                     await window.cyberpunkBridge.sendResponse({
                         type: 'GM_LINK_PLAYER_CHARACTER',
                         agentLink: agentLink || update._id, // Use agent-link as primary ID for Laravel
+                        actorId: update.character,
                         character: update.character,
                         isGM: user.isGM
                     });
@@ -462,6 +463,7 @@ class CyberpunkBridge {
             try {
                 const response = await this.sendResponse({
                     type: 'LINK_PLAYER_CHARACTER',
+                    actorId: char ? char.id : null,
                     character: char ? { id: char.id, name: char.name } : null,
                     actorName: char ? char.name : null,
                     agentLink: currentAgentLink || game.user.id,
@@ -515,6 +517,7 @@ class CyberpunkBridge {
             console.log(`%c[Bridge] Syncing change for ${actor.name}`, "color: #ffaa00;", delta);
             await this.sendResponse({
                 type: 'SHEET_DELTA',
+                actorId: actor.id,
                 uuid: actor.id,
                 delta: delta,
                 success: true
@@ -651,6 +654,7 @@ class CyberpunkBridge {
 
         this.sendResponse({
             type: 'ROLL_RESULT',
+            actorId: message.speaker?.actor || null,
             agentLink: user ? user.getFlag(MODULE_ID, 'agent-link') : null,
             playerName: message.alias,
             total: roll.total,
@@ -801,7 +805,7 @@ class CyberpunkBridge {
                 }
                 await actor.update(data.changes);
                 ui.notifications.info(`💾 Sync: ${actor.name} updated.`);
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, success: true, requestId });
                 break;
             }
 
@@ -818,7 +822,7 @@ class CyberpunkBridge {
                 }
                 await item.snort();
                 ui.notifications.info(`Sync: ${item.name} consumed.`);
-                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId, success: true, requestId });
+                await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, success: true, requestId });
                 break;
             }
 
@@ -871,7 +875,7 @@ class CyberpunkBridge {
                         [`items.${data.cyberdeckId}.system.installedItems.usedSlots`]: newUsedSlots
                     },
                     success: true,
-                    requestId: requestId
+                    requestId
                 });
                 break;
             }
@@ -907,7 +911,7 @@ class CyberpunkBridge {
                     delta[`items.${data.programId}.system.isRezzed`] = false;
                 }
 
-                await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta, success: true, requestId });
+                await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta, success: true, requestId });
                 break;
             }
 
@@ -919,7 +923,7 @@ class CyberpunkBridge {
                         await program.update({'system.isRezzed': data.targetState});
                         await this.sendResponse({
                             type: 'SHEET_DELTA',
-                            actorId,
+                            actorId: actorId,
                             delta: { [`items.${data.programId}.system.isRezzed`]: data.targetState },
                             success: true,
                             requestId
@@ -953,7 +957,7 @@ class CyberpunkBridge {
                             type: 'ROLL_RESULT',
                             rollMode: result.rollMode,
                             requestId: requestId,
-                            actorId,
+                            actorId: actorId,
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
@@ -998,7 +1002,7 @@ class CyberpunkBridge {
                             type: 'ROLL_RESULT',
                             rollMode: result.rollMode,
                             requestId: requestId,
-                            actorId,
+                            actorId: actorId,
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
@@ -1017,7 +1021,7 @@ class CyberpunkBridge {
                         // Also send a delta for the death save counter
                         await this.sendResponse({
                             type: 'SHEET_DELTA',
-                            actorId,
+                            actorId: actorId,
                             delta: { 'system.derivedStats.deathsave': deathSaves },
                             tab: 'stats',
                             success: true
@@ -1051,7 +1055,7 @@ class CyberpunkBridge {
                         type: 'ROLL_RESULT',
                         rollMode: result.rollMode,
                         requestId,
-                        actorId,
+                        actorId: actorId,
                         total: result.total,
                         isCriticalSuccess: result.isCriticalSuccess,
                         isCriticalFailure: result.isCriticalFailure,
@@ -1082,8 +1086,8 @@ class CyberpunkBridge {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             rollMode: result.rollMode,
-                            requestId,
-                            actorId,
+                            requestId: requestId,
+                            actorId: actorId,
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
@@ -1128,8 +1132,8 @@ class CyberpunkBridge {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             rollMode: result.rollMode,
-                            requestId,
-                            actorId,
+                            requestId: requestId,
+                            actorId: actorId,
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
@@ -1183,8 +1187,8 @@ class CyberpunkBridge {
                             await this.sendResponse({
                                 type: 'ROLL_RESULT',
                                 rollMode: result.rollMode,
-                                requestId,
-                                actorId,
+                                requestId: requestId,
+                                actorId: actorId,
                                 total: result.total,
                                 isCriticalSuccess: result.isCriticalSuccess,
                                 isCriticalFailure: result.isCriticalFailure,
@@ -1230,8 +1234,8 @@ class CyberpunkBridge {
                             await this.sendResponse({
                                 type: 'ROLL_RESULT',
                                 rollMode: result.rollMode,
-                                requestId,
-                                actorId,
+                                requestId: requestId,
+                                actorId: actorId,
                                 total: result.total,
                                 isCriticalSuccess: result.isCriticalSuccess,
                                 isCriticalFailure: result.isCriticalFailure,
@@ -1273,8 +1277,8 @@ class CyberpunkBridge {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             rollMode: result.rollMode,
-                            requestId,
-                            actorId,
+                            requestId: requestId,
+                            actorId: actorId,
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
@@ -1295,7 +1299,7 @@ class CyberpunkBridge {
             }
 
             case 'DICE_ROLL': {
-                if (requestId) this.activeRequests.set(requestId, { actorId, timestamp: Date.now() });
+                if (requestId) this.activeRequests.set(requestId, { actorId: actorId, timestamp: Date.now() });
                 const roll = new Roll(data.formula);
                 await roll.evaluate();
                 await roll.toMessage({
@@ -1306,8 +1310,8 @@ class CyberpunkBridge {
                 await this.sendResponse({
                     type: 'ROLL_RESULT',
                     rollMode: data.rollMode || game.settings.get("core", "rollMode"),
-                    requestId,
-                    actorId,
+                    requestId: requestId,
+                    actorId: actorId,
                     total: roll.total,
                     isCriticalSuccess: roll.isCriticalSuccess || false,
                     isCriticalFailure: roll.isCriticalFailure || false,
@@ -1336,10 +1340,10 @@ class CyberpunkBridge {
                     else if (data.direction === "right") newPos.x = token.document.x + canvas.grid.size;
                     await token.document.update(newPos);
 
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: true, requestId });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, tokenId, success: true, requestId });
                 } else {
                     console.warn(`MOVE_TOKEN: Token ID ${tokenId} not found.`);
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId, success: false, message: 'Token not found', requestId });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, tokenId, success: false, message: 'Token not found', requestId });
                 }
                 break;
             }
@@ -1382,7 +1386,7 @@ class CyberpunkBridge {
                         // we can either refresh all items or just let standard delta handle it.
                         // But for now, ensuring weapon.magazine and weapon.installedItems is a good start.
 
-                        await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta, success: true, requestId });
+                        await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta, success: true, requestId });
                     };
 
                     if (selectedAmmo) {
@@ -1407,7 +1411,7 @@ class CyberpunkBridge {
                 const token = canvas.tokens.get(data.targetTokenId);
                 if (token) {
                     token.setTarget(true, { releaseOthers: true, groupSelection: true });
-                    await this.sendResponse({ type: 'CONFIRMATION', action: type, tokenId: data.targetTokenId, success: true, requestId });
+                    await this.sendResponse({ type: 'CONFIRMATION', action: type, actorId: actorId, tokenId: data.targetTokenId, success: true, requestId });
                 }
                 break;
             }
@@ -1433,7 +1437,7 @@ class CyberpunkBridge {
                     }
                     await actor.update({ [path]: newValue });
                     // Send a focused sheet delta back to Agent and persist via API
-                    await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { [path]: newValue }, tab: 'stats', success: true, requestId });
+                    await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta: { [path]: newValue }, tab: 'stats', success: true, requestId });
                 }
                 break;
             }
@@ -1549,8 +1553,8 @@ class CyberpunkBridge {
                         await this.sendResponse({
                             type: 'ROLL_RESULT',
                             rollMode: result.rollMode,
-                            requestId,
-                            actorId,
+                            requestId: requestId,
+                            actorId: actorId,
                             total: result.total,
                             isCriticalSuccess: result.isCriticalSuccess,
                             isCriticalFailure: result.isCriticalFailure,
@@ -1659,7 +1663,7 @@ class CyberpunkBridge {
                     finalModifier: statValue + skillLevel + weaponAcc + totalPenalty,
                     injuries: effectList
                 };
-                await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', result, requestId });
+                await this.sendResponse({ type: 'ROLL_MODIFIERS_DATA', actorId: actorId, result, requestId });
                 break;
             }
 
@@ -1696,7 +1700,7 @@ class CyberpunkBridge {
                     const weaponData = jim.actor.items.get(weaponId);
                     if (!weaponData) {
                         console.warn(`GET_DV_INFO: Weapon ID ${weaponId} not found on actor ${jim.actor.name}.`);
-                        await this.sendResponse({ type: 'DV_INFO_DATA', result: null, requestId });
+                        await this.sendResponse({ type: 'DV_INFO_DATA', actorId: actorId, result: null, requestId });
                         break;
                     }
 
@@ -1730,10 +1734,10 @@ class CyberpunkBridge {
                         weaponCategory: category,
                         dv: targetDV === 99 ? 'Out of Range' : targetDV
                     };
-                    await this.sendResponse({ type: 'DV_INFO_DATA', result, requestId });
+                    await this.sendResponse({ type: 'DV_INFO_DATA', actorId: actorId, result, requestId });
                 } else {
                     console.warn(`GET_DV_INFO: Token(s) not found. Jim: ${!!jim}, Target: ${!!target}`);
-                    await this.sendResponse({ type: 'DV_INFO_DATA', result: null, requestId });
+                    await this.sendResponse({ type: 'DV_INFO_DATA', actorId: actorId, result: null, requestId });
                 }
                 break;
             }
@@ -1777,7 +1781,7 @@ class CyberpunkBridge {
                 } else {
                     console.warn(`LIST_VISIBLE_TOKENS: Token ID ${tokenId} not found.`);
                 }
-                await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', tokens: nearbyTokens, requestId });
+                await this.sendResponse({ type: 'VISIBLE_TOKENS_DATA', actorId: actorId, tokens: nearbyTokens, requestId });
                 break;
             }
 
@@ -1821,11 +1825,11 @@ class CyberpunkBridge {
                             })),
                             flags: obj.flags && obj.flags['cyberpunk-red-core'] ? { 'cyberpunk-red-core': obj.flags['cyberpunk-red-core'] } : {}
                         };
-                        await this.sendResponse({ type: 'ACTOR_DATA', actor: slim, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
+                        await this.sendResponse({ type: 'ACTOR_DATA', actorId: actorId, actor: slim, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
                         break;
                     }
                 }
-                await this.sendResponse({ type: 'ACTOR_DATA', actor: false, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
+                await this.sendResponse({ type: 'ACTOR_DATA', actorId: actorId, actor: false, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
                 break;
             }
 
@@ -1907,7 +1911,7 @@ class CyberpunkBridge {
                     }
                 }
 
-                await this.sendResponse({ type: 'ACTORS_DATA', actors: actors, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
+                await this.sendResponse({ type: 'ACTORS_DATA', actorId: actorId, actors: actors, requestId, isGM: targetUser.isGM, agentLink: targetUser.getFlag(MODULE_ID, 'agent-link') || targetUser.id });
                 break;
             }
 
@@ -1958,6 +1962,7 @@ class CyberpunkBridge {
                 // Send the payload back to Laravel
                 await this.sendResponse({
                     type: 'NET_POOL_DATA',
+                    actorId: actorId,
                     pools: dataPools,
                     requestId: requestId,
                     success: true
@@ -1983,7 +1988,7 @@ class CyberpunkBridge {
                         actor.deltaLedgerProperty("wealth", data.value, data.reason)
                         break;
                     case 'subtract':
-                        actor.deltaLedgerProperty("wealth", '-' + data.value, data.reason)
+                        actor.deltaLedgerProperty("wealth", -Number(data.value), data.reason)
                         break;
                     case 'set':
                         actor.setLedgerProperty("wealth", data.value, data.reason)
@@ -1991,7 +1996,7 @@ class CyberpunkBridge {
                 }
 
                 if (actor) {
-                    await this.sendResponse({ type: 'SHEET_DELTA', actorId, delta: { 'system.wealth': actor.system.wealth }, tab: 'stats', success: true, requestId });
+                    await this.sendResponse({ type: 'SHEET_DELTA', actorId: actorId, delta: { 'system.wealth': actor.system.wealth }, tab: 'stats', success: true, requestId });
                 }
                 break;
             }

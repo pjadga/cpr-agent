@@ -396,7 +396,7 @@ export function useCharacterData() {
                                 triggerRef(charData);
                                 setTimeout(refreshIcons, 50);
                             } else if (payload.type === 'SHEET_DELTA' && payload.delta) {
-                                const payloadActorId = String(payload.uuid || '').replace(/^Actor\./, '');
+                                const payloadActorId = String(payload.actorId || payload.uuid || '').replace(/^Actor\./, '');
                                 if (actorUuid && payloadActorId && payloadActorId !== actorUuid) return;
 
                                 // Adopting the UUID if we don't have one

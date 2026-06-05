@@ -21,12 +21,19 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
         const isGM = localStorage.getItem('cpr_is_gm') === 'true';
         const myAgentLink = (window.AgentConfig?.agent_link || localStorage.getItem('cpr_agent_link') || '').replace(/\/$/, '');
         const rollerLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '');
-        const isMe = rollerLink && myAgentLink && rollerLink === myAgentLink;
+        const isMe = rollerLink === myAgentLink;
 
-        // Synchronize public events with useCharacterData.js
-        let isPublicEvent = ['ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
 
-        if (['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type)) {
+        let isPublicEvent = false;
+
+        if (['ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type)) {
+            // Route to the specific actor's owner only; GMs see everything
+            const payloadActorId = payload.actorId;
+            isPublicEvent = isMyActor(payloadActorId) || isMyRequest(requestId);
+            if (isMyActor(payloadActorId)) {
+                console.log("only my actor should be updated")
+            }
+        } else if (['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type)) {
             if (rollMode === 'publicroll') {
                 isPublicEvent = true;
             } else if (rollMode === 'gmroll') {
@@ -38,7 +45,7 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
             }
         }
 
-        if (isPublicEvent || isMyRequest(requestId) || isMyActor(payload.actorId)) {
+        if (isPublicEvent) {
             handler(e);
         } else {
             console.log(`Listener Ignoring FoundryResponse with type [${payload.type}] and requestId [${requestId}] - privacy settings or initiated by another agent.`);
