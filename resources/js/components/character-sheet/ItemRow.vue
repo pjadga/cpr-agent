@@ -296,7 +296,6 @@ export default {
     directives: {icon: vIcon},
     emits: ['click', 'equip-click', 'consume-click'],
     setup(props, {emit}) {
-        console.log(`ItemRow setup: ${props.item.name} (${props.category})`);
         const {getImageUrl, fetchCharacterData, charData, isPlayer} = useCharacterData();
         const expanded = ref(false);
         const showReloadPopup = ref(false);

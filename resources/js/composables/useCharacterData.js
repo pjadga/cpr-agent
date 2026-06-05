@@ -433,7 +433,6 @@ export function useCharacterData() {
     };
 
     const isPlayer = computed(() => {
-        console.log("is player", charData.value?.type)
         return charData.value?.type === 'character';
     });
 

@@ -429,7 +429,7 @@
  * Handles character data fetching, stat updates, skills, gear, and combat controls.
  */
 
-import {computed, ref, triggerRef, watch} from "vue";
+import {computed, onMounted, ref, triggerRef, watch} from "vue";
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
@@ -729,8 +729,6 @@ export default {
             closeRollPanel,
             fetchRollModifiers
         } = useRollModifiers(controlState);
-
-        fetchRollModifiers();
 
         const {
             activeCyberdeck,
@@ -1060,6 +1058,11 @@ export default {
                 }
             }
         }, {deep: true});
+
+        //Wait for API to register the Reverb channel
+        onMounted( async () => {
+            await fetchRollModifiers();
+        })
 
         const refreshAll = () => {
             fetchCharacterData();

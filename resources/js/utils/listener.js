@@ -24,15 +24,17 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
 
 
         let isPublicEvent = false;
+        let isForMe = false;
 
-        if (['ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type)) {
-            // Route to the specific actor's owner only; GMs see everything
-            const payloadActorId = payload.actorId;
-            isPublicEvent = isMyActor(payloadActorId) || isMyRequest(requestId);
-            if (isMyActor(payloadActorId)) {
-                console.log("only my actor should be updated")
-            }
-        } else if (['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type)) {
+        // if (['ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type)) {
+        //     // Route to the specific actor's owner only; GMs see everything
+        //     const payloadActorId = payload.actorId;
+        //     isPublicEvent = isMyRequest(requestId);
+        //     isForMe = isMyActor(payloadActorId);
+        //
+        // } else
+
+        if (['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type)) {
             if (rollMode === 'publicroll') {
                 isPublicEvent = true;
             } else if (rollMode === 'gmroll') {
@@ -42,9 +44,14 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
             } else if (rollMode === 'selfroll') {
                 isPublicEvent = isMe;
             }
+        } else {
+            // Cover the other return calls, could be either request-specific or for an actor
+            const payloadActorId = payload.actorId;
+            isPublicEvent = isMyRequest(requestId);
+            isForMe = isMyActor(payloadActorId);
         }
 
-        if (isPublicEvent) {
+        if (isPublicEvent || isForMe) {
             handler(e);
         } else {
             console.log(`Listener Ignoring FoundryResponse with type [${payload.type}] and requestId [${requestId}] - privacy settings or initiated by another agent.`);
@@ -59,8 +66,6 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
                 const masterHandler = (e) => {
                     const payload = e.payload || e;
                     console.log(`%c[Agent] Incoming Response: ${payload.type}`, "color: #00ff00; font-weight: bold;", payload);
-                    console.log("RollMode: ", payload.rollMode || 'publicroll');
-
                     // Dispatch to all registered handlers for this channel/event
                     const listeners = sharedListeners.get(channelKey);
                     if (listeners) {
