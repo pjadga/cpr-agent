@@ -44,12 +44,14 @@ Route::get('/user', function (Request $request) {
 //    return $request->user();
 // })->middleware('auth:sanctum');
 
-// Callback API routes
-Route::post('/foundry/callback', [FoundryController::class, 'handle'])
-    ->middleware('auth:sanctum');
+// Callback API routes (with deduplication & rate limiting)
+Route::middleware(['throttle:60,1', 'foundry.deduplicate'])->group(function () {
+    Route::post('/foundry/callback', [FoundryController::class, 'handle'])
+        ->middleware('auth:sanctum');
 
-Route::post('/foundry/update', [FoundryController::class, 'update'])
-    ->middleware('auth:sanctum');
+    Route::post('/foundry/update', [FoundryController::class, 'update'])
+        ->middleware('auth:sanctum');
+});
 
 Route::middleware(['auth:sanctum', 'app.configured', 'profile.setup'])->group(function () {
     Route::get('/getbaseurl', [SettingsController::class, 'getFoundryUrl']);

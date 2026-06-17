@@ -4,7 +4,7 @@
     <form action="{{ route('token.create') }}" method="POST" id="token-create-form" class="hidden">
         @csrf
     </form>
-    <div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0) }">
+    <div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
         <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
             <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
                 Agent Settings
@@ -30,6 +30,150 @@
                 {{ session('success') }}
             </div>
         @endif
+
+        <!-- Session Status Banner -->
+        <div x-data="{ sessionInfo: @js($sessionInfo ?? null), loading: false, joinCode: '', joinMessage: '' }"
+             x-init="
+                 if (!sessionInfo) {
+                     fetch('{{ route('session.info') }}')
+                         .then(r => r.json())
+                         .then(data => { sessionInfo = data.session; })
+                         .catch(e => console.error('Failed to load session info', e));
+                 }
+             "
+             class="mb-8">
+
+            <!-- GM Active Session -->
+            <div x-show="sessionInfo && sessionInfo.type === 'gm'"
+                 class="bg-cpr-teal-dark/20 border-2 border-cpr-teal p-6 rounded-lg shadow-[0_0_20px_rgba(0,255,159,0.1)]">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h3 class="text-cpr-teal font-bold uppercase tracking-widest text-sm mb-1">Active Session</h3>
+                        <p class="text-2xl font-mono font-black text-white tracking-wider">{{ $sessionInfo['code'] ?? '---' }}</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            {{ $sessionInfo['player_count'] ?? 0 }} player(s) connected
+                            @if($sessionInfo['foundry_configured'] ?? false)
+                                <span class="text-cpr-teal">• Foundry config synced</span>
+                            @else
+                                <span class="text-cpr-yellow">• Configure Foundry settings below to auto-configure players</span>
+                            @endif
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button x-show="!sessionInfo.foundry_configured"
+                                @click="loading = true; fetch('{{ route('session.config') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
+                                    .then(r => r.json()).then(d => { if(d.success) sessionInfo.foundry_configured = true; loading = false; })"
+                                class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black px-4 py-2 uppercase text-xs font-bold">
+                            Sync Foundry Config to Session
+                        </button>
+                        <button @click="if(confirm('Terminate this session? All players will be disconnected.')) {
+                            loading = true;
+                            fetch('{{ route('session.delete') }}', { method: 'DELETE', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
+                                .then(r => r.json()).then(d => { sessionInfo = null; loading = false; alert(d.message); })
+                        }"
+                                class="cyber-button bg-cpr-red-dark border-cpr-red-dark px-4 py-2 uppercase text-xs font-bold hover:bg-cpr-red">
+                            Terminate Session
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player in Session -->
+            <div x-show="sessionInfo && sessionInfo.type === 'player'"
+                 class="bg-cpr-teal-dark/20 border-2 border-cpr-teal p-6 rounded-lg shadow-[0_0_20px_rgba(0,255,159,0.1)]">
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                        <h3 class="text-cpr-teal font-bold uppercase tracking-widest text-sm mb-1">Connected to Session</h3>
+                        <p class="text-2xl font-mono font-black text-white tracking-wider">{{ $sessionInfo['code'] ?? '---' }}</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            @if($sessionInfo['foundry_configured'] ?? false)
+                                <span class="text-cpr-teal">✓ Auto-configured from GM session</span>
+                            @else
+                                <span class="text-cpr-yellow">⚠ GM has not synced Foundry config yet — manual setup may be needed</span>
+                            @endif
+                        </p>
+                    </div>
+                    <button @click="if(confirm('Leave this session?')) {
+                        loading = true;
+                        fetch('{{ route('session.leave') }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' } })
+                            .then(r => r.json()).then(d => { sessionInfo = null; loading = false; alert(d.message); location.reload(); })
+                    }"
+                            class="cyber-button bg-cpr-red-dark border-cpr-red-dark px-4 py-2 uppercase text-xs font-bold hover:bg-cpr-red">
+                        Leave Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- No Session (Player) - Join Flow -->
+            <div x-show="!sessionInfo && {{ auth()->user()->is_gm ? 'false' : 'true' }}"
+                 class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
+                <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Join a Session</h3>
+                <div class="flex gap-2 items-end">
+                    <div class="flex-1">
+                        <label class="text-xs uppercase text-cpr-text-dim">Session Code</label>
+                        <input type="text" x-model="joinCode"
+                               placeholder="e.g. NEON-7X2"
+                               class="cyber-input-field mt-1 w-full uppercase font-mono">
+                    </div>
+                    <button @click="
+                        loading = true;
+                        joinMessage = '';
+                        fetch('{{ route('session.join') }}', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ code: joinCode.toUpperCase() })
+                        })
+                        .then(r => r.json())
+                        .then(d => {
+                            if (d.success) {
+                                joinMessage = d.message || 'Joined successfully!';
+                                setTimeout(() => location.reload(), 1500);
+                            } else {
+                                joinMessage = d.error || 'Failed to join.';
+                            }
+                        })
+                        .catch(e => { joinMessage = 'Network error.'; })
+                        .finally(() => loading = false)
+                        "
+                        class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black px-6 py-2 uppercase text-xs font-bold h-[42px]">
+                        Join
+                    </button>
+                </div>
+                <p x-show="joinMessage" x-text="joinMessage"
+                   class="mt-3 text-xs" :class="joinMessage.includes('success') || joinMessage.includes('Already') ? 'text-cpr-teal' : 'text-cpr-red'">
+                </p>
+            </div>
+
+            <!-- No Session (GM) - Create Flow -->
+            <div x-show="!sessionInfo && {{ auth()->user()->is_gm ? 'true' : 'false' }}"
+                 class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
+                <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Create a Session</h3>
+                <p class="text-xs text-cpr-text-dim mb-4">
+                    Create a new game session. Players will join using the session code.
+                </p>
+                <button @click="
+                    loading = true;
+                    fetch('{{ route('session.create') }}', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                    })
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.success) {
+                            sessionInfo = d.session;
+                            alert('Session created! Share this code with your players: ' + d.session.code);
+                        } else {
+                            alert(d.error || 'Failed to create session.');
+                        }
+                    })
+                    .catch(e => { alert('Network error.'); })
+                    .finally(() => loading = false)
+                    "
+                    class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black px-8 py-2 uppercase text-xs font-bold">
+                    Create Session
+                </button>
+            </div>
+        </div>
 
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -163,6 +307,36 @@
                     </button>
                 </form>
 
+                <!-- GM Session Config (auto-fill from core settings) -->
+                <div x-show="sessionInfo && sessionInfo.type === 'gm' && !sessionInfo.foundry_configured"
+                     class="mt-6 pt-6 border-t border-cpr-border">
+                    <h4 class="text-sm font-bold text-cpr-teal uppercase tracking-widest mb-3">Session Auto-Configure</h4>
+                    <p class="text-xs text-cpr-text-dim mb-3">
+                        Sync your Foundry URL and Reverb settings so players can auto-configure the Bridge module.
+                    </p>
+                    <button @click="
+                        loading = true;
+                        const formData = new FormData();
+                        formData.append('_token', '{{ csrf_token() }}');
+                        formData.append('foundry_url', document.getElementById('foundry_url').value || '');
+                        fetch('{{ route('session.config') }}', { method: 'POST', body: formData })
+                            .then(r => r.json())
+                            .then(d => {
+                                if (d.success) {
+                                    sessionInfo.foundry_configured = true;
+                                    alert('Session config synced! Players will auto-configure.');
+                                } else {
+                                    alert(d.error || 'Failed to sync.');
+                                }
+                            })
+                            .catch(e => { alert('Network error.'); })
+                            .finally(() => loading = false)
+                        "
+                        class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black w-full uppercase font-bold py-2">
+                        Sync Foundry Settings to Session
+                    </button>
+                </div>
+
                 <!-- Step 1 Tooltip -->
                 <div x-show="onboardingStep === 1"
                      x-transition:enter="transition ease-out duration-300"
@@ -279,8 +453,10 @@
                                 </div>
 
                                 <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                                    Assign a character in the Foundry Module, refresh the Agent, and select and save
-                                    your character.
+                                    Assign a character in the Foundry Module (Agent Bridge → Manage Characters), then select and save your character here.
+                                    @if($sessionInfo && $sessionInfo['foundry_configured'])
+                                        Your session is auto-configured — just pick your character!
+                                    @endif
                                 </p>
                                 <div
                                     class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
@@ -301,18 +477,17 @@
                             </div>
                         </div>
 
-                        <!-- Channel ID -->
+                        <!-- Channel ID (auto-populated from session) -->
                         <div class="relative">
                             <div class="flex items-center gap-2">
                                 <x-input-label for="channel_id" :value="__('Channel ID')"
                                                class="text-xs uppercase text-cpr-muted"/>
                                 <div class="group relative flex items-center">
                                     <i data-lucide="help-circle"
-                                       class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help transition-colors"></i>
+                                       class="w-3 h-3 text-cpr-text-dim hover:text-cpr-yellow cursor-help cursor-help transition-colors"></i>
                                     <div
-                                        class="absolute left-full ml-2 w-48 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
-                                        The unique channel ID for your game session. GMs generate this and share it with
-                                        players.
+                                        class="absolute left-full ml-2 w-64 p-2 bg-cpr-black-deep border border-cpr-yellow text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
+                                        Auto-populated when you join a session via the code above. GMs can also enter manually.
                                     </div>
                                 </div>
                             </div>
@@ -346,12 +521,11 @@
                                 </div>
 
                                 <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                                    Make sure the Channel IDs match between the Module and Agent. Commit the Sync to
-                                    save the channel ID.
+                                    Join the GM's session using their session code (shown in the banner above). This auto-configures your Channel ID and Foundry settings.
                                 </p>
                                 <div
                                     class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
-                                    Uplink established. Now, let's setup some Personal ICE.
+                                    Uplink established. Session handshake in progress...
                                 </div>
 
                                 <div class="flex justify-between items-center">

@@ -2,28 +2,28 @@
 
 namespace Tests\Unit;
 
-use App\Http\Controllers\Api\FoundryController;
+use App\Http\Handlers\DeltaApplier;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
- * Unit tests for Foundry callback helper methods
+ * Unit tests for the DeltaApplier (extracted from FoundryController).
  */
 class FoundryCallbackHelperTest extends TestCase
 {
-    protected FoundryController $controller;
+    protected DeltaApplier $applier;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->controller = new FoundryController;
+        $this->applier = new DeltaApplier();
     }
 
     #[Test]
     public function it_can_parse_dot_notation_paths()
     {
         $array = [];
-        $this->controller->arraySetDot($array, 'system.stats.body.value', 8);
+        $this->applier->apply($array, ['system.stats.body.value' => 8]);
 
         $this->assertEquals(8, $array['system']['stats']['body']['value']);
     }
@@ -40,7 +40,7 @@ class FoundryCallbackHelperTest extends TestCase
             ],
         ];
 
-        $this->controller->arraySetDot($array, 'system.stats.body.value', 8);
+        $this->applier->apply($array, ['system.stats.body.value' => 8]);
 
         $this->assertEquals(8, $array['system']['stats']['body']['value']);
         $this->assertEquals(6, $array['system']['stats']['ref']['value']);
@@ -58,7 +58,7 @@ class FoundryCallbackHelperTest extends TestCase
             ],
         ];
 
-        $this->controller->arraySetDot($array, 'system.stats.body', null);
+        $this->applier->apply($array, ['system.stats.body' => null]);
 
         $this->assertArrayNotHasKey('body', $array['system']['stats']);
         $this->assertEquals(7, $array['system']['stats']['ref']['value']);
@@ -74,7 +74,7 @@ class FoundryCallbackHelperTest extends TestCase
             'name' => 'Pistol',
         ];
 
-        $this->controller->arraySetDot($array, 'items.+item-001', $newItem);
+        $this->applier->apply($array, ['items.+item-001' => $newItem]);
 
         $this->assertCount(1, $array['items']);
         $this->assertEquals('Pistol', $array['items'][0]['name']);
@@ -90,7 +90,7 @@ class FoundryCallbackHelperTest extends TestCase
             ],
         ];
 
-        $this->controller->arraySetDot($array, 'items.item-001.equipped', true);
+        $this->applier->apply($array, ['items.item-001.equipped' => true]);
 
         $this->assertTrue($array['items'][0]['equipped']);
         $this->assertEquals('Pistol', $array['items'][0]['name']);
@@ -106,7 +106,7 @@ class FoundryCallbackHelperTest extends TestCase
             ],
         ];
 
-        $this->controller->arraySetDot($array, 'items.item-001', null);
+        $this->applier->apply($array, ['items.item-001' => null]);
 
         $this->assertCount(1, $array['items']);
         $this->assertEquals('Rifle', $array['items'][0]['name']);
@@ -122,7 +122,7 @@ class FoundryCallbackHelperTest extends TestCase
         ];
 
         $updatedItem = ['_id' => 'item-001', 'name' => 'Heavy Pistol'];
-        $this->controller->arraySetDot($array, 'items.+item-001', $updatedItem);
+        $this->applier->apply($array, ['items.+item-001' => $updatedItem]);
 
         $this->assertCount(1, $array['items']);
         $this->assertEquals('Heavy Pistol', $array['items'][0]['name']);
@@ -133,7 +133,7 @@ class FoundryCallbackHelperTest extends TestCase
     {
         $array = [];
 
-        $this->controller->arraySetDot($array, 'a.b.c.d.e.f', 'deep value');
+        $this->applier->apply($array, ['a.b.c.d.e.f' => 'deep value']);
 
         $this->assertEquals('deep value', $array['a']['b']['c']['d']['e']['f']);
     }
@@ -143,8 +143,8 @@ class FoundryCallbackHelperTest extends TestCase
     {
         $array = [];
 
-        $this->controller->arraySetDot($array, 'system.hp.value', 45);
-        $this->controller->arraySetDot($array, 'system.hp.max', 50);
+        $this->applier->apply($array, ['system.hp.value' => 45]);
+        $this->applier->apply($array, ['system.hp.max' => 50]);
 
         $this->assertEquals(45, $array['system']['hp']['value']);
         $this->assertEquals(50, $array['system']['hp']['max']);
@@ -155,8 +155,8 @@ class FoundryCallbackHelperTest extends TestCase
     {
         $array = [];
 
-        $this->controller->arraySetDot($array, 'system.equipped', true);
-        $this->controller->arraySetDot($array, 'system.broken', false);
+        $this->applier->apply($array, ['system.equipped' => true]);
+        $this->applier->apply($array, ['system.broken' => false]);
 
         $this->assertTrue($array['system']['equipped']);
         $this->assertFalse($array['system']['broken']);
@@ -167,7 +167,7 @@ class FoundryCallbackHelperTest extends TestCase
     {
         $array = [];
 
-        $this->controller->arraySetDot($array, 'system.modifiers', [1, 2, 3]);
+        $this->applier->apply($array, ['system.modifiers' => [1, 2, 3]]);
 
         $this->assertEquals([1, 2, 3], $array['system']['modifiers']);
     }
@@ -181,7 +181,7 @@ class FoundryCallbackHelperTest extends TestCase
             ],
         ];
 
-        $this->controller->arraySetDot($array, 'system.hp.value', 30);
+        $this->applier->apply($array, ['system.hp.value' => 30]);
 
         $this->assertEquals(30, $array['system']['hp']['value']);
     }

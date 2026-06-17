@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CheckProfileSetup;
+use App\Http\Middleware\DeduplicateFoundryRequests;
 use App\Http\Middleware\EnsureAppIsConfigured;
 use App\Http\Middleware\FixTailscaleContentType;
 use Illuminate\Foundation\Application;
@@ -26,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'profile.setup' => CheckProfileSetup::class,
             'app.configured' => EnsureAppIsConfigured::class,
+            'foundry.deduplicate' => DeduplicateFoundryRequests::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
