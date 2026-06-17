@@ -49,12 +49,25 @@ class Session extends Model
         });
 
         static::deleting(function (Session $session) {
-            // Clean up players - remove their channel_id and default_actor_id
-            User::where('channel_id', $session->code)->update([
-                'channel_id' => null,
-                'default_actor_id' => null,
-                'default_token_id' => null,
-            ]);
+            // Disconnect players from the channel and drop their session-scoped
+            // character binding. The GM is on this same channel (they join their
+            // own session on create) but is handled separately below so their
+            // character selection survives.
+            User::where('channel_id', $session->code)
+                ->where('id', '!=', $session->gm_user_id)
+                ->update([
+                    'channel_id' => null,
+                    'default_actor_id' => null,
+                    'default_token_id' => null,
+                ]);
+
+            // GM: leave the dead channel (a fresh personal one regenerates on read)
+            // but keep their actor/token selection.
+            if ($session->gm_user_id) {
+                User::where('id', $session->gm_user_id)
+                    ->where('channel_id', $session->code)
+                    ->update(['channel_id' => null]);
+            }
         });
     }
 
@@ -91,6 +104,27 @@ class Session extends Model
             'foundry_config' => $this->foundry_config ?? [],
             'message' => "Joined session {$this->code}. Your Agent Link has been established.",
         ];
+    }
+
+    /**
+     * Pull the GM's saved Foundry settings onto the session so joining players
+     * auto-configure. Called automatically on session create and whenever the GM
+     * saves their connection settings — no manual "sync" step required.
+     *
+     * No-op until the GM has a Foundry URL, so an empty session is never written.
+     */
+    public function syncFoundryConfigFor(User $gm): void
+    {
+        $foundryUrl = $gm->config?->foundry_url;
+
+        if (empty($foundryUrl)) {
+            return;
+        }
+
+        $this->setFoundryConfig([
+            'foundry_url' => $foundryUrl,
+            'reverb_key' => config('broadcasting.connections.reverb.key'),
+        ]);
     }
 
     /**

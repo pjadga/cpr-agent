@@ -115,6 +115,50 @@ class SettingsController extends Controller
     }
 
     /**
+     * Emit a one-paste "Foundry Setup Code" for the GM.
+     *
+     * Bundles everything the Agent Bridge module needs to connect — Agent URL,
+     * Channel ID, the GM's API key, and the Reverb app key — as a base64-encoded
+     * JSON blob the GM pastes into the Bridge's Quick Setup menu. The Bridge
+     * derives Reverb host/port/SSL from the Agent URL, so only the key is sent.
+     *
+     * The Channel ID is the user's own `channel_id` — the same value shown in the
+     * Channel ID field and used by the live broadcast channel (cpr-agent.{channel_id}).
+     * It must match what the browser subscribes to, or channel auth rejects it.
+     *
+     * GM-only: the blob carries the GM's secret API key.
+     */
+    public function foundrySetupCode(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user->is_gm) {
+            return response()->json(['error' => 'Only GMs can generate a Foundry setup code.'], 403);
+        }
+
+        $config = $user->config;
+        if (! $config || empty($config->api_key)) {
+            return response()->json([
+                'error' => 'no_api_key',
+                'message' => 'Generate an API key in Core System Settings first.',
+            ], 422);
+        }
+
+        $payload = [
+            'v' => 1,
+            'agentUrl' => rtrim(config('app.url'), '/'),
+            'channelId' => $user->channel_id,
+            'apiKey' => $config->api_key,
+            'reverbKey' => config('broadcasting.connections.reverb.key'),
+        ];
+
+        return response()->json([
+            'code' => base64_encode(json_encode($payload)),
+            'has_channel' => ! empty($payload['channelId']),
+        ]);
+    }
+
+    /**
      * Sync user profile (actor selection + channel_id from session).
      */
     public function storeSync(Request $request)
@@ -123,6 +167,7 @@ class SettingsController extends Controller
             'default_actor_id' => 'nullable|string',
             'default_token_id' => 'nullable|string',
             'channel_id' => 'nullable|string',
+            'theme' => 'nullable|string|in:night,day,bartmoss,corpo,medtech,blind',
         ]);
 
         $user = Auth::user();
@@ -146,6 +191,13 @@ class SettingsController extends Controller
 
         $user->save();
 
+        // Interface theme lives with the personal "Your Agent" group.
+        if ($request->has('theme') && ! empty($validated['theme'])) {
+            $config = $user->config ?: new Config(['user_id' => $user->id]);
+            $config->theme = $validated['theme'];
+            $config->save();
+        }
+
         // Refresh character data if actor was set
         if ($user->default_actor_id && $request->has('default_actor_id')) {
             $this->refreshCharacterData($user, $user->default_actor_id);
@@ -162,6 +214,7 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'api_key' => 'nullable|string',
             'foundry_url' => 'nullable|string',
+            'channel_id' => 'nullable|string',
             'theme' => 'nullable|string|in:night,day,bartmoss,corpo,medtech,blind',
         ]);
 
@@ -183,6 +236,26 @@ class SettingsController extends Controller
         }
 
         $config->save();
+
+        // Channel ID is part of the connection group (GMs set it manually;
+        // players get it auto-filled by joining a session).
+        if ($request->has('channel_id') && ! empty($validated['channel_id'])) {
+            $user->channel_id = $validated['channel_id'];
+            $user->save();
+        }
+
+        // Keep the GM's session in step with their latest Foundry settings, so
+        // players auto-configure without a manual "sync" click.
+        if ($user->is_gm) {
+            $user->setRelation('config', $config);
+            $session = Session::where('gm_user_id', $user->id)
+                ->where(function ($query) {
+                    $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
+                })
+                ->first();
+
+            $session?->syncFoundryConfigFor($user);
+        }
 
         return redirect()->route('settings')->with('success', 'Configuration updated successfully.');
     }

@@ -91,4 +91,22 @@ class SessionTest extends TestCase
         $this->assertNotEquals($code, User::where('id', $player->id)->value('channel_id'));
         $this->assertNull(User::where('id', $player->id)->value('default_actor_id'));
     }
+
+    #[Test]
+    public function deleting_a_session_frees_the_gm_channel_but_keeps_their_actor()
+    {
+        $gm = User::factory()->create(['is_gm' => true, 'default_actor_id' => 'actor-gm-1']);
+        $session = Session::create(['gm_user_id' => $gm->id]);
+
+        // The GM is on their own session channel (mirrors SessionController::create).
+        $gm->channel_id = $session->code;
+        $gm->save();
+
+        $code = $session->code;
+        $session->delete();
+
+        // GM leaves the dead channel, but their character selection is preserved.
+        $this->assertNotEquals($code, User::where('id', $gm->id)->value('channel_id'));
+        $this->assertSame('actor-gm-1', User::where('id', $gm->id)->value('default_actor_id'));
+    }
 }

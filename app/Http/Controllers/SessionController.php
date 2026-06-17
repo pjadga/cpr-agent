@@ -6,8 +6,6 @@ use App\Models\Session;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Validation\Rule;
 
 class SessionController extends Controller
 {
@@ -31,6 +29,15 @@ class SessionController extends Controller
             ->first();
 
         if ($existingSession) {
+            // Self-heal: keep the GM on their own session's channel (see below).
+            if ($user->channel_id !== $existingSession->code) {
+                $user->channel_id = $existingSession->code;
+                $user->save();
+            }
+
+            // Keep player auto-config current with the GM's latest Foundry settings.
+            $existingSession->syncFoundryConfigFor($user);
+
             return response()->json([
                 'success' => true,
                 'session' => [
@@ -46,6 +53,16 @@ class SessionController extends Controller
             'gm_user_id' => $user->id,
             'expires_at' => now()->addDays(30),
         ]);
+
+        // The GM joins their own session's channel. This is the unifying step:
+        // players who join adopt the same code as their channel_id (joinPlayer),
+        // so the GM's Agent app, every player, and the Foundry Bridge all share
+        // the one cpr-agent.{code} broadcast channel.
+        $user->channel_id = $session->code;
+        $user->save();
+
+        // Auto-sync the GM's Foundry settings so players joining auto-configure.
+        $session->syncFoundryConfigFor($user);
 
         return response()->json([
             'success' => true,
@@ -100,44 +117,6 @@ class SessionController extends Controller
         $result = $session->joinPlayer($user);
 
         return response()->json($result);
-    }
-
-    /**
-     * GM sets their Foundry Bridge configuration for auto-configuration.
-     */
-    public function setFoundryConfig(Request $request)
-    {
-        $user = Auth::user();
-
-        if (! $user->is_gm) {
-            return response()->json(['error' => 'Only GMs can configure session settings.'], 403);
-        }
-
-        $session = Session::where('gm_user_id', $user->id)
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
-            ->first();
-
-        if (! $session) {
-            return response()->json(['error' => 'No active session found. Create one first.'], 404);
-        }
-
-        $validated = $request->validate([
-            'foundry_url' => ['nullable', 'url'],
-            'reverb_host' => ['nullable', 'string'],
-            'reverb_port' => ['nullable', 'integer', 'min:1', 'max:65535'],
-            'reverb_use_ssl' => ['nullable', 'boolean'],
-            'reverb_key' => ['nullable', 'string'],
-        ]);
-
-        $session->setFoundryConfig($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Session Foundry config updated. Players will auto-configure.',
-        ]);
     }
 
     /**

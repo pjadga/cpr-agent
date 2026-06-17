@@ -161,13 +161,32 @@ export function classifyCameraError(err) {
 }
 
 /**
- * Validate the scanned text and return { payload } or { error } code.
+ * Decode a pairing code from either raw JSON (scanned QR) or a base64-encoded
+ * JSON blob (pasted "link code"). Returns the parsed object, or null if neither.
+ */
+function decodePairingText(text) {
+    const trimmed = (text || '').trim();
+    if (!trimmed) return null;
+
+    // Raw JSON first (what the QR encodes).
+    try {
+        return JSON.parse(trimmed);
+    } catch { /* fall through to base64 */ }
+
+    // Base64-wrapped JSON (the copyable paste code).
+    try {
+        return JSON.parse(atob(trimmed));
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Validate the scanned/pasted text and return { payload } or { error } code.
  */
 export function parseQrPayload(text, currentOrigin = window.location.origin) {
-    let data;
-    try {
-        data = JSON.parse(text);
-    } catch {
+    const data = decodePairingText(text);
+    if (!data) {
         return { error: 'qr_unreadable_format' };
     }
 

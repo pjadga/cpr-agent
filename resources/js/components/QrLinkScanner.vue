@@ -20,6 +20,7 @@ const errorCode = ref(null);
 const warningCode = ref(null);
 const sessionName = ref('');
 const video = ref(null);
+const pasteCode = ref('');
 
 const fail = (code) => {
     stop();
@@ -39,6 +40,15 @@ async function onDecode(text) {
     if (error) return fail(error);
 
     stop();
+    state.value = 'claiming';
+    await claim(payload.nonce);
+}
+
+// Manual paste path (PC / no camera): same validation + claim as a scan.
+async function submitPaste() {
+    const { payload, error } = parseQrPayload(pasteCode.value);
+    if (error) return fail(error);
+
     state.value = 'claiming';
     await claim(payload.nonce);
 }
@@ -123,14 +133,35 @@ onBeforeUnmount(stop);
 <template>
     <div class="cpr-qr-scanner">
         <!-- Idle -->
-        <button
-            v-if="state === 'idle'"
-            type="button"
-            @click="beginScan"
-            class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black px-6 py-3 uppercase text-sm font-bold w-full"
-        >
-            <i class="fas fa-qrcode mr-2"></i> Scan to Link Foundry
-        </button>
+        <div v-if="state === 'idle'">
+            <button
+                type="button"
+                @click="beginScan"
+                class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black px-6 py-3 uppercase text-sm font-bold w-full"
+            >
+                <i class="fas fa-qrcode mr-2"></i> Scan to Link Foundry
+            </button>
+
+            <!-- No camera? Paste the GM's link code instead. -->
+            <p class="text-cpr-text-dim text-xs mt-3 mb-1 uppercase tracking-wider">No camera? Paste the link code</p>
+            <div class="flex gap-2 items-stretch">
+                <input
+                    v-model="pasteCode"
+                    type="text"
+                    placeholder="Paste link code from the GM"
+                    class="cyber-input-field flex-1 font-mono text-xs"
+                    @keyup.enter="pasteCode.trim() && submitPaste()"
+                />
+                <button
+                    type="button"
+                    :disabled="!pasteCode.trim()"
+                    @click="submitPaste"
+                    class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black px-5 uppercase text-xs font-bold disabled:opacity-40"
+                >
+                    Link
+                </button>
+            </div>
+        </div>
 
         <!-- Scanning -->
         <div v-show="state === 'scanning'" class="text-center">

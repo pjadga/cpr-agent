@@ -58,11 +58,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/sync', [SettingsController::class, 'storeSync'])->name('profile-setup.store');
     Route::get('/config', [SettingsController::class, 'show'])->name('config.index');
     Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
+    Route::get('/settings/foundry-setup-code', [SettingsController::class, 'foundrySetupCode'])->name('settings.foundry-setup-code');
 
     // Session API endpoints
     Route::post('/session/create', [SessionController::class, 'create'])->name('session.create');
     Route::post('/session/join', [SessionController::class, 'join'])->name('session.join');
-    Route::post('/session/config', [SessionController::class, 'setFoundryConfig'])->name('session.config');
     Route::get('/session/info', [SessionController::class, 'show'])->name('session.info');
     Route::post('/session/leave', [SessionController::class, 'leave'])->name('session.leave');
     Route::delete('/session/delete', [SessionController::class, 'destroy'])->name('session.delete');

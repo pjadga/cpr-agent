@@ -73,6 +73,23 @@ describe('parseQrPayload', () => {
     it('treats a versioned-but-nonceless payload as invalid', () => {
         expect(parseQrPayload(JSON.stringify({ v: PAYLOAD_VERSION }), ORIGIN).error).toBe('qr_invalid');
     });
+
+    it('accepts a base64-wrapped pasted link code', () => {
+        const code = btoa(validPayload());
+        const { payload, error } = parseQrPayload(code, ORIGIN);
+        expect(error).toBeUndefined();
+        expect(payload.nonce).toBe('abc123');
+    });
+
+    it('trims whitespace around a pasted code', () => {
+        const { payload, error } = parseQrPayload(`  ${validPayload()}\n`, ORIGIN);
+        expect(error).toBeUndefined();
+        expect(payload.nonce).toBe('abc123');
+    });
+
+    it('rejects an empty paste', () => {
+        expect(parseQrPayload('   ', ORIGIN).error).toBe('qr_unreadable_format');
+    });
 });
 
 describe('classifyClaimError', () => {
