@@ -11,6 +11,10 @@ class Session extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     /**
      * The table associated with the model.
      */

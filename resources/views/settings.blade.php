@@ -108,6 +108,16 @@
             <div x-show="!sessionInfo && {{ auth()->user()->is_gm ? 'false' : 'true' }}"
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
                 <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Join a Session</h3>
+
+                <!-- Primary: scan the GM's QR to auto-configure and link -->
+                <qr-link-scanner agent-link="{{ auth()->user()->agent_link }}"></qr-link-scanner>
+
+                <div class="flex items-center gap-3 my-4">
+                    <span class="flex-1 h-px bg-cpr-border"></span>
+                    <span class="text-xs uppercase text-cpr-text-dim">or enter a code</span>
+                    <span class="flex-1 h-px bg-cpr-border"></span>
+                </div>
+
                 <div class="flex gap-2 items-end">
                     <div class="flex-1">
                         <label class="text-xs uppercase text-cpr-text-dim">Session Code</label>

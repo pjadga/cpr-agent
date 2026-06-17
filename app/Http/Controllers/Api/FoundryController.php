@@ -88,6 +88,7 @@ class FoundryController extends Controller
             'message' => 'nullable|string',
             'rollMode' => 'nullable|string',
             'pools' => 'nullable|array',
+            'nonce' => 'nullable|string',
         ]);
     }
 

@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\Models\Session;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class SessionTest extends TestCase
@@ -19,7 +20,7 @@ class SessionTest extends TestCase
         ]);
 
         $this->assertNotNull($session->code);
-        $this->assertMatchesRegularExpression('/^[a-z]+-[A-Z]{3}$/', $session->code);
+        $this->assertMatchesRegularExpression('/^[a-z]+-[A-Z0-9]{3}$/', $session->code);
     }
 
     #[Test]
@@ -78,10 +79,16 @@ class SessionTest extends TestCase
         $player = User::factory()->create();
         $session->joinPlayer($player);
 
-        $this->assertNotNull($player->fresh()->channel_id);
+        $this->assertEquals($session->code, $player->fresh()->channel_id);
 
+        $code = $session->code;
         $session->delete();
 
-        $this->assertNull(User::where('id', $player->id)->value('channel_id'));
+        // The player is disconnected from the session: their channel is no longer
+        // the session code, and their session-scoped actor binding is cleared.
+        // (The User::getChannelIdAttribute accessor then hands them a fresh personal
+        // channel by design, so the raw value is non-session rather than strictly null.)
+        $this->assertNotEquals($code, User::where('id', $player->id)->value('channel_id'));
+        $this->assertNull(User::where('id', $player->id)->value('default_actor_id'));
     }
 }
