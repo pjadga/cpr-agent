@@ -166,7 +166,7 @@ If you prefer to host your own instance of the CPR Agent, follow these steps.
    ddev npm install
    ```
 5. **Setup Database & Assets**:
-
+> **SUPER IMPORTANT NOTE ABOUT UPDATING**: If you are updating your current installation, just use 'migrate' and not 'migrate:fresh'. It will wipe the logins/database with fresh.
    ```bash
    ddev artisan migrate:fresh
    ddev npm run build
