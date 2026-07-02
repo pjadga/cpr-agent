@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\FoundryController;
+use App\Http\Controllers\Api\PairingController;
 use App\Http\Controllers\Cyberdeck\InstallProgram;
 use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
@@ -44,12 +45,14 @@ Route::get('/user', function (Request $request) {
 //    return $request->user();
 // })->middleware('auth:sanctum');
 
-// Callback API routes
-Route::post('/foundry/callback', [FoundryController::class, 'handle'])
-    ->middleware('auth:sanctum');
+// Callback API routes (with deduplication & rate limiting)
+Route::middleware(['throttle:60,1', 'foundry.deduplicate'])->group(function () {
+    Route::post('/foundry/callback', [FoundryController::class, 'handle'])
+        ->middleware('auth:sanctum');
 
-Route::post('/foundry/update', [FoundryController::class, 'update'])
-    ->middleware('auth:sanctum');
+    Route::post('/foundry/update', [FoundryController::class, 'update'])
+        ->middleware('auth:sanctum');
+});
 
 Route::middleware(['auth:sanctum', 'app.configured', 'profile.setup'])->group(function () {
     Route::get('/getbaseurl', [SettingsController::class, 'getFoundryUrl']);
@@ -83,6 +86,15 @@ Route::middleware(['auth:sanctum', 'app.configured', 'profile.setup'])->group(fu
     Route::post('/programroll', [ProgramRoll::class, 'programRoll']);
     Route::post('/update-eb', [UpdateEuroBucks::class, 'updateEuroBucks']);
     Route::get('/proxy-image', [ImageProxy::class, 'proxy'])->name('proxy-image');
+});
+
+// QR pairing handshake. Not behind app.configured: claiming is what configures
+// the player. register() is called by the GM's Bridge (Bearer token); claim()
+// and status() by the player's Agent (session cookie).
+Route::middleware(['auth:sanctum', 'throttle:30,1'])->prefix('pairing')->group(function () {
+    Route::post('/register', [PairingController::class, 'register'])->name('pairing.register');
+    Route::post('/claim', [PairingController::class, 'claim'])->name('pairing.claim');
+    Route::get('/status', [PairingController::class, 'status'])->name('pairing.status');
 });
 
 Broadcast::routes(['middleware' => [

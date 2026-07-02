@@ -31,3 +31,5 @@ package-lock.json
 /.claude/
 /base/
 /CLAUDE.md
+
+CHANGELOG.md

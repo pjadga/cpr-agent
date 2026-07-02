@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SettingsController;
 use App\Models\Config;
 use Illuminate\Http\Request;
@@ -51,11 +52,20 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+// Session management routes (unified onboarding)
 Route::middleware(['auth'])->group(function () {
     Route::post('/settings/onboarding/read', [SettingsController::class, 'markOnboardingAsRead'])->name('settings.onboarding.read');
     Route::post('/settings/sync', [SettingsController::class, 'storeSync'])->name('profile-setup.store');
     Route::get('/config', [SettingsController::class, 'show'])->name('config.index');
     Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
+    Route::get('/settings/foundry-setup-code', [SettingsController::class, 'foundrySetupCode'])->name('settings.foundry-setup-code');
+
+    // Session API endpoints
+    Route::post('/session/create', [SessionController::class, 'create'])->name('session.create');
+    Route::post('/session/join', [SessionController::class, 'join'])->name('session.join');
+    Route::get('/session/info', [SessionController::class, 'show'])->name('session.info');
+    Route::post('/session/leave', [SessionController::class, 'leave'])->name('session.leave');
+    Route::delete('/session/delete', [SessionController::class, 'destroy'])->name('session.delete');
 });
 
 // API Key registration

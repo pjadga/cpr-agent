@@ -2,24 +2,61 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\FoundryResponse;
 use App\Http\Controllers\Controller;
-use App\Jobs\SyncCharacterDataToDb;
+use App\Http\Handlers\BroadcastHandler;
+use App\Http\Handlers\DeltaSyncHandler;
+use App\Http\Handlers\IdentifyUserHandler;
+use App\Http\Handlers\LinkPlayerHandler;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class FoundryController extends Controller
 {
     /**
      * Handle the callback from Foundry.
+     *
+     * Orchestrates: validation → user identification → handler dispatch → broadcast.
      */
     public function handle(Request $request)
     {
         $start = microtime(true);
 
-        $validated = $request->validate([
+        // 1. Validate incoming payload
+        $validated = $this->validatePayload($request);
+        $type = $validated['type'] ?? null;
+
+        // 2. Identify the user
+        $identifyHandler = new IdentifyUserHandler;
+        $user = $identifyHandler->handle($request, $validated);
+
+        // 3. Dispatch to appropriate handler
+        $result = $this->dispatchHandler($user, $type, $validated, $request);
+
+        // 4. Broadcast response (unless handler returned early)
+        if ($result !== null && is_array($result)) {
+            return response()->json($result);
+        }
+
+        // 5. Broadcast to WebSocket + cache for polling
+        $agentLink = $validated['agentLink'] ?? $validated['agent_link'] ?? null;
+        $userChannelId = $user?->channel_id;
+        (new BroadcastHandler)->handle($validated, $agentLink, $userChannelId);
+
+        $duration = round((microtime(true) - $start) * 1000, 2);
+        Log::info("Foundry Callback [{$type}] processed in {$duration}ms", [
+            'requestId' => $validated['requestId'] ?? 'N/A',
+        ]);
+
+        return response()->json(['status' => 'acknowledged', 'processing_ms' => $duration]);
+    }
+
+    /**
+     * Validate the incoming Foundry callback payload.
+     */
+    private function validatePayload(Request $request): array
+    {
+        return $request->validate([
             'requestId' => 'nullable|string',
             'type' => 'required|string',
             'action' => 'nullable|string',
@@ -51,262 +88,44 @@ class FoundryController extends Controller
             'message' => 'nullable|string',
             'rollMode' => 'nullable|string',
             'pools' => 'nullable|array',
+            'nonce' => 'nullable|string',
         ]);
-
-        $agentLink = $validated['agentLink'] ?? $validated['agent_link'] ?? null;
-        $type = $validated['type'] ?? null;
-        $actorId = $validated['actorId'] ?? ($validated['actor']['_id'] ?? null);
-
-        // Try to identify the user first for all request types
-        $user = null;
-        if ($agentLink) {
-            $normalizedLink = rtrim($agentLink, '/');
-            $user = User::where('agent_link', $normalizedLink)
-                ->orWhere('agent_link', $normalizedLink.'/')
-                ->first();
-        }
-
-        if (! $user && $actorId) {
-            $cleanActorId = str_replace('Actor.', '', $actorId);
-            $user = User::where('default_actor_id', $actorId)
-                ->orWhere('default_actor_id', $cleanActorId)
-                ->first();
-        }
-
-        // Fallback to the user associated with the API token
-        if (! $user) {
-            $user = $request->user();
-        }
-
-        // If it's a link request, we might be creating/updating a user
-        if ($type === 'LINK_PLAYER_CHARACTER' || $type === 'GM_LINK_PLAYER_CHARACTER') {
-            $targetUser = null;
-            $userIdentifier = $validated['agentLink'] ?? $validated['agent_link'] ?? $validated['foundryUserId'] ?? null;
-
-            if (! $user) {
-                $user = $request->user();
-            }
-
-            // If it's a GM-initiated link, find the target user by agentLink or foundryUserId
-            if ($type === 'GM_LINK_PLAYER_CHARACTER' && ! empty($userIdentifier)) {
-                $targetUser = User::where('agent_link', $userIdentifier)->first();
-                if ($targetUser) {
-                    $user = $targetUser;
-                } else {
-                    Log::info("GM tried to sync character for Foundry User but no Laravel user found with identifier [{$userIdentifier}].");
-
-                    return response()->json(['success' => false, 'message' => 'Target user not found']);
-                }
-            }
-
-            $user->default_actor_id = is_array($validated['character']) ? ($validated['character']['id'] ?? null) : $validated['character'];
-
-            if (isset($validated['isGM'])) {
-                $user->is_gm = $validated['isGM'];
-            }
-
-            $user->save();
-
-            Log::info("Character link updated for User [{$user->id}] (Actor: {$user->default_actor_id}) via {$type}");
-
-            return response()->json([
-                'success' => true,
-                'agent_link' => $user->agent_link,
-            ]);
-        }
-
-        // General update for is_gm if present and user identified
-        if ($user && isset($validated['isGM'])) {
-            if ($user->is_gm !== (bool) $validated['isGM']) {
-                $user->is_gm = $validated['isGM'];
-                $user->save();
-                Log::info("User [{$user->id}] is_gm status updated to [{$user->is_gm}] via {$type}");
-            }
-        }
-
-        // Persist actor data to the user's mirror if it's a full update or a delta
-        if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA']) && $user) {
-            // If update is not for the user's assigned character, only GMs should save it
-            if ($user->default_actor_id && $actorId && $user->default_actor_id !== $actorId && str_replace('Actor.', '', $user->default_actor_id) !== str_replace('Actor.', '', $actorId)) {
-                $authUser = $request->user();
-                if ($authUser && $authUser->is_gm) {
-                    // Logic to handle GM-driven updates if needed
-                }
-            }
-
-            $current = Cache::get("user_char_{$user->id}");
-            // Fetch from DB if no Foundry call
-            if (! $current) {
-                $current = $user->character_data ?? [];
-            }
-
-            // TODO This should throw error
-            if (! is_array($current)) {
-                $current = [];
-            }
-
-            if ($type === 'ACTOR_DATA' && ! empty($validated['actor'])) {
-                $current = $validated['actor'];
-            } elseif ($type === 'SHEET_DELTA' && ! empty($validated['delta'])) {
-                foreach ($validated['delta'] as $path => $value) {
-                    $this->arraySetDot($current, $path, $value);
-                }
-            }
-
-            // Update Redis Cache (High Speed)
-            Cache::put("user_char_{$user->id}", $current, 3600);
-
-            // Queue the DB sync (Async Persistence)
-            SyncCharacterDataToDb::dispatch($user->id, $current);
-        }
-
-        // Broadcast to the Web Client
-        $broadcastPayload = $validated;
-        if ($agentLink) {
-            $broadcastPayload['agentLink'] = $agentLink;
-        }
-
-        // Add channel ID if we have a user
-        $incomingChannelId = $validated['channel_id'] ?? $validated['channelId'] ?? null;
-        if ($user && $user->channel_id) {
-            $broadcastPayload['channel_id'] = $user->channel_id;
-        } elseif ($incomingChannelId) {
-            $broadcastPayload['channel_id'] = $incomingChannelId;
-        }
-
-        FoundryResponse::dispatch($broadcastPayload);
-
-        // Put in cache for synchronous polling
-        if (! empty($validated['requestId'])) {
-            Cache::put('foundry_response_'.$validated['requestId'], $request->all(), 10);
-        }
-
-        $duration = round((microtime(true) - $start) * 1000, 2);
-        Log::info("Foundry Callback [{$type}] processed in {$duration}ms", [
-            'requestId' => $validated['requestId'] ?? 'N/A',
-        ]);
-
-        return response()->json(['status' => 'acknowledged', 'processing_ms' => $duration]);
     }
 
     /**
-     * Helper to set an array value by dot-notated path
+     * Dispatch to the appropriate handler based on message type.
+     * Returns early if a handler produces a direct response (e.g., link requests).
      */
-    public function arraySetDot(array &$array, string $path, $value): void
+    private function dispatchHandler(?User $user, ?string $type, array $payload, Request $request): ?array
     {
-        // Special case for items: if path is "items.+ID", we append the item to the items array
-        if (str_starts_with($path, 'items.+')) {
-            if (! isset($array['items']) || ! is_array($array['items'])) {
-                $array['items'] = [];
-            }
-
-            // Avoid duplicates by ID
-            $id = substr($path, 7);
-            $found = false;
-            foreach ($array['items'] as $index => $item) {
-                if (isset($item['_id']) && $item['_id'] === $id) {
-                    $array['items'][$index] = $value;
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (! $found) {
-                $array['items'][] = $value;
-            }
-
-            return;
+        // Link player character events produce direct responses
+        if (in_array($type, ['LINK_PLAYER_CHARACTER', 'GM_LINK_PLAYER_CHARACTER'])) {
+            return app(LinkPlayerHandler::class)->handle($user ?? $request->user(), $payload);
         }
 
-        $keys = explode('.', $path);
-
-        // Special handling for items.ID.field pattern
-        if (count($keys) >= 3 && $keys[0] === 'items') {
-            $itemId = $keys[1];
-            $found = false;
-
-            foreach ($array['items'] as $index => &$item) {
-                if (isset($item['_id']) && $item['_id'] === $itemId) {
-                    $found = true;
-                    // Build the remaining path after items.ID
-                    $remainingPath = implode('.', array_slice($keys, 2));
-
-                    // Navigate to the nested property
-                    $ref = &$item;
-                    $remainingKeys = array_slice($keys, 2);
-                    foreach ($remainingKeys as $i => $key) {
-                        if ($i === count($remainingKeys) - 1) {
-                            if ($value === null) {
-                                unset($ref[$key]);
-                            } else {
-                                $ref[$key] = $value;
-                            }
-                        } else {
-                            if (! isset($ref[$key]) || ! is_array($ref[$key])) {
-                                $ref[$key] = [];
-                            }
-                            $ref = &$ref[$key];
-                        }
-                    }
-                    break;
-                }
-            }
-
-            if (! $found) {
-                // Item not found, can't update
-                return;
-            }
-
-            return;
-        }
-
-        // Handle items.ID deletion or replacement
-        if (count($keys) === 2 && $keys[0] === 'items') {
-            $itemId = $keys[1];
-
-            if ($value === null) {
-                // Delete item by ID
-                foreach ($array['items'] as $index => $item) {
-                    if (isset($item['_id']) && $item['_id'] === $itemId) {
-                        unset($array['items'][$index]);
-                        $array['items'] = array_values($array['items']); // Re-index
-
-                        return;
-                    }
-                }
-            } else {
-                // Replace entire item
-                $found = false;
-                foreach ($array['items'] as $index => $item) {
-                    if (isset($item['_id']) && $item['_id'] === $itemId) {
-                        $array['items'][$index] = $value;
-                        $found = true;
-                        break;
-                    }
-                }
-                if (! $found) {
-                    $array['items'][] = $value;
-                }
-            }
-
-            return;
-        }
-
-        // Standard dot notation handling for non-items paths
-        $ref = &$array;
-        foreach ($keys as $i => $key) {
-            if ($i === count($keys) - 1) {
-                if ($value === null) {
-                    unset($ref[$key]);
-                } else {
-                    $ref[$key] = $value;
-                }
-            } else {
-                if (! isset($ref[$key]) || ! is_array($ref[$key])) {
-                    $ref[$key] = [];
-                }
-                $ref = &$ref[$key];
+        // Update is_gm status if present
+        if ($user && isset($payload['isGM'])) {
+            if ($user->is_gm !== (bool) $payload['isGM']) {
+                $user->is_gm = $payload['isGM'];
+                $user->save();
+                Log::info("User [{$user->id}] is_gm updated to [{$user->is_gm}] via {$type}");
             }
         }
+
+        // Persist actor data / sheet deltas
+        if (in_array($type, ['ACTOR_DATA', 'SHEET_DELTA']) && $user) {
+            app(DeltaSyncHandler::class)->handle($user->id, $type, $payload);
+        }
+
+        return null; // Continue to broadcast
+    }
+
+    /**
+     * Handle bulk updates from Foundry.
+     */
+    public function update(Request $request)
+    {
+        // Legacy endpoint — delegates to handle() for now
+        return $this->handle($request);
     }
 }

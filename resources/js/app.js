@@ -20,6 +20,7 @@ import LifepathTab from "./components/character-sheet/LifepathTab.vue";
 import NavBtn from "./components/character-sheet/NavBtn.vue";
 import RollResultPopup from "./components/RollResultPopup.vue";
 import DiceHistory from "./components/DiceHistory.vue";
+import QrLinkScanner from "./components/QrLinkScanner.vue";
 import {vCprImg} from "./directives/cpr-img";
 import mitt from 'mitt';
 
@@ -49,5 +50,19 @@ app.component('lifepath-tab', LifepathTab);
 app.component('nav-btn', NavBtn);
 app.component('roll-result-popup', RollResultPopup);
 app.component('dice-history', DiceHistory);
+app.component('qr-link-scanner', QrLinkScanner);
 app.directive('cpr-img', vCprImg);
-app.mount('#app');
+
+// The main agent UI mounts on #app. Some pages (e.g. settings) are Alpine-driven
+// and have no #app — guard so Vue doesn't warn on a missing root there.
+if (document.getElementById('app')) {
+    app.mount('#app');
+}
+
+// The settings page is Alpine-land, so the QR/paste linker gets its own isolated
+// Vue root that can't clash with Alpine directives elsewhere on the page.
+if (document.getElementById('qr-link-app')) {
+    const qrApp = createApp({});
+    qrApp.component('qr-link-scanner', QrLinkScanner);
+    qrApp.mount('#qr-link-app');
+}
