@@ -144,12 +144,19 @@ class SettingsController extends Controller
             ], 422);
         }
 
+        $appUrl = sprintf(
+            '%s://%s',
+            config('vite.reverb.scheme') === 'https' ? 'https' : 'http',
+            config('app.domain')
+        );
+
         $payload = [
             'v' => 1,
-            'agentUrl' => rtrim(config('app.url'), '/'),
+            'agentUrl' => $appUrl,
             'channelId' => $user->channel_id,
             'apiKey' => $config->api_key,
             'reverbKey' => config('broadcasting.connections.reverb.key'),
+            'reverbPort' => config('vite.reverb.port'),
         ];
 
         return response()->json([

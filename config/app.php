@@ -56,6 +56,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public-facing Domain
+    |--------------------------------------------------------------------------
+    |
+    | The public host (with port) players use to reach the Agent. May differ
+    | from APP_URL when tunnelling (e.g. Tailscale). Used to build the Foundry
+    | setup code so the browser subscribes to a reachable host.
+    |
+    */
+
+    'domain' => env('APP_DOMAIN'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
