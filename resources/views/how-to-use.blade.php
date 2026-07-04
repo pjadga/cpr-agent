@@ -31,6 +31,33 @@
                     </ul>
                 </section>
 
+                <section class="bg-cpr-black/50 p-6 rounded border-l-4 border-l-cpr-yellow">
+                    <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-2">Quick Connect: QR
+                        Pairing</h2>
+                    <p class="text-cpr-text-muted italic mb-4">The idea here is to minimise the connection errors. There is
+                    much better error handling on the Agent side so any troubleshooting should be easier. With that said:</p>
+                    <p class="mb-3">There are <strong>two QR codes</strong>, GM (for setup) and Player (for connection):</p>
+                    <ul class="list-disc list-inside space-y-3 ml-4">
+                        <li><strong>Foundry Setup Code (GM only)</strong> — In <strong>Settings</strong>, enter your
+                            Foundry URL, generate an API Key and create a session, then hit <strong>Copy Foundry Setup
+                                Code</strong>. In Foundry, paste it into <strong>Agent Bridge → Quick Setup</strong> to
+                            configure the Bridge. It carries your secret API key, so never share it with
+                            players.
+                        </li>
+                        <li><strong>Pairing QR (per player)</strong> — Once your Bridge is online, open <strong>Agent
+                                Bridge → Manage Characters</strong> and hit the <strong>QR button</strong> next to a
+                            player. They open <strong>Settings → Join a Session</strong>, tap <strong>Scan to Link
+                                Foundry</strong>, and point their camera at the code. Their Agent picks up the Channel
+                            ID and Foundry URL, and their character is linked automatically.
+                        </li>
+                    </ul>
+                    <p class="text-cpr-text-muted text-sm mt-4">No camera? A copyable link code appears under the scan
+                        button — paste that instead. Codes are one-time use and expire after 5 minutes. Camera access
+                        needs an <code class="text-cpr-red">https://</code> (or <code
+                            class="text-cpr-red">localhost</code>) connection.</p>
+                    <p class="mt-4">Prefer to do it by hand? The manual steps below still work as a fallback.</p>
+                </section>
+
                 <section>
                     <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
@@ -82,7 +109,15 @@
                 </section>
             </div>
 
-            <div class="mt-12 flex justify-center">
+            <div class="mt-12 border-t border-cpr-red/30 pt-6 text-center text-cpr-text-muted">
+                <p>Want the full walkthrough — self-hosting, sharing over Tailscale, the QR handshake internals and
+                    troubleshooting? Read the
+                    <a href="https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/GUIDE.md" target="_blank"
+                       class="text-cpr-red hover:text-cpr-red underline">complete GUIDE.md</a>.
+                </p>
+            </div>
+
+            <div class="mt-8 flex justify-center">
                 <a href="{{ url()->previous() == url()->current() ? url('/') : url()->previous() }}"
                    class="cyber-button bg-cpr-black-elevated border-cpr-border text-lg px-12 py-3 uppercase font-bold">
                     Return
