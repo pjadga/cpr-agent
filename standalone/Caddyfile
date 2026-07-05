@@ -1,0 +1,17 @@
+{
+	frankenphp
+	order php_server before file_server
+}
+
+# Standalone single-host entrypoint. Reverb runs as a separate process on
+# 127.0.0.1:8080; the /app/* WebSocket path is proxied to it so players only
+# ever see one origin and one port.
+:8000 {
+	root * public/
+	encode zstd gzip
+
+	@reverb path /app/*
+	reverse_proxy @reverb 127.0.0.1:8085
+
+	php_server
+}

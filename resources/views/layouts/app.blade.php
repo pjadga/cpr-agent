@@ -19,6 +19,7 @@
     <link href="https://fonts.cdnfonts.com/css/repetition-scrolling" rel="stylesheet">
 
     <!-- Scripts -->
+    @include('partials.reverb-config')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans antialiased">

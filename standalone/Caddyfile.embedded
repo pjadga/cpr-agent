@@ -1,0 +1,16 @@
+{
+	frankenphp
+	order php_server before file_server
+}
+
+# For the embedded (single-binary) build: php_server serves the app baked
+# into the binary — no root directive needed. Reverb runs as a child process
+# on 127.0.0.1:8085 and players ride the same origin via /app/*.
+:8000 {
+	encode zstd gzip
+
+	@reverb path /app/*
+	reverse_proxy @reverb 127.0.0.1:8085
+
+	php_server
+}

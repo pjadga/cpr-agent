@@ -22,6 +22,7 @@
         rel="stylesheet">
 
     <!-- Scripts -->
+    @include('partials.reverb-config')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @if(!app()->environment('local'))
         <x-turnstile.scripts/>

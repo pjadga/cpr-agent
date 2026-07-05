@@ -385,7 +385,7 @@
                                                 })
                                                 .catch(e => { error = e.message; })
                                                 .finally(() => loading = false)
-                                        "
+                                        "p
                                         class="cyber-button bg-cpr-black-elevated border-cpr-teal text-cpr-teal px-3 py-1.5 uppercase text-[10px] font-bold w-full">
                                     <i data-lucide="clipboard-copy" class="w-3 h-3 inline -mt-0.5"></i>
                                     <span x-show="!loading && !shortCode">Get Foundry Setup Code</span>
