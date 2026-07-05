@@ -20,56 +20,18 @@ class SessionController extends Controller
             return response()->json(['error' => 'Only GMs can create sessions.'], 403);
         }
 
-        // Check if user already has an active session
-        $existingSession = Session::where('gm_user_id', $user->id)
-            ->where(function ($query) {
-                $query->whereNull('expires_at')
-                    ->orWhere('expires_at', '>', now());
-            })
-            ->first();
-
-        if ($existingSession) {
-            // Self-heal: keep the GM on their own session's channel (see below).
-            if ($user->channel_id !== $existingSession->code) {
-                $user->channel_id = $existingSession->code;
-                $user->save();
-            }
-
-            // Keep player auto-config current with the GM's latest Foundry settings.
-            $existingSession->syncFoundryConfigFor($user);
-
-            return response()->json([
-                'success' => true,
-                'session' => [
-                    'code' => $existingSession->code,
-                    'player_count' => $existingSession->player_count,
-                    'message' => "You already have an active session. Share code: {$existingSession->code}",
-                ],
-            ]);
-        }
-
-        // Create new session (expires in 30 days by default)
-        $session = Session::create([
-            'gm_user_id' => $user->id,
-            'expires_at' => now()->addDays(30),
-        ]);
-
-        // The GM joins their own session's channel. This is the unifying step:
-        // players who join adopt the same code as their channel_id (joinPlayer),
-        // so the GM's Agent app, every player, and the Foundry Bridge all share
-        // the one cpr-agent.{code} broadcast channel.
-        $user->channel_id = $session->code;
-        $user->save();
-
-        // Auto-sync the GM's Foundry settings so players joining auto-configure.
-        $session->syncFoundryConfigFor($user);
+        // Channel unification, self-heal and Foundry-config sync all live in
+        // ensureActiveFor — shared with the auto-create on connection save.
+        $session = Session::ensureActiveFor($user);
 
         return response()->json([
             'success' => true,
             'session' => [
                 'code' => $session->code,
-                'player_count' => 0,
-                'message' => "Session created! Share this code with your players: {$session->code}",
+                'player_count' => $session->player_count,
+                'message' => $session->wasRecentlyCreated
+                    ? "Session created! Share this code with your players: {$session->code}"
+                    : "You already have an active session. Share code: {$session->code}",
             ],
         ]);
     }

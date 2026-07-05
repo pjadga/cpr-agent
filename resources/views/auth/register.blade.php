@@ -55,6 +55,35 @@
                         <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2"/>
                     </div>
 
+                    <!-- Role: shapes the whole onboarding flow. Changeable later in Settings. -->
+                    <div>
+                        <x-input-label :value="__('Your Role')" class="text-xs uppercase text-cpr-text-muted"/>
+                        <div class="grid grid-cols-2 gap-2 mt-1">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="player" class="peer sr-only"
+                                       {{ old('role', 'player') === 'player' ? 'checked' : '' }}>
+                                <div class="border border-cpr-border rounded p-3 text-center uppercase text-xs tracking-widest text-cpr-text-dim
+                                            peer-checked:border-cpr-teal peer-checked:text-cpr-teal peer-checked:bg-cpr-teal/10 transition-colors">
+                                    <i class="fas fa-user-astronaut block text-lg mb-1"></i>
+                                    Player
+                                </div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="role" value="gm" class="peer sr-only"
+                                       {{ old('role') === 'gm' ? 'checked' : '' }}>
+                                <div class="border border-cpr-border rounded p-3 text-center uppercase text-xs tracking-widest text-cpr-text-dim
+                                            peer-checked:border-cpr-red peer-checked:text-cpr-red peer-checked:bg-cpr-red/10 transition-colors">
+                                    <i class="fas fa-crown block text-lg mb-1"></i>
+                                    Game Master
+                                </div>
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-cpr-text-dim mt-1 uppercase">
+                            Not sure? Pick Player — you can change this later in Settings.
+                        </p>
+                        <x-input-error :messages="$errors->get('role')" class="mt-2"/>
+                    </div>
+
                     <!-- Captcha -->
                     @if(!app()->environment('local'))
                         <div class="mt-4 flex flex-col items-center">

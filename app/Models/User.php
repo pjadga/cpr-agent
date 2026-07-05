@@ -121,6 +121,21 @@ class User extends Authenticatable
         return $value;
     }
 
+    /**
+     * Whether this user is the GM of a currently active (non-expired) session.
+     * Used to protect a session-owning GM from being auto-demoted by Foundry
+     * sync payloads (e.g. testing the world from a player login).
+     */
+    public function ownsActiveSession(): bool
+    {
+        return Session::where('gm_user_id', $this->id)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->exists();
+    }
+
     public function getActorId(): string
     {
         return $this->default_actor_id ?? '';

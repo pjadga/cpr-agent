@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -23,10 +24,40 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'role' => 'player',
             'cf-turnstile-response' => 'test-token',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertFalse(User::where('email', 'test@example.com')->first()->is_gm);
+    }
+
+    public function test_registering_as_gm_sets_the_declared_role(): void
+    {
+        $this->post('/register', [
+            'name' => 'The GM',
+            'email' => 'gm@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'gm',
+            'cf-turnstile-response' => 'test-token',
+        ]);
+
+        $this->assertTrue(User::where('email', 'gm@example.com')->first()->is_gm);
+    }
+
+    public function test_registration_requires_a_role(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'No Role',
+            'email' => 'norole@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'cf-turnstile-response' => 'test-token',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertGuest();
     }
 }

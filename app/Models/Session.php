@@ -87,6 +87,43 @@ class Session extends Model
     }
 
     /**
+     * Return the GM's active session, creating one if none exists. Keeps the
+     * GM on their own session's channel (the unifying invariant: GM, players
+     * and the Foundry Bridge all share cpr-agent.{code}) and keeps the
+     * session's Foundry config in step with the GM's latest settings.
+     *
+     * This is the GM bootstrap: called on explicit "Create Session" and
+     * automatically when a GM saves their connection settings, so a fresh GM
+     * never has to sequence session-vs-setup-code manually.
+     */
+    public static function ensureActiveFor(User $gm): self
+    {
+        $session = self::where('gm_user_id', $gm->id)
+            ->where(function ($query) {
+                $query->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            })
+            ->first();
+
+        if (! $session) {
+            $session = self::create([
+                'gm_user_id' => $gm->id,
+                'expires_at' => now()->addDays(30),
+            ]);
+        }
+
+        // Self-heal: the GM always lives on their own session's channel.
+        if ($gm->channel_id !== $session->code) {
+            $gm->channel_id = $session->code;
+            $gm->save();
+        }
+
+        $session->syncFoundryConfigFor($gm);
+
+        return $session;
+    }
+
+    /**
      * Join a player to this session. Returns the session data needed for auto-configuration.
      */
     public function joinPlayer(User $player): array

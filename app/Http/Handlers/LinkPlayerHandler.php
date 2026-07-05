@@ -39,7 +39,14 @@ class LinkPlayerHandler
     private function updateCharacter(User $user, ?string $actorId, bool $isGm): array
     {
         $user->default_actor_id = $actorId;
-        $user->is_gm = $isGm;
+
+        // Foundry's isGM verifies the declared role — but never auto-demote a
+        // user who owns an active session (e.g. a GM testing from a player
+        // login would otherwise lose access to their own session management).
+        if ($isGm || ! $user->ownsActiveSession()) {
+            $user->is_gm = $isGm;
+        }
+
         $user->save();
 
         Log::info("Character link updated for User [{$user->id}] (Actor: {$actorId})");

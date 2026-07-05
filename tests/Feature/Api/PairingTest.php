@@ -133,6 +133,21 @@ class PairingTest extends TestCase
     }
 
     #[Test]
+    public function gm_claiming_their_own_pairing_does_not_count_as_a_player()
+    {
+        // GM self-link (e.g. scanning their own QR from the phone): the GM was
+        // on a different channel beforehand, but must not inflate player_count.
+        $this->gm->update(['channel_id' => 'somewhere-else']);
+        $this->registerPairing(['foundry_user_id' => 'foundry-gm']);
+
+        $this->actingAs($this->gm, 'sanctum')
+            ->postJson('/api/pairing/claim', ['nonce' => 'nonce-abc'])->assertOk();
+
+        $this->assertEquals(0, $this->session->fresh()->player_count);
+        $this->assertEquals($this->session->code, $this->gm->fresh()->channel_id);
+    }
+
+    #[Test]
     public function unknown_nonce_is_rejected()
     {
         $this->actingAs($this->player, 'sanctum')

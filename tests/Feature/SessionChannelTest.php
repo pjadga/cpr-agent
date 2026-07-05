@@ -55,6 +55,49 @@ class SessionChannelTest extends TestCase
     }
 
     #[Test]
+    public function saving_connection_settings_auto_creates_a_session_for_a_gm_without_one()
+    {
+        $gm = User::factory()->create(['is_gm' => true]);
+
+        $this->actingAs($gm)->post(route('config.store'), [
+            'foundry_url' => 'https://gm-foundry.example.com',
+            'api_key' => 'token-1',
+        ])->assertRedirect(route('settings'));
+
+        // GM Quick Start: no manual "Create Session" step needed.
+        $session = Session::where('gm_user_id', $gm->id)->first();
+        $this->assertNotNull($session);
+        $this->assertSame($session->code, $gm->fresh()->channel_id);
+        $this->assertSame('https://gm-foundry.example.com', $session->foundry_config['foundry_url']);
+    }
+
+    #[Test]
+    public function gm_channel_id_is_derived_not_taken_from_the_form()
+    {
+        $gm = User::factory()->create(['is_gm' => true]);
+        $this->actingAs($gm)->postJson(route('session.create'));
+        $sessionCode = $gm->fresh()->channel_id;
+
+        $this->actingAs($gm)->post(route('config.store'), [
+            'channel_id' => 'hand-typed-drift',
+        ]);
+
+        $this->assertSame($sessionCode, $gm->fresh()->channel_id);
+    }
+
+    #[Test]
+    public function player_can_still_set_channel_id_via_the_form()
+    {
+        $player = User::factory()->create(['is_gm' => false]);
+
+        $this->actingAs($player)->post(route('config.store'), [
+            'channel_id' => 'gm-shared-code',
+        ]);
+
+        $this->assertSame('gm-shared-code', $player->fresh()->channel_id);
+    }
+
+    #[Test]
     public function recreating_with_an_existing_session_heals_a_drifted_gm_channel()
     {
         $gm = User::factory()->create(['is_gm' => true]);

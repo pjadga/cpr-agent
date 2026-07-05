@@ -37,6 +37,7 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => ['required', 'in:player,gm'],
         ];
 
         if (! app()->environment('local')) {
@@ -58,6 +59,10 @@ class RegisteredUserController extends Controller
             'default_actor_id' => $demoData['_id'] ?? null,
             'default_token_id' => $demoData['_id'] ?? null,
             'agent_link' => (string) Str::uuid(),
+            // Declared role. Foundry's isGM sync verifies/corrects this later —
+            // declaration bootstraps the GM flow (session, setup code) so the
+            // Bridge can be configured at all. Changeable in Settings.
+            'is_gm' => $request->role === 'gm',
         ]);
 
         event(new Registered($user));

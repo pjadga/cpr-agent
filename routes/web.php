@@ -59,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/config', [SettingsController::class, 'show'])->name('config.index');
     Route::post('/config', [SettingsController::class, 'storeConfig'])->name('config.store');
     Route::get('/settings/foundry-setup-code', [SettingsController::class, 'foundrySetupCode'])->name('settings.foundry-setup-code');
+    Route::patch('/settings/role', [SettingsController::class, 'updateRole'])->name('settings.role');
 
     // Session API endpoints
     Route::post('/session/create', [SessionController::class, 'create'])->name('session.create');

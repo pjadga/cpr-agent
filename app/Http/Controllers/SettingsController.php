@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Support\EventWaiter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class SettingsController extends Controller
@@ -115,6 +116,38 @@ class SettingsController extends Controller
     }
 
     /**
+     * Switch the user's declared role (GM <-> Player).
+     *
+     * Declared at registration, changeable here. Guard: a GM who still owns an
+     * active session must terminate it before demoting — otherwise the session
+     * would be orphaned with no one able to manage it.
+     */
+    public function updateRole(Request $request)
+    {
+        $validated = $request->validate([
+            'role' => ['required', 'in:player,gm'],
+        ]);
+
+        $user = Auth::user();
+        $wantsGm = $validated['role'] === 'gm';
+
+        if (! $wantsGm && $user->is_gm && $user->ownsActiveSession()) {
+            return redirect()->route('settings')->with(
+                'error',
+                'Terminate your active session before switching to Player.'
+            );
+        }
+
+        $user->is_gm = $wantsGm;
+        $user->save();
+
+        return redirect()->route('settings')->with(
+            'success',
+            $wantsGm ? 'Role updated — you are now a GM.' : 'Role updated — you are now a Player.'
+        );
+    }
+
+    /**
      * Emit a one-paste "Foundry Setup Code" for the GM.
      *
      * Bundles everything the Agent Bridge module needs to connect — Agent URL,
@@ -150,19 +183,56 @@ class SettingsController extends Controller
             config('app.domain')
         );
 
+        // GMs always have a session by the time they get here (auto-created on
+        // connection save), but ensure it so the code never carries a personal
+        // channel_id that matches no session — that used to 404 pairing.
+        $session = Session::ensureActiveFor($user);
+
         $payload = [
             'v' => 1,
             'agentUrl' => $appUrl,
-            'channelId' => $user->channel_id,
+            'channelId' => $session->code,
             'apiKey' => $config->api_key,
             'reverbKey' => config('broadcasting.connections.reverb.key'),
             'reverbPort' => config('vite.reverb.port'),
         ];
 
+        // Short one-time code for cross-device setup (e.g. Agent on a phone,
+        // Foundry on a desktop): the Bridge's Quick Setup redeems it over HTTP
+        // instead of the GM shuttling a long base64 blob between devices.
+        $shortCode = self::generateShortSetupCode();
+        Cache::put(
+            'foundry-setup-code:'.$shortCode,
+            $payload,
+            now()->addSeconds(self::SETUP_CODE_TTL)
+        );
+
         return response()->json([
             'code' => base64_encode(json_encode($payload)),
+            'short_code' => $shortCode,
+            'expires_in' => self::SETUP_CODE_TTL,
             'has_channel' => ! empty($payload['channelId']),
         ]);
+    }
+
+    /**
+     * Lifetime of a short setup code, in seconds.
+     */
+    public const SETUP_CODE_TTL = 300;
+
+    /**
+     * Generate a short, typeable setup code (e.g. "KX7M-4PWD"). Alphabet skips
+     * ambiguous characters (0/O, 1/I/L) since GMs read this off a phone screen.
+     */
+    public static function generateShortSetupCode(): string
+    {
+        $alphabet = '23456789ABCDEFGHJKMNPQRSTUVWXYZ';
+        $pick = fn (int $n) => implode('', array_map(
+            fn () => $alphabet[random_int(0, strlen($alphabet) - 1)],
+            range(1, $n)
+        ));
+
+        return $pick(4).'-'.$pick(4);
     }
 
     /**
@@ -244,24 +314,20 @@ class SettingsController extends Controller
 
         $config->save();
 
-        // Channel ID is part of the connection group (GMs set it manually;
-        // players get it auto-filled by joining a session).
-        if ($request->has('channel_id') && ! empty($validated['channel_id'])) {
+        // Channel ID is part of the connection group. Players get it auto-filled
+        // by joining a session (or can paste it); for GMs it is derived from
+        // their session below, so manual input is ignored.
+        if (! $user->is_gm && $request->has('channel_id') && ! empty($validated['channel_id'])) {
             $user->channel_id = $validated['channel_id'];
             $user->save();
         }
 
-        // Keep the GM's session in step with their latest Foundry settings, so
-        // players auto-configure without a manual "sync" click.
+        // GM Quick Start: saving connection settings guarantees a session, puts
+        // the GM on its channel, and keeps the session's Foundry config current
+        // so players auto-configure. No manual create/sync sequencing needed.
         if ($user->is_gm) {
             $user->setRelation('config', $config);
-            $session = Session::where('gm_user_id', $user->id)
-                ->where(function ($query) {
-                    $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
-                })
-                ->first();
-
-            $session?->syncFoundryConfigFor($user);
+            Session::ensureActiveFor($user);
         }
 
         return redirect()->route('settings')->with('success', 'Configuration updated successfully.');

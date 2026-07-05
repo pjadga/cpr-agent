@@ -127,11 +127,14 @@ class PairingController extends Controller
         );
 
         // Maintain session player_count when the player joins a new session.
+        // A GM claiming their own pairing (self-link via QR) isn't a player.
         if ($previousChannel !== $pairing->channel_id) {
             if ($previousChannel) {
                 Session::where('code', $previousChannel)->where('player_count', '>', 0)->decrement('player_count');
             }
-            Session::where('code', $pairing->channel_id)->increment('player_count');
+            Session::where('code', $pairing->channel_id)
+                ->where('gm_user_id', '!=', $user->id)
+                ->increment('player_count');
         }
 
         $pairing->update([

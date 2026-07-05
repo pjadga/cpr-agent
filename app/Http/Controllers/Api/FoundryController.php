@@ -103,10 +103,12 @@ class FoundryController extends Controller
             return app(LinkPlayerHandler::class)->handle($user ?? $request->user(), $payload);
         }
 
-        // Update is_gm status if present
+        // Update is_gm status if present. Promotion always applies; demotion is
+        // skipped while the user owns an active session (see LinkPlayerHandler).
         if ($user && isset($payload['isGM'])) {
-            if ($user->is_gm !== (bool) $payload['isGM']) {
-                $user->is_gm = $payload['isGM'];
+            $isGm = (bool) $payload['isGM'];
+            if ($user->is_gm !== $isGm && ($isGm || ! $user->ownsActiveSession())) {
+                $user->is_gm = $isGm;
                 $user->save();
                 Log::info("User [{$user->id}] is_gm updated to [{$user->is_gm}] via {$type}");
             }

@@ -31,6 +31,13 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div
+                class="bg-cpr-red-dark/50 border border-cpr-red text-cpr-red p-4 mb-8 uppercase text-xs tracking-widest">
+                {{ session('error') }}
+            </div>
+        @endif
+
         <!-- Session Status Banner -->
         <div x-data="{ sessionInfo: @js($sessionInfo ?? null), sessionLoading: {{ $sessionInfo ? 'false' : 'true' }}, loading: false, joinCode: '', joinMessage: '' }"
              x-init="
@@ -112,14 +119,17 @@
                 <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Join a Session</h3>
 
                 <!-- Primary: scan the GM's QR (or paste the link code) to auto-configure and link.
-                     Isolated Vue mount — this Alpine page has no global #app root. -->
-                <div id="qr-link-app">
-                    <qr-link-scanner agent-link="{{ auth()->user()->agent_link }}"></qr-link-scanner>
-                </div>
+                     Isolated Vue mount — this Alpine page has no global #app root. Rendered once
+                     per page: players get it here, GMs get it in their link block below. -->
+                @unless(auth()->user()->is_gm)
+                    <div id="qr-link-app">
+                        <qr-link-scanner agent-link="{{ auth()->user()->agent_link }}"></qr-link-scanner>
+                    </div>
+                @endunless
 
                 <div class="flex items-center gap-3 my-4">
                     <span class="flex-1 h-px bg-cpr-border"></span>
-                    <span class="text-xs uppercase text-cpr-text-dim">or enter a code</span>
+                    <span class="text-xs uppercase text-cpr-text-dim">or enter a code if connected</span>
                     <span class="flex-1 h-px bg-cpr-border"></span>
                 </div>
 
@@ -164,7 +174,8 @@
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
                 <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Create a Session</h3>
                 <p class="text-xs text-cpr-text-dim mb-4">
-                    Create a new game session. Players will join using the session code.
+                    A session is created automatically when you save your Foundry connection below —
+                    or create one now. Players join using the session code.
                 </p>
                 <button @click="
                     loading = true;
@@ -192,6 +203,33 @@
             </div>
         </div>
 
+        @if(auth()->user()->is_gm)
+            <!-- GM self-link: same scan/paste flow players get. In Foundry the GM's
+                 "Link my Agent" mints their own QR instantly (no round-trip). -->
+            <details class="mb-8 group border border-cpr-border rounded-lg overflow-hidden bg-cpr-black-deep/40">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-cpr-teal/10 transition-colors list-none">
+                    <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm">
+                        <i class="fas fa-qrcode mr-2"></i>Link this Agent to your Foundry user
+                    </h3>
+                    <div class="transition-transform duration-300 group-open:rotate-180">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-cpr-teal" fill="none"
+                             viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                </summary>
+                <div class="p-4 border-t border-cpr-border">
+                    <p class="text-xs text-cpr-text-dim mb-4">
+                        In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong> —
+                        as the GM you get your own QR immediately. Scan it here (phone) or paste the
+                        link code (desktop). Optional if the Bridge already shows your account as linked.
+                    </p>
+                    <div id="qr-link-app">
+                        <qr-link-scanner agent-link="{{ auth()->user()->agent_link }}"></qr-link-scanner>
+                    </div>
+                </div>
+            </details>
+        @endif
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <!-- Global App Configuration -->
@@ -201,9 +239,12 @@
                 </h3>
                 <p class="text-xs text-cpr-text-dim">
                     @if(auth()->user()->is_gm)
-                        Enter your Foundry URL + API key, create a session up top, then <strong class="text-cpr-teal">Copy Foundry Setup Code</strong> into the Bridge. Share your Channel ID with players.
+                        Enter your Foundry URL and generate an API key — saving creates your game session
+                        automatically. Then use the <strong class="text-cpr-teal">Setup Code</strong> below in
+                        Foundry → Agent Bridge → Quick Setup, and share the session code with your players.
                     @else
-                        Join your GM's session up top to auto-fill these — or paste the Channel ID your GM gives you.
+                        Scan your GM's QR (or paste their link code) up top to auto-fill all of this —
+                        or join with a session code.
                     @endif
                 </p>
                 <form action="{{ route('config.store') }}" method="POST" class="space-y-4">
@@ -305,20 +346,32 @@
                                    class="w-3 h-3 text-cpr-text-dim hover:text-cpr-teal cursor-help transition-colors"></i>
                                 <div
                                     class="absolute left-full ml-2 w-64 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
-                                    The shared broadcast channel. Players: auto-filled when you join a session above. GMs: share this with your players.
+                                    The shared broadcast channel.
+                                    @if(auth()->user()->is_gm)
+                                        Derived from your session automatically — share it with your players.
+                                    @else
+                                        Auto-filled when you link or join a session above.
+                                    @endif
                                 </div>
                             </div>
                         </div>
-                        <x-text-input type="text" name="channel_id" id="channel_id"
-                                      value="{{ old('channel_id', $user->channel_id) }}"
-                                      class="cyber-input-field mt-1 w-full"/>
+                        @if(auth()->user()->is_gm)
+                            <x-text-input type="text" name="channel_id" id="channel_id"
+                                          value="{{ old('channel_id', $user->channel_id) }}"
+                                          class="cyber-input-field mt-1 w-full opacity-70" readonly/>
+                        @else
+                            <x-text-input type="text" name="channel_id" id="channel_id"
+                                          value="{{ old('channel_id', $user->channel_id) }}"
+                                          class="cyber-input-field mt-1 w-full"/>
+                        @endif
                         <x-input-error :messages="$errors->get('channel_id')"
                                        class="mt-1 text-cpr-red text-[10px] uppercase"/>
 
                         @if(auth()->user()->is_gm)
-                            <!-- One-paste Foundry setup: copy into the Bridge's Quick Setup menu.
-                                 Carries this Channel ID, the Agent URL, API key and Reverb key. -->
-                            <div class="mt-3" x-data="{ setupCode: '', loading: false, copied: false, error: '' }">
+                            <!-- One-paste Foundry setup for the Bridge's Quick Setup menu. Emits a
+                                 short one-time code (typeable across devices — phone Agent, desktop
+                                 Foundry) plus the full base64 blob as a same-device fallback. -->
+                            <div class="mt-3" x-data="{ setupCode: '', shortCode: '', loading: false, copied: false, error: '' }">
                                 <button type="button"
                                         :disabled="loading"
                                         @click="
@@ -327,6 +380,7 @@
                                                 .then(async r => { const d = await r.json(); if (!r.ok) throw new Error(d.message || d.error || 'Failed'); return d; })
                                                 .then(async d => {
                                                     setupCode = d.code;
+                                                    shortCode = d.short_code || '';
                                                     try { await navigator.clipboard.writeText(d.code); copied = true; } catch (e) { /* clipboard blocked; copy from the box */ }
                                                 })
                                                 .catch(e => { error = e.message; })
@@ -334,20 +388,36 @@
                                         "
                                         class="cyber-button bg-cpr-black-elevated border-cpr-teal text-cpr-teal px-3 py-1.5 uppercase text-[10px] font-bold w-full">
                                     <i data-lucide="clipboard-copy" class="w-3 h-3 inline -mt-0.5"></i>
-                                    <span x-show="!loading && !copied">Copy Foundry Setup Code</span>
-                                    <span x-show="!loading && copied">✓ Copied — paste into Foundry → Bridge → Quick Setup</span>
+                                    <span x-show="!loading && !shortCode">Get Foundry Setup Code</span>
+                                    <span x-show="!loading && shortCode">↻ Get a fresh code</span>
                                     <span x-show="loading">…</span>
                                 </button>
                                 <p class="text-[10px] text-cpr-text-dim mt-1">
-                                    One paste configures the Agent Bridge module (URL, Channel ID, API key, Reverb key).
+                                    One code configures the Agent Bridge module (Channel ID, API key, Reverb key). Make sure the Bridge already has the URL of your Agent if self-hosting.
                                 </p>
                                 <p x-show="error" x-text="error" class="text-cpr-red text-[10px] mt-1"></p>
-                                <textarea x-show="setupCode" x-model="setupCode" readonly rows="2"
-                                          @focus="$el.select()"
-                                          class="cyber-input-field mt-2 w-full font-mono text-[10px] break-all select-all"></textarea>
-                                <p x-show="setupCode" class="text-cpr-yellow text-[10px] mt-1">
-                                    ⚠ Contains your API key — share only with your own Foundry world.
-                                </p>
+
+                                <div x-show="shortCode"
+                                     class="mt-2 text-center border border-cpr-teal/40 rounded-lg p-3 bg-cpr-black-deep">
+                                    <p class="text-[10px] uppercase tracking-widest text-cpr-text-dim">Ok Gr
+                                        In Foundry: Agent Bridge → Quick Setup → type this code
+                                    </p>
+                                    <p class="text-3xl font-mono font-black text-cpr-teal tracking-widest my-1"
+                                       x-text="shortCode"></p>
+                                    <p class="text-[10px] text-cpr-text-dim">One-time use · expires in 5 minutes</p>
+                                </div>
+
+                                <details x-show="setupCode" class="mt-2">
+                                    <summary class="text-[10px] uppercase text-cpr-text-dim cursor-pointer">
+                                        Same device? Paste the full code instead <span x-show="copied">(✓ copied to clipboard)</span>
+                                    </summary>
+                                    <textarea x-model="setupCode" readonly rows="2"
+                                              @focus="$el.select()"
+                                              class="cyber-input-field mt-2 w-full font-mono text-[10px] break-all select-all"></textarea>
+                                    <p class="text-cpr-yellow text-[10px] mt-1">
+                                        ⚠ Contains your API key — share only with your own Foundry world.
+                                    </p>
+                                </details>
                             </div>
                         @endif
 
@@ -373,7 +443,14 @@
                             </div>
 
                             <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                                GMs: copy the Foundry Setup Code into the Bridge, then share your Channel ID with players. Players: join the GM's session up top and this auto-fills.
+                                @if(auth()->user()->is_gm)
+                                    Click <strong>Get Foundry Setup Code</strong> and type the short code into
+                                    Foundry → Agent Bridge → Quick Setup. That configures the whole Foundry side.
+                                    Share your session code with players.
+                                @else
+                                    Your Channel ID fills in automatically when you link or join a session —
+                                    only change it if your GM tells you to.
+                                @endif
                             </p>
                             <div
                                 class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
@@ -430,8 +507,13 @@
                     </div>
 
                     <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                        First, enter your Foundry URL and generate an API key. Paste this key into the Cyberpunk Red
-                        Agent Bridge in Foundry.
+                        @if(auth()->user()->is_gm)
+                            Enter your Foundry URL and generate an API key. Saving your connection also
+                            creates your game session automatically — no separate step.
+                        @else
+                            You don't need to type any of this — ask your GM for a QR code or link code and
+                            use <strong>Scan to Link</strong> up top. Everything configures itself.
+                        @endif
                     </p>
                     <div class="bg-cpr-teal/10 border-l-2 border-cpr-teal p-3 mb-6 italic text-xs text-cpr-text">
                         Welcome, Edgerunner. Before we hit the Net, we need to establish a stable uplink to your Foundry
@@ -528,7 +610,12 @@
                                 </div>
 
                                 <p class="text-cpr-text mb-4 leading-relaxed text-sm">
-                                    Assign a character in the Foundry Module (Agent Bridge → Manage Characters), then select and save your character here.
+                                    @if(auth()->user()->is_gm)
+                                        Assign characters to your players in Foundry (Agent Bridge →
+                                        Manage Characters), then select and save your own character here.
+                                    @else
+                                        Once your GM assigns you a character, select and save it here.
+                                    @endif
                                     @if($sessionInfo && $sessionInfo['foundry_configured'])
                                         Your session is auto-configured — just pick your character!
                                     @endif
@@ -632,6 +719,33 @@
                                 class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark w-full uppercase font-bold py-2 hover:bg-cpr-teal text-black">
                             Update Profile
                         </button>
+                    </form>
+
+                    <!-- Declared role — drives the whole onboarding flow. Foundry
+                         verifies it once the Bridge connects. -->
+                    <form method="post" action="{{ route('settings.role') }}" class="pt-4 border-t border-cpr-border/50">
+                        @csrf
+                        @method('patch')
+
+                        <x-input-label for="role" :value="__('Role')" class="text-xs uppercase text-cpr-teal"/>
+                        <div class="flex gap-2 items-stretch mt-1">
+                            <select id="role" name="role" class="cyber-select-field flex-1 text-base">
+                                <option value="player" {{ !$user->is_gm ? 'selected' : '' }} class="cyber-select-option">
+                                    Player
+                                </option>
+                                <option value="gm" {{ $user->is_gm ? 'selected' : '' }} class="cyber-select-option">
+                                    Game Master
+                                </option>
+                            </select>
+                            <button type="submit"
+                                    class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark px-6 uppercase font-bold text-xs hover:bg-cpr-teal text-black">
+                                Update Role
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-cpr-text-dim mt-1 uppercase">
+                            Switching role changes your setup flow. GMs must terminate their active session
+                            before switching to Player.
+                        </p>
                     </form>
                 </div>
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\FoundryController;
 use App\Http\Controllers\Api\PairingController;
+use App\Http\Controllers\Api\SetupCodeController;
 use App\Http\Controllers\Cyberdeck\InstallProgram;
 use App\Http\Controllers\Cyberdeck\RemoveProgram;
 use App\Http\Controllers\Cyberdeck\ToggleRez;
@@ -96,6 +97,12 @@ Route::middleware(['auth:sanctum', 'throttle:30,1'])->prefix('pairing')->group(f
     Route::post('/claim', [PairingController::class, 'claim'])->name('pairing.claim');
     Route::get('/status', [PairingController::class, 'status'])->name('pairing.status');
 });
+
+// Short setup code redemption, called by the Bridge's Quick Setup before it has
+// any credentials. Public by necessity; hard-throttled, single-use, short TTL.
+Route::middleware('throttle:10,1')
+    ->get('/setup-code/{code}', [SetupCodeController::class, 'redeem'])
+    ->name('setup-code.redeem');
 
 Broadcast::routes(['middleware' => [
     'auth:sanctum',  // 2. Allow EITHER Sanctum Token OR Web Session

@@ -39,10 +39,12 @@
                     <p class="mb-3">There are <strong>two QR codes</strong>, GM (for setup) and Player (for connection):</p>
                     <ul class="list-disc list-inside space-y-3 ml-4">
                         <li><strong>Foundry Setup Code (GM only)</strong> — In <strong>Settings</strong>, enter your
-                            Foundry URL, generate an API Key and create a session, then hit <strong>Copy Foundry Setup
-                                Code</strong>. In Foundry, paste it into <strong>Agent Bridge → Quick Setup</strong> to
-                            configure the Bridge. It carries your secret API key, so never share it with
-                            players.
+                            Foundry URL and generate an API Key — saving creates your session automatically. Hit
+                            <strong>Get Foundry Setup Code</strong> and type the short code (e.g.
+                            <code class="text-cpr-teal">KX7M-4PWD</code>) into <strong>Agent Bridge → Quick
+                                Setup</strong> in Foundry — it works even when the Agent is on your phone. (A full
+                            copy-paste code is also available for same-device setup.) Setup codes fetch your secret
+                            API key, so never share one with players.
                         </li>
                         <li><strong>Pairing QR (per player)</strong> — Once your Bridge is online, open <strong>Agent
                                 Bridge → Manage Characters</strong> and hit the <strong>QR button</strong> next to a
@@ -60,16 +62,20 @@
 
                 <section>
                     <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
+                    <p class="mb-4 text-cpr-text-muted text-sm">Pick <strong>Game Master</strong> when you register
+                        (or switch role in Settings → Account Control) to unlock the GM flow.</p>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
                         <li>As the Game Master, navigate to the <strong>Settings</strong> page.</li>
-                        <li>Generate an <strong>API Key</strong> and copy it. This needs to be entered into the Agent
-                            Bridge module in Foundry.
+                        <li>Enter your <strong>Foundry URL</strong>, generate an <strong>API Key</strong>, and save —
+                            your game session (and Channel ID) is created automatically.
                         </li>
-                        <li>Copy your <strong>Channel ID</strong> from the Settings page.</li>
-                        <li>In Foundry, go to <strong>Configure Settings</strong> -> <strong>Agent Bridge</strong> and
-                            paste the <strong>Channel ID</strong> and API Key.
+                        <li>Use the <strong>Foundry Setup Code</strong> (above) to configure the Bridge in one step —
+                            or manually paste the Channel ID and API Key into <strong>Configure Settings</strong> ->
+                            <strong>Agent Bridge</strong> in Foundry.
                         </li>
-                        <li>Share this <strong>Channel ID</strong> with your players.</li>
+                        <li>Share your <strong>session code</strong> with your players — or skip codes entirely and
+                            hand them pairing QRs from <strong>Agent Bridge → Manage Characters</strong>.
+                        </li>
                     </ol>
                 </section>
 
