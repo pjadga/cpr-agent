@@ -31,6 +31,7 @@ class AuthenticationFlowTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'role' => 'player',
             'cf-turnstile-response' => 'test-token',
         ]);
 

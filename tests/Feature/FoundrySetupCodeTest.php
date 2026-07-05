@@ -24,7 +24,11 @@ class FoundrySetupCodeTest extends TestCase
     #[Test]
     public function gm_gets_a_decodable_setup_code_carrying_their_session_channel()
     {
-        config(['app.url' => 'https://agent.example.com', 'broadcasting.connections.reverb.key' => 'reverb-key-1']);
+        config([
+            'app.domain' => 'agent.example.com',
+            'vite.reverb.scheme' => 'https',
+            'broadcasting.connections.reverb.key' => 'reverb-key-1',
+        ]);
 
         $gm = $this->gmWithKey();
 
@@ -50,8 +54,6 @@ class FoundrySetupCodeTest extends TestCase
     #[Test]
     public function setup_code_response_includes_a_short_code_redeemable_once()
     {
-        config(['app.url' => 'https://agent.example.com']);
-
         $gm = $this->gmWithKey();
 
         $response = $this->actingAs($gm)->getJson(route('settings.foundry-setup-code'));
