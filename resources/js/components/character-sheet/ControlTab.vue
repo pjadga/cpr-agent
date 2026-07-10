@@ -71,48 +71,11 @@
                 <div class="space-y-2">
                     <div v-for="weapon in groupedEquipped.weapon" :key="weapon._id"
                          @click="controlState.selectedWeapon = weapon"
-                         class="cpr-panel p-3 flex items-center justify-between cursor-pointer border transition-all relative overflow-hidden"
-                         :class="controlState.selectedWeapon?._id === weapon._id ? 'border-cpr-yellow bg-cpr-yellow-dark/10' : 'border-cpr-border bg-cpr-black hover:border-cpr-border-muted'">
-
-                        <div v-if="getStatusLine(weapon)"
-                             class="absolute top-0 left-0 h-[2px] transition-all duration-500 z-10"
-                             :class="getStatusLine(weapon).color"
-                             :style="{ width: getStatusLine(weapon).width }">
-                        </div>
-
-                        <div class="cpr-corner-square text-cpr-red">
-                        </div>
-
-                        <div class="flex items-center gap-3">
-                            <img v-cpr-img:cpr-red="getImageUrl(weapon.img)"
-                                 class="w-10 h-10 object-cover border border-cpr-border">
-                            <div>
-                                <div class="text-xs font-bold  uppercase">{{ weapon.name }}</div>
-                                <div class="flex items-center gap-2 mt-0.5">
-                                    <span class="text-[10px] text-cpr-text-muted">
-                                        <template v-if="!isMeleeOrUnarmed(weapon) && weapon.system.magazine">
-
-                                            <span class="font-numbers">{{ weapon.system.magazine.value }}</span> <span
-                                            class="text-cpr-text-dim">/</span> <span
-                                            class="font-numbers">{{ weapon.system.magazine.max }}</span>
-                                            <span v-if="getAmmoName(weapon)" class="ml-1 text-cpr-yellow text-[8px]">[{{
-                                                    getAmmoName(weapon)
-                                                }}]</span>
-                                        </template>
-                                        <span v-if="weapon.system.damage" :class="{'ml-2': !isMeleeOrUnarmed(weapon)}"
-                                              class="text-cpr-red font-bold font-numbers">{{
-                                                weapon.system.damage
-                                            }}</span>
-                                        <span v-if="weapon.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span
-                                            class="font-numbers">{{ weapon.system.rof }}</span></span>
-                                        <span v-if="!isPlayer" class="ml-2 text-cpr-yellow/60" title="Equipped">
-                                            <i v-icon data-lucide="hand" class="w-3 h-3 inline"></i>
-                                        </span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div v-if="controlState.selectedWeapon?._id === weapon._id" class="text-cpr-yellow">
+                         class="relative cursor-pointer transition-all"
+                         :class="controlState.selectedWeapon?._id === weapon._id ? 'ring-2 ring-cpr-yellow' : 'opacity-80 hover:opacity-100'">
+                        <item-row :item="weapon" category="weapon" :all-items="charData?.data?.items"/>
+                        <div v-if="controlState.selectedWeapon?._id === weapon._id"
+                             class="absolute top-2 right-2 z-20 text-cpr-yellow pointer-events-none">
                             <i v-icon data-lucide="check-circle-2" class="w-5 h-5"></i>
                         </div>
                     </div>
@@ -343,7 +306,8 @@ export default {
             getAmmoName,
             getStatusLine,
             hasNetspaceOptions,
-            isPlayer
+            isPlayer,
+            charData
         };
     }
 }

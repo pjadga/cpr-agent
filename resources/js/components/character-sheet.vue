@@ -38,6 +38,9 @@
         </div>
 
         <div v-if="!loading && charData && !error">
+            <!-- Fixed backdrop behind everything; opaque header/nav frame it between the borders. -->
+            <mobile-background-frame></mobile-background-frame>
+
             <!-- Modals & Popups -->
             <cyberdeck-config
                 v-if="showCyberdeckConfig"
@@ -450,6 +453,7 @@ import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
 import TopBorderFrame from "./character-sheet/frames/TopBorderFrame.vue";
 import BottomBorderFrame from "./character-sheet/frames/BottomBorderFrame.vue";
+import MobileBackgroundFrame from "./character-sheet/frames/MobileBackgroundFrame.vue";
 // --- COMPOSABLES ---
 import {useCharacterData} from '../composables/useCharacterData';
 import {useCombat} from '../composables/useCombat';
@@ -481,7 +485,8 @@ export default {
         DiceHistory,
         RollResultPopup,
         TopBorderFrame,
-        BottomBorderFrame
+        BottomBorderFrame,
+        MobileBackgroundFrame
     },
     directives: {icon: vIcon},
     setup() {
@@ -1142,6 +1147,7 @@ export default {
             handleEurobucksUpdated,
             TopBorderFrame,
             BottomBorderFrame,
+            MobileBackgroundFrame,
 
             // Actions
             sendStatRequest,

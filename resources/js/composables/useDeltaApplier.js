@@ -115,6 +115,18 @@ export function useDeltaApplier(charData, loading) {
                 return;
             }
 
+            // Deep item-field updates (e.g. data.items.ID.system.magazine.value) mutate
+            // the item object in place — same reference, so child props never change and
+            // computeds (ammo bar, equipped icon) don't re-run. Record the index so the
+            // clone pass below gives that item a fresh reference and reactivity fires.
+            if (mapped.startsWith('data.items.') && !mapped.startsWith('data.items.+')) {
+                const parts = mapped.split('.');
+                if (parts.length > 3) {
+                    const idx = (charData.value.data.items || []).findIndex(i => i._id === parts[2]);
+                    if (idx > -1) modifiedItemIndices.add(idx);
+                }
+            }
+
             deepSet(charData.value, mapped, value);
         });
 
