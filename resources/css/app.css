@@ -17,8 +17,11 @@
 
     --color-cpr-black: var(--cpr-black);
     --color-cpr-black-deep: var(--cpr-black-deep);
+    --color-cpr-black-panel: var(--cpr-black-panel);
     --color-cpr-black-soft: var(--cpr-black-soft);
     --color-cpr-black-elevated: var(--cpr-black-elevated);
+
+    --color-cpr-green: var(--cpr-green);
 
     --color-cpr-border: var(--cpr-border);
     --color-cpr-border-dark: var(--cpr-border-dark);
@@ -137,11 +140,11 @@ body {
 }
 
 .glow-red {
-    text-shadow: 0 0 8px rgba(218, 0, 0, 0.4);
+    text-shadow: 0 0 8px rgba(230, 0, 18, 0.4);
 }
 
 .glow-teal {
-    text-shadow: 0 0 8px rgba(20, 184, 166, 0.4);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 
 .glow-yellow {

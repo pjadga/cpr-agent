@@ -22,6 +22,7 @@ import RollResultPopup from "./components/RollResultPopup.vue";
 import DiceHistory from "./components/DiceHistory.vue";
 import QrLinkScanner from "./components/QrLinkScanner.vue";
 import {vCprImg} from "./directives/cpr-img";
+import {initTiltShadow} from "./composables/useTiltShadow";
 import mitt from 'mitt';
 
 window.emitter = mitt();
@@ -57,6 +58,8 @@ app.directive('cpr-img', vCprImg);
 // and have no #app — guard so Vue doesn't warn on a missing root there.
 if (document.getElementById('app')) {
     app.mount('#app');
+    // Tilt/gyro parallax for the frame drop-shadows (pointer fallback on desktop).
+    initTiltShadow();
 }
 
 // The settings page is Alpine-land, so the QR/paste linker gets its own isolated

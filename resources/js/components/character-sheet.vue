@@ -121,7 +121,8 @@
             </combat-panel>
 
             <header
-                class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-yellow-dark backdrop-blur-md">
+                class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black-deep fixed w-full top-(nativephp-safe-area - --inset-top) z-50 backdrop-blur-md">
+                <top-border-frame></top-border-frame>
                 <div class="pt-3 flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
@@ -180,7 +181,7 @@
                     </div>
                 </div>
             </header>
-
+            <div class="pt-[calc(6rem+env(safe-area-inset-bottom))]"></div>
             <main class="p-3 max-w-md mx-auto space-y-4 relative min-h-[60vh]">
 
                 <transition name="fade">
@@ -282,7 +283,8 @@
             </main>
 
             <nav
-                class="fixed bottom-0 inset-x-0 bg-cpr-black-deep border-t border-cpr-red-dark/30 flex justify-around p-2 pb-6 z-50">
+                class="fixed bottom-0 inset-x-0 bg-cpr-black-deep border-t border-cpr-red-dark/30 flex justify-around pt-4 p-2 pb-6 z-50">
+                <bottom-border-frame></bottom-border-frame>
                 <nav-btn icon="activity" label="Stats" :active="activeTab === 'stats'"
                          @click="activeTab = 'stats'"></nav-btn>
                 <nav-btn icon="brain" label="Skills" :active="activeTab === 'skills'"
@@ -446,7 +448,8 @@ import EurobucksPanel from './character-sheet/EurobucksPanel.vue';
 import DiceHistory from './DiceHistory.vue';
 import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
-
+import TopBorderFrame from "./character-sheet/frames/TopBorderFrame.vue";
+import BottomBorderFrame from "./character-sheet/frames/BottomBorderFrame.vue";
 // --- COMPOSABLES ---
 import {useCharacterData} from '../composables/useCharacterData';
 import {useCombat} from '../composables/useCombat';
@@ -476,7 +479,9 @@ export default {
         NetTab,
         EurobucksPanel,
         DiceHistory,
-        RollResultPopup
+        RollResultPopup,
+        TopBorderFrame,
+        BottomBorderFrame
     },
     directives: {icon: vIcon},
     setup() {
@@ -1135,6 +1140,8 @@ export default {
             expandedSkills,
             handleItemClick,
             handleEurobucksUpdated,
+            TopBorderFrame,
+            BottomBorderFrame,
 
             // Actions
             sendStatRequest,
