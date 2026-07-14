@@ -8,40 +8,31 @@
         <div class="frame__layer frame__layer--s2">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 45 66" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 45 / 66" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     style="aspect-ratio: 45 / 66" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
                 <svg class="item-frame__mid" viewBox="45 0 115 66" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
                 <svg class="item-frame__cap" viewBox="160 0 17 66" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 17 / 66" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     style="aspect-ratio: 17 / 66" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
             </div>
         </div>
         <div class="frame__layer frame__layer--s1">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 45 66" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 45 / 66" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     style="aspect-ratio: 45 / 66" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
                 <svg class="item-frame__mid" viewBox="45 0 115 66" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
                 <svg class="item-frame__cap" viewBox="160 0 17 66" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 17 / 66" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     style="aspect-ratio: 17 / 66" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
             </div>
         </div>
         <div class="frame__layer">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 45 66" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 45 / 66" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     style="aspect-ratio: 45 / 66" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
                 <svg class="item-frame__mid" viewBox="45 0 115 66" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
                 <svg class="item-frame__cap" viewBox="160 0 17 66" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 17 / 66" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
+                     style="aspect-ratio: 17 / 66" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#ms-art"/></svg>
             </div>
         </div>
     </div>

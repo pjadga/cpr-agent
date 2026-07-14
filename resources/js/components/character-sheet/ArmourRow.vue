@@ -1,22 +1,16 @@
 <template>
     <div
-        class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group border-gray-800"
-        :class="{
-            'border-cpr-teal-dark': category === 'armor'
-         }">
+        class="relative flex flex-col group min-h-[3.5rem]"
+        :style="{ '--frame-accent': 'var(--cpr-border)' }">
 
-        <div class="cpr-corner-square"
-             :class="{
-                'text-cpr-teal-dark': category === 'armor'
-             }">
-        </div>
+        <ArmourRowFrame class="absolute inset-0 pointer-events-none select-none"/>
 
         <div v-if="statusLine" class="absolute top-0 left-0 h-[6px] transition-all duration-500 z-10"
              :class="statusLine.color"
              :style="{ width: statusLine.width }">
         </div>
 
-        <div class="flex items-stretch min-h-[2.5rem]">
+        <div class="relative z-10 flex items-stretch min-h-[3.5rem]">
             <div class="flex-1 p-2 px-4 flex flex-col justify-center cursor-default transition-colors"
                  @click="console.log('Row clicked:', item.name); $emit('click', item)">
                 <div class="flex justify-between items-center mt-[6px] ">
@@ -55,9 +49,11 @@ import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {findItemInList, formatCategoryName} from '../../utils/helpers';
+import ArmourRowFrame from './frames/ArmourRowFrame.vue';
 
 export default {
     name: 'ArmourRow',
+    components: {ArmourRowFrame},
     props: ['item', 'category', 'allItems', 'activeTab', 'refreshAll'],
     directives: {icon: vIcon},
     emits: ['click', 'equip-click', 'consume-click'],

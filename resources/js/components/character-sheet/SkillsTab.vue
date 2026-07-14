@@ -1,45 +1,51 @@
 <template>
     <div v-if="activeTab === 'skills'" key="skills"
          class="space-y-4 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
-        <div v-if="roleItem"
-             class="relative bg-cpr-black/60 border border-cpr-yellow/30 overflow-hidden clip-corner shadow-[0_0_15px_rgba(234,179,8,0.1)]">
-            <div
-                class="flex items-stretch bg-gradient-to-r from-yellow-900/40 to-transparent border-b border-cpr-yellow/20">
-                <div @click="$emit('role-request', roleItem.name)"
-                     class="flex-grow p-3 cursor-pointer hover:bg-cpr-yellow/10 transition-colors group">
-                    <div class="flex justify-between items-start gap-3">
-                        <div class="flex-grow">
-                            <h3 class="text-cpr-yellow font-black uppercase text-base tracking-tighter group-hover:text-cpr-yellow transition-colors">
-                                {{ roleItem.name }}</h3>
-                            <p class="text-[10px] text-cpr-yellow/60 font-mono uppercase tracking-widest">
-                                {{ roleItem.system.mainRoleAbility }}</p>
-                        </div>
-                        <div class="flex flex-col items-end shrink-0">
-                            <span class="text-2xl font-black text-cpr-yellow leading-none font-numbers">{{
-                                    roleItem.system.rank
-                                }}</span>
-                            <span class="text-[8px] text-cpr-yellow/50 uppercase font-bold">Rank</span>
+        <div v-if="roleItem" class="flex flex-col gap-1">
+            <!-- Role header row -->
+            <div class="relative min-h-[3.75rem] group"
+                 :style="{ '--frame-accent': 'var(--cpr-border)', '--frame-colour-change': 'var(--cpr-yellow)' }">
+                <RoleRowFrame class="absolute inset-0 pointer-events-none select-none"/>
+                <div class="relative z-10 flex items-stretch">
+                    <div @click="$emit('role-request', roleItem.name)"
+                         class="flex-grow p-3 pl-4 cursor-pointer">
+                        <div class="flex justify-between items-start gap-3">
+                            <div class="flex-grow">
+                                <h3 class="text-cpr-yellow font-black uppercase text-base tracking-tighter">
+                                    {{ roleItem.name }}</h3>
+                                <p class="text-[10px] text-cpr-yellow/60 font-mono uppercase tracking-widest">
+                                    {{ roleItem.system.mainRoleAbility }}</p>
+                            </div>
+                            <div class="flex flex-col items-end shrink-0 pr-2">
+                                <span class="text-2xl font-black text-cpr-yellow leading-none font-numbers">{{
+                                        roleItem.system.rank
+                                    }}</span>
+                                <span class="text-[8px] text-cpr-yellow/50 uppercase font-bold">Rank</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div @click="$emit('toggle-role', roleItem._id)"
-                     class="w-10 flex items-center justify-center border-l border-cpr-yellow/20 cursor-pointer hover:bg-cpr-yellow/10 transition-colors">
-                    <i v-icon data-lucide="chevron-down"
-                       class="w-5 h-5 text-cpr-yellow/50 transition-transform duration-300"
-                       :class="{'rotate-180': expandedRoleItems[roleItem._id]}"></i>
+                    <div @click="$emit('toggle-role', roleItem._id)"
+                         class="w-12 flex items-center justify-center cursor-pointer">
+                        <i v-icon data-lucide="chevron-down"
+                           class="w-5 h-5 text-cpr-yellow/50 transition-transform duration-300"
+                           :class="{'rotate-180': expandedRoleItems[roleItem._id]}"></i>
+                    </div>
                 </div>
             </div>
 
+            <!-- Role description dropdown -->
             <transition name="expand">
-                <div v-if="expandedRoleItems[roleItem._id]"
-                     class="p-3 bg-cpr-yellow-dark/5 border-b border-cpr-yellow/10">
-                    <div class="text-[11px] text-cpr-text-main leading-relaxed cpr-description"
+                <div v-if="expandedRoleItems[roleItem._id]" class="relative"
+                     :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                    <DropdownInfoFrame class="absolute inset-0 pointer-events-none select-none"/>
+                    <div class="relative z-10 p-4 text-[11px] text-cpr-text-main leading-relaxed cpr-description"
                          v-html="roleItem.system.description.value"></div>
                 </div>
             </transition>
 
+            <!-- Role abilities (unchanged first pass) -->
             <div v-if="roleItem.system.abilities && Object.keys(roleItem.system.abilities).length > 0"
-                 class="divide-y divide-yellow-500/10">
+                 class="divide-y divide-yellow-500/10 border border-cpr-yellow/20 bg-cpr-black/40">
                 <div v-for="(ability, key) in roleItem.system.abilities" :key="key" class="group/ability">
                     <div class="flex items-stretch hover:bg-cpr-yellow/5 transition-colors">
                         <div @click="$emit('role-ability-request', roleItem.name, ability.name)"
@@ -91,49 +97,56 @@
                        class="w-4 h-4 text-cpr-red group-hover:text-cpr-teal"></i>
                 </div>
             </div>
-            <div v-show="!collapsedCategories[categoryKey]"
-                 class="grid grid-cols-1 gap-px bg-cpr-black-elevated border border-cpr-border">
-                <div v-for="(skill, index) in group" :key="skill._id"
-                     class="flex flex-col bg-cpr-black border-b border-white/5 last:border-0">
-                    <div
-                        class="flex justify-between items-center p-2 hover:bg-cpr-teal-dark/20 cursor-pointer group transition-colors gap-3"
-                        @click="$emit('skill-request', skill.name)">
-                        <div class="flex items-center gap-3 flex-1">
-                            <div class="flex flex-col">
-                                <div class="flex items-baseline gap-2">
-                                    <span
-                                        class="text-sm font-medium text-cpr-text-main group-hover:text-cpr-teal transition-colors">{{
-                                            skill.name
-                                        }}</span>
-                                    <span class="text-[10px] text-cpr-red font-black uppercase tracking-wider">({{
-                                            skill.system.stat
-                                        }})</span>
+            <div v-show="!collapsedCategories[categoryKey]" class="flex flex-col gap-2">
+                <div v-for="(skill, index) in group" :key="skill._id" class="flex flex-col">
+                    <!-- Skill row -->
+                    <div class="relative flex items-stretch min-h-[3.25rem] group"
+                         :style="{ '--frame-accent': 'var(--cpr-border)', '--frame-colour-change': 'var(--cpr-red)' }">
+                        <SkillRowFrame class="absolute inset-0 pointer-events-none select-none"/>
+                        <div
+                            class="relative z-10 flex-1 flex justify-between items-center p-2 pl-4 cursor-pointer gap-3"
+                            @click="$emit('skill-request', skill.name)">
+                            <div class="flex items-center gap-3 flex-1">
+                                <div class="flex flex-col">
+                                    <div class="flex items-baseline gap-2">
+                                        <span
+                                            class="text-sm font-medium text-cpr-text-main group-hover:text-cpr-teal transition-colors">{{
+                                                skill.name
+                                            }}</span>
+                                        <span class="text-[10px] text-cpr-red font-black uppercase tracking-wider">({{
+                                                skill.system.stat
+                                            }})</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    @click.stop="$emit('toggle-skill', skill._id)"
+                                    class="p-1 hover:text-cpr-teal transition-colors"
+                                    v-if="skillsDescriptions[skill.name]">
+                                    <i v-icon data-lucide="chevron-down"
+                                       class="w-4 h-4 text-cpr-text-dim transition-transform duration-300"
+                                       :class="{ 'rotate-180': expandedSkills[skill._id] }"></i>
+                                </button>
+                                <span class="text-[9px] mr-4 text-cpr-text-dim uppercase">Lvl <span class="font-numbers">{{
+                                        skill.system.level
+                                    }}</span></span>
+                                <div
+                                    class="w-8 h-8 flex items-center justify-center mt-[2px] text-cpr-black font-bold font-black font-numbers text-m">
+                                    {{ calculateBase(skill) }}
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-[9px] text-cpr-text-dim uppercase mr-1">Lvl <span class="font-numbers">{{
-                                    skill.system.level
-                                }}</span></span>
-                            <div
-                                class="w-8 h-8 flex items-center justify-center bg-[var(--cpr-black-elevated)] border border-cpr-border text-cpr-red font-bold font-numbers text-sm rounded-sm">
-                                {{ calculateBase(skill) }}
-                            </div>
-                            <button
-                                @click.stop="$emit('toggle-skill', skill._id)"
-                                class="ml-1 p-1 hover:text-cpr-teal transition-colors"
-                                v-if="skillsDescriptions[skill.name]">
-                                <i v-icon data-lucide="chevron-down"
-                                   class="w-4 h-4 text-cpr-text-dim transition-transform duration-300"
-                                   :class="{ 'rotate-180': expandedSkills[skill._id] }"></i>
-                            </button>
-                        </div>
                     </div>
 
+                    <!-- Skill description dropdown -->
                     <transition name="expand">
-                        <div v-if="expandedSkills[skill._id] && skillsDescriptions[skill.name]"
-                             class="px-3 py-2 bg-cpr-black-deep/40 text-[11px] text-cpr-text-muted border-t border-white/5">
-                            {{ skillsDescriptions[skill.name].text }}
+                        <div v-if="expandedSkills[skill._id] && skillsDescriptions[skill.name]" class="relative mt-1"
+                             :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                            <DropdownInfoFrame class="absolute inset-0 pointer-events-none select-none"/>
+                            <div class="relative z-10 px-4 py-3 text-[11px] text-cpr-text-muted">
+                                {{ skillsDescriptions[skill.name].text }}
+                            </div>
                         </div>
                     </transition>
                 </div>
@@ -145,9 +158,13 @@
 <script>
 import {vIcon} from '../../directives/icon';
 import {formatCategoryName} from '../../utils/helpers';
+import RoleRowFrame from './frames/RoleRowFrame.vue';
+import SkillRowFrame from './frames/SkillRowFrame.vue';
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
 
 export default {
     name: 'SkillsTab',
+    components: {RoleRowFrame, SkillRowFrame, DropdownInfoFrame},
     props: ['activeTab', 'roleItem', 'expandedRoleItems', 'expandedSkills', 'groupedSkills', 'collapsedCategories', 'calculateBase', 'skillsDescriptions'],
     directives: {icon: vIcon},
     emits: ['role-request', 'role-ability-request', 'toggle-role', 'toggle-skill', 'toggle-category', 'skill-request'],

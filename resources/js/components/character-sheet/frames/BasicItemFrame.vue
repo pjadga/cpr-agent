@@ -196,40 +196,31 @@
         <div class="frame__layer frame__layer--s2">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 155 75" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 155 / 75" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     style="aspect-ratio: 155 / 75" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
                 <svg class="item-frame__mid" viewBox="155 0 176 75" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
                 <svg class="item-frame__cap" viewBox="331 0 35 75" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 35 / 75" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     style="aspect-ratio: 35 / 75" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
             </div>
         </div>
         <div class="frame__layer frame__layer--s1">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 155 75" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 155 / 75" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     style="aspect-ratio: 155 / 75" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
                 <svg class="item-frame__mid" viewBox="155 0 176 75" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
                 <svg class="item-frame__cap" viewBox="331 0 35 75" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 35 / 75" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     style="aspect-ratio: 35 / 75" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
             </div>
         </div>
         <div class="frame__layer">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 155 75" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 155 / 75" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     style="aspect-ratio: 155 / 75" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
                 <svg class="item-frame__mid" viewBox="155 0 176 75" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
                 <svg class="item-frame__cap" viewBox="331 0 35 75" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 35 / 75" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
+                     style="aspect-ratio: 35 / 75" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bi-art"/></svg>
             </div>
         </div>
     </div>

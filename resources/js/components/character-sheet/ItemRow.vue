@@ -184,7 +184,10 @@
         </div>
 
         <transition name="expand">
-            <div v-if="expanded" class="border-t border-white/5 bg-cpr-black/40 p-3 shadow-inner">
+            <div v-if="expanded" class="relative mt-1"
+                 :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                <DropdownInfoFrame class="absolute inset-0 pointer-events-none select-none"/>
+                <div class="relative z-10 p-3">
                 <template v-if="category !== 'criticalInjury'">
                     <div v-if="item.system.description && item.system.description.value"
                          class="text-cpr-text-main text-xs leading-relaxed font-sans cpr-description mb-3"
@@ -285,6 +288,7 @@
                         </button>
                     </div>
                 </div>
+                </div>
             </div>
         </transition>
     </div>
@@ -300,11 +304,12 @@ import {findItemInList, formatCategoryName} from '../../utils/helpers';
 import BasicItemFrame from './frames/BasicItemFrame.vue';
 import WeaponItemFrame from './frames/WeaponItemFrame.vue';
 import MeleeItemFrame from './frames/MeleeItemFrame.vue';
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
 
 export default {
     name: 'ItemRow',
     props: ['item', 'category', 'allItems', 'activeTab', 'refreshAll'],
-    components: {BasicItemFrame, WeaponItemFrame, MeleeItemFrame},
+    components: {BasicItemFrame, WeaponItemFrame, MeleeItemFrame, DropdownInfoFrame},
     directives: {icon: vIcon},
     emits: ['click', 'equip-click', 'consume-click'],
     setup(props, {emit}) {

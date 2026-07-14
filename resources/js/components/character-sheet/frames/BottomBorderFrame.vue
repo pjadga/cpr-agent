@@ -10,14 +10,11 @@
         <div class="frame__layer">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 185 15" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 185 / 15" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bb-art"/></svg>
+                     style="aspect-ratio: 185 / 15" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bb-art"/></svg>
                 <svg class="item-frame__mid" viewBox="185 0 20 15" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bb-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bb-art"/></svg>
                 <svg class="item-frame__cap" viewBox="205 0 185 15" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 185 / 15" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bb-art"/></svg>
+                     style="aspect-ratio: 185 / 15" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#bb-art"/></svg>
             </div>
         </div>
     </div>

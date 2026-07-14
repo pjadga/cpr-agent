@@ -436,40 +436,31 @@
         <div class="frame__layer frame__layer--s2">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 150 111" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 150 / 111" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     style="aspect-ratio: 150 / 111" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
                 <svg class="item-frame__mid" viewBox="150 0 150 111" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
                 <svg class="item-frame__cap" viewBox="300 0 66 111" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 66 / 111" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     style="aspect-ratio: 66 / 111" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
             </div>
         </div>
         <div class="frame__layer frame__layer--s1">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 150 111" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 150 / 111" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     style="aspect-ratio: 150 / 111" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
                 <svg class="item-frame__mid" viewBox="150 0 150 111" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
                 <svg class="item-frame__cap" viewBox="300 0 66 111" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 66 / 111" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     style="aspect-ratio: 66 / 111" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
             </div>
         </div>
         <div class="frame__layer">
             <div class="item-frame">
                 <svg class="item-frame__cap" viewBox="0 0 150 111" preserveAspectRatio="xMinYMid meet"
-                     style="aspect-ratio: 150 / 111" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     style="aspect-ratio: 150 / 111" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
                 <svg class="item-frame__mid" viewBox="150 0 150 111" preserveAspectRatio="none"
-                     fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
                 <svg class="item-frame__cap" viewBox="300 0 66 111" preserveAspectRatio="xMaxYMid meet"
-                     style="aspect-ratio: 66 / 111" fill="none" aria-hidden="true"
-                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
+                     style="aspect-ratio: 66 / 111" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#wi-art"/></svg>
             </div>
         </div>
     </div>

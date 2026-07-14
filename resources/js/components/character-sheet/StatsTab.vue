@@ -57,7 +57,9 @@
             </adjustable-stat>
         </div>
 
-        <div class="cpr-box border-cpr-red p-3 flex justify-between divide-x divide-gray-800">
+        <div class="relative p-3">
+            <MedStatFrame/>
+            <div class="relative z-10 flex justify-between divide-x divide-gray-800">
             <div v-if="charData.type === 'character'"
                  class="px-2 text-center w-1/4 cursor-pointer hover:bg-cpr-black-elevated transition-colors"
                  @click="$emit('open-eurobucks')">
@@ -87,6 +89,7 @@
                 <div class="text-cpr-red font-numbers font-bold">
                     {{ charData.data.system.derivedStats.deathSave.penalty }}
                 </div>
+            </div>
             </div>
         </div>
 
@@ -192,11 +195,12 @@ import AdjustableStat from './AdjustableStat.vue';
 import ItemRow from './ItemRow.vue';
 import {formatCategoryName} from '../../utils/helpers';
 import ArmourRow from "./ArmourRow.vue";
+import MedStatFrame from "./frames/MedStatFrame.vue";
 
 export default {
     name: 'StatsTab',
     props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll', 'groupedArmour'],
-    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow, ArmourRow},
+    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow, ArmourRow, MedStatFrame},
     directives: {icon: vIcon},
     emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'consume-click', 'toggle-category', 'open-eurobucks'],
     setup() {
