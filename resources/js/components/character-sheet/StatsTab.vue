@@ -1,6 +1,6 @@
 <template>
     <div v-if="activeTab === 'stats'" key="stats"
-         class="space-y-5 absolute w-full top-0 left-0 p-3">
+         class="space-y-5 w-full p-3">
 
         <div class="grid grid-cols-2 gap-3">
             <resource-counter label="HIT POINTS"

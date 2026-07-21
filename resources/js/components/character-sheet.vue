@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen pb-100 text-sans bg-cpr-black-deep">
+    <div class="min-h-screen pb-100 text-sans bg-none">
 
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
@@ -105,6 +105,7 @@
 
             <roll-result-popup></roll-result-popup>
             <dice-history></dice-history>
+            <radial-menu-host></radial-menu-host>
 
             <combat-panel
                 :show="showCombatPanel"
@@ -185,9 +186,9 @@
                 </div>
             </header>
             <div class="pt-[calc(6rem+env(safe-area-inset-bottom))]"></div>
-            <main class="p-3 max-w-md mx-auto space-y-4 relative min-h-[60vh]">
+            <main class="max-w-md mx-auto relative min-h-[60vh]">
 
-                <transition name="fade">
+                <transition name="fade" mode="out-in">
                     <stats-tab
                         v-if="activeTab === 'stats'"
                         :active-tab="activeTab"
@@ -284,7 +285,7 @@
                     ></net-tab>
                 </transition>
             </main>
-
+            <div class="pb-[calc(7rem+env(safe-area-inset-bottom))]"></div>
             <nav
                 class="fixed bottom-0 inset-x-0 bg-cpr-black-deep border-t border-cpr-red-dark/30 flex justify-around pt-4 p-2 pb-6 z-50">
                 <bottom-border-frame></bottom-border-frame>

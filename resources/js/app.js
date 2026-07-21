@@ -23,6 +23,7 @@ import DiceHistory from "./components/DiceHistory.vue";
 import QrLinkScanner from "./components/QrLinkScanner.vue";
 import {vCprImg} from "./directives/cpr-img";
 import {initTiltShadow} from "./composables/useTiltShadow";
+import {RadialMenu} from "./plugins/radial-menu";
 import mitt from 'mitt';
 
 window.emitter = mitt();
@@ -53,9 +54,10 @@ app.component('roll-result-popup', RollResultPopup);
 app.component('dice-history', DiceHistory);
 app.component('qr-link-scanner', QrLinkScanner);
 app.directive('cpr-img', vCprImg);
+app.use(RadialMenu);
 
 // The main agent UI mounts on #app. Some pages (e.g. settings) are Alpine-driven
-// and have no #app — guard so Vue doesn't warn on a missing root there.
+// and have no #app, so guard against Vue warning on a missing root there.
 if (document.getElementById('app')) {
     app.mount('#app');
     // Tilt/gyro parallax for the frame drop-shadows (pointer fallback on desktop).

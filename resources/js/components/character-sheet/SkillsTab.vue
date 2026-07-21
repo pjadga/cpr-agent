@@ -1,6 +1,6 @@
 <template>
     <div v-if="activeTab === 'skills'" key="skills"
-         class="space-y-4 absolute w-full top-0 left-0 p-3 pb-[calc(5rem+env(safe-area-inset-bottom))]">
+         class="space-y-4 w-full p-3">
         <div v-if="roleItem" class="flex flex-col gap-1">
             <!-- Role header row -->
             <div class="relative min-h-[3.75rem] group"

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="activeTab === 'control'" key="control" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
+    <div v-if="activeTab === 'control'" key="control" class="space-y-6 w-full p-3">
 
         <div v-if="hasNetspaceOptions" class="flex bg-cpr-black border border-cpr-border p-1 rounded-sm">
             <button @click="controlState.spaceMode = 'meatspace'"
@@ -21,43 +21,48 @@
                     <span class="text-cpr-yellow font-bold text-sm uppercase">Target Acquisition</span>
                 </h3>
                 <div class="relative">
-                    <button @click="showTargetDropdown = !showTargetDropdown"
-                            class="w-full p-3 bg-cpr-black border border-cpr-border flex items-center justify-between text-left transition-colors hover:border-cpr-border-muted">
-                        <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
-
-                            <span class="text-xs font-bold text-cpr-yellow uppercase">{{
-                                    controlState.selectedTarget.name
-                                }}</span>
-                            <span class="text-[9px] text-cpr-text-dim">(<span
-                                class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
+                    <!-- Trigger row -->
+                    <div @click="showTargetDropdown = !showTargetDropdown"
+                         class="relative flex items-stretch min-h-[3.25rem] cursor-pointer group"
+                         :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                        <BasicRowFrame class="absolute inset-0 pointer-events-none select-none"/>
+                        <div class="relative z-10 flex-1 flex items-center justify-between p-2 pl-4 gap-3">
+                            <div v-if="controlState.selectedTarget" class="flex items-center gap-3">
+                                <span class="text-xs font-bold text-cpr-yellow uppercase">{{
+                                        controlState.selectedTarget.name
+                                    }}</span>
+                                <span class="text-[9px] text-cpr-text-dim">(<span
+                                    class="font-numbers">{{ controlState.selectedTarget.distanceM }}</span>m)</span>
+                            </div>
+                            <span v-else class="text-xs text-cpr-text-dim uppercase italic font-mono">No Hostile Signal Locked</span>
+                            <i v-icon data-lucide="chevron-down"
+                               class="w-4 h-4 text-cpr-text-dim transition-transform duration-200"
+                               :class="{'rotate-180': showTargetDropdown}"></i>
                         </div>
-                        <span v-else class="text-xs text-cpr-text-dim uppercase italic font-mono">No Hostile Signal Locked</span>
-                        <i v-icon data-lucide="chevron-down"
-                           class="w-4 h-4 text-cpr-text-dim transition-transform duration-200"
-                           :class="{'rotate-180': showTargetDropdown}"></i>
-                    </button>
+                    </div>
 
+                    <!-- Target list dropdown -->
                     <transition name="expand">
-                        <div v-if="showTargetDropdown"
-                             class="absolute z-50 w-full mt-1 bg-cpr-black-deep border border-cpr-border shadow-[0_10px_30px_rgba(0,0,0,0.8)] max-h-64 overflow-y-auto divide-y divide-gray-900">
-                            <div v-for="enemy in mockEnemies" :key="enemy.id"
-                                 @click="controlState.selectedTarget = enemy; showTargetDropdown = false"
-                                 class="p-3 flex items-center justify-between cursor-pointer hover:bg-cpr-red-dark/20 transition-colors">
-                                <div class="flex items-center gap-3">
-
+                        <div v-if="showTargetDropdown" class="relative mt-1"
+                             :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                            <DropdownInfoFrame class="absolute inset-0 pointer-events-none select-none"/>
+                            <div class="relative z-10 max-h-64 overflow-y-auto p-2 space-y-1">
+                                <div v-for="enemy in mockEnemies" :key="enemy.id"
+                                     @click="controlState.selectedTarget = enemy; showTargetDropdown = false"
+                                     class="p-2 flex items-center justify-between cursor-pointer hover:bg-cpr-red-dark/20 transition-colors">
                                     <div>
                                         <div class="text-xs font-bold text-cpr-yellow uppercase">{{ enemy.name }}</div>
                                         <div class="text-[9px] text-cpr-text-dim"><span
                                             class="font-numbers">{{ enemy.distanceM }}</span>m away
                                         </div>
                                     </div>
+                                    <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-cpr-red">
+                                        <i v-icon data-lucide="target" class="w-4 h-4"></i>
+                                    </div>
                                 </div>
-                                <div v-if="controlState.selectedTarget?.id === enemy.id" class="text-cpr-red">
-                                    <i v-icon data-lucide="target" class="w-4 h-4"></i>
+                                <div v-if="mockEnemies.length === 0" class="p-6 text-center">
+                                    <span class="text-[10px] text-cpr-text-dim uppercase font-mono italic">No hostile signals detected</span>
                                 </div>
-                            </div>
-                            <div v-if="mockEnemies.length === 0" class="p-6 text-center">
-                                <span class="text-[10px] text-cpr-text-dim uppercase font-mono italic">No hostile signals detected</span>
                             </div>
                         </div>
                     </transition>
@@ -124,8 +129,10 @@
                         <button v-for="action in ['Jack In', 'Breach', 'Quickhack']"
                                 :key="action"
                                 @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
-                                class="py-3 bg-cpr-teal-dark/20 border border-cpr-teal/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black hover:border-cpr-teal transition-all">
-                            {{ action }}
+                                class="relative py-3 px-1 flex items-center justify-center text-[9px] font-bold text-cpr-text-bright uppercase hover:text-cpr-teal hover:[--frame-colour-change:var(--cpr-teal)] transition-all group"
+                                :style="{ '--frame-border': 'var(--cpr-teal)' }">
+                            <med-stat-frame/>
+                            <span class="relative z-10 text-center leading-tight">{{ action }}</span>
                         </button>
                     </div>
 
@@ -136,8 +143,10 @@
                             v-for="action in ['Scanner', 'Backdoor', 'Cloak', 'Control', 'Eye-Dee', 'Pathfinder', 'Slide', 'Virus', 'Zap', 'Defense', 'Speed']"
                             :key="action"
                             @click="$emit('program-roll-request', { programName: action, type: 'interface', cyberdeckId: activeCyberdeck._id})"
-                            class="py-3 bg-cpr-teal-dark/20 border border-cpr-teal/30 text-[9px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black hover:border-cpr-teal transition-all">
-                            {{ action }}
+                            class="relative py-3 px-1 flex items-center justify-center text-[9px] font-bold text-cpr-text-bright uppercase hover:text-cpr-teal hover:[--frame-colour-change:var(--cpr-teal)] transition-all group"
+                            :style="{ '--frame-border': 'var(--cpr-teal)' }">
+                            <med-stat-frame/>
+                            <span class="relative z-10 text-center leading-tight">{{ action }}</span>
                         </button>
                     </div>
                 </div>
@@ -191,21 +200,25 @@
             <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-4">
                 <div></div>
                 <button @click="$emit('move', 'up')"
-                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
-                    <i v-icon data-lucide="chevron-up" class="w-6 h-6 pointer-events-none"></i>
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                    <simple-stat-frame class="rotate-0"/>
+                    <i v-icon data-lucide="chevron-up" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
                 <div></div>
                 <button @click="$emit('move', 'left')"
-                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
-                    <i v-icon data-lucide="chevron-left" class="w-6 h-6 pointer-events-none"></i>
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                    <simple-stat-frame class="-rotate-90"/>
+                    <i v-icon data-lucide="chevron-left" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
                 <button @click="$emit('move', 'down')"
-                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
-                    <i v-icon data-lucide="chevron-down" class="w-6 h-6 pointer-events-none"></i>
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                    <simple-stat-frame class="rotate-180"/>
+                    <i v-icon data-lucide="chevron-down" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
                 <button @click="$emit('move', 'right')"
-                        class="aspect-square bg-cpr-black-deep border border-cpr-border text-cpr-yellow flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
-                    <i v-icon data-lucide="chevron-right" class="w-6 h-6 pointer-events-none"></i>
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                    <simple-stat-frame class="rotate-90"/>
+                    <i v-icon data-lucide="chevron-right" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
             </div>
         </div>
@@ -218,6 +231,10 @@ import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import ProgramRow from './ProgramRow.vue';
 import ItemRow from './ItemRow.vue';
+import BasicRowFrame from './frames/BasicRowFrame.vue';
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
+import SimpleStatFrame from './frames/SimpleStatFrame.vue';
+import MedStatFrame from './frames/MedStatFrame.vue';
 
 
 export default {
@@ -227,7 +244,7 @@ export default {
         'availableFireModes', 'dvLoading', 'dvError', 'dvInfo',
         'activeCyberdeck', 'programCategories', 'expandedPrograms', 'refreshAll'
     ],
-    components: {ProgramRow, ItemRow},
+    components: {ProgramRow, ItemRow, BasicRowFrame, DropdownInfoFrame, SimpleStatFrame, MedStatFrame},
     directives: {icon: vIcon},
     emits: [
         'roll-hit', 'roll-damage', 'reload', 'move',

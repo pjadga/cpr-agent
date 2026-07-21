@@ -1,5 +1,5 @@
 <template>
-    <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
+    <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 w-full p-3">
 
 
         <div>
@@ -19,7 +19,7 @@
                             {{ type }}
                         </h4>
                         <div class="space-y-2">
-                            <div v-for="cw in group" :key="cw._id">
+                            <div v-for="cw in group" :key="cw._id" v-long-press="() => itemActions(cw)">
                                 <item-row
                                     :item="cw"
                                     category="cyberware"
@@ -67,7 +67,7 @@
                                 {{ formatCategory(category) }}
                             </h4>
                             <div class="space-y-2">
-                                <div v-for="item in items" :key="item._id">
+                                <div v-for="item in items" :key="item._id" v-long-press="() => itemActions(item)">
                                     <item-row
                                         :item="item"
                                         :category="category"
@@ -105,16 +105,33 @@
 <script>
 import {vIcon} from '../../directives/icon';
 import ItemRow from './ItemRow.vue';
+import {longPress} from '../../plugins/radial-menu';
 import {formatCategoryName} from '../../utils/helpers';
 
 export default {
     name: 'GearTab',
     props: ['activeTab', 'collapsedCategories', 'groupedCyberware', 'groupedGear', 'charData', 'refreshAll'],
     components: {ItemRow},
-    directives: {icon: vIcon},
+    directives: {icon: vIcon, 'long-press': longPress},
     emits: ['toggle-category', 'item-click', 'equip-click', 'consume-click'],
-    setup() {
-        return {formatCategory: formatCategoryName};
+    setup(props, {emit}) {
+        // Contextual radial-menu actions for an inventory item. Handlers reuse the
+        // existing modal/select flows plumbed up to the parent sheet.
+        const itemActions = (item) => {
+            const actions = [
+                {id: 'info', icon: 'info', label: 'Info', handler: () => emit('item-click', item)},
+                {id: 'equip', icon: 'hand', label: 'Equip', handler: () => emit('equip-click', item)},
+            ];
+            if (item.type === 'drug' || item.system?.isConsumable) {
+                actions.push({id: 'use', icon: 'pill', label: 'Use', handler: () => emit('consume-click', item)});
+            }
+            if (item.system?.isWeapon) {
+                actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('item-click', item)});
+            }
+            return actions;
+        };
+
+        return {formatCategory: formatCategoryName, itemActions};
     }
 }
 </script>
