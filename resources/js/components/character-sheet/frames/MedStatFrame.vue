@@ -1,4 +1,4 @@
-<!-- Generated from resources/svg/ by scripts/build-frames.py — edit the SVG or the script, not this file. -->
+<!-- Generated from resources/svg/ by scripts/build-frames.py. Edit the SVG or the script, not this file. -->
 <template>
     <div class="frame absolute inset-0 z-0">
         <svg class="frame__defs" width="0" height="0" aria-hidden="true" focusable="false"

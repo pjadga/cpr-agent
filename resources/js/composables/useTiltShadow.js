@@ -15,7 +15,7 @@ import gsap from 'gsap';
  * Call once after mount: initTiltShadow().
  */
 
-const BASE = { s1: 3, s2: 6 };   // rest offsets (px) — match the CSS defaults
+const BASE = { s1: 3, s2: 6 };   // rest offsets (px), match the CSS defaults
 const RANGE = { s1: 5, s2: 10 }; // ± travel (px) at full deflection
 const FULL_TILT = 25;            // degrees of tilt that maps to full deflection
 

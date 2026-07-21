@@ -116,7 +116,7 @@ export function useDeltaApplier(charData, loading) {
             }
 
             // Deep item-field updates (e.g. data.items.ID.system.magazine.value) mutate
-            // the item object in place — same reference, so child props never change and
+            // the item object in place (same reference), so child props never change and
             // computeds (ammo bar, equipped icon) don't re-run. Record the index so the
             // clone pass below gives that item a fresh reference and reactivity fires.
             if (mapped.startsWith('data.items.') && !mapped.startsWith('data.items.+')) {
