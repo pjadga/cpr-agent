@@ -1,7 +1,7 @@
 <template>
     <transition name="radial-fade">
         <div v-if="radialState.open"
-             class="fixed inset-0 z-[300] select-none touch-none"
+             class="fixed inset-0 z-[300] select-none touch-none bg-cpr-black/65"
              @pointerdown.self="onBackdropDown"
              @click.self="closeRadial">
 
@@ -15,7 +15,11 @@
                 :ref="el => (petalEls[i] = el)"
                 type="button"
                 class="radial-petal group"
-                :class="{ 'radial-petal--on': highlightIndex === i, 'radial-petal--off': a.disabled }"
+                :class="{
+                    'radial-petal--on': highlightIndex === i,
+                    'radial-petal--dim': highlightIndex !== -1 && highlightIndex !== i && !a.disabled,
+                    'radial-petal--off': a.disabled,
+                }"
                 :style="petalStyle(i)"
                 @pointerup.stop.prevent="onPetalUp(i)"
                 @pointerenter="!isDragPointer && (highlightIndex = i)"
@@ -24,10 +28,10 @@
                 <span class="relative z-10 flex flex-col items-center justify-center gap-0.5 pointer-events-none px-1">
                     <i v-icon :data-lucide="a.icon || 'circle'"
                        class="w-5 h-5 transition-colors"
-                       :style="{ color: highlightIndex === i ? 'var(--cpr-black)' : (a.color || 'var(--cpr-yellow)') }"></i>
+                       :style="{ color: highlightIndex === i ? 'var(--cpr-yellow)' : (a.color || 'var(--cpr-text-main)') }"></i>
                     <span v-if="a.label"
                           class="text-[8px] font-black uppercase tracking-tight leading-none text-center transition-colors"
-                          :style="{ color: highlightIndex === i ? 'var(--cpr-black)' : 'var(--cpr-text-main)' }">{{
+                          :style="{ color: highlightIndex === i ? 'var(--cpr-yellow)' : 'var(--cpr-text-main)' }">{{
                             a.label
                         }}</span>
                 </span>
@@ -127,8 +131,7 @@ export default {
             let bestDiff = Infinity;
             const ang = (Math.atan2(dy, dx) * 180) / Math.PI; // 0 = east
             layout.value.forEach((l, i) => {
-                let diff = Math.abs(((ang - l.angleDeg + 540) % 360) - 180);
-                diff = 180 - diff; // smaller diff = closer
+                const diff = Math.abs(((ang - l.angleDeg + 540) % 360) - 180); // smaller diff = closer
                 if (diff < bestDiff) {
                     bestDiff = diff;
                     best = i;
@@ -208,12 +211,18 @@ export default {
     border: 0;
     cursor: pointer;
     touch-action: none;
-    transition: filter 0.15s ease;
+    transition: filter 0.15s ease, background-color 0.15s ease;
 }
 
 .radial-petal--on {
+    background-color: var(--cpr-panel-hover);
+    border-radius: 10px;
     filter: drop-shadow(0 0 12px rgba(234, 179, 8, 0.55));
     z-index: 2;
+}
+
+.radial-petal--dim {
+    filter: brightness(0.6);
 }
 
 .radial-petal--off {

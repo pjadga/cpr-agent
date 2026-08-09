@@ -122,7 +122,7 @@
                             <div class="flex items-center gap-2">
                                 <button
                                     @click.stop="$emit('toggle-skill', skill._id)"
-                                    class="p-1 hover:text-cpr-teal transition-colors"
+                                    class="p-1 hover:text-cpr-teal transition-colors cursor-pointer"
                                     v-if="skillsDescriptions[skill.name]">
                                     <i v-icon data-lucide="chevron-down"
                                        class="w-4 h-4 text-cpr-text-dim transition-transform duration-300"

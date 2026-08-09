@@ -200,23 +200,23 @@
             <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-4">
                 <div></div>
                 <button @click="$emit('move', 'up')"
-                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
                     <simple-stat-frame class="rotate-0"/>
                     <i v-icon data-lucide="chevron-up" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
                 <div></div>
                 <button @click="$emit('move', 'left')"
-                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
                     <simple-stat-frame class="-rotate-90"/>
                     <i v-icon data-lucide="chevron-left" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
                 <button @click="$emit('move', 'down')"
-                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
                     <simple-stat-frame class="rotate-180"/>
                     <i v-icon data-lucide="chevron-down" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>
                 <button @click="$emit('move', 'right')"
-                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group">
+                        class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
                     <simple-stat-frame class="rotate-90"/>
                     <i v-icon data-lucide="chevron-right" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                 </button>

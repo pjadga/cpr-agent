@@ -39,7 +39,7 @@
 
         <div v-if="!loading && charData && !error">
             <!-- Fixed backdrop behind everything; opaque header/nav frame it between the borders. -->
-            <mobile-background-frame></mobile-background-frame>
+            <mobile-background-frame :style="{ '--frame-border': 'var(--cpr-teal-dark)' }"></mobile-background-frame>
 
             <!-- Modals & Popups -->
             <cyberdeck-config
@@ -186,7 +186,7 @@
                 </div>
             </header>
             <div class="pt-[calc(6rem+env(safe-area-inset-bottom))]"></div>
-            <main class="max-w-md mx-auto relative min-h-[60vh]">
+            <main class="max-w-md mx-auto relative min-h-[60vh] [backdrop-filter:blur(6px)] [-webkit-backdrop-filter:blur(6px)]">
 
                 <transition name="fade" mode="out-in">
                     <stats-tab

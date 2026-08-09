@@ -77,20 +77,20 @@
                     <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-2">
                         <div></div>
                         <button @click="$emit('move', 'up')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
                             <i v-icon data-lucide="chevron-up" class="w-6 h-6"></i>
                         </button>
                         <div></div>
                         <button @click="$emit('move', 'left')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
                             <i v-icon data-lucide="chevron-left" class="w-6 h-6"></i>
                         </button>
                         <button @click="$emit('move', 'down')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
                             <i v-icon data-lucide="chevron-down" class="w-6 h-6"></i>
                         </button>
                         <button @click="$emit('move', 'right')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg">
+                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
                             <i v-icon data-lucide="chevron-right" class="w-6 h-6"></i>
                         </button>
                     </div>

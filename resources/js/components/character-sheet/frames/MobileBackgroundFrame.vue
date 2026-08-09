@@ -33,7 +33,7 @@ export default {
 /* Layered shadow: two darkened, offset back layers behind the real front layer.
    GSAP drives --shadow-s1-x/y and --shadow-s2-x/y (gyro parallax); the fill
    roles are neutralised on the back layers so only the outline casts. */
-.frame { width: 100%; height: 100%; pointer-events: none; }
+.frame { width: 100%; height: 100%; pointer-events: none; opacity: 0.3}
 .frame__defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 .frame__layer { position: absolute; inset: 0; }
 .frame__layer--s2 { transform: translate(var(--shadow-s2-x, 6px), var(--shadow-s2-y, 6px)); filter: brightness(0.3); --frame-bg: transparent; --frame-panel: transparent; --frame-teal: transparent; --frame-text: transparent; --frame-muted: transparent; --frame-green: transparent; }

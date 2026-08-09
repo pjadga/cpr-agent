@@ -7,7 +7,8 @@
             '--frame-colour-change': `var(--${categoryColor})`,
             '--ammo-fill': ammo ? ammo.fill : 0,
             '--ammo-colour': ammo ? ammo.colour : null,
-        }">
+        }"
+        v-long-press="itemActions">
 
         <div class="relative flex items-stretch"
              :class="category !== 'weapon' ? 'min-h-[75px]' : (isMeleeOrUnarmed ? 'min-h-[83px]' : 'min-h-[111px]')">
@@ -301,6 +302,7 @@ import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {findItemInList, formatCategoryName} from '../../utils/helpers';
+import {longPress} from '../../plugins/radial-menu';
 import BasicItemFrame from './frames/BasicItemFrame.vue';
 import WeaponItemFrame from './frames/WeaponItemFrame.vue';
 import MeleeItemFrame from './frames/MeleeItemFrame.vue';
@@ -310,7 +312,7 @@ export default {
     name: 'ItemRow',
     props: ['item', 'category', 'allItems', 'activeTab', 'refreshAll'],
     components: {BasicItemFrame, WeaponItemFrame, MeleeItemFrame, DropdownInfoFrame},
-    directives: {icon: vIcon},
+    directives: {icon: vIcon, 'long-press': longPress},
     emits: ['click', 'equip-click', 'consume-click'],
     setup(props, {emit}) {
         const {getImageUrl, fetchCharacterData, charData, isPlayer} = useCharacterData();
@@ -319,6 +321,23 @@ export default {
 
         const toggle = () => {
             expanded.value = !expanded.value;
+        };
+
+        // Contextual radial-menu (long-press) actions for this row. "Info" opens
+        // the row's own dropdown directly rather than bubbling a click, so it
+        // works the same on any tab that renders an ItemRow.
+        const itemActions = () => {
+            const actions = [
+                {id: 'info', icon: 'info', label: 'Info', handler: toggle},
+                {id: 'equip', icon: 'hand', label: 'Equip', handler: () => emit('equip-click', props.item)},
+            ];
+            if (props.item.type === 'drug' || props.item.system?.isConsumable) {
+                actions.push({id: 'use', icon: 'pill', label: 'Use', handler: () => emit('consume-click', props.item)});
+            }
+            if (props.item.system?.isWeapon) {
+                actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('click', props.item)});
+            }
+            return actions;
         };
 
         const reloadWithAmmo = async (ammoId) => {
@@ -507,6 +526,7 @@ export default {
         return {
             expanded,
             toggle,
+            itemActions,
             formatType,
             findItem,
             ammoName,
