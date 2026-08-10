@@ -1,21 +1,36 @@
 <template>
     <div @click="$emit('click')"
-         class="cpr-panel bg-[var(--cpr-black-elevated)] hover:bg-cpr-teal-dark/40 hover:border-cpr-teal/50 p-2 flex flex-col items-center justify-center cpr-stat-box cursor-pointer transition-all group relative">
+         class="h-25 hover:bg-cpr-teal-dark/40 hover:border-cpr-teal/50 hover:[--frame-colour-change:var(--cpr-teal)] p-2 flex flex-col items-center justify-center  cursor-pointer transition-all group relative">
+        <simple-stat-frame></simple-stat-frame>
         <span
-            class="text-2xl font-black text-cpr-yellow leading-none group-hover:text-cpr-teal transition-colors font-numbers">{{
+            class="text-2xl font-black text-cpr-yellow leading-none group-hover:text-cpr-teal transition-colors z-0 font-numbers">{{
                 value
             }}</span>
-        <span class="text-[11px] text-cpr-red font-black uppercase mt-1 group-hover:text-cpr-teal transition-colors">{{
+        <span class="text-[11px] text-cpr-red font-black uppercase mt-1 group-hover:text-cpr-teal z-0 transition-colors">{{
                 label
             }}</span>
-        <div class="cpr-corner-square text-cpr-red"></div>
+
     </div>
 </template>
 
 <script>
+import SimpleStatFrame from "./frames/SimpleStatFrame.vue";
+
 export default {
     name: 'SimpleStat',
+    components: {SimpleStatFrame},
     props: ['label', 'value'],
     emits: ['click']
 };
 </script>
+
+<style>
+.stat-frame {
+    filter: drop-shadow(3px 3px 0px #ff00001f) drop-shadow(6px 6px 0px #310000);
+    transition: 0.2s
+}
+.stat-frame:hover {
+    filter: drop-shadow(0px 0px 0px #ff00001f) drop-shadow(0px 0px 0px #310000);
+    transition: 0.2s
+}
+</style>

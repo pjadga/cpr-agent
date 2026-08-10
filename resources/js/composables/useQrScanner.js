@@ -4,7 +4,7 @@ import { classifyCameraError } from './useFoundryDiagnostics';
 
 /**
  * Drives the device camera and decodes QR codes with jsQR.
- * Pure camera plumbing — payload validation lives in useFoundryDiagnostics.
+ * Just the camera plumbing; payload validation lives in useFoundryDiagnostics.
  */
 export function useQrScanner() {
     const scanning = ref(false);

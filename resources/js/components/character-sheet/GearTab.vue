@@ -1,5 +1,5 @@
 <template>
-    <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 absolute w-full top-0 left-0 p-3 pb-20">
+    <div v-if="activeTab === 'gear'" key="gear" class="space-y-6 w-full p-3">
 
 
         <div>
