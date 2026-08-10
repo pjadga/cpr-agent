@@ -327,15 +327,34 @@ export default {
         // the row's own dropdown directly rather than bubbling a click, so it
         // works the same on any tab that renders an ItemRow.
         const itemActions = () => {
+            // Cyberware: Info only — equipping/removing incurs penalties not modelled yet.
+            if (props.category === 'cyberware') {
+                return [{id: 'info', icon: 'info', label: 'Info', handler: toggle}];
+            }
+
             const actions = [
                 {id: 'info', icon: 'info', label: 'Info', handler: toggle},
-                {id: 'equip', icon: 'hand', label: 'Equip', handler: () => emit('equip-click', props.item)},
             ];
+            // Equip is meaningless on the Control page — those weapons are already
+            // equipped, and "Equip" doesn't ready them for combat. Select does.
+            const isControlWeapon = isWeaponItem.value && props.activeTab === 'control';
+            if (!isControlWeapon) {
+                actions.push({id: 'equip', icon: 'hand', label: 'Equip', handler: () => emit('equip-click', props.item)});
+            }
             if (props.item.type === 'drug' || props.item.system?.isConsumable) {
                 actions.push({id: 'use', icon: 'pill', label: 'Use', handler: () => emit('consume-click', props.item)});
             }
-            if (props.item.system?.isWeapon) {
-                actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('click', props.item)});
+            if (isWeaponItem.value) {
+                // On the Control page, "Select" makes this the weapon being fired
+                // (same as tapping the row). Elsewhere it's the generic "Ready".
+                if (props.activeTab === 'control') {
+                    actions.push({id: 'select', icon: 'crosshair', label: 'Select', handler: () => emit('click', props.item)});
+                } else {
+                    actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('click', props.item)});
+                }
+            }
+            if (usesAmmo.value) {
+                actions.push({id: 'reload', icon: 'rotate-cw', label: 'Reload', handler: reloadThisWeapon});
             }
             return actions;
         };
@@ -354,6 +373,38 @@ export default {
                 refresh();
             } catch (err) {
                 console.error("Error reloading weapon:", err);
+            }
+        };
+
+        // Reliable weapon test: real Foundry data often leaves system.isWeapon
+        // null, so fall back to the intrinsic type / passed category (mirrors
+        // handleItemClick's `isWeapon || type === 'weapon'`).
+        const isWeaponItem = computed(() =>
+            !!props.item.system?.isWeapon || props.item.type === 'weapon' || props.category === 'weapon'
+        );
+
+        // True for ranged weapons that draw from a magazine — drives the radial
+        // "Reload" petal (melee/unarmed and mag-less weapons are excluded).
+        const usesAmmo = computed(() => {
+            const sys = props.item.system;
+            if (!isWeaponItem.value) return false;
+            if (isMeleeOrUnarmed.value) return false;
+            return !!(sys.magazine && sys.magazine.max > 0);
+        });
+
+        // One-tap reload of THIS weapon (any page). ammoId omitted → Foundry
+        // reloads with the currently-installed ammo. Mirrors useCombat's payload.
+        const reloadThisWeapon = async () => {
+            try {
+                await window.axios.post('/api/reloadweapon', {
+                    weaponId: props.item._id,
+                    actorId: charData.value?.uuid,
+                    tokenId: charData.value?.tokenId,
+                });
+                const refresh = props.refreshAll || fetchCharacterData;
+                refresh();
+            } catch (err) {
+                console.error('Error reloading weapon:', err);
             }
         };
 

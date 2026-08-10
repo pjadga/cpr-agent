@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen pb-100 text-sans bg-none">
+    <div class="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom))] text-sans bg-none">
 
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
@@ -186,7 +186,16 @@
                 </div>
             </header>
             <div class="pt-[calc(6rem+env(safe-area-inset-bottom))]"></div>
-            <main class="max-w-md mx-auto relative min-h-[60vh] [backdrop-filter:blur(6px)] [-webkit-backdrop-filter:blur(6px)]">
+            <main class="max-w-md mx-auto relative min-h-[60vh]">
+
+                <!-- Progressive/tapered backdrop blur: stacked masked layers compound toward
+                     the centre (strong, ~10px) and fade to the edges. Content stays sharp
+                     because these sit on -z-10 behind the in-flow content. aria-hidden. -->
+                <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+                    <div class="absolute inset-0 [backdrop-filter:blur(2px)] [-webkit-backdrop-filter:blur(2px)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_60%,transparent_100%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_60%,transparent_100%)]"></div>
+                    <div class="absolute inset-0 [backdrop-filter:blur(4px)] [-webkit-backdrop-filter:blur(4px)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_30%,transparent_72%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_30%,transparent_72%)]"></div>
+                    <div class="absolute inset-0 [backdrop-filter:blur(8px)] [-webkit-backdrop-filter:blur(8px)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_12%,transparent_48%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_12%,transparent_48%)]"></div>
+                </div>
 
                 <transition name="fade" mode="out-in">
                     <stats-tab

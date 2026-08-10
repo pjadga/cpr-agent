@@ -10,6 +10,11 @@ import {openRadial} from './useRadialMenu';
  * Moving past the threshold before the hold fires cancels it, so normal
  * scrolling still works. The opening pointer id is handed to the host so a
  * continuous drag can slide straight onto a petal and release to select.
+ *
+ * The current binding value is stashed on the element and refreshed in
+ * `updated()`, so a changed action list (reactive edit, or HMR swapping the
+ * component) takes effect without a full remount — the hold reads the live
+ * value at trigger time rather than a stale mount-time snapshot.
  */
 const DEFAULT_DELAY = 350;
 const MOVE_CANCEL = 12; // px of movement that aborts the hold (treat as scroll)
@@ -20,13 +25,19 @@ function resolveActions(value) {
     return Array.isArray(value) ? value : [];
 }
 
+function resolveDelay(value) {
+    return (typeof value === 'object' && value?.delay) || DEFAULT_DELAY;
+}
+
 export const longPress = {
     mounted(el, binding) {
-        const delay = (typeof binding.value === 'object' && binding.value?.delay) || DEFAULT_DELAY;
         let timer = null;
         let startX = 0;
         let startY = 0;
         let startPointerId = null;
+
+        // Live binding value; kept current by updated() below.
+        el.__radialBinding = binding.value;
 
         const clear = () => {
             if (timer) {
@@ -43,11 +54,11 @@ export const longPress = {
             clear();
             timer = setTimeout(() => {
                 timer = null;
-                const actions = resolveActions(binding.value);
+                const actions = resolveActions(el.__radialBinding);
                 if (!actions.length) return;
                 if (navigator.vibrate) navigator.vibrate(15);
                 openRadial({x: startX, y: startY, actions, pointerId: startPointerId});
-            }, delay);
+            }, resolveDelay(el.__radialBinding));
         };
 
         const onMove = (e) => {
@@ -74,7 +85,11 @@ export const longPress = {
             el.removeEventListener('contextmenu', onContextMenu);
         };
     },
+    updated(el, binding) {
+        el.__radialBinding = binding.value;
+    },
     unmounted(el) {
         el.__radialLongPressCleanup?.();
+        delete el.__radialBinding;
     },
 };

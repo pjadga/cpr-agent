@@ -78,7 +78,9 @@
                          @click="controlState.selectedWeapon = weapon"
                          class="relative cursor-pointer transition-all"
                          :class="controlState.selectedWeapon?._id === weapon._id ? 'ring-2 ring-cpr-yellow' : 'opacity-80 hover:opacity-100'">
-                        <item-row :item="weapon" category="weapon" :all-items="charData?.data?.items"/>
+                        <item-row :item="weapon" category="weapon" active-tab="control"
+                                  :all-items="charData?.data?.items"
+                                  @click="controlState.selectedWeapon = weapon"/>
                         <div v-if="controlState.selectedWeapon?._id === weapon._id"
                              class="absolute top-2 right-2 z-20 text-cpr-yellow pointer-events-none">
                             <i v-icon data-lucide="check-circle-2" class="w-5 h-5"></i>
@@ -119,7 +121,7 @@
                         </div>
                         <button @click="$emit('open-cyberdeck-config')"
                                 class="flex items-center gap-1.5 px-3 py-1.5 bg-cpr-teal-dark/40 border border-cpr-teal/50 text-[10px] font-bold text-cpr-text-bright uppercase hover:bg-cpr-teal hover:text-black transition-all shadow-[0_0_10px_rgba(20,184,166,0.2)]">
-                            <i v-icon data-lucide="settings" class="w-3 h-3"></i> Config
+                            <i v-icon data-lucide="settings" class="w-3 h-3"></i>
                         </button>
                     </div>
 
@@ -197,7 +199,7 @@
                 <span class="text-[10px] font-black text-cpr-text-dim uppercase tracking-[0.3em]">Positioning</span>
                 <div class="h-px bg-cpr-border/30 flex-1"></div>
             </div>
-            <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-4">
+            <div class="grid grid-cols-3 gap-2 max-w-[250px] mx-auto pb-4">
                 <div></div>
                 <button @click="$emit('move', 'up')"
                         class="relative aspect-square flex items-center justify-center text-cpr-yellow hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">

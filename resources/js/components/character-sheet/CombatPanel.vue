@@ -5,7 +5,6 @@
             <!-- Header/Handle -->
             <div class="flex items-center justify-between p-3 border-b border-cpr-red-dark/50 bg-cpr-black-deep/10">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="crosshair" class="w-4 h-4 text-cpr-red"></i>
                     <span class="text-xs font-black uppercase tracking-[0.2em] text-cpr-red">Combat Systems</span>
                 </div>
                 <button @click="$emit('close')" class="p-2 text-cpr-text-muted hover:text-cpr-yellow transition-colors">
@@ -16,26 +15,29 @@
             <div class="p-4 space-y-6 max-h-[70vh] overflow-y-auto">
                 <!-- Weapon & Fire Mode -->
                 <div v-if="selectedWeapon" class="space-y-4">
-                    <div
-                        class="flex items-center justify-between bg-cpr-black/40 border border-cpr-border p-3 rounded-sm">
+                    <div class="flex items-stretch justify-between gap-4">
                         <div class="flex-1">
                             <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-2">Select Fire Mode</div>
                             <div class="grid grid-cols-2 gap-2">
                                 <button v-for="mode in availableFireModes" :key="mode.id"
                                         @click="$emit('update:fireMode', mode.id)"
-                                        class="px-4 py-3 text-xs font-black uppercase border transition-all flex items-center justify-center gap-2 rounded-sm"
-                                        :class="fireMode === mode.id ? 'bg-cpr-yellow-dark border-cpr-black-deep text-black' : 'border-cpr-border text-cpr-text-muted hover:text-cpr-text-main hover:border-cpr-border-muted'">
-                                    <i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i> {{ mode.label }}
+                                        class="relative px-4 py-3 text-xs font-black uppercase transition-all flex items-center justify-center group"
+                                        :style="{ '--frame-border': fireMode === mode.id ? 'var(--cpr-yellow)' : 'var(--cpr-border)' }"
+                                        :class="fireMode === mode.id ? 'text-cpr-yellow' : 'text-cpr-text-muted hover:text-cpr-text-main hover:[--frame-colour-change:var(--cpr-border-muted)]'">
+                                    <med-stat-frame/>
+                                    <span class="relative z-10 flex items-center gap-2"><i v-icon :data-lucide="mode.icon" class="w-4 h-4"></i> {{ mode.label }}</span>
                                 </button>
                             </div>
                         </div>
-                        <div class="text-right pl-4 border-l border-cpr-border ml-4">
-                            <div class="text-[10px] text-cpr-text-dim uppercase font-bold mb-1">Target DV</div>
-                            <div v-if="dvLoading" class="text-cpr-yellow-dark animate-pulse font-mono font-bold">
+                        <div class="relative flex flex-col items-center justify-center px-5 min-w-[92px]"
+                             :style="{ '--frame-border': 'var(--cpr-yellow-dark)' }">
+                            <med-stat-frame/>
+                            <div class="relative z-10 text-[10px] text-cpr-text-dim uppercase font-bold mb-1">Target DV</div>
+                            <div v-if="dvLoading" class="relative z-10 text-cpr-yellow-dark animate-pulse font-mono font-bold">
                                 CALC...
                             </div>
-                            <div v-else-if="dvError" class="text-cpr-red font-mono text-xs">ERR</div>
-                            <div v-else class="text-3xl font-black text-cpr-yellow font-numbers leading-none">
+                            <div v-else-if="dvError" class="relative z-10 text-cpr-red font-mono text-xs">ERR</div>
+                            <div v-else class="relative z-10 text-3xl font-black text-cpr-yellow font-numbers leading-none">
                                 {{ dvInfo || '--' }}
                             </div>
                         </div>
@@ -45,20 +47,26 @@
                     <div class="grid grid-cols-2 gap-3">
                         <button @click="$emit('roll-hit')"
                                 :disabled="reloadRequired"
-                                class="py-4 bg-cpr-red text-black font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-cpr-red transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed rounded-sm">
-                            <span class="text-l">Execute Attack</span>
-                            <span v-if="reloadRequired" class="text-[10px] animate-pulse mt-1">Out of Ammo!</span>
+                                class="relative py-4 text-cpr-red font-black uppercase tracking-tighter flex flex-col items-center justify-center transition-all active:scale-95 group hover:[--frame-colour-change:var(--cpr-red)] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed"
+                                :style="{ '--frame-border': 'var(--cpr-red)' }">
+                            <med-stat-frame/>
+                            <span class="relative z-10 text-l">Execute Attack</span>
+                            <span v-if="reloadRequired" class="relative z-10 text-[10px] animate-pulse mt-1">Out of Ammo!</span>
                         </button>
                         <button @click="$emit('roll-damage')"
-                                class="py-4 border-2 border-cpr-red text-cpr-red font-black uppercase tracking-tighter flex flex-col items-center justify-center hover:bg-cpr-red hover:text-black transition-all active:scale-95 rounded-sm">
-                            <span class="text-l">Roll Damage</span>
+                                class="relative py-4 text-cpr-red font-black uppercase tracking-tighter flex flex-col items-center justify-center transition-all active:scale-95 group hover:[--frame-colour-change:var(--cpr-red)]"
+                                :style="{ '--frame-border': 'var(--cpr-red)' }">
+                            <med-stat-frame/>
+                            <span class="relative z-10 text-l">Roll Damage</span>
                         </button>
                     </div>
 
                     <button v-if="selectedWeapon.system.magazine"
                             @click="$emit('reload')"
-                            class="w-full py-3 bg-cpr-black-deep border border-cpr-teal-dark text-cpr-text-muted font-bold uppercase text-xs tracking-[0.2em] hover:bg-cpr-black-elevated hover:text-cpr-yellow transition-all rounded-sm flex items-center justify-center gap-2">
-                        <i v-icon data-lucide="rotate-cw" class="w-4 h-4"></i> Reload Systems
+                            class="relative w-full py-3 text-cpr-text-muted font-bold uppercase text-xs tracking-[0.2em] hover:text-cpr-yellow hover:[--frame-colour-change:var(--cpr-teal)] transition-all flex items-center justify-center group"
+                            :style="{ '--frame-border': 'var(--cpr-teal-dark)' }">
+                        <med-stat-frame/>
+                        <span class="relative z-10 flex items-center gap-2"><i v-icon data-lucide="rotate-cw" class="w-4 h-4"></i> Reload Systems</span>
                     </button>
                 </div>
 
@@ -74,24 +82,29 @@
                         <span class="text-[10px] font-black text-cpr-red uppercase tracking-[0.3em]">Positioning</span>
                         <div class="h-px bg-cpr-red-dark/30 flex-1"></div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 max-w-[150px] mx-auto pb-2">
+                    <div class="grid grid-cols-3 gap-2 max-w-[250px] mx-auto pb-2"
+                         :style="{ '--frame-border': 'var(--cpr-red-dark)' }">
                         <div></div>
                         <button @click="$emit('move', 'up')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
-                            <i v-icon data-lucide="chevron-up" class="w-6 h-6"></i>
+                                class="relative aspect-square flex items-center justify-center text-cpr-red hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
+                            <simple-stat-frame class="rotate-0"/>
+                            <i v-icon data-lucide="chevron-up" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                         </button>
                         <div></div>
                         <button @click="$emit('move', 'left')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
-                            <i v-icon data-lucide="chevron-left" class="w-6 h-6"></i>
+                                class="relative aspect-square flex items-center justify-center text-cpr-red hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
+                            <simple-stat-frame class="-rotate-90"/>
+                            <i v-icon data-lucide="chevron-left" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                         </button>
                         <button @click="$emit('move', 'down')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
-                            <i v-icon data-lucide="chevron-down" class="w-6 h-6"></i>
+                                class="relative aspect-square flex items-center justify-center text-cpr-red hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
+                            <simple-stat-frame class="rotate-180"/>
+                            <i v-icon data-lucide="chevron-down" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                         </button>
                         <button @click="$emit('move', 'right')"
-                                class="aspect-square bg-cpr-black-deep border border-cpr-red-dark/40 text-cpr-red flex items-center justify-center hover:bg-cpr-red hover:text-black active:scale-90 transition-all rounded-sm shadow-lg cursor-pointer">
-                            <i v-icon data-lucide="chevron-right" class="w-6 h-6"></i>
+                                class="relative aspect-square flex items-center justify-center text-cpr-red hover:[--frame-colour-change:var(--cpr-red)] active:scale-90 transition-all group cursor-pointer">
+                            <simple-stat-frame class="rotate-90"/>
+                            <i v-icon data-lucide="chevron-right" class="relative z-10 w-6 h-6 pointer-events-none"></i>
                         </button>
                     </div>
                 </div>
@@ -103,9 +116,12 @@
 
 <script>
 import {vIcon} from '../../directives/icon';
+import MedStatFrame from './frames/MedStatFrame.vue';
+import SimpleStatFrame from './frames/SimpleStatFrame.vue';
 
 export default {
     name: 'CombatPanel',
+    components: {MedStatFrame, SimpleStatFrame},
     props: [
         'show', 'selectedWeapon', 'availableFireModes', 'fireMode',
         'dvLoading', 'dvError', 'dvInfo', 'reloadRequired'

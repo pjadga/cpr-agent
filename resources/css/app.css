@@ -45,6 +45,33 @@ body {
     touch-action: manipulation;
     background-color: var(--cpr-black-deep);
     color: var(--cpr-text-main);
+    /* App-like feel: no accidental text selection on tap/drag, and no iOS
+       long-press callout (also keeps the press-and-hold radial menu clean).
+       user-select is inherited, so this cascades to the whole UI. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* touch-action does NOT inherit — set it on every element so double-tap zoom
+   (and the legacy 300ms tap delay) is disabled UI-wide. `manipulation` still
+   allows scrolling/panning and pinch, just kills double-tap + non-standard gestures. */
+*,
+*::before,
+*::after {
+    touch-action: manipulation;
+}
+
+/* Keep text usable where it actually matters: form fields and readable copy.
+   Add the `select-text` class to opt any other element back in. */
+input,
+textarea,
+[contenteditable="true"],
+.cpr-description,
+.select-text {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
 }
 
 
