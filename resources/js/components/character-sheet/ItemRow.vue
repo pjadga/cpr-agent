@@ -108,7 +108,7 @@
             </div>
 
             <div
-                v-if="category === 'weapon' && isPlayer"
+                v-if="category === 'weapon' && isPlayer && activeTab !== 'control'"
                 class="flex items-start pt-6 gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"

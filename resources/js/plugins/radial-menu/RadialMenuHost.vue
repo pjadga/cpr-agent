@@ -224,6 +224,11 @@ export default {
     transition: filter 0.15s ease, background-color 0.15s ease;
 }
 
+.radial-petal :deep(.frame__layer--s1),
+.radial-petal :deep(.frame__layer--s2) {
+    display: none;
+}
+
 .radial-petal--on {
     background-color: var(--cpr-panel-hover);
     border-radius: 10px;
@@ -231,8 +236,10 @@ export default {
     z-index: 2;
 }
 
+/* Non-highlighted petals stay at full brightness — the yellow highlight already
+   carries the selection; dimming the rest only hurt readability. */
 .radial-petal--dim {
-    filter: brightness(0.6);
+    /* intentionally empty */
 }
 
 .radial-petal--off {
