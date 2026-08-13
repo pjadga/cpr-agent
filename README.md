@@ -41,3 +41,9 @@ Currently functioning but actively being worked on.
 
 This Agent is built with Vue.js, PHP (Laravel along with Reverb + Sanctum), Tailwind CSS, and a ton of JS to make the Foundry Module. I used to use the [ThreeHats API](https://github.com/ThreeHats/foundryvtt-rest-api) and my own [PHP Wrapper](https://packagist.org/packages/surrealtech/threehats-api-php-wrapper)
 to take care of the communication, however I wanted more control over returns and data storage! Please give them a look if a more system agnostic API is what you're looking for.
+
+## Support
+
+If this project is useful to you and you'd like to support its development, you can buy me a coffee:
+Tips go towards caffeine and the running of the hosting.
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V8M8238Q2V)
