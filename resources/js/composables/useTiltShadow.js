@@ -19,6 +19,13 @@ const BASE = { s1: 3, s2: 6 };   // rest offsets (px), match the CSS defaults
 const RANGE = { s1: 5, s2: 10 }; // ± travel (px) at full deflection
 const FULL_TILT = 25;            // degrees of tilt that maps to full deflection
 
+// Smoothing time constants. quickTo re-eases toward each sensor reading, so the
+// shadow trails the phone by roughly half the duration — this is the "lag". The
+// front layer tracks tight (feels responsive); the back layer trails a touch, and
+// that timing gap is what reads as parallax depth rather than the two in lockstep.
+// Keep a little smoothing so raw sensor noise doesn't jitter through.
+const EASE = { s1: 0.18, s2: 0.32 };
+
 const clamp = (n, lo = -1, hi = 1) => Math.min(hi, Math.max(lo, n));
 
 export function initTiltShadow(target = document.documentElement) {
@@ -26,12 +33,14 @@ export function initTiltShadow(target = document.documentElement) {
     // Respect reduced-motion: leave the static 3px/6px defaults in place.
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return () => {};
 
-    // Smooth numeric state, driven by GSAP's eased quickTo tweens.
+    // Smooth numeric state, driven by GSAP's eased quickTo tweens. power3.out
+    // settles crisply; the front/back layers use different durations (see EASE).
     const state = { s1x: BASE.s1, s1y: BASE.s1, s2x: BASE.s2, s2y: BASE.s2 };
-    const ease = { duration: 0.5, ease: 'power2.out' };
+    const s1Ease = { duration: EASE.s1, ease: 'power3.out' };
+    const s2Ease = { duration: EASE.s2, ease: 'power3.out' };
     const to = {
-        s1x: gsap.quickTo(state, 's1x', ease), s1y: gsap.quickTo(state, 's1y', ease),
-        s2x: gsap.quickTo(state, 's2x', ease), s2y: gsap.quickTo(state, 's2y', ease),
+        s1x: gsap.quickTo(state, 's1x', s1Ease), s1y: gsap.quickTo(state, 's1y', s1Ease),
+        s2x: gsap.quickTo(state, 's2x', s2Ease), s2y: gsap.quickTo(state, 's2y', s2Ease),
     };
 
     // Mobile lag came from repainting every frame: the shadow layers use

@@ -349,9 +349,10 @@ export default {
                 // (same as tapping the row). Elsewhere it's the generic "Ready".
                 if (props.activeTab === 'control') {
                     actions.push({id: 'select', icon: 'crosshair', label: 'Select', handler: () => emit('click', props.item)});
-                } else {
-                    actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('click', props.item)});
                 }
+                // else {
+                //     actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('click', props.item)});
+                // }
             }
             if (usesAmmo.value) {
                 actions.push({id: 'reload', icon: 'rotate-cw', label: 'Reload', handler: reloadThisWeapon});
