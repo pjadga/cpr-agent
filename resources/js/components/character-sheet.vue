@@ -39,7 +39,7 @@
 
         <div v-if="!loading && charData && !error">
             <!-- Fixed backdrop behind everything; opaque header/nav frame it between the borders. -->
-            <mobile-background-frame :style="{ '--frame-border': 'var(--cpr-teal-dark)' }"></mobile-background-frame>
+            <mobile-background-frame class="cpr-agent-background" :style="{ '--frame-border': 'var(--cpr-teal-dark)' }"></mobile-background-frame>
 
             <!-- Modals & Popups -->
             <cyberdeck-config

@@ -9,6 +9,7 @@
 export const UI_PREF_KEYS = {
     reduceMotion: 'cpr-reduce-motion',
     disableTapHold: 'cpr-disable-tap-hold',
+    hideBackground: 'cpr-hide-background',
 };
 
 function getBoolPref(key) {
@@ -27,4 +28,9 @@ export function reduceMotionEnabled() {
 /** Disable Tap and Hold: suppresses the press-and-hold radial menu. */
 export function tapHoldDisabled() {
     return getBoolPref(UI_PREF_KEYS.disableTapHold);
+}
+
+/** Hide Agent Background: hides the blue-tinted SVG background on the agent UI. */
+export function backgroundHidden() {
+    return getBoolPref(UI_PREF_KEYS.hideBackground);
 }

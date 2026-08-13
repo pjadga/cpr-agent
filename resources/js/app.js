@@ -24,7 +24,7 @@ import QrLinkScanner from "./components/QrLinkScanner.vue";
 import {vCprImg} from "./directives/cpr-img";
 import {initTiltShadow} from "./composables/useTiltShadow";
 import {RadialMenu} from "./plugins/radial-menu";
-import {reduceMotionEnabled} from "./utils/uiPreferences";
+import {reduceMotionEnabled, backgroundHidden} from "./utils/uiPreferences";
 import mitt from 'mitt';
 
 window.emitter = mitt();
@@ -67,6 +67,11 @@ if (document.getElementById('app')) {
     const reduceMotion = reduceMotionEnabled();
     if (reduceMotion) {
         document.documentElement.classList.add('cpr-reduce-motion');
+    }
+    // Hide Agent Background (UI setting): flag <html> before mount so the
+    // blue-tinted SVG background frame is hidden from first paint (no flash).
+    if (backgroundHidden()) {
+        document.documentElement.classList.add('cpr-hide-background');
     }
     app.mount('#app');
     if (!reduceMotion) {

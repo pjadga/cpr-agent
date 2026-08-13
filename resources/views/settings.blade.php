@@ -691,11 +691,14 @@
                  x-data="{
                      reduceMotion: false,
                      disableTapHold: false,
+                     hideBackground: false,
                      savedMotion: false,
                      savedTapHold: false,
+                     savedBackground: false,
                      init() {
                          this.reduceMotion = localStorage.getItem('cpr-reduce-motion') === '1';
                          this.disableTapHold = localStorage.getItem('cpr-disable-tap-hold') === '1';
+                         this.hideBackground = localStorage.getItem('cpr-hide-background') === '1';
                      },
                      flash(key) {
                          this[key] = true;
@@ -712,6 +715,12 @@
                          this.disableTapHold = v;
                          localStorage.setItem('cpr-disable-tap-hold', v ? '1' : '0');
                          this.flash('savedTapHold');
+                     },
+                     setHideBackground(v) {
+                         this.hideBackground = v;
+                         localStorage.setItem('cpr-hide-background', v ? '1' : '0');
+                         document.documentElement.classList.toggle('cpr-hide-background', v);
+                         this.flash('savedBackground');
                      },
                  }">
 
@@ -754,6 +763,27 @@
                             :class="disableTapHold ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
                         <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
                               :class="disableTapHold ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <!-- Hide Agent Background -->
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-cpr-border/50">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Hide Agent Background</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Hides the blue-tinted background graphic on the Agent interface.
+                        </p>
+                        <p x-show="savedBackground" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="hideBackground"
+                            @click="setHideBackground(!hideBackground)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="hideBackground ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="hideBackground ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
                     </button>
                 </div>
 

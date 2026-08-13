@@ -114,6 +114,12 @@ html.cpr-reduce-motion .frame__layer--s2 {
     display: none;
 }
 
+/* Hide Agent Background (UI setting): hide the blue-tinted SVG background frame
+   on the agent UI (class applied to <html> in app.js from the stored pref). */
+html.cpr-hide-background .cpr-agent-background {
+    display: none !important;
+}
+
 
 ::-webkit-scrollbar {
     width: 10px;
