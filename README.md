@@ -16,9 +16,10 @@ Currently functioning but actively being worked on.
 ## Features
 
 * **Character Management**: Displays relevant character stats, skills, and roles, all rollable from the app.
-* **Gear & Cyberware**: Displays equipped gear, ammo count, costs, damage, and descriptions in an easy-to-read format. Equipped states & ammo types are now changeable.
+* **Gear & Cyberware**: Displays equipped gear, ammo count, costs, damage, and descriptions in an easy-to-read format. Equipped states & ammo types are now changeable. Most homebrew gear should 'just' work, if it follows the CPR models. 
 * **ER Mission Kit rolls**: Currently supports Quickhack (un-named, will update as they are supported within the CPR Module), Jack in + Breach.
 * **NetPools**: Create a NetPool within Foundry's Journal system.
+ * PDF and Rich Text are supported for content display, as well as custom Icons for the 'terminal'.
 * **Token Control**: Directional control of tokens via an on-screen D-pad.
 * **Combat Support**:
   * Listed tokens on map with relative positions.
@@ -31,9 +32,11 @@ Currently functioning but actively being worked on.
 * **Local Caching within Foundry**
 * **Dice Roll returns**
 * **Lifepaths and Notes section available**
-* **Item carry control (Carry, equip)_**
+* **Item carry control (Carry, equip)**
 * **Critical Injuries list (ouch)**
 * **Dice Roller + Dice Modifiers**
+* **Vector based UI**
+* **Shadow Animations, Graphics toggles, Radial menu + toggles**
 
 # Please check the (Guide)[GUIDE.md] for an indepth look at setup, self-hosting and technicals
 
