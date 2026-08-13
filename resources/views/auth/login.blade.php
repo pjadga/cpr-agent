@@ -86,6 +86,23 @@
                         How to Use
                     </a>
                 </div>
+                {{-- Ko-fi support button — inside the box, below "How to Use". Only on the
+     official hosted instance; self-hosted / local instances hide it here
+     (it stays on the How to Use page). Colour matches the dark panel. --}}
+                @if (request()->getHost() === 'agent.surrealdisco.co.uk')
+                    <div class="flex justify-center mt-8">
+                        <p class="text-cpr-text-muted text-xs italic block max-w-md">
+                            Tips are always appreciated but never required, they will go towards the running of the server this is hosted on.
+                        </p>
+                    </div>
+                    <div class="flex justify-center mt-8">
+                        <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js' @cspNonce></script>
+                        <script type='text/javascript' @cspNonce>
+                            kofiwidget2.init('Support me on Ko-fi', '#141414', 'V8M8238Q2V');
+                            kofiwidget2.draw();
+                        </script>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
