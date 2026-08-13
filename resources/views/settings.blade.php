@@ -5,9 +5,9 @@
         @csrf
     </form>
     <div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
-        <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
+        <div class="flex justify-between flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
             <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
-                Agent Settings
+                Settings
             </h2>
             <div class="flex gap-2 pt-2">
                 <a href="{{ route('dashboard') }}"
@@ -389,7 +389,7 @@
                                         class="cyber-button bg-cpr-black-elevated border-cpr-teal text-cpr-teal px-3 py-1.5 uppercase text-[10px] font-bold w-full">
                                     <i data-lucide="clipboard-copy" class="w-3 h-3 inline -mt-0.5"></i>
                                     <span x-show="!loading && !shortCode">Get Foundry Setup Code</span>
-                                    <span x-show="!loading && shortCode">↻ Get a fresh code</span>
+                                    <span x-show="!loading && shortCode">Get a fresh code</span>
                                     <span x-show="loading">…</span>
                                 </button>
                                 <p class="text-[10px] text-cpr-text-dim mt-1">
@@ -402,7 +402,7 @@
                                     <p class="text-[10px] uppercase tracking-widest text-cpr-text-dim">Ok Gr
                                         In Foundry: Agent Bridge → Quick Setup → type this code
                                     </p>
-                                    <p class="text-3xl font-mono font-black text-cpr-teal tracking-widest my-1"
+                                    <p class="text-3xl font-mono font-black text-cpr-teal tracking-widest my-1 select-all"
                                        x-text="shortCode"></p>
                                     <p class="text-[10px] text-cpr-text-dim">One-time use · expires in 5 minutes</p>
                                 </div>
@@ -681,6 +681,71 @@
             </div>
         </div>
 
+        <!-- UI Settings (client-side preferences, stored in localStorage) -->
+        <div class="mt-12 pt-8 border-t-2 border-cpr-border">
+            <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
+                Interface Settings
+            </h3>
+
+            <div class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg space-y-6"
+                 x-data="{
+                     reduceMotion: false,
+                     disableTapHold: false,
+                     init() {
+                         this.reduceMotion = localStorage.getItem('cpr-reduce-motion') === '1';
+                         this.disableTapHold = localStorage.getItem('cpr-disable-tap-hold') === '1';
+                     },
+                     setReduceMotion(v) {
+                         this.reduceMotion = v;
+                         localStorage.setItem('cpr-reduce-motion', v ? '1' : '0');
+                         document.documentElement.classList.toggle('cpr-reduce-motion', v);
+                     },
+                     setDisableTapHold(v) {
+                         this.disableTapHold = v;
+                         localStorage.setItem('cpr-disable-tap-hold', v ? '1' : '0');
+                     },
+                 }">
+
+                <!-- Reduce Motion -->
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Reduce Motion</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Turns off gyro motion controls and removes the shadow depth effect.
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="reduceMotion"
+                            @click="setReduceMotion(!reduceMotion)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="reduceMotion ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="reduceMotion ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <!-- Disable Tap and Hold -->
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-cpr-border/50">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Disable Tap and Hold</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Disables the tap-and-hold (press-and-hold) radial menu.
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="disableTapHold"
+                            @click="setDisableTapHold(!disableTapHold)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="disableTapHold ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="disableTapHold ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <p class="text-[10px] text-cpr-text-dim uppercase tracking-widest pt-2">
+                    These preferences are stored on this device and apply the next time the Agent loads.
+                </p>
+            </div>
+        </div>
+
         <!-- Account Management -->
         <div class="mt-12 pt-8 border-t-2 border-cpr-border">
             <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
@@ -813,6 +878,15 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Help -->
+        <div class="mt-12 pt-8 border-t-2 border-cpr-border text-center">
+            <a href="{{ route('how-to-use') }}"
+               class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                How to Use
+            </a>
         </div>
     </div>
 

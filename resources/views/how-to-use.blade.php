@@ -11,6 +11,21 @@
                     Night City.</p>
             </div>
 
+            {{-- Ko-fi support button — top of the page, under the title. Colour matches the
+                 dark panel. Shown on the How to Use page for every instance. --}}
+            <div class="mb-8 flex flex-col items-center gap-2 text-center">
+                <div class="flex justify-center">
+                    <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js' @cspNonce></script>
+                    <script type='text/javascript' @cspNonce>
+                        kofiwidget2.init('Support me on Ko-fi', '#141414', 'V8M8238Q2V');
+                        kofiwidget2.draw();
+                    </script>
+                </div>
+                <p class="text-cpr-text-muted text-xs italic max-w-md">
+                    Tips are always appreciated, they will go towards the running of the server this is hosted on.
+                </p>
+            </div>
+
             <div class="space-y-8 text-cpr-text-main">
                 <section>
                     <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">1. Preparation &
@@ -123,6 +138,20 @@
                 </p>
             </div>
 
+            <div class="mt-10 border-t border-cpr-border/40 pt-6 text-center text-cpr-text-dim text-xs">
+                <h2 class="text-sm font-bold text-cpr-text-muted uppercase tracking-widest mb-3">Credits</h2>
+                <p>
+                    Heading font <strong class="text-cpr-text-muted">"Cyberpnuk2"</strong> by junkohanhero —
+                    <a href="https://www.dafont.com/junkohanhero.d1293" target="_blank"
+                       class="text-cpr-red hover:text-cpr-red underline">dafont.com/junkohanhero.d1293</a>.
+                </p>
+                <p class="mt-1">
+                    Vector artwork assistance via
+                    <a href="https://www.vecteezy.com" target="_blank"
+                       class="text-cpr-red hover:text-cpr-red underline">vecteezy.com</a>.
+                </p>
+            </div>
+
             <div class="mt-8 flex justify-center">
                 <a href="{{ url()->previous() == url()->current() ? url('/') : url()->previous() }}"
                    class="cyber-button bg-cpr-black-elevated border-cpr-border text-lg px-12 py-3 uppercase font-bold">
@@ -131,4 +160,5 @@
             </div>
         </div>
     </div>
+
 @endsection

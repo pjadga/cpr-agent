@@ -1,4 +1,5 @@
 import {openRadial} from './useRadialMenu';
+import {tapHoldDisabled} from '../../utils/uiPreferences';
 
 /**
  * v-long-press: press-and-hold to open the radial menu around the finger.
@@ -47,6 +48,8 @@ export const longPress = {
         };
 
         const onDown = (e) => {
+            // "Disable Tap and Hold" UI setting — read live so it needs no remount.
+            if (tapHoldDisabled()) return;
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             startX = e.clientX;
             startY = e.clientY;
