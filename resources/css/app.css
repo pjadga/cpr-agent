@@ -244,3 +244,9 @@ html.cpr-reduce-motion .frame__layer--s2 {
 .hidden-none {
     display: none !important;
 }
+
+/* Alpine: keep x-show/x-transition elements hidden until Alpine initialises,
+   so notes like the settings "Saved" flash don't flash on page load. */
+[x-cloak] {
+    display: none !important;
+}

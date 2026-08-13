@@ -691,18 +691,27 @@
                  x-data="{
                      reduceMotion: false,
                      disableTapHold: false,
+                     savedMotion: false,
+                     savedTapHold: false,
                      init() {
                          this.reduceMotion = localStorage.getItem('cpr-reduce-motion') === '1';
                          this.disableTapHold = localStorage.getItem('cpr-disable-tap-hold') === '1';
+                     },
+                     flash(key) {
+                         this[key] = true;
+                         clearTimeout(this['_t_' + key]);
+                         this['_t_' + key] = setTimeout(() => { this[key] = false; }, 2500);
                      },
                      setReduceMotion(v) {
                          this.reduceMotion = v;
                          localStorage.setItem('cpr-reduce-motion', v ? '1' : '0');
                          document.documentElement.classList.toggle('cpr-reduce-motion', v);
+                         this.flash('savedMotion');
                      },
                      setDisableTapHold(v) {
                          this.disableTapHold = v;
                          localStorage.setItem('cpr-disable-tap-hold', v ? '1' : '0');
+                         this.flash('savedTapHold');
                      },
                  }">
 
@@ -712,6 +721,10 @@
                         <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Reduce Motion</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
                             Turns off gyro motion controls and removes the shadow depth effect.
+                        </p>
+                        <p x-show="savedMotion" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
                         </p>
                     </div>
                     <button type="button" role="switch" :aria-checked="reduceMotion"
@@ -729,6 +742,10 @@
                         <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Disable Tap and Hold</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
                             Disables the tap-and-hold (press-and-hold) radial menu.
+                        </p>
+                        <p x-show="savedTapHold" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
                         </p>
                     </div>
                     <button type="button" role="switch" :aria-checked="disableTapHold"
