@@ -168,6 +168,12 @@ export default {
 
         const onBackdropDown = () => { /* swallow to keep pointer capture sane */ };
 
+        // The finger that opened the menu is still owned by the source row, whose
+        // touch-action allows vertical panning — so without this the browser scrolls
+        // the page and fires pointercancel, killing the angle tracking. While the
+        // menu is open we cancel the scroll so the drag keeps flowing to onWindowMove.
+        const preventScroll = (e) => { if (radialState.open) e.preventDefault(); };
+
         watch(() => radialState.open, async (open) => {
             if (open) {
                 highlightIndex.value = -1;
@@ -177,10 +183,14 @@ export default {
                 bloom();
                 window.addEventListener('pointermove', onWindowMove);
                 window.addEventListener('pointerup', onWindowUp);
+                window.addEventListener('pointercancel', onWindowUp);
+                document.addEventListener('touchmove', preventScroll, {passive: false});
             } else {
                 petalEls.value = [];
                 window.removeEventListener('pointermove', onWindowMove);
                 window.removeEventListener('pointerup', onWindowUp);
+                window.removeEventListener('pointercancel', onWindowUp);
+                document.removeEventListener('touchmove', preventScroll, {passive: false});
             }
         });
 

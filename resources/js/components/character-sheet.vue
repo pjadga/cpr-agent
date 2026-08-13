@@ -185,7 +185,7 @@
                     </div>
                 </div>
             </header>
-            <div class="pt-[calc(6rem+env(safe-area-inset-bottom))]"></div>
+            <div class="pt-[calc(4.75rem+var(--nativephp-safe-area,env(safe-area-inset-top)))]"></div>
             <main class="max-w-md mx-auto relative min-h-[60vh]">
 
                 <!-- Progressive/tapered backdrop blur: stacked masked layers compound toward
@@ -1031,6 +1031,9 @@ export default {
 
         // --- WATCHERS ---
         watch(activeTab, (newTab) => {
+            // Always land the new tab at the top — the page scrolls at window
+            // level, so without this a mid-scroll position carries across tabs.
+            window.scrollTo({top: 0, left: 0});
             if (newTab === 'control') {
                 const prevSelectedId = controlState.value.selectedTarget?.id || null;
                 if (prevSelectedId) {

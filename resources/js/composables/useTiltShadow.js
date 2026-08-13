@@ -26,7 +26,7 @@ export function initTiltShadow(target = document.documentElement) {
     // Respect reduced-motion: leave the static 3px/6px defaults in place.
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return () => {};
 
-    // Smooth numeric state, then a ticker writes it to the CSS vars each frame.
+    // Smooth numeric state, driven by GSAP's eased quickTo tweens.
     const state = { s1x: BASE.s1, s1y: BASE.s1, s2x: BASE.s2, s2y: BASE.s2 };
     const ease = { duration: 0.5, ease: 'power2.out' };
     const to = {
@@ -34,13 +34,35 @@ export function initTiltShadow(target = document.documentElement) {
         s2x: gsap.quickTo(state, 's2x', ease), s2y: gsap.quickTo(state, 's2y', ease),
     };
 
+    // Mobile lag came from repainting every frame: the shadow layers use
+    // filter: brightness(), so writing a fresh sub-pixel value (.toFixed(2))
+    // 60×/sec forced a full shadow repaint on every visible row every frame —
+    // even while the phone sat still. Two changes fix that:
+    //   1. Snap to whole pixels — across the ±5/±10px travel that's a handful
+    //      of distinct values, so most frames write nothing and skip the repaint.
+    //   2. Idle the ticker once the eased motion settles, and resume it only on
+    //      new input, so a steady phone costs zero repaints.
+    const VARS = { s1x: '--shadow-s1-x', s1y: '--shadow-s1-y', s2x: '--shadow-s2-x', s2y: '--shadow-s2-y' };
+    const written = { s1x: Math.round(BASE.s1), s1y: Math.round(BASE.s1), s2x: Math.round(BASE.s2), s2y: Math.round(BASE.s2) };
+    let running = false;
+    let idleFrames = 0;
+
     const render = () => {
-        target.style.setProperty('--shadow-s1-x', state.s1x.toFixed(2) + 'px');
-        target.style.setProperty('--shadow-s1-y', state.s1y.toFixed(2) + 'px');
-        target.style.setProperty('--shadow-s2-x', state.s2x.toFixed(2) + 'px');
-        target.style.setProperty('--shadow-s2-y', state.s2y.toFixed(2) + 'px');
+        let changed = false;
+        for (const k in VARS) {
+            const v = Math.round(state[k]);
+            if (v !== written[k]) {
+                written[k] = v;
+                target.style.setProperty(VARS[k], v + 'px');
+                changed = true;
+            }
+        }
+        // ~20 still frames (a third of a second) and we stop repainting entirely.
+        if (changed) idleFrames = 0;
+        else if (++idleFrames > 20) { gsap.ticker.remove(render); running = false; }
     };
-    gsap.ticker.add(render);
+
+    const wake = () => { if (!running) { running = true; idleFrames = 0; gsap.ticker.add(render); } };
 
     // nx / ny are normalised tilt in [-1, 1]; shadow moves the opposite way.
     const aim = (nx, ny) => {
@@ -48,6 +70,7 @@ export function initTiltShadow(target = document.documentElement) {
         to.s1y(BASE.s1 - ny * RANGE.s1);
         to.s2x(BASE.s2 - nx * RANGE.s2);
         to.s2y(BASE.s2 - ny * RANGE.s2);
+        wake();
     };
 
     // Device orientation: first reading is the neutral pose, so it works upright
@@ -93,7 +116,7 @@ export function initTiltShadow(target = document.documentElement) {
     }
 
     return () => {
-        gsap.ticker.remove(render);
+        if (running) { gsap.ticker.remove(render); running = false; }
         window.removeEventListener('pointermove', onPointer);
         window.removeEventListener('deviceorientation', onOrient);
     };
