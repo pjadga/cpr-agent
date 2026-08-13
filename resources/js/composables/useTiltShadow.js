@@ -43,23 +43,24 @@ export function initTiltShadow(target = document.documentElement) {
         s2x: gsap.quickTo(state, 's2x', s2Ease), s2y: gsap.quickTo(state, 's2y', s2Ease),
     };
 
-    // Mobile lag came from repainting every frame: the shadow layers use
-    // filter: brightness(), so writing a fresh sub-pixel value (.toFixed(2))
-    // 60×/sec forced a full shadow repaint on every visible row every frame —
-    // even while the phone sat still. Two changes fix that:
-    //   1. Snap to whole pixels — across the ±5/±10px travel that's a handful
-    //      of distinct values, so most frames write nothing and skip the repaint.
-    //   2. Idle the ticker once the eased motion settles, and resume it only on
-    //      new input, so a steady phone costs zero repaints.
+    // Each write sets a CSS var on <html>, which invalidates style for every
+    // element that reads it — so we don't want to write every frame. But snapping
+    // to WHOLE pixels made the shadow stair-step visibly on slow tilts. The middle
+    // ground: quantise to a fraction of a pixel (STEP). Fine enough to read as
+    // smooth, coarse enough that most frames still write nothing and skip the
+    // recalc. 0.25 is exact in floating point, so the dedupe compare stays stable.
+    // Paired with idling the ticker once motion settles, a steady phone costs zero.
+    const STEP = 0.25;
+    const snap = (n) => Math.round(n / STEP) * STEP;
     const VARS = { s1x: '--shadow-s1-x', s1y: '--shadow-s1-y', s2x: '--shadow-s2-x', s2y: '--shadow-s2-y' };
-    const written = { s1x: Math.round(BASE.s1), s1y: Math.round(BASE.s1), s2x: Math.round(BASE.s2), s2y: Math.round(BASE.s2) };
+    const written = { s1x: snap(BASE.s1), s1y: snap(BASE.s1), s2x: snap(BASE.s2), s2y: snap(BASE.s2) };
     let running = false;
     let idleFrames = 0;
 
     const render = () => {
         let changed = false;
         for (const k in VARS) {
-            const v = Math.round(state[k]);
+            const v = snap(state[k]);
             if (v !== written[k]) {
                 written[k] = v;
                 target.style.setProperty(VARS[k], v + 'px');

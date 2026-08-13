@@ -10,6 +10,7 @@ export const UI_PREF_KEYS = {
     reduceMotion: 'cpr-reduce-motion',
     disableTapHold: 'cpr-disable-tap-hold',
     hideBackground: 'cpr-hide-background',
+    shadowAnimation: 'cpr-shadow-animation',
 };
 
 function getBoolPref(key) {
@@ -33,4 +34,14 @@ export function tapHoldDisabled() {
 /** Hide Agent Background: hides the blue-tinted SVG background on the agent UI. */
 export function backgroundHidden() {
     return getBoolPref(UI_PREF_KEYS.hideBackground);
+}
+
+/**
+ * Shadow Animation: gyro/pointer tilt parallax on the frame drop-shadows.
+ * Opt-IN — off by default, so an absent key reads false. The static shadow
+ * offsets still render either way; this only controls whether device tilt
+ * drives them. (Reduce Motion, if on, removes the shadows entirely and wins.)
+ */
+export function shadowAnimationEnabled() {
+    return getBoolPref(UI_PREF_KEYS.shadowAnimation);
 }

@@ -24,7 +24,7 @@ import QrLinkScanner from "./components/QrLinkScanner.vue";
 import {vCprImg} from "./directives/cpr-img";
 import {initTiltShadow} from "./composables/useTiltShadow";
 import {RadialMenu} from "./plugins/radial-menu";
-import {reduceMotionEnabled, backgroundHidden} from "./utils/uiPreferences";
+import {reduceMotionEnabled, backgroundHidden, shadowAnimationEnabled} from "./utils/uiPreferences";
 import mitt from 'mitt';
 
 window.emitter = mitt();
@@ -74,7 +74,10 @@ if (document.getElementById('app')) {
         document.documentElement.classList.add('cpr-hide-background');
     }
     app.mount('#app');
-    if (!reduceMotion) {
+    // Tilt/gyro shadow parallax is opt-in (off by default). The static shadow
+    // offsets still render; this only drives them from device tilt. Reduce Motion
+    // removes the shadows outright, so it takes precedence.
+    if (!reduceMotion && shadowAnimationEnabled()) {
         initTiltShadow();
     }
 }

@@ -2,9 +2,9 @@
 
 @section('content')
     <div
-        class="min-h-screen flex flex-col items-center justify-center p-6 bg-[url('{{ asset('images/external/splash-square.png') }}')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-cpr-black/80">
+        class="min-h-screen flex flex-col items-center justify-center  bg-[url('{{ asset('images/external/splash-square.png') }}')] bg-cover bg-center bg-no-repeat bg-blend-overlay bg-cpr-black/80">
         <div
-            class="cpr-panel p-8 max-w-4xl w-full border-t-4 border-t-red-600 shadow-2xl backdrop-blur-sm overflow-y-auto max-h-[90vh]">
+            class="cpr-panel p-4 max-w-4xl w-full h-full border-t-4 border-t-red-600 shadow-2xl backdrop-blur-sm overflow-y-auto">
             <div class="mb-8 border-b border-cpr-red/30 pb-4">
                 <h1 class="text-4xl font-black glow-red text-cpr-red uppercase tracking-tighter">How to Use</h1>
                 <p class="text-cpr-text-muted italic"><br>Follow these steps to synchronize your Agent interface with
@@ -26,9 +26,9 @@
                 </p>
             </div>
 
-            <div class="space-y-8 text-cpr-text-main">
+            <div class="help-body space-y-8 text-cpr-text-main">
                 <section>
-                    <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">1. Preparation &
+                    <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">1. Preparation &
                         Installation</h2>
                     <ul class="list-disc list-inside space-y-2 ml-4">
                         <li>Ensure you have the <a href="https://foundryvtt.com/packages/cyberpunk-red-core"
@@ -47,7 +47,7 @@
                 </section>
 
                 <section class="bg-cpr-black/50 p-6 rounded border-l-4 border-l-cpr-yellow">
-                    <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-2">Quick Connect: QR
+                    <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-2">Quick Connect: QR
                         Pairing</h2>
                     <p class="text-cpr-text-muted italic mb-4">The idea here is to minimise the connection errors. There is
                     much better error handling on the Agent side so any troubleshooting should be easier. With that said:</p>
@@ -76,7 +76,7 @@
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
+                    <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
                     <p class="mb-4 text-cpr-text-muted text-sm">Pick <strong>Game Master</strong> when you register
                         (or switch role in Settings → Account Control) to unlock the GM flow.</p>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
@@ -95,7 +95,7 @@
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">3. Player Setup</h2>
+                    <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">3. Player Setup</h2>
                     <p class="mb-4">Players must link their accounts to the GM's session:</p>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
                         <li>Log in to this Agent app and navigate to <strong>Settings</strong>.</li>
@@ -112,7 +112,7 @@
                 </section>
 
                 <section>
-                    <h2 class="text-2xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Character
+                    <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">4. Character
                         Assignment & Sync</h2>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
                         <li>In Foundry VTT, the GM should open the <strong>Character Assignment</strong> menu (found in

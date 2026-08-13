@@ -9,7 +9,7 @@
             <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
                 Settings
             </h2>
-            <div class="flex gap-2 pt-2">
+            <div class="flex justify-between gap-2 pt-2 ml-auto">
                 <a href="{{ route('dashboard') }}"
                    class="cyber-button bg-cpr-black-elevated border-cpr-border text-xs px-4 py-2 uppercase w-32 text-center">
                     Return
@@ -690,13 +690,16 @@
             <div class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg space-y-6"
                  x-data="{
                      reduceMotion: false,
+                     shadowAnimation: false,
                      disableTapHold: false,
                      hideBackground: false,
                      savedMotion: false,
+                     savedShadowAnim: false,
                      savedTapHold: false,
                      savedBackground: false,
                      init() {
                          this.reduceMotion = localStorage.getItem('cpr-reduce-motion') === '1';
+                         this.shadowAnimation = localStorage.getItem('cpr-shadow-animation') === '1';
                          this.disableTapHold = localStorage.getItem('cpr-disable-tap-hold') === '1';
                          this.hideBackground = localStorage.getItem('cpr-hide-background') === '1';
                      },
@@ -710,6 +713,11 @@
                          localStorage.setItem('cpr-reduce-motion', v ? '1' : '0');
                          document.documentElement.classList.toggle('cpr-reduce-motion', v);
                          this.flash('savedMotion');
+                     },
+                     setShadowAnimation(v) {
+                         this.shadowAnimation = v;
+                         localStorage.setItem('cpr-shadow-animation', v ? '1' : '0');
+                         this.flash('savedShadowAnim');
                      },
                      setDisableTapHold(v) {
                          this.disableTapHold = v;
@@ -742,6 +750,27 @@
                             :class="reduceMotion ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
                         <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
                               :class="reduceMotion ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <!-- Shadow Animation -->
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-cpr-border/50">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Shadow Animation</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Drives the frame shadow depth from device tilt (gyroscope). Off by default; the static shadows still show.
+                        </p>
+                        <p x-show="savedShadowAnim" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="shadowAnimation"
+                            @click="setShadowAnimation(!shadowAnimation)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="shadowAnimation ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="shadowAnimation ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
                     </button>
                 </div>
 

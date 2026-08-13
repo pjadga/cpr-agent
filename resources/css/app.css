@@ -256,3 +256,10 @@ html.cpr-hide-background .cpr-agent-background {
 [x-cloak] {
     display: none !important;
 }
+
+@media (max-width: 767px) {
+    :where(.help-body) :where(p, li) {
+        font-size: 0.8125rem;
+        line-height: 1.5;
+    }
+}
