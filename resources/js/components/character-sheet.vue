@@ -145,14 +145,14 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <h1 v-if="!isWssConnected"
-                                class="text-xl font-bold uppercase truncate leading-none text-cpr-yellow">
+                                class="text-[0.8rem] font-normal uppercase truncate leading-none text-cpr-yellow">
                                 <span
                                     class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
                                     Offline
                                 </span>
                                 {{ charData.data.name }}
                             </h1>
-                            <h1 v-else class="text-xl font-bold uppercase truncate leading-none text-cpr-yellow">
+                            <h1 v-else class="text-[0.8rem] font-normal uppercase truncate leading-none text-cpr-yellow">
                                 {{ charData.data.name }}
                             </h1>
                         </div>
