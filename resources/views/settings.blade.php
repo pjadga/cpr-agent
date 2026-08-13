@@ -735,9 +735,9 @@
                 <!-- Reduce Motion -->
                 <div class="flex items-center justify-between gap-4">
                     <div>
-                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Reduce Motion</p>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Reduce Shadows</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
-                            Turns off gyro motion controls and removes the shadow depth effect.
+                            Removes the shadow depth effect.
                         </p>
                         <p x-show="savedMotion" x-transition.opacity x-cloak
                            class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
