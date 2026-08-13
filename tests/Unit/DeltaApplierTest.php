@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use App\Http\Handlers\DeltaApplier;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 class DeltaApplierTest extends TestCase
