@@ -44,6 +44,8 @@
                         <p class="text-cpr-text-muted text-xs italic block max-w-md">
                             Tips are always appreciated but never required, they will go towards the running of the server this is hosted on.
                         </p>
+                    </div>
+                    <div class="flex justify-center mt-8">
                         <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js' @cspNonce></script>
                         <script type='text/javascript' @cspNonce>
                             kofiwidget2.init('Support me on Ko-fi', '#141414', 'V8M8238Q2V');
