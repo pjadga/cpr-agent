@@ -46,4 +46,5 @@ to take care of the communication, however I wanted more control over returns an
 
 If this project is useful to you and you'd like to support its development, you can buy me a coffee:
 Tips go towards caffeine and the running of the hosting.
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V8M8238Q2V)
