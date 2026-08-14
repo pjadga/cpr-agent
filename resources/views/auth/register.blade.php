@@ -85,7 +85,7 @@
                     </div>
 
                     <!-- Captcha -->
-                    @if(!app()->environment('local'))
+                    @if(config('services.turnstile.enabled'))
                         <div class="mt-4 flex flex-col items-center">
                             <x-turnstile/>
                             <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2"/>

@@ -38,7 +38,7 @@ class NewPasswordController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ];
 
-        if (! app()->environment('local')) {
+        if (config('services.turnstile.enabled')) {
             $rules['cf-turnstile-response'] = ['required', new Turnstile];
         }
 

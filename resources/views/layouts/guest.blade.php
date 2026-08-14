@@ -24,7 +24,7 @@
     <!-- Scripts -->
     @include('partials.reverb-config')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @if(!app()->environment('local'))
+    @if(config('services.turnstile.enabled'))
         <x-turnstile.scripts/>
     @endif
 </head>

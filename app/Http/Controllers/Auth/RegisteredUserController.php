@@ -40,7 +40,7 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'in:player,gm'],
         ];
 
-        if (! app()->environment('local')) {
+        if (config('services.turnstile.enabled')) {
             $rules['cf-turnstile-response'] = ['required', new Turnstile];
         }
 

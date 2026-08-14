@@ -31,7 +31,7 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ];
 
-        if (! app()->environment('local')) {
+        if (config('services.turnstile.enabled')) {
             $rules['cf-turnstile-response'] = ['required', new Turnstile];
         }
 
