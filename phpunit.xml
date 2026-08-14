@@ -40,6 +40,9 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
-        <env name="BROADCAST_DRIVER" value="log"/>
+        <!-- force overrides the container/.env value (DDEV injects the project
+             .env, where BROADCAST_CONNECTION=reverb); tests must never make a
+             real broadcast HTTP call to a Reverb server. -->
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
     </php>
 </phpunit>
