@@ -15,6 +15,7 @@
     <title>{{ config('app.name', 'Cyberpunk Interface') }}</title>
 
     <!-- Fonts -->
+    <link rel="preload" as="font" type="font/ttf" href="{{ Vite::asset('resources/fonts/Cybrpnuk2.ttf') }}" crossorigin>
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/hack-font@3/build/web/hack.css">
     <link href="https://fonts.cdnfonts.com/css/repetition-scrolling" rel="stylesheet">
 

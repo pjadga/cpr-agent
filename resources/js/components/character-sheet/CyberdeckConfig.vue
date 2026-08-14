@@ -5,7 +5,6 @@
             class="cpr-panel w-full max-w-2xl bg-cpr-black-deep border-2 border-cpr-teal shadow-[0_0_40px_rgba(20,184,166,0.2)] flex flex-col max-h-[85vh]">
             <div class="bg-cpr-teal-dark p-3 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2">
-                    <i v-icon data-lucide="cpu" class="w-5 h-5 text-black"></i>
                     <span class="text-sm font-black text-black tracking-tighter uppercase italic">Cyberdeck Configuration</span>
                 </div>
                 <button @click="$emit('close')" class="text-black hover:text-cpr-yellow transition-colors">

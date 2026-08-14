@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen pb-100 text-sans bg-cpr-black-deep">
+    <div class="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom))] text-sans bg-none">
 
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
@@ -38,6 +38,9 @@
         </div>
 
         <div v-if="!loading && charData && !error">
+            <!-- Fixed backdrop behind everything; opaque header/nav frame it between the borders. -->
+            <mobile-background-frame class="cpr-agent-background" :style="{ '--frame-border': 'var(--cpr-teal-dark)' }"></mobile-background-frame>
+
             <!-- Modals & Popups -->
             <cyberdeck-config
                 v-if="showCyberdeckConfig"
@@ -102,6 +105,7 @@
 
             <roll-result-popup></roll-result-popup>
             <dice-history></dice-history>
+            <radial-menu-host></radial-menu-host>
 
             <combat-panel
                 :show="showCombatPanel"
@@ -121,7 +125,8 @@
             </combat-panel>
 
             <header
-                class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black/90 sticky top-(nativephp-safe-area - --inset-top) z-50 border-b border-cpr-yellow-dark backdrop-blur-md">
+                class="pb-3 pr-3 pl-3 pt-(nativephp-safe-area) bg-cpr-black-deep fixed w-full top-(nativephp-safe-area - --inset-top) z-50 backdrop-blur-md">
+                <top-border-frame></top-border-frame>
                 <div class="pt-3 flex items-center gap-3 justify-between">
                     <div class="relative w-12 h-12 shrink-0 cursor-pointer group" @click="showImagePopup = true">
                         <div
@@ -140,14 +145,14 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
                             <h1 v-if="!isWssConnected"
-                                class="text-xl font-bold uppercase truncate leading-none text-cpr-yellow">
+                                class="text-[0.8rem] font-normal uppercase truncate leading-none text-cpr-yellow">
                                 <span
                                     class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
                                     Offline
                                 </span>
                                 {{ charData.data.name }}
                             </h1>
-                            <h1 v-else class="text-xl font-bold uppercase truncate leading-none text-cpr-yellow">
+                            <h1 v-else class="text-[0.8rem] font-normal uppercase truncate leading-none text-cpr-yellow">
                                 {{ charData.data.name }}
                             </h1>
                         </div>
@@ -180,10 +185,19 @@
                     </div>
                 </div>
             </header>
+            <div class="pt-[calc(4.75rem+var(--nativephp-safe-area,env(safe-area-inset-top)))]"></div>
+            <main class="max-w-md mx-auto relative min-h-[60vh]">
 
-            <main class="p-3 max-w-md mx-auto space-y-4 relative min-h-[60vh]">
+                <!-- Progressive/tapered backdrop blur: stacked masked layers compound toward
+                     the centre (strong, ~10px) and fade to the edges. Content stays sharp
+                     because these sit on -z-10 behind the in-flow content. aria-hidden. -->
+                <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+                    <div class="absolute inset-0 [backdrop-filter:blur(2px)] [-webkit-backdrop-filter:blur(2px)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_60%,transparent_100%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_60%,transparent_100%)]"></div>
+                    <div class="absolute inset-0 [backdrop-filter:blur(4px)] [-webkit-backdrop-filter:blur(4px)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_30%,transparent_72%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_30%,transparent_72%)]"></div>
+                    <div class="absolute inset-0 [backdrop-filter:blur(8px)] [-webkit-backdrop-filter:blur(8px)] [mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_12%,transparent_48%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,#000_0%,#000_12%,transparent_48%)]"></div>
+                </div>
 
-                <transition name="fade">
+                <transition name="fade" mode="out-in">
                     <stats-tab
                         v-if="activeTab === 'stats'"
                         :active-tab="activeTab"
@@ -280,9 +294,10 @@
                     ></net-tab>
                 </transition>
             </main>
-
+            <div class="pb-[calc(7rem+env(safe-area-inset-bottom))]"></div>
             <nav
-                class="fixed bottom-0 inset-x-0 bg-cpr-black-deep border-t border-cpr-red-dark/30 flex justify-around p-2 pb-6 z-50">
+                class="fixed bottom-0 inset-x-0 bg-cpr-black-deep border-t border-cpr-red-dark/30 flex justify-around pt-4 p-2 pb-6 z-50">
+                <bottom-border-frame></bottom-border-frame>
                 <nav-btn icon="activity" label="Stats" :active="activeTab === 'stats'"
                          @click="activeTab = 'stats'"></nav-btn>
                 <nav-btn icon="brain" label="Skills" :active="activeTab === 'skills'"
@@ -446,7 +461,9 @@ import EurobucksPanel from './character-sheet/EurobucksPanel.vue';
 import DiceHistory from './DiceHistory.vue';
 import RollResultPopup from './RollResultPopup.vue';
 import skillsDescriptions from '../../../skills.json';
-
+import TopBorderFrame from "./character-sheet/frames/TopBorderFrame.vue";
+import BottomBorderFrame from "./character-sheet/frames/BottomBorderFrame.vue";
+import MobileBackgroundFrame from "./character-sheet/frames/MobileBackgroundFrame.vue";
 // --- COMPOSABLES ---
 import {useCharacterData} from '../composables/useCharacterData';
 import {useCombat} from '../composables/useCombat';
@@ -476,7 +493,10 @@ export default {
         NetTab,
         EurobucksPanel,
         DiceHistory,
-        RollResultPopup
+        RollResultPopup,
+        TopBorderFrame,
+        BottomBorderFrame,
+        MobileBackgroundFrame
     },
     directives: {icon: vIcon},
     setup() {
@@ -598,8 +618,8 @@ export default {
                     itemId: itemId,
                     state: state
                 });
-                // Don't call refreshAll() here - the SHEET_DELTA websocket event
-                // from Foundry will update the UI via applyDelta() automatically
+                // Don't call refreshAll() here. The SHEET_DELTA websocket event
+                // from Foundry updates the UI via applyDelta() automatically.
             } catch (err) {
                 console.error("Error updating equip state:", err);
                 // On error, refresh to restore correct state
@@ -1011,6 +1031,9 @@ export default {
 
         // --- WATCHERS ---
         watch(activeTab, (newTab) => {
+            // Always land the new tab at the top — the page scrolls at window
+            // level, so without this a mid-scroll position carries across tabs.
+            window.scrollTo({top: 0, left: 0});
             if (newTab === 'control') {
                 const prevSelectedId = controlState.value.selectedTarget?.id || null;
                 if (prevSelectedId) {
@@ -1135,6 +1158,9 @@ export default {
             expandedSkills,
             handleItemClick,
             handleEurobucksUpdated,
+            TopBorderFrame,
+            BottomBorderFrame,
+            MobileBackgroundFrame,
 
             // Actions
             sendStatRequest,

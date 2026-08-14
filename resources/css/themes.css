@@ -1,21 +1,23 @@
 :root {
-    /* DEFAULT THEME (Night Mode) */
-    --cpr-red: #da0000;
-    --cpr-red-dark: #a30000;
+    /* DEFAULT THEME (Night Mode) — core colours ported from the item frame SVGs */
+    --cpr-red: #e60012;
+    --cpr-red-dark: #ad000e; /* derived from --cpr-red, not in the SVGs */
     --cpr-yellow: #fcee0a;
     --cpr-yellow-dark: #cfc100;
-    --cpr-teal: #14b8a6;
-    --cpr-teal-dark: #0d9488;
+    --cpr-teal: #00f0ff;
+    --cpr-teal-dark: #00b0bf; /* derived from --cpr-teal, not in the SVGs */
     --cpr-black: #1a1a1a;
     --cpr-black-deep: #141414;
+    --cpr-black-panel: #232323;
     --cpr-black-soft: rgba(35, 35, 35, 0.51);
     --cpr-black-elevated: rgba(50, 50, 50, 0.73);
+    --cpr-green: #22c55e;
     --cpr-panel: rgba(28, 28, 28, 0.85);
-    --cpr-panel-hover: rgba(218, 0, 0, 0.15);
+    --cpr-panel-hover: rgba(230, 0, 18, 0.15);
     --cpr-border: #333333;
     --cpr-border-dark: #262626;
     --cpr-border-muted: #404040;
-    --cpr-border-accent: rgba(218, 0, 0, 0.44);
+    --cpr-border-accent: rgba(230, 0, 18, 0.44);
     --cpr-text-main: #b0b0b0;
     --cpr-text-muted: #7d8c99;
     --cpr-text-bright: #e5e5e5;

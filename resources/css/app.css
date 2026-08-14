@@ -17,8 +17,11 @@
 
     --color-cpr-black: var(--cpr-black);
     --color-cpr-black-deep: var(--cpr-black-deep);
+    --color-cpr-black-panel: var(--cpr-black-panel);
     --color-cpr-black-soft: var(--cpr-black-soft);
     --color-cpr-black-elevated: var(--cpr-black-elevated);
+
+    --color-cpr-green: var(--cpr-green);
 
     --color-cpr-border: var(--cpr-border);
     --color-cpr-border-dark: var(--cpr-border-dark);
@@ -38,10 +41,83 @@
     --border-cpr-width: var(--cpr-border-width, 1px);
 }
 
+/* Display font for headings — "Cyberpnuk2" by junkohanhero (dafont.com/junkohanhero.d1293),
+   bundled locally in resources/fonts. Vite resolves the relative url at build. */
+@font-face {
+    font-family: 'Cyberpnuk2';
+    src: url('../fonts/Cybrpnuk2.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* All H1/H2 use the display font. Broad on purpose (per request — tweak later).
+   font-synthesis:none stops the browser faux-bolding this single-weight face
+   (it renders far too intense under font-bold); real fonts with a bold face
+   are unaffected, so fallbacks still bold normally. */
+h1,
+h2 {
+    /* !important so the display font wins regardless of theme font vars or any
+       utility/inherited font-family on a given page. font-weight:normal both keeps
+       the display font from reading too intense (it ships a single 400 face) and
+       makes the requested weight match that face exactly — a 900 (font-black)
+       request against a 400-only font is a fragile match that can drop to fallback. */
+    font-family: 'Cyberpnuk2', var(--font-sans, 'Hack'), monospace !important;
+    font-weight: normal !important;
+}
+
 body {
     touch-action: manipulation;
     background-color: var(--cpr-black-deep);
     color: var(--cpr-text-main);
+    /* App-like feel: no accidental text selection on tap/drag, and no iOS
+       long-press callout (also keeps the press-and-hold radial menu clean).
+       user-select is inherited, so this cascades to the whole UI. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* touch-action does NOT inherit — set it on every element so double-tap zoom
+   (and the legacy 300ms tap delay) is disabled UI-wide. `manipulation` still
+   allows scrolling/panning and pinch, just kills double-tap + non-standard gestures. */
+*,
+*::before,
+*::after {
+    touch-action: manipulation;
+}
+
+/* Keep text usable where it actually matters: form fields and readable copy.
+   Add the `select-text` class to opt any other element back in. */
+input,
+textarea,
+[contenteditable="true"],
+.cpr-description,
+.select-text {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+}
+
+/* Copyable codes/keys: Tailwind's `select-all` only sets the standard property,
+   so on WebKit/iOS the inherited `-webkit-user-select: none` from body still
+   blocks selection. Re-enable the WebKit side so one tap selects the whole code. */
+.select-all {
+    -webkit-user-select: all;
+    -webkit-touch-callout: default;
+}
+
+/* Reduce Motion (UI setting): strip the parallax shadow-depth layers. The gyro
+   listener is also skipped in JS (app.js), so nothing drives these vars either. */
+html.cpr-reduce-motion .frame__layer--s1,
+html.cpr-reduce-motion .frame__layer--s2 {
+    display: none;
+}
+
+/* Hide Agent Background (UI setting): hide the blue-tinted SVG background frame
+   on the agent UI (class applied to <html> in app.js from the stored pref). */
+html.cpr-hide-background .cpr-agent-background {
+    display: none !important;
 }
 
 
@@ -137,11 +213,11 @@ body {
 }
 
 .glow-red {
-    text-shadow: 0 0 8px rgba(218, 0, 0, 0.4);
+    text-shadow: 0 0 8px rgba(230, 0, 18, 0.4);
 }
 
 .glow-teal {
-    text-shadow: 0 0 8px rgba(20, 184, 166, 0.4);
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
 }
 
 .glow-yellow {
@@ -173,4 +249,17 @@ body {
 
 .hidden-none {
     display: none !important;
+}
+
+/* Alpine: keep x-show/x-transition elements hidden until Alpine initialises,
+   so notes like the settings "Saved" flash don't flash on page load. */
+[x-cloak] {
+    display: none !important;
+}
+
+@media (max-width: 767px) {
+    :where(.help-body) :where(p, li) {
+        font-size: 0.8125rem;
+        line-height: 1.5;
+    }
 }

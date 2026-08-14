@@ -35,3 +35,5 @@ package-lock.json
 /CLAUDE.md
 
 CHANGELOG.md
+
+scripts/build-frames.py

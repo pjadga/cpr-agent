@@ -2,8 +2,8 @@
  * Foundry pairing diagnostics.
  *
  * Central catalogue of every way QR linking can fail, with plain-language
- * troubleshooting for each — including a definitive answer for "the Agent
- * can't reach Foundry" across both hosted and local-LAN setups.
+ * troubleshooting for each, including an answer for "the Agent can't reach
+ * Foundry" across both hosted and local-LAN setups.
  */
 
 export const PAYLOAD_VERSION = 1;

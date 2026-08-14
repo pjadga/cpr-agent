@@ -116,7 +116,7 @@ export function useWebSocketSubscription() {
     };
 
     /**
-     * Called when a component mounts — subscribes on first mount.
+     * Called when a component mounts. Subscribes on the first mount.
      */
     const onMount = () => {
         useCount++;
@@ -126,7 +126,7 @@ export function useWebSocketSubscription() {
     };
 
     /**
-     * Called when the last component unmounts — cleans up.
+     * Called when the last component unmounts. Cleans up.
      */
     const onUnmount = () => {
         useCount--;

@@ -65,7 +65,7 @@ async function claim(nonce) {
     const data = res.data || {};
     sessionName.value = data.foundry_user_name || data.channel_id || '';
 
-    // Claim succeeded — the player is now configured. Verify Foundry reachability
+    // Claim succeeded, the player is now configured. Verify Foundry reachability
     // and wait briefly for the GM's Bridge to confirm the link round-trip.
     state.value = 'checking';
 

@@ -1,43 +1,27 @@
 <template>
     <div
-        class="cpr-panel bg-[var(--cpr-black-soft)] flex flex-col transition-colors border-l-2 relative group border-gray-800"
-        :class="{
-            'border-cpr-red': category === 'weapon',
-            'border-cpr-teal-dark': category === 'armor',
-            'border-cpr-yellow-dark': category === 'ammo',
-            'border-cpr-yellow': category === 'drug',
-            'border-cpr-border-muted': category === 'gear',
-            'border-cpr-teal': category === 'cyberware',
-            'border-cpr-red border-dashed': category === 'criticalInjury',
-            'z-20': showEquipPopup
-         }">
+        class="flex flex-col transition-colors relative group"
+        :class="{ 'z-20': showEquipPopup }"
+        :style="{
+            '--frame-accent': 'var(--cpr-border)',
+            '--frame-colour-change': `var(--${categoryColor})`,
+            '--ammo-fill': ammo ? ammo.fill : 0,
+            '--ammo-colour': ammo ? ammo.colour : null,
+        }"
+        v-long-press="itemActions">
 
-        <div class="cpr-corner-square"
-             :class="{
-                'text-cpr-red': category === 'weapon',
-                'text-cpr-teal-dark': category === 'armor',
-                'text-cpr-yellow-dark': category === 'ammo',
-                'border-cpr-yellow-dark': category === 'drug',
-                'text-cpr-border-muted': category === 'gear',
-                'text-cpr-teal': category === 'cyberware',
-                'text-cpr-red': category === 'criticalInjury'
-             }">
-        </div>
-
-        <div v-if="statusLine" class="absolute top-0 left-0 h-[3px] transition-all duration-500 z-10"
-             :class="statusLine.color"
-             :style="{ width: statusLine.width }">
-        </div>
-
-        <div class="flex items-stretch min-h-[3.5rem]">
-            <div class="flex items-center pl-3 py-2 shrink-0">
+        <div class="relative flex items-stretch"
+             :class="category !== 'weapon' ? 'min-h-[75px]' : (isMeleeOrUnarmed ? 'min-h-[83px]' : 'min-h-[111px]')">
+            <component :is="category !== 'weapon' ? 'BasicItemFrame' : (isMeleeOrUnarmed ? 'MeleeItemFrame' : 'WeaponItemFrame')"
+                       class="absolute inset-0 pointer-events-none select-none"/>
+            <div class="relative flex items-start pl-[9px] py-[10px] shrink-0">
                 <img v-cpr-img:[categoryColor]="getImageUrl(item.img)"
-                     class="w-10 h-10 object-cover border border-cpr-border bg-cpr-black/50"/>
+                     class="w-15 h-15 object-cover border border-cpr-border bg-cpr-black/50"/>
             </div>
-            <div class="flex-1 p-2 flex flex-col justify-center cursor-default transition-colors"
+            <div class="relative flex-1 pl-3 py-3 flex flex-col items-start cursor-default transition-colors"
                  @click="console.log('Row clicked:', item.name); $emit('click', item)">
                 <div class="flex justify-between items-start pr-2">
-                    <div class="flex flex-col">
+                    <div class="flex flex-col justify-between h-[57px]">
                     <span class="text-sm font-bold text-cpr-text-main group-hover:text-cpr-teal transition-colors">
                         {{ item.name }}
                         <span v-if="category === 'weapon' && ammoName"
@@ -74,17 +58,17 @@
 
 
                             <div v-if="category === 'weapon'" class="flex items-center gap-1">
-                                <i v-icon data-lucide="logs" class="w-3 h-3 text-cpr-text-dim"
-                                   v-if="!isMeleeOrUnarmed"></i>
                                 <span class="text-[10px] text-cpr-text-muted">
                                     <template v-if="!isMeleeOrUnarmed && item.system.magazine">
-                                        <span class="font-numbers">{{ item.system.magazine.value }}</span> <span
-                                        class="text-cpr-text-dim">/</span> <span
-                                        class="font-numbers">{{ item.system.magazine.max }}</span>
-                                        <span v-if="ammoTotal !== null"
-                                              class="text-cpr-yellow ml-1 font-numbers">[{{ ammoTotal }}]</span>
+                                        <span class="absolute top-[80px] left-[-55px]">
+                                            <span class="font-numbers">{{ item.system.magazine.value }}</span> <span
+                                            class="text-cpr-text-dim">/</span> <span
+                                            class="font-numbers">{{ item.system.magazine.max }}</span>
+                                            <span v-if="ammoTotal !== null"
+                                                  class="text-cpr-yellow ml-1 font-numbers">[{{ ammoTotal }}]</span>
+                                        </span>
                                     </template>
-                                    <span v-if="item.system.damage" :class="{'ml-2': !isMeleeOrUnarmed}"
+                                    <span v-if="item.system.damage"
                                           class="text-cpr-red font-bold font-numbers">{{ item.system.damage }}</span>
                                     <span v-if="item.system.rof > 0" class="ml-2 text-cpr-teal">ROF:<span
                                         class="font-numbers">{{ item.system.rof }}</span></span>
@@ -124,11 +108,23 @@
             </div>
 
             <div
-                v-if="category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug' && category !== 'gear' && isPlayer"
+                v-if="category === 'weapon' && isPlayer && activeTab !== 'control'"
+                class="flex items-start pt-6 gap-1 shrink-0 relative mr-1">
+                <button
+                    @click.stop="$emit('equip-click', item)"
+                    class="p-2 text-cpr-text-dim hover:text-cpr-yellow transition-colors flex items-start relative z-10"
+                    :title="'Status: ' + equipStateLabel"
+                >
+                    <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
+                </button>
+            </div>
+
+            <div
+                v-if="category !== 'weapon' && category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury' && category !== 'drug' && category !== 'gear' && isPlayer"
                 class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
                     @click.stop="$emit('equip-click', item)"
-                    class="p-2 text-cpr-text-dim hover:text-cpr-yellow transition-colors flex items-center justify-center relative z-10"
+                    class="p-2 text-cpr-text-dim hover:text-cpr-yellow transition-colors flex items-start relative z-10"
                     :title="'Status: ' + equipStateLabel"
                 >
                     <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
@@ -138,7 +134,7 @@
             <div
                 v-if="(!isPlayer && (category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'))"
                 class="flex items-center gap-1 shrink-0 relative mr-1">
-                <div class="p-2 text-cpr-yellow/60 flex items-center justify-center relative z-10"
+                <div class="p-2 text-cpr-yellow/60 flex items-start relative z-10"
                      title="Equipped (Locked)">
                     <i v-icon :data-lucide="equipIcon" class="w-5 h-5 pointer-events-none"></i>
                 </div>
@@ -164,8 +160,21 @@
             </div>
 
             <button
+                v-if="category === 'weapon' && isPlayer"
                 @click.stop="toggle"
-                class="w-12 shrink-0 flex items-center justify-center bg-cpr-black-deep/30 border-l border-white/5 active:bg-cpr-teal-dark/20 transition-colors hover:bg-cpr-teal-dark/40 cursor-pointer">
+                class="relative w-15 shrink-0 pt-8 flex items-start justify-center transition-colors cursor-pointer">
+                <div class="transition-transform duration-300 flex items-center justify-center"
+                     :class="{ 'rotate-180': expanded }">
+                    <i v-icon data-lucide="chevron-down"
+                       class="w-5 h-5 text-cpr-text-dim group-hover:text-cpr-teal">
+                    </i>
+                </div>
+            </button>
+
+            <button
+                v-if="category !== 'weapon' && isPlayer"
+                @click.stop="toggle"
+                class="relative w-15 shrink-0 flex items-center justify-center transition-colors cursor-pointer">
                 <div class="transition-transform duration-300 flex items-center justify-center"
                      :class="{ 'rotate-180': expanded }">
                     <i v-icon data-lucide="chevron-down"
@@ -176,7 +185,10 @@
         </div>
 
         <transition name="expand">
-            <div v-if="expanded" class="border-t border-white/5 bg-cpr-black/40 p-3 shadow-inner">
+            <div v-if="expanded" class="relative mt-1"
+                 :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                <DropdownInfoFrame class="absolute inset-0 pointer-events-none select-none"/>
+                <div class="relative z-10 p-3">
                 <template v-if="category !== 'criticalInjury'">
                     <div v-if="item.system.description && item.system.description.value"
                          class="text-cpr-text-main text-xs leading-relaxed font-sans cpr-description mb-3"
@@ -277,6 +289,7 @@
                         </button>
                     </div>
                 </div>
+                </div>
             </div>
         </transition>
     </div>
@@ -289,11 +302,17 @@ import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {findItemInList, formatCategoryName} from '../../utils/helpers';
+import {longPress} from '../../plugins/radial-menu';
+import BasicItemFrame from './frames/BasicItemFrame.vue';
+import WeaponItemFrame from './frames/WeaponItemFrame.vue';
+import MeleeItemFrame from './frames/MeleeItemFrame.vue';
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
 
 export default {
     name: 'ItemRow',
     props: ['item', 'category', 'allItems', 'activeTab', 'refreshAll'],
-    directives: {icon: vIcon},
+    components: {BasicItemFrame, WeaponItemFrame, MeleeItemFrame, DropdownInfoFrame},
+    directives: {icon: vIcon, 'long-press': longPress},
     emits: ['click', 'equip-click', 'consume-click'],
     setup(props, {emit}) {
         const {getImageUrl, fetchCharacterData, charData, isPlayer} = useCharacterData();
@@ -302,6 +321,43 @@ export default {
 
         const toggle = () => {
             expanded.value = !expanded.value;
+        };
+
+        // Contextual radial-menu (long-press) actions for this row. "Info" opens
+        // the row's own dropdown directly rather than bubbling a click, so it
+        // works the same on any tab that renders an ItemRow.
+        const itemActions = () => {
+            // Cyberware: Info only — equipping/removing incurs penalties not modelled yet.
+            if (props.category === 'cyberware') {
+                return [{id: 'info', icon: 'info', label: 'Info', handler: toggle}];
+            }
+
+            const actions = [
+                {id: 'info', icon: 'info', label: 'Info', handler: toggle},
+            ];
+            // Equip is meaningless on the Control page — those weapons are already
+            // equipped, and "Equip" doesn't ready them for combat. Select does.
+            const isControlWeapon = isWeaponItem.value && props.activeTab === 'control';
+            if (!isControlWeapon) {
+                actions.push({id: 'equip', icon: 'hand', label: 'Equip', handler: () => emit('equip-click', props.item)});
+            }
+            if (props.item.type === 'drug' || props.item.system?.isConsumable) {
+                actions.push({id: 'use', icon: 'pill', label: 'Use', handler: () => emit('consume-click', props.item)});
+            }
+            if (isWeaponItem.value) {
+                // On the Control page, "Select" makes this the weapon being fired
+                // (same as tapping the row). Elsewhere it's the generic "Ready".
+                if (props.activeTab === 'control') {
+                    actions.push({id: 'select', icon: 'crosshair', label: 'Select', handler: () => emit('click', props.item)});
+                }
+                // else {
+                //     actions.push({id: 'ready', icon: 'crosshair', label: 'Ready', handler: () => emit('click', props.item)});
+                // }
+            }
+            if (usesAmmo.value) {
+                actions.push({id: 'reload', icon: 'rotate-cw', label: 'Reload', handler: reloadThisWeapon});
+            }
+            return actions;
         };
 
         const reloadWithAmmo = async (ammoId) => {
@@ -318,6 +374,38 @@ export default {
                 refresh();
             } catch (err) {
                 console.error("Error reloading weapon:", err);
+            }
+        };
+
+        // Reliable weapon test: real Foundry data often leaves system.isWeapon
+        // null, so fall back to the intrinsic type / passed category (mirrors
+        // handleItemClick's `isWeapon || type === 'weapon'`).
+        const isWeaponItem = computed(() =>
+            !!props.item.system?.isWeapon || props.item.type === 'weapon' || props.category === 'weapon'
+        );
+
+        // True for ranged weapons that draw from a magazine — drives the radial
+        // "Reload" petal (melee/unarmed and mag-less weapons are excluded).
+        const usesAmmo = computed(() => {
+            const sys = props.item.system;
+            if (!isWeaponItem.value) return false;
+            if (isMeleeOrUnarmed.value) return false;
+            return !!(sys.magazine && sys.magazine.max > 0);
+        });
+
+        // One-tap reload of THIS weapon (any page). ammoId omitted → Foundry
+        // reloads with the currently-installed ammo. Mirrors useCombat's payload.
+        const reloadThisWeapon = async () => {
+            try {
+                await window.axios.post('/api/reloadweapon', {
+                    weaponId: props.item._id,
+                    actorId: charData.value?.uuid,
+                    tokenId: charData.value?.tokenId,
+                });
+                const refresh = props.refreshAll || fetchCharacterData;
+                refresh();
+            } catch (err) {
+                console.error('Error reloading weapon:', err);
             }
         };
 
@@ -450,49 +538,20 @@ export default {
             return results.length > 0 ? results : null;
         });
 
-        const statusLine = computed(() => {
-            let percent = null;
+        // Weapons only: drives the frame's dotted ammo line. `fill` (0-1) reveals
+        // the dashes left→right via the clip var; `colour` shifts with fill level
+        // (low = red, mid = amber, full = green). Armour rows show no line.
+        const ammo = computed(() => {
             const sys = props.item.system;
+            if (props.category !== 'weapon' || isMeleeOrUnarmed.value) return null;
+            if (!sys.magazine || !(sys.magazine.max > 0)) return null;
 
-            if (props.category === 'weapon' && sys.magazine && sys.magazine.max > 0 && !isMeleeOrUnarmed.value) {
-                percent = (sys.magazine.value / sys.magazine.max) * 100;
-            } else if (props.category === 'armor') {
-                console.log("PROPS", props)
-                if (sys.isShield && sys.shieldHitPoints && sys.shieldHitPoints.max > 0) {
-                    percent = (sys.shieldHitPoints.value / sys.shieldHitPoints.max) * 100;
-                } else {
-                    let totalSp = 0;
-                    let currentSp = 0;
-                    let count = 0;
+            const fill = Math.min(1, Math.max(0, sys.magazine.value / sys.magazine.max));
+            let colour = 'var(--cpr-green)';
+            if (fill < 0.25) colour = 'var(--cpr-red)';
+            else if (fill < 0.60) colour = 'var(--cpr-yellow)';
 
-                    if (sys['headLocation'] && sys['headLocation'].sp > 0) {
-                        totalSp += sys['headLocation'].sp;
-                        currentSp += (sys['headLocation'].sp - sys['headLocation'].ablation);
-                        count++;
-                    }
-                    if (sys['bodyLocation'] && sys['bodyLocation'].sp > 0) {
-                        totalSp += sys['bodyLocation'].sp;
-                        currentSp += (sys['bodyLocation'].sp - sys['bodyLocation'].ablation);
-                        count++;
-                    }
-
-                    if (totalSp > 0) {
-                        percent = (currentSp / totalSp) * 100;
-                    }
-                }
-            }
-
-            if (percent === null) return null;
-            percent = Math.min(100, Math.max(0, percent));
-
-            let color = 'bg-green-500';
-            if (percent < 25) color = 'bg-cpr-red';
-            else if (percent < 60) color = 'bg-amber-500';
-
-            return {
-                width: `${percent}%`,
-                color: color
-            };
+            return { fill, colour };
         });
 
         const categoryColor = computed(() => {
@@ -519,6 +578,7 @@ export default {
         return {
             expanded,
             toggle,
+            itemActions,
             formatType,
             findItem,
             ammoName,
@@ -526,7 +586,7 @@ export default {
             isMeleeOrUnarmed,
             armorDisplay,
             injuryModifier,
-            statusLine,
+            ammo,
             getImageUrl,
             showReloadPopup,
             consumeIcon,

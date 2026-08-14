@@ -5,11 +5,11 @@
         @csrf
     </form>
     <div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
-        <div class="flex justify-around flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
+        <div class="flex justify-between flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
             <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
-                Agent Settings
+                Settings
             </h2>
-            <div class="flex gap-2 pt-2">
+            <div class="flex justify-between gap-2 pt-2 ml-auto">
                 <a href="{{ route('dashboard') }}"
                    class="cyber-button bg-cpr-black-elevated border-cpr-border text-xs px-4 py-2 uppercase w-32 text-center">
                     Return
@@ -389,7 +389,7 @@
                                         class="cyber-button bg-cpr-black-elevated border-cpr-teal text-cpr-teal px-3 py-1.5 uppercase text-[10px] font-bold w-full">
                                     <i data-lucide="clipboard-copy" class="w-3 h-3 inline -mt-0.5"></i>
                                     <span x-show="!loading && !shortCode">Get Foundry Setup Code</span>
-                                    <span x-show="!loading && shortCode">↻ Get a fresh code</span>
+                                    <span x-show="!loading && shortCode">Get a fresh code</span>
                                     <span x-show="loading">…</span>
                                 </button>
                                 <p class="text-[10px] text-cpr-text-dim mt-1">
@@ -402,7 +402,7 @@
                                     <p class="text-[10px] uppercase tracking-widest text-cpr-text-dim">Ok Gr
                                         In Foundry: Agent Bridge → Quick Setup → type this code
                                     </p>
-                                    <p class="text-3xl font-mono font-black text-cpr-teal tracking-widest my-1"
+                                    <p class="text-3xl font-mono font-black text-cpr-teal tracking-widest my-1 select-all"
                                        x-text="shortCode"></p>
                                     <p class="text-[10px] text-cpr-text-dim">One-time use · expires in 5 minutes</p>
                                 </div>
@@ -681,6 +681,147 @@
             </div>
         </div>
 
+        <!-- UI Settings (client-side preferences, stored in localStorage) -->
+        <div class="mt-12 pt-8 border-t-2 border-cpr-border">
+            <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
+                Interface Settings
+            </h3>
+
+            <div class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg space-y-6"
+                 x-data="{
+                     reduceMotion: false,
+                     shadowAnimation: false,
+                     disableTapHold: false,
+                     hideBackground: false,
+                     savedMotion: false,
+                     savedShadowAnim: false,
+                     savedTapHold: false,
+                     savedBackground: false,
+                     init() {
+                         this.reduceMotion = localStorage.getItem('cpr-reduce-motion') === '1';
+                         this.shadowAnimation = localStorage.getItem('cpr-shadow-animation') === '1';
+                         this.disableTapHold = localStorage.getItem('cpr-disable-tap-hold') === '1';
+                         this.hideBackground = localStorage.getItem('cpr-hide-background') === '1';
+                     },
+                     flash(key) {
+                         this[key] = true;
+                         clearTimeout(this['_t_' + key]);
+                         this['_t_' + key] = setTimeout(() => { this[key] = false; }, 2500);
+                     },
+                     setReduceMotion(v) {
+                         this.reduceMotion = v;
+                         localStorage.setItem('cpr-reduce-motion', v ? '1' : '0');
+                         document.documentElement.classList.toggle('cpr-reduce-motion', v);
+                         this.flash('savedMotion');
+                     },
+                     setShadowAnimation(v) {
+                         this.shadowAnimation = v;
+                         localStorage.setItem('cpr-shadow-animation', v ? '1' : '0');
+                         this.flash('savedShadowAnim');
+                     },
+                     setDisableTapHold(v) {
+                         this.disableTapHold = v;
+                         localStorage.setItem('cpr-disable-tap-hold', v ? '1' : '0');
+                         this.flash('savedTapHold');
+                     },
+                     setHideBackground(v) {
+                         this.hideBackground = v;
+                         localStorage.setItem('cpr-hide-background', v ? '1' : '0');
+                         document.documentElement.classList.toggle('cpr-hide-background', v);
+                         this.flash('savedBackground');
+                     },
+                 }">
+
+                <!-- Reduce Motion -->
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Reduce Shadows</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Removes the shadow depth effect.
+                        </p>
+                        <p x-show="savedMotion" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="reduceMotion"
+                            @click="setReduceMotion(!reduceMotion)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="reduceMotion ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="reduceMotion ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <!-- Shadow Animation -->
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-cpr-border/50">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Shadow Animation</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Drives the frame shadow depth from device tilt (gyroscope). Off by default; the static shadows still show.
+                        </p>
+                        <p x-show="savedShadowAnim" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="shadowAnimation"
+                            @click="setShadowAnimation(!shadowAnimation)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="shadowAnimation ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="shadowAnimation ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <!-- Disable Tap and Hold -->
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-cpr-border/50">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Disable Tap and Hold</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Disables the tap-and-hold (press-and-hold) radial menu.
+                        </p>
+                        <p x-show="savedTapHold" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="disableTapHold"
+                            @click="setDisableTapHold(!disableTapHold)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="disableTapHold ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="disableTapHold ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <!-- Hide Agent Background -->
+                <div class="flex items-center justify-between gap-4 pt-6 border-t border-cpr-border/50">
+                    <div>
+                        <p class="text-sm font-bold text-cpr-teal uppercase tracking-widest">Hide Agent Background</p>
+                        <p class="text-xs text-cpr-text-dim mt-1">
+                            Hides the blue-tinted background graphic on the Agent interface.
+                        </p>
+                        <p x-show="savedBackground" x-transition.opacity x-cloak
+                           class="text-[10px] text-cpr-teal uppercase tracking-widest mt-1">
+                            ✓ Saved
+                        </p>
+                    </div>
+                    <button type="button" role="switch" :aria-checked="hideBackground"
+                            @click="setHideBackground(!hideBackground)"
+                            class="relative shrink-0 w-14 h-7 border-2 transition-colors"
+                            :class="hideBackground ? 'bg-cpr-teal-dark border-cpr-teal' : 'bg-cpr-black-elevated border-cpr-border'">
+                        <span class="absolute top-0.5 left-0.5 w-5 h-5 transition-transform"
+                              :class="hideBackground ? 'translate-x-7 bg-cpr-teal' : 'translate-x-0 bg-cpr-text-dim'"></span>
+                    </button>
+                </div>
+
+                <p class="text-[10px] text-cpr-text-dim uppercase tracking-widest pt-2">
+                    These preferences are stored on this device and apply the next time the Agent loads.
+                </p>
+            </div>
+        </div>
+
         <!-- Account Management -->
         <div class="mt-12 pt-8 border-t-2 border-cpr-border">
             <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
@@ -813,6 +954,15 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <!-- Help -->
+        <div class="mt-12 pt-8 border-t-2 border-cpr-border text-center">
+            <a href="{{ route('how-to-use') }}"
+               class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                How to Use
+            </a>
         </div>
     </div>
 

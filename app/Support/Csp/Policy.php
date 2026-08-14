@@ -22,6 +22,7 @@ class Policy implements Preset
                 'https://unpkg.com/lucide.min.js.map',
                 'https://unpkg.com/lucide@latest',
                 'https://challenges.cloudflare.com',
+                'https://storage.ko-fi.com',
             ])
             ->add(Directive::SCRIPT_ELEM, [
                 Keyword::SELF,
@@ -29,6 +30,7 @@ class Policy implements Preset
                 Keyword::UNSAFE_EVAL,
                 'https://unpkg.com/lucide@latest',
                 'https://challenges.cloudflare.com',
+                'https://storage.ko-fi.com',
             ])
             ->add(Directive::STYLE, [
                 Keyword::SELF,
@@ -48,12 +50,18 @@ class Policy implements Preset
                 'https://cdn.jsdelivr.net',
                 'https://fonts.cdnfonts.com',
             ])
+            ->add(Directive::STYLE, [
+                'https://storage.ko-fi.com',
+            ])
             ->add(Directive::FRAME, [
                 'https://challenges.cloudflare.com',
+                'https://ko-fi.com',
             ])
             ->add(Directive::IMG, [
                 Keyword::SELF,
                 'data:',
+                'https://storage.ko-fi.com',
+                'https://ko-fi.com',
                 $foundryUrl ? $foundryUrl : '',
             ])
             ->add(Directive::CONNECT, [
@@ -64,6 +72,8 @@ class Policy implements Preset
                 'wss:',
                 'https://unpkg.com/lucide.min.js.map',
                 'https://challenges.cloudflare.com',
+                'https://storage.ko-fi.com',
+                'https://ko-fi.com',
             ]);
     }
 }

@@ -75,11 +75,11 @@
                     <div class="text-[8px] text-cpr-text-dim uppercase font-bold">Damage</div>
                     <div class="flex gap-2">
                         <div v-if="prog.system.damage.standard"
-                             class="text-[9px] bg-cpr-red-dark/30 border border-cpr-red-dark/50 px-1.5 py-0.5 text-cpr-red">
+                             class="text-[9px] bg-cpr-red-dark/30 border border-cpr-red-dark/50 px-1.5 py-0.5 text-cpr-yellow">
                             STD: <span class="font-numbers">{{ prog.system.damage.standard }}</span>
                         </div>
                         <div v-if="prog.system.damage.blackIce"
-                             class="text-[9px] bg-cpr-yellow-dark/30 border border-cpr-yellow-dark/50 px-1.5 py-0.5 text-cpr-yellow">
+                             class="text-[9px] bg-cpr-yellow-dark/30 border border-cpr-yellow-dark/50 px-1.5 py-0.5 text-cpr-text-main">
                             B.ICE: <span class="font-numbers">{{ prog.system.damage.blackIce }}</span>
                         </div>
                     </div>
