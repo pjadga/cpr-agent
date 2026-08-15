@@ -133,6 +133,13 @@ vitest:
     paths:
       - coverage/
     expire_in: 1 week
+  # Must match the rules on the job it needs. A tag pipeline does not set
+  # CI_COMMIT_BRANCH, so npm is absent there, and a needs: on a job that does
+  # not exist makes the whole pipeline config invalid rather than just skipping.
+  # Tags build a release from code that was already tested on its branch.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
 
 # ============================================
 # Lint Stage
@@ -149,6 +156,10 @@ pint:
   script:
     - php vendor/bin/pint --test
   allow_failure: true
+  # See the note on vitest: these rules must match the composer job this needs.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
 
 eslint:
   stage: lint
@@ -158,6 +169,10 @@ eslint:
   script:
     - npm run lint 2>/dev/null || echo "ESLint not configured, skipping"
   allow_failure: true
+  # See the note on vitest: these rules must match the npm job this needs.
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
 
 # ============================================
 # Package Stage
@@ -221,9 +236,12 @@ standalone:check:
       fi
 
       echo "Every top level directory is accounted for in the bundle lists."
+  # Tags included: a release build is exactly when a silently incomplete bundle
+  # does the most damage, so the guard has to run there too.
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
+    - if: $CI_COMMIT_TAG
 
 # Builds exactly what `build-bundle.ps1 -SkipDependencies` expects, so the
 # Windows box never has to run Composer or npm. Download this artifact, unpack
@@ -234,7 +252,11 @@ standalone:check:
 standalone:windows-inputs:
   stage: package
   image: php:8.4-cli
-  needs: []
+  # Gated on the guard: building a release bundle that is missing a directory
+  # is worse than not building one. standalone:check runs in every pipeline
+  # this job runs in, so the dependency is always satisfiable.
+  needs:
+    - standalone:check
   <<: *composer-cache
   before_script:
     - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev curl
