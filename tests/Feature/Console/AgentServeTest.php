@@ -31,6 +31,30 @@ class AgentServeTest extends TestCase
         }
     }
 
+    public function test_web_command_survives_quoted_paths_containing_spaces(): void
+    {
+        // The launcher has to quote both paths when the install directory has a
+        // space in it. env() strips matching outer quotes from a value, so a
+        // command that both starts and ends with one loses its first and last
+        // character, and every argument after that is wrong. Reading the real
+        // environment variable avoids that.
+        // Paths without spaces on purpose. The command is still quoted, which is
+        // what triggers the stripping, but the arguments then render unquoted,
+        // so a surviving quote is unambiguous evidence of the bug. (With spaces
+        // in the paths the renderer re-quotes them and the two cases look the
+        // same on screen.)
+        putenv('AGENT_WEB_COMMAND="C:\CPRAgent\frankenphp.exe" run --config "C:\CPRAgent\Caddyfile"');
+
+        try {
+            $this->artisan('agent:serve', ['--with-web' => true, '--dry-run' => true])
+                ->expectsOutputToContain('C:\CPRAgent\frankenphp.exe run --config C:\CPRAgent\Caddyfile')
+                ->doesntExpectOutputToContain('exe"')
+                ->assertSuccessful();
+        } finally {
+            putenv('AGENT_WEB_COMMAND');
+        }
+    }
+
     public function test_it_reaps_a_stray_child_left_by_a_hard_killed_run(): void
     {
         // A hard-killed supervisor leaves its children running; they keep

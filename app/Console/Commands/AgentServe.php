@@ -304,7 +304,7 @@ class AgentServe extends Command
         ];
 
         if ($this->option('with-web')) {
-            $web = (string) env('AGENT_WEB_COMMAND', '');
+            $web = $this->webCommand();
             if ($web === '') {
                 $this->warn('--with-web set but AGENT_WEB_COMMAND is empty; skipping web process.');
             } else {
@@ -313,6 +313,32 @@ class AgentServe extends Command
         }
 
         return $processes;
+    }
+
+    /**
+     * The web server command line, read verbatim when it comes from a real
+     * environment variable.
+     *
+     * env() strips matching outer quotes from a value, which quietly destroys a
+     * command line whose first argument is a quoted path and whose last one is
+     * too: `"C:\...\frankenphp.exe" run --config "C:\...\Caddyfile"` loses its
+     * first and last character and every argument after that is wrong. Quoting
+     * both is exactly what a launcher has to do when the install path contains
+     * a space, so this is the normal case, not an edge case.
+     *
+     * getenv() returns the untouched value, so a launcher gets what it set. A
+     * value defined only in a .env file falls through to env() and keeps the
+     * usual dotenv semantics, which is what someone editing that file expects.
+     */
+    private function webCommand(): string
+    {
+        $raw = getenv('AGENT_WEB_COMMAND');
+
+        if (is_string($raw) && $raw !== '') {
+            return $raw;
+        }
+
+        return (string) env('AGENT_WEB_COMMAND', '');
     }
 
     /**
@@ -342,6 +368,17 @@ class AgentServe extends Command
      */
     private function splitCommand(string $command): array
     {
-        return array_values(array_filter(explode(' ', $command)));
+        // Double quotes are respected because AGENT_WEB_COMMAND carries absolute
+        // paths, and on Windows those routinely contain spaces. Splitting on
+        // every space would turn one path into several broken arguments.
+        preg_match_all('/"([^"]*)"|(\S+)/', $command, $matches, PREG_SET_ORDER);
+
+        $parts = [];
+
+        foreach ($matches as $match) {
+            $parts[] = ($match[2] ?? '') !== '' ? $match[2] : $match[1];
+        }
+
+        return array_values(array_filter($parts, fn (string $part) => $part !== ''));
     }
 }
