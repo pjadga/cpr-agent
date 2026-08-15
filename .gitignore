@@ -38,3 +38,5 @@ package-lock.json
 CHANGELOG.md
 
 scripts/build-frames.py
+
+/dist
