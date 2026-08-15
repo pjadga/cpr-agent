@@ -86,6 +86,28 @@ $include = @(
     'routes', 'vendor', 'storage', 'artisan', 'composer.json'
 )
 
+# Top level directories deliberately not shipped. Kept as an explicit list so
+# that adding a directory to the project is a decision here rather than an
+# oversight: anything in neither list stops the build below, and the
+# standalone:check CI job applies the same rule on every push.
+#
+# Without this, a new top level directory is silently left out of the bundle
+# and the app fails in a confusing way on a user's machine, weeks later.
+$excludeFromBundle = @(
+    'base', 'dist', 'node_modules', 'tests', 'standalone'
+)
+
+# Dot directories are tooling (.git, .ddev, .idea, caches) and never shipped,
+# so they are not worth listing individually.
+$unaccounted = Get-ChildItem $repo -Directory |
+    Where-Object { -not $_.Name.StartsWith('.') } |
+    Where-Object { ($include -notcontains $_.Name) -and ($excludeFromBundle -notcontains $_.Name) } |
+    Select-Object -ExpandProperty Name
+
+if ($unaccounted) {
+    throw "Top level directories in neither `$include nor `$excludeFromBundle: $($unaccounted -join ', '). Add each to one list or the other."
+}
+
 foreach ($item in $include) {
     $source = Join-Path $repo $item
     if (-not (Test-Path $source)) { continue }
