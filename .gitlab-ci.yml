@@ -259,7 +259,11 @@ standalone:windows-inputs:
     - standalone:check
   <<: *composer-cache
   before_script:
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev curl
+    # libsqlite3-dev is required to build pdo_sqlite. The official php image
+    # bundles pdo_sqlite already, so docker-php-ext-install rebuilds it and
+    # fails at configure without the headers. Keep this line in step with
+    # .php-test-setup below: the two install the same extensions.
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev curl
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y nodejs
     - docker-php-ext-install pdo_sqlite zip bcmath gd
