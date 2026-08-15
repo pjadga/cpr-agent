@@ -21,7 +21,7 @@
 ; before deleting it.
 
 #define AppName "CPR Agent"
-#define AppVersion "0.1.0"
+#define AppVersion "0.5.0"
 #define AppPublisher "Surreal Tech"
 #define BundleDir "..\..\dist\bundle"
 

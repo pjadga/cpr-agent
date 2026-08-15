@@ -75,8 +75,35 @@ The `standalone:check` job guards the file paths this script copies, so a
 rename fails a pipeline in seconds instead of surfacing weeks later when
 someone tries to cut a build.
 
-Bump `AppVersion` in `cpr-agent.iss` for each release. Leave `AppId` alone:
-Windows uses it to recognise an upgrade rather than a second install.
+## What changes between releases
+
+Usually just one line: `AppVersion` in `cpr-agent.iss`. Leave `AppId` alone,
+because Windows uses it to recognise an upgrade rather than a second install.
+
+The rest of this directory is stable, but four things do need attention when
+the app itself changes. None are obvious from a failing build, so they are
+worth knowing before they bite:
+
+| When you | Update |
+| --- | --- |
+| Add a PHP extension requirement | `standalone/php.ini-windows` |
+| Change ports or routes | `standalone/Caddyfile` |
+| Add an environment variable the app needs at startup | `launcher.ps1` |
+| Add a new top level directory to the project | `$include` in `build-bundle.ps1` |
+
+The last one used to be the dangerous one. `build-bundle.ps1` copies an
+explicit list of directories, so a new one was silently left out of the bundle
+and the app failed in a confusing way on a user's machine, long after the
+release.
+
+That is now guarded from both ends. `build-bundle.ps1` refuses to build, and
+the `standalone:check` CI job fails on every push, if a top level directory
+appears in neither `$include` (ship it) nor `$excludeFromBundle` (do not).
+Adding a directory is therefore a decision you make once, in one file, rather
+than something you can forget.
+
+Dot directories are treated as tooling and never shipped, so `.ddev`, `.idea`
+and friends need no entry.
 
 ## Installed layout
 

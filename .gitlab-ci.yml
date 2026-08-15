@@ -177,6 +177,8 @@ standalone:check:
   needs: []
   script:
     - |
+      set -eu
+
       for file in \
         standalone/php.ini-windows \
         standalone/Caddyfile \
@@ -189,6 +191,36 @@ standalone:check:
         if [ ! -f "$file" ]; then echo "Missing packaging input: $file"; exit 1; fi
       done
       echo "All Windows packaging inputs present."
+    - |
+      set -eu
+
+      # build-bundle.ps1 copies an explicit list of top level directories. A new
+      # one that nobody adds to that list is silently missing from the bundle,
+      # and the failure only shows up on a user's machine after a release. So
+      # every top level directory must be named in one list or the other.
+      #
+      # Patterns omit the leading $ because GitLab would try to expand it.
+      script=standalone/windows/build-bundle.ps1
+
+      sed -n '/include = @(/,/^)/p' "$script"           | grep -o "'[^']*'" | tr -d "'"  > /tmp/known
+      sed -n '/excludeFromBundle = @(/,/^)/p' "$script" | grep -o "'[^']*'" | tr -d "'" >> /tmp/known
+      sort -u /tmp/known -o /tmp/known
+
+      # Dot directories are tooling and never shipped; ls skips them already.
+      ls -d */ 2>/dev/null | sed 's#/$##' | sort -u > /tmp/actual
+
+      missing=$(comm -23 /tmp/actual /tmp/known)
+
+      if [ -n "$missing" ]; then
+        echo "These top level directories appear in neither list in $script:"
+        echo "$missing" | sed 's/^/  /'
+        echo
+        echo "Add each to \$include (ship it) or \$excludeFromBundle (do not),"
+        echo "otherwise the Windows bundle silently ships without them."
+        exit 1
+      fi
+
+      echo "Every top level directory is accounted for in the bundle lists."
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
