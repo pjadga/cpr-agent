@@ -33,7 +33,7 @@ class LoginRequest extends FormRequest
             'password' => ['required', 'string'],
         ];
 
-        if (! app()->environment('local')) {
+        if (config('services.turnstile.enabled')) {
             $rules['cf-turnstile-response'] = ['required', new Turnstile];
         }
 

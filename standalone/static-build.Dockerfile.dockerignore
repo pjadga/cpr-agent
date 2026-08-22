@@ -1,0 +1,17 @@
+# BuildKit per-Dockerfile ignore for standalone/static-build.Dockerfile.
+# Keep the context lean — composer install runs inside the builder, and the
+# prebuilt Vite assets in public/build/ MUST stay included.
+.git
+node_modules
+vendor
+base
+tests
+.ddev
+standalone/bin
+standalone/database.sqlite
+database/database.sqlite
+storage/logs/*
+public/hot
+.env
+.env.*
+!standalone/.env.embed

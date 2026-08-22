@@ -10,14 +10,25 @@ window.axios.defaults.withCredentials = true;
 
 const {isWssConnected} = useCharacterData();
 
+// Server-injected runtime config (partials/reverb-config.blade.php) wins over
+// values baked into the bundle at build time, so prebuilt assets work on any
+// host. Final fallback derives everything from the page's own origin, which
+// is correct whenever Reverb is reverse-proxied on the same domain.
+const reverbConfig = window.reverbConfig ?? {};
+const reverbScheme = reverbConfig.scheme
+    ?? import.meta.env.VITE_REVERB_SCHEME
+    ?? window.location.protocol.replace(':', '');
+const reverbPort = reverbConfig.port
+    ?? import.meta.env.VITE_REVERB_PORT
+    ?? (window.location.port || (reverbScheme === 'https' ? 443 : 80));
+
 window.Echo = new Echo({
     broadcaster: 'reverb',
-    key: import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: import.meta.env.VITE_REVERB_HOST,
-    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
-    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
-    // Let the .env file dictate the protocol (http vs https)
-    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    key: reverbConfig.key ?? import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: reverbConfig.host ?? import.meta.env.VITE_REVERB_HOST ?? window.location.hostname,
+    wsPort: reverbPort,
+    wssPort: reverbPort,
+    forceTLS: reverbScheme === 'https',
     // Standard Config
     enabledTransports: ['ws', 'wss'],
     disableStats: true,

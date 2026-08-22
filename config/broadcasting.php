@@ -44,6 +44,18 @@ return [
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
             ],
+
+            /*
+            | Values injected into the page as window.reverbConfig so prebuilt
+            | assets work on any host without rebuilding the Vite bundle.
+            | Null host/port/scheme fall back to window.location in the client.
+            */
+            'frontend' => [
+                'key' => env('REVERB_APP_KEY'),
+                'host' => env('VITE_REVERB_HOST') ?: null,
+                'port' => env('VITE_REVERB_PORT') ?: null,
+                'scheme' => env('VITE_REVERB_SCHEME') ?: null,
+            ],
         ],
 
         'pusher' => [
