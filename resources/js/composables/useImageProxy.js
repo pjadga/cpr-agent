@@ -10,11 +10,23 @@ export function useImageProxy() {
      * Fetch base URL for images from the server.
      */
     const fetchBaseUrl = async () => {
+        // In the Foundry embed there is no authenticated session and
+        // /api/getbaseurl is short-circuited to {} by the postMessage adapter.
+        // The image base is the parent (Foundry) origin, which initEmbed()
+        // seeds into cpr_base_url — read that instead of calling the server.
+        if (window.__CPR_EMBED) {
+            baseUrl.value = localStorage.getItem('cpr_base_url') || baseUrl.value;
+            return;
+        }
         try {
             const response = await window.axios.get("/api/getbaseurl");
-            const url = response.data.replace(/\/$/, '');
-            baseUrl.value = url;
-            localStorage.setItem('cpr_base_url', baseUrl.value);
+            // getFoundryUrl() returns a string (or null); guard so a non-string
+            // response (e.g. an empty-object degrade) never throws on .replace.
+            const url = typeof response.data === 'string' ? response.data.replace(/\/$/, '') : '';
+            if (url) {
+                baseUrl.value = url;
+                localStorage.setItem('cpr_base_url', baseUrl.value);
+            }
         } catch (err) {
             console.error("Error fetching base URL:", err);
         }

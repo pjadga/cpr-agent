@@ -26,7 +26,15 @@ export function useWebSocketSubscription() {
         if (!window.Echo) return;
 
         const channel_id = window.AgentConfig?.channel_id;
-        const channelName = channel_id ? `cpr-agent.${channel_id}` : null;
+        // In the Foundry embed there is no Reverb channel: window.Echo is the
+        // MockEcho fed by postMessage, and it ignores the channel name. We still
+        // must register the .FoundryResponse listener, otherwise the Bridge's
+        // ACTOR_DATA push (which carries the actorId) is delivered to no one —
+        // the sheet never paints and cpr_actor_uuid is never adopted. Use a
+        // synthetic channel name so the guard below doesn't short-circuit.
+        const channelName = channel_id
+            ? `cpr-agent.${channel_id}`
+            : (window.__CPR_EMBED ? 'cpr-agent.embed' : null);
 
         if (!channelName) {
             console.warn('[Agent] No channel_id configured. Live updates disabled.');

@@ -35,6 +35,23 @@ Route::get('/how-to-use', function () {
 
 Route::view('/design-brief', 'design-brief');
 
+// In-Foundry embed. Auth-less and stateless: the page renders the Vue app in
+// embedded mode, fed entirely via postMessage from the Bridge module (no
+// Laravel session, no Reverb). AllowEmbedding permits cross-origin framing.
+Route::get('/embed', function () {
+    return view('embed');
+})
+    ->middleware(\App\Http\Middleware\AllowEmbedding::class)
+    // Stateless embed: strip session/CSRF so no SameSite cookies are emitted to
+    // the cross-origin Foundry iframe (the browser would reject them anyway).
+    // All data flows over postMessage; nothing here reads the session.
+    ->withoutMiddleware([
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+    ])
+    ->name('embed');
+
 Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
     Route::get('/dashboard', function () {
         return view('api');
