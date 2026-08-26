@@ -1,4 +1,4 @@
-import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, triggerRef } from 'vue';
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, triggerRef, watch } from 'vue';
 import { useRefreshIcons, useDeltaApplier } from './useDeltaApplier';
 import { useImageProxy } from './useImageProxy';
 import { useWebSocketSubscription } from './useWebSocketSubscription';
@@ -7,6 +7,16 @@ import { useNetPool } from './useNetPool';
 
 // Expose delta applier globally for WebSocket handler
 window.__applyDelta = null;
+
+// Shared singleton for the roll privacy mode. This MUST be module-level so every
+// useCharacterData() consumer reads and writes the same ref: the roll-mode
+// dropdown and the components that dispatch rolls. A per-call ref silently
+// desynced them, so the dropdown updated its own copy while rolls went out with
+// a stale 'publicroll'. The watcher persists any change (v-model or setRollMode).
+const rollMode = ref(localStorage.getItem('cpr_roll_mode') || 'publicroll');
+watch(rollMode, (mode) => {
+    try { localStorage.setItem('cpr_roll_mode', mode); } catch (e) { /* noop */ }
+});
 
 /**
  * Main orchestrator composable for character data.
@@ -154,7 +164,7 @@ export function useCharacterData() {
     });
 
     const setRollMode = (mode) => {
-        localStorage.setItem('cpr_roll_mode', mode);
+        rollMode.value = mode; // the module-level watcher persists to localStorage
     };
 
     const isPlayer = computed(() => {
@@ -168,7 +178,7 @@ export function useCharacterData() {
         error,
         agentLink,
         isGM,
-        rollMode: ref(localStorage.getItem('cpr_roll_mode') || 'publicroll'),
+        rollMode,
         isPlayer,
         setRollMode,
         getImageUrl,
