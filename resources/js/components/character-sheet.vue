@@ -310,7 +310,7 @@
                          @click="activeTab = 'control'"></nav-btn>
                 <nav-btn v-if="netPoolData.length > 0" icon="globe" label="CitiNet" :active="activeTab === 'net'"
                          @click="activeTab = 'net'"></nav-btn>
-                <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
+                <nav-btn v-if="!isEmbed" icon="settings" label="Config" :active="activeTab === 'profile'"
                          @click="goToSettings"></nav-btn>
             </nav>
 
@@ -536,6 +536,15 @@ export default {
 
         // --- INITIAL DATA LOAD ---
         fetchNetPool();
+
+        //Fetch post app load
+        let netPoolFetched = false;
+        watch(charData, (val) => {
+            if (val && !netPoolFetched) {
+                netPoolFetched = true;
+                fetchNetPool();
+            }
+        }, {immediate: true});
 
         // --- UTILS & HELPERS ---
         const throwError = (message) => {
@@ -1109,8 +1118,12 @@ export default {
             refreshSheet();
         };
 
+        // Running inside the Foundry iframe
+        const isEmbed = window.__CPR_EMBED === true;
+
         return {
             // State
+            isEmbed,
             charData,
             loading,
             error,
