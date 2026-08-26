@@ -38,7 +38,9 @@ Currently functioning but actively being worked on.
 * **Vector based UI**
 * **Shadow Animations, Graphics toggles, Radial menu + toggles**
 
-# Please check the (Guide)[GUIDE.md] for an indepth look at setup, self-hosting and technicals
+## How To...
+> Please check the Guide for an indepth look at setup, self-hosting and technicals
+> (Guide)[GUIDE.md]
 
 ## Technical Foundation
 
