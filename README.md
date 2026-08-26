@@ -1,4 +1,4 @@
-# CPR Agent - [Connect](https://agent.surrealdisco.co.uk/)
+# CPR Agent - [Check it out](https://agent.surrealdisco.co.uk/)
 
 # Cyberpunk Red Companion App
 
