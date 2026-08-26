@@ -39,8 +39,8 @@ Currently functioning but actively being worked on.
 * **Shadow Animations, Graphics toggles, Radial menu + toggles**
 
 ## How To...
-> Please check the Guide for an indepth look at setup, self-hosting and technicals
-> (Guide)[GUIDE.md]
+> [Important]Please check the Guide for an indepth look at setup, self-hosting and technicals
+> (Guide)[https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/GUIDE.md?ref_type=heads]
 
 ## Technical Foundation
 
