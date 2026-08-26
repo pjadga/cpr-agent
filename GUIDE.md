@@ -2,6 +2,14 @@
 
 This guide provides detailed instructions on how to set up, self-host, and connect the CPR Agent with Foundry VTT.
 
+WINDOWS (and OSX) USERS - 
+
+Whilst below is fairly comprehensive, it is a very involved process, especially when dealing with WSL2 and the like. 
+
+Thanks to capt_garris from the CPR Discord, they've done a fantastic write-up on getting the Agent self-hosted using Laravel's Herd app. It takes SO much of the faff out of self-hosting!
+
+[Check it out here](https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/Agent%20Herd%20Guide.md?ref_type=heads)
+
 ## Table of Contents
 
 1. [Getting Started](#getting-started)
