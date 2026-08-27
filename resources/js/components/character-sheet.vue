@@ -1,6 +1,13 @@
 <template>
     <div class="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom))] text-sans bg-none">
 
+        <!-- Roll overlays live at the root, OUTSIDE the charData gate: a player
+             observing someone else's roll needs the big modal / mini side popup
+             even if their own sheet has not loaded (e.g. a GM with no assigned
+             character). Both are driven purely by window.emitter. -->
+        <roll-result-popup></roll-result-popup>
+        <dice-history></dice-history>
+
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
                 <div class="text-cpr-yellow font-mono animate-pulse text-xl">INITIALIZING AGENT...</div>
@@ -103,8 +110,6 @@
                 @save="commitResourceValue">
             </resource-modal>
 
-            <roll-result-popup></roll-result-popup>
-            <dice-history></dice-history>
             <radial-menu-host></radial-menu-host>
 
             <combat-panel
@@ -115,6 +120,7 @@
                 :dv-loading="dvLoading"
                 :dv-error="dvError"
                 :dv-info="dvInfo"
+                :target-distance="controlState.selectedTarget?.distanceM"
                 :reload-required="controlState.reloadRequired"
                 @close="showCombatPanel = false"
                 @roll-hit="rollHit"

@@ -52,6 +52,15 @@ export function useWebSocketSubscription() {
                 if (payload.type === 'ACTOR_DATA' && payload.actor) {
                     handleActorData(payload);
                 }
+                // The Bridge answers with actor === false when the Foundry user
+                // has no character assigned. Degrade honestly instead of spinning
+                // on the loading screen forever.
+                else if (payload.type === 'ACTOR_DATA' && payload.actor === false) {
+                    loading.value = false;
+                    if (!charData.value) {
+                        error.value = 'No character is assigned to your Foundry user. Ask the GM to assign one in the Agent Character Assignment menu, then reload.';
+                    }
+                }
                 // Handle SHEET_DELTA events
                 else if (payload.type === 'SHEET_DELTA' && payload.delta) {
                     handleSheetDelta(payload);
@@ -99,6 +108,7 @@ export function useWebSocketSubscription() {
             requestId: payload.requestId
         };
         loading.value = false;
+        error.value = null; // clear any prior "no character" / timeout state now that real data arrived
     };
 
     /**

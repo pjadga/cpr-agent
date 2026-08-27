@@ -1,6 +1,12 @@
 <template>
+    <!-- Tap-outside-to-close backdrop. Sits below the drawer (z-55 < z-60), so
+         taps on the drawer hit the drawer and taps anywhere else close it. -->
+    <transition name="fade">
+        <div v-if="show" class="fixed inset-0 z-[55]" @click="$emit('close')"></div>
+    </transition>
     <transition name="slide-right">
         <aside v-if="show"
+               @click.stop
                class="fixed top-0 right-0 h-full w-[18rem] max-w-[85vw] z-[60] bg-cpr-black/95 border-l border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.35)] flex flex-col">
             <div
                 class="flex items-center justify-between p-2 pt-[calc(0.5rem+env(safe-area-inset-top))] border-b border-cpr-red-dark bg-cpr-black/70 sticky top-0 shrink-0">

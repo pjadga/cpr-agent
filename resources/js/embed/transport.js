@@ -51,8 +51,12 @@ export const ENDPOINT_MAP = {
     // reads data.weaponId. Passing selectedWeapon through untransformed leaves
     // weaponId undefined, so the modifier panel loses all weapon skill/stat/acc.
     '/getrollmodifiers':  { type: 'GET_ROLL_MODIFIERS', transform: (b) => ({ weaponId: b.selectedWeapon?._id ?? null }) }, // ROLL_MODIFIERS_DATA returns via echo
-    '/getvisibletokens':  { type: 'GET_DV_INFO' },         // TODO(verify)
-    '/listvisibletokens': { type: 'LIST_VISIBLE_TOKENS' }, // TODO(verify)
+    // Mirror App\Http\Controllers\Token\GetVisibleTokens: it reduces the body to
+    // weaponId (selectedWeapon._id) and targetTokenId (selectedTarget.id) before
+    // dispatching GET_DV_INFO. Without this the Bridge sees weaponId undefined
+    // ("Weapon ID undefined not found on actor"). DV_INFO_DATA returns via echo.
+    '/getvisibletokens':  { type: 'GET_DV_INFO', transform: (b) => ({ weaponId: b.selectedWeapon?._id ?? null, targetTokenId: b.selectedTarget?.id ?? null }) },
+    '/listvisibletokens': { type: 'LIST_VISIBLE_TOKENS' }, // empty body; VISIBLE_TOKENS_DATA returns via echo (verified)
     '/getbaseurl':        { empty: true },                 // image-proxy base; images are a known embed gap
     '/get-rolls':         { empty: true },                 // dice history is server-stored; empty in embed
 
@@ -60,8 +64,12 @@ export const ENDPOINT_MAP = {
     '/statrollrequest':   { type: 'STAT_ROLL',  transform: (b) => ({ ...b, label: String(b.label ?? '').toLowerCase() }) }, // StatRollRequest: strtolower
     '/skillrollrequest':  { type: 'SKILL_ROLL', transform: (b) => ({ ...b, label: ucfirst(b.label) }) },                     // SkillRollRequest: ucfirst
     '/rolerollrequest':   { type: 'ROLE_ROLL',  transform: (b) => ({ ...b, label: ucfirst(b.label), role: ucfirst(b.role) }) }, // RoleRollRequest: ucfirst label + role
-    '/attackroll':        { type: 'ATTACK_ROLL' },
-    '/damageroll':        { type: 'DAMAGE_ROLL' },
+    // Attack/Damage: hosted controllers reduce the body to weaponId
+    // (selectedWeapon._id) + targetId (selectedTarget.id). Passing the raw
+    // controlState through leaves weaponId undefined, so CPR finds no weapon, no
+    // rollcard renders and the Bridge's capture interceptor times out.
+    '/attackroll':        { type: 'ATTACK_ROLL', transform: (b) => ({ weaponId: b.selectedWeapon?._id ?? null, targetId: b.selectedTarget?.id ?? null, fireMode: b.fireMode, actorId: b.actorId, tokenId: b.tokenId, rollMode: b.rollMode }) },
+    '/damageroll':        { type: 'DAMAGE_ROLL', transform: (b) => ({ weaponId: b.selectedWeapon?._id ?? null, targetId: b.selectedTarget?.id ?? null, fireMode: b.fireMode, actorId: b.actorId, tokenId: b.tokenId, rollMode: b.rollMode }) },
     '/deathsave':         { type: 'DEATH_SAVE' },
     '/facedown':          { type: 'FACEDOWN_ROLL' },
     '/initiativeroll':    { type: 'INITIATIVE_ROLL' },
@@ -72,9 +80,12 @@ export const ENDPOINT_MAP = {
     '/item-equip':        { type: 'ITEM_EQUIP' },
     '/consume-item':      { type: 'CONSUME_ITEM' },
     '/reloadweapon':      { type: 'RELOAD_WEAPON' },
-    '/installprogram':    { type: 'INSTALL_PROGRAM' },
-    '/uninstallprogram':  { type: 'REMOVE_PROGRAM' },
-    '/toggleprogramrez':  { type: 'TOGGLE_REZ' },
+    // Hosted controllers rename deckId -> cyberdeckId (Install/RemoveProgram) and
+    // isRezzed -> targetState (ToggleRez) before dispatch; the Bridge reads those
+    // renamed fields. Reproduce or the deck/state is undefined and nothing happens.
+    '/installprogram':    { type: 'INSTALL_PROGRAM', transform: (b) => ({ programId: b.programId, cyberdeckId: b.deckId }) },
+    '/uninstallprogram':  { type: 'REMOVE_PROGRAM',  transform: (b) => ({ programId: b.programId, cyberdeckId: b.deckId }) },
+    '/toggleprogramrez':  { type: 'TOGGLE_REZ',      transform: (b) => ({ programId: b.programId, targetState: b.isRezzed }) },
     '/updatestat':        { type: 'UPDATE_STAT', transform: mapUpdateStat },
     '/update-eb':         { type: 'UPDATE_EB' },
     // Hosted UpdateNotes dispatches UPDATE_STAT (label 'information.notes')
