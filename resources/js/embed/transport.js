@@ -19,6 +19,7 @@ import { MockEcho } from './mock-echo.js';
 // lookup fails) or UPDATE_STAT with 'HP' instead of 'derivedStats.hp.value'
 // (actor.update writes a dead path). See app/Http/Controllers/{Rolls,Values}/.
 const ucfirst = (s) => { s = String(s ?? ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+const lcfirst = (s) => { s = String(s ?? ''); return s.charAt(0).toLowerCase() + s.slice(1); };
 
 // Mirror of App\Http\Controllers\Values\UpdateStat::updateStat.
 function mapUpdateStat(b) {
@@ -74,7 +75,17 @@ export const ENDPOINT_MAP = {
     '/facedown':          { type: 'FACEDOWN_ROLL' },
     '/initiativeroll':    { type: 'INITIATIVE_ROLL' },
     '/make-roll':         { type: 'DICE_ROLL' },
-    '/programroll':       { type: 'PROGRAM_ROLL' },
+    // Hosted ProgramRoll computes rollType from executionType (execute vs
+    // interface) and lcfirst's the name; the Bridge reads data.rollType. Without
+    // this rollType is undefined and no rollcard renders (interceptor times out).
+    '/programroll':       { type: 'PROGRAM_ROLL', transform: (b) => ({
+                              cyberdeckId: b.cyberdeckId,
+                              programId: b.programId,
+                              programName: lcfirst(b.programName),
+                              executionType: b.executionType ?? null,
+                              rollType: b.executionType ? 'cyberdeckProgram' : 'interfaceAbility',
+                              rollMode: b.rollMode,
+                          }) },
 
     // Writes (SHEET_DELTA returns via echo)
     '/item-equip':        { type: 'ITEM_EQUIP' },
@@ -92,6 +103,13 @@ export const ENDPOINT_MAP = {
     '/updatenotes':       { type: 'UPDATE_STAT', transform: (b) => ({ label: 'information.notes', operation: 'set', value: b.notes }) },
     '/movetoken':         { type: 'MOVE_TOKEN' },
     '/targettokens':      { type: 'TARGET_TOKEN' },
+
+    // Cyberware install/uninstall. PREPARE returns CYBERWARE_INSTALL_OPTIONS via
+    // echo (targets + humanity options for the modal); INSTALL/UNINSTALL are
+    // fire-and-forget and the result reflects through SHEET_DELTA.
+    '/prepare-cyberware-install': { type: 'PREPARE_CYBERWARE_INSTALL' },
+    '/install-cyberware':         { type: 'INSTALL_CYBERWARE' },
+    '/uninstall-cyberware':       { type: 'UNINSTALL_CYBERWARE' },
 };
 
 const AWAIT_TIMEOUT_MS = 4000;
