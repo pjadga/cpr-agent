@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+
+## Description: Switch this test environment between the HTTP and HTTPS topologies from wiki/setup-herd.md
+## Usage: agent-topology [http|https|status]
+## Example: "ddev agent-topology http" | "ddev agent-topology https" | "ddev agent-topology"
+
+# DDEV serves the same site on both :80 and :443, so flipping APP_URL is enough
+# to reproduce what a self-hoster gets on each topology:
+#
+#   https -> topology A/C (herd secure, or Tailscale terminating TLS)
+#   http  -> topology B   (LAN IP over plain HTTP)
+#
+# The scheme in APP_URL is what session.secure is derived from, so this is also
+# how you check that the Secure-cookie fix behaves on both. Browse the matching
+# scheme afterwards: loading https:// while APP_URL says http:// is itself the
+# misconfiguration this exists to test.
+
+set -euo pipefail
+
+ENV_FILE="/var/www/html/.env"
+MODE="${1:-status}"
+
+if [ ! -f "$ENV_FILE" ]; then
+    echo "No .env found at $ENV_FILE. Run 'ddev exec php artisan agent:install' first." >&2
+    exit 1
+fi
+
+current_url() {
+    grep -E '^APP_URL=' "$ENV_FILE" | head -1 | cut -d'=' -f2- | tr -d '"' | tr -d "'"
+}
+
+show_status() {
+    local url secure
+    url="$(current_url)"
+    # Ask the framework rather than re-deriving the rule here, so this reports
+    # what the app will actually do.
+    secure="$(php artisan tinker --execute="echo config('session.secure') ? 'yes' : 'no';" 2>/dev/null | tail -1)"
+
+    echo
+    echo "  APP_URL             ${url}"
+    echo "  Session cookie      $([ "$secure" = "yes" ] && echo 'Secure (https only)' || echo 'not Secure (works over http)')"
+    echo
+    echo "  Browse:             ${url}"
+    echo
+}
+
+case "$MODE" in
+    http|https)
+        url="$(current_url)"
+        host="${url#*://}"
+
+        if [ -z "$host" ]; then
+            echo "Could not read a host out of APP_URL. Check $ENV_FILE by hand." >&2
+            exit 1
+        fi
+
+        # Strip any port DDEV does not serve on; :80 and :443 are implicit.
+        host="${host%/}"
+
+        sed -i -E "s|^APP_URL=.*|APP_URL=\"${MODE}://${host}\"|" "$ENV_FILE"
+        php artisan config:clear >/dev/null
+
+        echo "Switched to the ${MODE} topology."
+        show_status
+        ;;
+    status)
+        show_status
+        ;;
+    -h|--help)
+        echo "Usage: ddev agent-topology [http|https|status]"
+        ;;
+    *)
+        echo "Unknown option '${MODE}'. Use: http, https, or status." >&2
+        exit 1
+        ;;
+esac
