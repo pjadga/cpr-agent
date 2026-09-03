@@ -133,8 +133,8 @@
             <div class="mt-12 border-t border-cpr-red/30 pt-6 text-center text-cpr-text-muted">
                 <p>Want the full walkthrough — self-hosting, sharing over Tailscale, the QR handshake internals and
                     troubleshooting? Read the
-                    <a href="https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/GUIDE.md" target="_blank"
-                       class="text-cpr-red hover:text-cpr-red underline">complete GUIDE.md</a>.
+                    <a href="https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/wiki/" target="_blank"
+                       class="text-cpr-red hover:text-cpr-red underline">complete documentation</a>.
                 </p>
             </div>
 

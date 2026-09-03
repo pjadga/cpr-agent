@@ -40,3 +40,5 @@ CHANGELOG.md
 scripts/build-frames.py
 
 /dist
+
+EMBED_README.md

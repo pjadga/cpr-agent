@@ -325,9 +325,25 @@
                                         </div>
                                     @endif
 
+                                    @if (session('flash_token_replaced'))
+                                        <div class="border border-amber-500 bg-amber-950/60 p-4 mb-4 rounded">
+                                            <p class="text-xs text-amber-200 uppercase tracking-tight font-bold mb-1">
+                                                Your old key no longer works
+                                            </p>
+                                            <p class="text-xs text-amber-100/90">
+                                                Paste the key above into <span class="font-mono">Configure Settings →
+                                                Agent Bridge → API Key</span> in Foundry. Until you do, the Bridge will
+                                                report 401 errors and show as offline.
+                                            </p>
+                                        </div>
+                                    @endif
+
                                     <button type="submit" form="token-create-form"
+                                            @if ($config->api_key)
+                                                onclick="return confirm('This replaces your current API key. The key already saved in your Foundry Bridge module will stop working until you paste the new one in. Continue?')"
+                                            @endif
                                             class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black w-full uppercase font-bold py-2">
-                                        Generate New Connection Key
+                                        {{ $config->api_key ? 'Replace Connection Key' : 'Generate Connection Key' }}
                                     </button>
 
                                     @if ($config->api_key)

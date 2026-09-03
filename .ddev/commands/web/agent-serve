@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+## Description: Run Reverb + the queue worker (mirrors `php artisan agent:serve` on a Herd install)
+## Usage: agent-serve [flags]
+## Example: "ddev agent-serve" | "ddev agent-serve --no-migrate"
+
+# Same entry point a self-hoster uses, so this environment exercises the
+# supervisor, the queue worker and the loopback Reverb bind rather than a
+# bare `reverb:start`. Character deltas are persisted by the queue worker;
+# without it the app looks fine but data only lives in cache.
+php artisan agent:serve "$@"

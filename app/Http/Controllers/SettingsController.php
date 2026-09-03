@@ -177,11 +177,12 @@ class SettingsController extends Controller
             ], 422);
         }
 
-        $appUrl = sprintf(
-            '%s://%s',
-            config('vite.reverb.scheme') === 'https' ? 'https' : 'http',
-            config('app.domain')
-        );
+        // The address players actually load, straight from APP_URL. This used
+        // to be assembled from the *WebSocket* scheme and APP_DOMAIN, so a
+        // plain-HTTP self-host that (correctly) left VITE_REVERB_SCHEME unset
+        // got handed https://<domain> — a URL its Bridge could never reach, and
+        // one that made every player's QR scan fail as "wrong server".
+        $appUrl = rtrim((string) config('app.url'), '/');
 
         // GMs always have a session by the time they get here (auto-created on
         // connection save), but ensure it so the code never carries a personal
@@ -194,7 +195,10 @@ class SettingsController extends Controller
             'channelId' => $session->code,
             'apiKey' => $config->api_key,
             'reverbKey' => config('broadcasting.connections.reverb.key'),
-            'reverbPort' => config('vite.reverb.port'),
+            // Only sent when Reverb genuinely lives on another port. Omitted on
+            // a single-origin install so the Bridge keeps its own default and
+            // derives the port from the Agent URL.
+            'reverbPort' => config('vite.reverb.port') ?: null,
         ];
 
         // Short one-time code for cross-device setup (e.g. Agent on a phone,

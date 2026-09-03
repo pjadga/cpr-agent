@@ -35,6 +35,23 @@ Route::get('/how-to-use', function () {
 
 Route::view('/design-brief', 'design-brief');
 
+// In-Foundry embed. Auth-less and stateless: the page renders the Vue app in
+// embedded mode, fed entirely via postMessage from the Bridge module (no
+// Laravel session, no Reverb). AllowEmbedding permits cross-origin framing.
+Route::get('/embed', function () {
+    return view('embed');
+})
+    ->middleware(\App\Http\Middleware\AllowEmbedding::class)
+    // Stateless embed: strip session/CSRF so no SameSite cookies are emitted to
+    // the cross-origin Foundry iframe (the browser would reject them anyway).
+    // All data flows over postMessage; nothing here reads the session.
+    ->withoutMiddleware([
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+        \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+    ])
+    ->name('embed');
+
 Route::middleware(['auth', 'app.configured', 'profile.setup'])->group(function () {
     Route::get('/dashboard', function () {
         return view('api');
@@ -72,8 +89,9 @@ Route::middleware(['auth'])->group(function () {
 // API Key registration
 
 Route::middleware('auth')->post('/settings/api-token', function (Request $request) {
-    // Delete old tokens if you want them to only have one active connection
-    $request->user()->tokens()->delete();
+    // Replace only this app's own connection token. The blanket
+    // tokens()->delete() also revoked anything else the account held.
+    $replacing = $request->user()->tokens()->where('name', 'FoundryClient')->delete() > 0;
 
     $token = $request->user()->createToken('FoundryClient')->plainTextToken;
 
@@ -82,7 +100,13 @@ Route::middleware('auth')->post('/settings/api-token', function (Request $reques
     $config->api_key = $token;
     $config->save();
 
-    return back()->with('flash_token', $token);
+    // Generating a key necessarily invalidates the previous one, including the
+    // copy already pasted into the Foundry Bridge — which then fails every call
+    // with a 401 ("Failed to mint pairing", "Bridge Offline") for no reason the
+    // GM can see. Say so out loud instead of leaving them to work it out.
+    return back()
+        ->with('flash_token', $token)
+        ->with('flash_token_replaced', $replacing);
 })->name('token.create');
 
 require __DIR__.'/auth.php';

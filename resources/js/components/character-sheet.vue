@@ -1,6 +1,15 @@
 <template>
     <div class="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom))] text-sans bg-none">
 
+        <!-- Roll overlays live at the root, OUTSIDE the charData gate: a player
+             observing someone else's roll needs the big modal / mini side popup
+             even if their own sheet has not loaded (e.g. a GM with no assigned
+             character). Both are driven purely by window.emitter. -->
+        <roll-result-popup></roll-result-popup>
+        <dice-history></dice-history>
+        <cyberware-install-modal :show="showCyberwareModal" :options="cyberwareOptions"
+                                 @close="closeCyberwareModal" @confirm="confirmCyberwareInstall"></cyberware-install-modal>
+
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
                 <div class="text-cpr-yellow font-mono animate-pulse text-xl">INITIALIZING AGENT...</div>
@@ -103,8 +112,6 @@
                 @save="commitResourceValue">
             </resource-modal>
 
-            <roll-result-popup></roll-result-popup>
-            <dice-history></dice-history>
             <radial-menu-host></radial-menu-host>
 
             <combat-panel
@@ -115,6 +122,7 @@
                 :dv-loading="dvLoading"
                 :dv-error="dvError"
                 :dv-info="dvInfo"
+                :target-distance="controlState.selectedTarget?.distanceM"
                 :reload-required="controlState.reloadRequired"
                 @close="showCombatPanel = false"
                 @roll-hit="rollHit"
@@ -310,7 +318,7 @@
                          @click="activeTab = 'control'"></nav-btn>
                 <nav-btn v-if="netPoolData.length > 0" icon="globe" label="CitiNet" :active="activeTab === 'net'"
                          @click="activeTab = 'net'"></nav-btn>
-                <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
+                <nav-btn v-if="!isEmbed" icon="settings" label="Config" :active="activeTab === 'profile'"
                          @click="goToSettings"></nav-btn>
             </nav>
 
@@ -471,6 +479,8 @@ import {useRollModifiers} from '../composables/useRollModifiers';
 import {useResources} from '../composables/useResources';
 import {useNetrunner} from '../composables/useNetrunner';
 import {useNetPool} from '../composables/useNetPool';
+import {useCyberware} from '../composables/useCyberware';
+import CyberwareInstallModal from './character-sheet/CyberwareInstallModal.vue';
 import {useEchoListener} from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
@@ -494,6 +504,7 @@ export default {
         EurobucksPanel,
         DiceHistory,
         RollResultPopup,
+        CyberwareInstallModal,
         TopBorderFrame,
         BottomBorderFrame,
         MobileBackgroundFrame
@@ -522,6 +533,19 @@ export default {
             handleNetPoolData
         } = useNetPool();
 
+        // Cyberware install/uninstall. Triggered from the ItemRow radial menu over
+        // window.emitter; the modal (rendered at root) shows targets + humanity option.
+        const {
+            showInstallModal: showCyberwareModal,
+            installOptions: cyberwareOptions,
+            requestInstall: requestCyberwareInstall,
+            confirmInstall: confirmCyberwareInstall,
+            uninstall: uninstallCyberware,
+            closeInstallModal: closeCyberwareModal
+        } = useCyberware();
+        window.emitter?.on('cyberware-install', (item) => requestCyberwareInstall(item));
+        window.emitter?.on('cyberware-uninstall', (item) => uninstallCyberware(item));
+
         const activeTab = ref('stats');
         const showPopup = ref(false);
         const showEquipModal = ref(false);
@@ -536,6 +560,15 @@ export default {
 
         // --- INITIAL DATA LOAD ---
         fetchNetPool();
+
+        //Fetch post app load
+        let netPoolFetched = false;
+        watch(charData, (val) => {
+            if (val && !netPoolFetched) {
+                netPoolFetched = true;
+                fetchNetPool();
+            }
+        }, {immediate: true});
 
         // --- UTILS & HELPERS ---
         const throwError = (message) => {
@@ -1109,8 +1142,12 @@ export default {
             refreshSheet();
         };
 
+        // Running inside the Foundry iframe
+        const isEmbed = window.__CPR_EMBED === true;
+
         return {
             // State
+            isEmbed,
             charData,
             loading,
             error,
@@ -1181,6 +1218,12 @@ export default {
             isWssConnected,
             reloadPage,
             netPoolData,
+
+            // Cyberware install
+            showCyberwareModal,
+            cyberwareOptions,
+            confirmCyberwareInstall,
+            closeCyberwareModal,
 
             // Combat
             mockEnemies,

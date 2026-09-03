@@ -169,7 +169,13 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', true),
+    // Derived from APP_URL rather than defaulted to true. A hard `true` marks
+    // the cookie Secure on plain-HTTP installs, where the browser then refuses
+    // to store it at all: login redirects back to login, forms 419, and
+    // /api/broadcasting/auth 401s so the sheet never loads. Only localhost and
+    // 127.0.0.1 are exempt (browsers treat them as trustworthy), which is why
+    // this survived local testing but broke every LAN and *.test setup.
+    'secure' => env('SESSION_SECURE_COOKIE', str_starts_with((string) env('APP_URL'), 'https://')),
 
     /*
     |--------------------------------------------------------------------------

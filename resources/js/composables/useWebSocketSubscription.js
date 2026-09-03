@@ -26,7 +26,11 @@ export function useWebSocketSubscription() {
         if (!window.Echo) return;
 
         const channel_id = window.AgentConfig?.channel_id;
-        const channelName = channel_id ? `cpr-agent.${channel_id}` : null;
+        // In the Foundry embed there is no Reverb channel: window.Echo is the
+        // MockEcho fed by postMessage, and it ignores the channel name.
+        const channelName = channel_id
+            ? `cpr-agent.${channel_id}`
+            : (window.__CPR_EMBED ? 'cpr-agent.embed' : null);
 
         if (!channelName) {
             console.warn('[Agent] No channel_id configured. Live updates disabled.');
@@ -47,6 +51,15 @@ export function useWebSocketSubscription() {
                 // Handle ACTOR_DATA events
                 if (payload.type === 'ACTOR_DATA' && payload.actor) {
                     handleActorData(payload);
+                }
+                // The Bridge answers with actor === false when the Foundry user
+                // has no character assigned. Degrade honestly instead of spinning
+                // on the loading screen forever.
+                else if (payload.type === 'ACTOR_DATA' && payload.actor === false) {
+                    loading.value = false;
+                    if (!charData.value) {
+                        error.value = 'No character is assigned to your Foundry user. Ask the GM to assign one in the Agent Character Assignment menu, then reload.';
+                    }
                 }
                 // Handle SHEET_DELTA events
                 else if (payload.type === 'SHEET_DELTA' && payload.delta) {
@@ -86,11 +99,16 @@ export function useWebSocketSubscription() {
 
         charData.value = {
             ...charData.value,
+            // Mirror the hosted /api/actorsheet shape: a top-level `type` drives
+            // isPlayer (charData.type === 'character'). Without it, embed rows
+            // render the locked/mook variant
+            type: payload.actor.type,
             data: payload.actor,
             uuid: payloadActorId,
             requestId: payload.requestId
         };
         loading.value = false;
+        error.value = null; // clear any prior "no character" / timeout state now that real data arrived
     };
 
     /**
