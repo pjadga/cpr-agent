@@ -1,4 +1,4 @@
-# CPR Agent - [Connect](https://agent.surrealdisco.co.uk/)
+# CPR Agent - [Check it out](https://agent.surrealdisco.co.uk/)
 
 # Cyberpunk Red Companion App
 
@@ -38,7 +38,12 @@ Currently functioning but actively being worked on.
 * **Vector based UI**
 * **Shadow Animations, Graphics toggles, Radial menu + toggles**
 
-# Please check the (Guide)[GUIDE.md] for an indepth look at setup, self-hosting and technicals
+## How To...
+
+> [!IMPORTANT]
+> Please check the [Guide](https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/GUIDE.md?ref_type=heads)
+ for an indepth look at setup, self-hosting and technicals.
+
 
 ## Technical Foundation
 
