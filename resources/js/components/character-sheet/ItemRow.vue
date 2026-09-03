@@ -132,6 +132,19 @@
             </div>
 
             <div
+                v-if="category === 'cyberware' && isPlayer"
+                class="flex items-center gap-1 shrink-0 relative mr-1">
+                <button
+                    @click.stop="item.system?.isInstalled ? uninstallCyberware() : installCyberware()"
+                    class="p-2 transition-colors flex items-start relative z-10"
+                    :class="item.system?.isInstalled ? 'text-cpr-teal hover:text-cpr-yellow' : 'text-cpr-text-dim hover:text-cpr-yellow'"
+                    :title="item.system?.isInstalled ? 'Uninstall' : 'Install'"
+                >
+                    <i v-icon :data-lucide="item.system?.isInstalled ? 'unplug' : 'plug'" class="w-5 h-5 pointer-events-none"></i>
+                </button>
+            </div>
+
+            <div
                 v-if="(!isPlayer && (category !== 'cyberware' && category !== 'skill' && category !== 'role' && category !== 'ammo' && category !== 'criticalInjury'))"
                 class="flex items-center gap-1 shrink-0 relative mr-1">
                 <div class="p-2 text-cpr-yellow/60 flex items-start relative z-10"
@@ -323,13 +336,27 @@ export default {
             expanded.value = !expanded.value;
         };
 
+        // Cyberware install/uninstall, routed over window.emitter (same path as the
+        // radial actions) so it reaches character-sheet without prop-drilling.
+        const installCyberware = () => window.emitter?.emit('cyberware-install', props.item);
+        const uninstallCyberware = () => window.emitter?.emit('cyberware-uninstall', props.item);
+
         // Contextual radial-menu (long-press) actions for this row. "Info" opens
         // the row's own dropdown directly rather than bubbling a click, so it
         // works the same on any tab that renders an ItemRow.
         const itemActions = () => {
-            // Cyberware: Info only — equipping/removing incurs penalties not modelled yet.
+            // Cyberware: Info, plus Install / Uninstall. A single "Install" opens
+            // the flow that CPR runs in Foundry (choose install target if the item
+            // is not foundational, then the humanity-loss option). Routed over
+            // window.emitter so it reaches character-sheet without prop-drilling.
             if (props.category === 'cyberware') {
-                return [{id: 'info', icon: 'info', label: 'Info', handler: toggle}];
+                const cw = [{id: 'info', icon: 'info', label: 'Info', handler: toggle}];
+                if (props.item.system?.isInstalled) {
+                    cw.push({id: 'uninstall', icon: 'unplug', label: 'Uninstall', handler: () => window.emitter?.emit('cyberware-uninstall', props.item)});
+                } else {
+                    cw.push({id: 'install', icon: 'plug', label: 'Install', handler: () => window.emitter?.emit('cyberware-install', props.item)});
+                }
+                return cw;
             }
 
             const actions = [
@@ -579,6 +606,8 @@ export default {
             expanded,
             toggle,
             itemActions,
+            installCyberware,
+            uninstallCyberware,
             formatType,
             findItem,
             ammoName,
