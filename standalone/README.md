@@ -1,7 +1,7 @@
 # Standalone / FrankenPHP prototype
 
 > Terse runbook. The full tutorial, architecture rationale, and the complete
-> build-failure catalog live in [`../standalone.md`](../standalone.md).
+> build-failure catalog live in [`../wiki/standalone.md`](../wiki/standalone.md).
 
 Run CPR Agent as a self-hosted app with **zero external services**: SQLite,
 file cache/sessions, database queue, and [FrankenPHP](https://frankenphp.dev)
