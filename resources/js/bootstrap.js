@@ -3,6 +3,7 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import {useCharacterData} from './composables/useCharacterData';
 import {isEmbed, initEmbed} from './embed';
+import {resolveReverbEndpoint} from './reverb-endpoint';
 
 window.axios = axios;
 
@@ -23,21 +24,20 @@ if (isEmbed()) {
 // values baked into the bundle at build time, so prebuilt assets work on any
 // host. Final fallback derives everything from the page's own origin, which
 // is correct whenever Reverb is reverse-proxied on the same domain.
-const reverbConfig = window.reverbConfig ?? {};
-const reverbScheme = reverbConfig.scheme
-    ?? import.meta.env.VITE_REVERB_SCHEME
-    ?? window.location.protocol.replace(':', '');
-const reverbPort = reverbConfig.port
-    ?? import.meta.env.VITE_REVERB_PORT
-    ?? (window.location.port || (reverbScheme === 'https' ? 443 : 80));
+// See resources/js/reverb-endpoint.js for the full precedence rule.
+const endpoint = resolveReverbEndpoint({
+    runtime: window.reverbConfig,
+    build: import.meta.env,
+    location: window.location,
+});
 
 window.Echo = new Echo({
     broadcaster: 'reverb',
-    key: reverbConfig.key ?? import.meta.env.VITE_REVERB_APP_KEY,
-    wsHost: reverbConfig.host ?? import.meta.env.VITE_REVERB_HOST ?? window.location.hostname,
-    wsPort: reverbPort,
-    wssPort: reverbPort,
-    forceTLS: reverbScheme === 'https',
+    key: endpoint.key,
+    wsHost: endpoint.host,
+    wsPort: endpoint.port,
+    wssPort: endpoint.port,
+    forceTLS: endpoint.forceTLS,
     // Standard Config
     enabledTransports: ['ws', 'wss'],
     disableStats: true,

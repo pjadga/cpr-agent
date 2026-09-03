@@ -44,5 +44,12 @@
              .env, where BROADCAST_CONNECTION=reverb); tests must never make a
              real broadcast HTTP call to a Reverb server. -->
         <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <!-- Likewise pinned: with CSP on, @cspMetaTag renders the whole policy
+             into every page, so assertions about page content start matching
+             allow-listed hostnames rather than actual scripts. Leaving this to
+             the developer's own .env made the suite pass or fail depending on
+             whose machine it ran on. Tests that need CSP switch it on
+             explicitly with config(['csp.enabled' => true]). -->
+        <env name="CSP_ENABLED" value="false" force="true"/>
     </php>
 </phpunit>
