@@ -89,8 +89,9 @@ Route::middleware(['auth'])->group(function () {
 // API Key registration
 
 Route::middleware('auth')->post('/settings/api-token', function (Request $request) {
-    // Delete old tokens if you want them to only have one active connection
-    $request->user()->tokens()->delete();
+    // Replace only this app's own connection token. The blanket
+    // tokens()->delete() also revoked anything else the account held.
+    $replacing = $request->user()->tokens()->where('name', 'FoundryClient')->delete() > 0;
 
     $token = $request->user()->createToken('FoundryClient')->plainTextToken;
 
@@ -99,7 +100,13 @@ Route::middleware('auth')->post('/settings/api-token', function (Request $reques
     $config->api_key = $token;
     $config->save();
 
-    return back()->with('flash_token', $token);
+    // Generating a key necessarily invalidates the previous one, including the
+    // copy already pasted into the Foundry Bridge — which then fails every call
+    // with a 401 ("Failed to mint pairing", "Bridge Offline") for no reason the
+    // GM can see. Say so out loud instead of leaving them to work it out.
+    return back()
+        ->with('flash_token', $token)
+        ->with('flash_token_replaced', $replacing);
 })->name('token.create');
 
 require __DIR__.'/auth.php';

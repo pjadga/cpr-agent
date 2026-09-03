@@ -52,8 +52,16 @@ export function useImageProxy() {
             fullUrl = baseUrl.value + "/" + cleanPath;
         }
 
-        // Proxy ngrok URLs to avoid mixed content issues
-        if (fullUrl.includes('ngrok-free.dev') || fullUrl.includes('ngrok.dev')) {
+        // Fetch through the server whenever the browser would refuse to do it
+        // itself. An https page cannot load an http image: it is blocked as
+        // mixed content (or silently rewritten to https by an
+        // upgrade-insecure-requests header, which then 404s). Either way the
+        // token art just vanishes while character data keeps syncing, so it
+        // reads as a cosmetic glitch rather than the scheme mismatch it is.
+        // ngrok stays on the list regardless of scheme: its interstitial needs
+        // the skip header the proxy sends.
+        const isCrossScheme = window.location.protocol === 'https:' && fullUrl.startsWith('http://');
+        if (isCrossScheme || fullUrl.includes('ngrok-free.dev') || fullUrl.includes('ngrok.dev')) {
             return `/api/proxy-image?url=${encodeURIComponent(fullUrl)}`;
         }
 

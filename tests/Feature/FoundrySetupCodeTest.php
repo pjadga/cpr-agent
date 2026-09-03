@@ -25,8 +25,7 @@ class FoundrySetupCodeTest extends TestCase
     public function gm_gets_a_decodable_setup_code_carrying_their_session_channel()
     {
         config([
-            'app.domain' => 'agent.example.com',
-            'vite.reverb.scheme' => 'https',
+            'app.url' => 'https://agent.example.com',
             'broadcasting.connections.reverb.key' => 'reverb-key-1',
         ]);
 
