@@ -1,3 +1,12 @@
+*** SUPERSEDED ***
+This guide describes the old setup, which shipped a bundled .env with WebSocket
+settings you had to edit by hand. That file (.env.herd) has been removed: the
+Agent now serves the WebSocket on its own address, so there is nothing to point
+at a second port.
+
+Follow wiki/setup-herd.md instead. It is shorter, and it is the one that
+matches the current code.
+
 A few notes before we get started:
 
 This guide covers setting up Travisse's preem af Cyberpunk Red Foundry app using Laravel Herd instead of Docker/DDEV. By the end of this, you'll have a working web app that is accessible by both the host PC as well as other devices on your home network like phones, tablets, laptops, ect. Getting it to talk to the bridge module in Foundry is pretty well documented already, so I'm not covering that, but if need be I will gladly update this guide to include those steps as well. 

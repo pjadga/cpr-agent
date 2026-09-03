@@ -1,3 +1,12 @@
+> [!WARNING]
+> **Superseded.** This guide describes the old setup, which shipped a bundled
+> `.env` with WebSocket settings you had to edit by hand. That file
+> (`.env.herd`) has been removed: the Agent now serves the WebSocket on its own
+> address, so there is nothing to point at a second port.
+>
+> Follow **[`wiki/setup-herd.md`](wiki/setup-herd.md)** instead. It is shorter,
+> and it is the one that matches the current code.
+
 # Setting Up the Cyberpunk RED Agent App with Laravel Herd
 
 A guide to running Travisse's Cyberpunk RED Foundry app using **Laravel Herd** instead of Docker/DDEV.

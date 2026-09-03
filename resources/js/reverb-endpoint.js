@@ -3,16 +3,16 @@
  *
  * Three sources, in falling order of authority:
  *
- *   1. window.reverbConfig  — injected per-request by the server
+ *   1. window.reverbConfig  -> injected per-request by the server
  *      (partials/reverb-config.blade.php). Wins so that one prebuilt asset
  *      bundle works on any host without a rebuild.
- *   2. import.meta.env      — VITE_REVERB_* baked in at build time.
- *   3. window.location      — the page's own origin.
+ *   2. import.meta.env      -> VITE_REVERB_* baked in at build time.
+ *   3. window.location      -> the page's own origin.
  *
  * (3) is the normal case now that Reverb is reverse-proxied under /app on the
  * app's own listener: an https page derives wss on 443, an http page derives ws
  * on 80, and neither needs to be told. That is also why (1) and (2) must be
- * genuinely absent rather than defaulted — a stale VITE_REVERB_SCHEME=https on
+ * genuinely absent rather than defaulted, a stale VITE_REVERB_SCHEME=https on
  * a plain-http install points the browser at an endpoint that does not exist,
  * and the only symptom is a sheet that never updates.
  *
