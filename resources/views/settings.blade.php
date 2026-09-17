@@ -38,6 +38,21 @@
             </div>
         @endif
 
+        {{-- Why one of the three pieces (Reverb, Foundry URL, Bridge) is missing.
+             This page still loads when they are, which is the point: it is where
+             you come to fix them. --}}
+        @if(\App\Support\ConnectionDiagnostics::has($connectionIssue ?? null))
+            @php($diag = \App\Support\ConnectionDiagnostics::get($connectionIssue))
+            <div class="bg-cpr-yellow-dark/20 border border-cpr-yellow p-4 mb-8">
+                <div class="flex items-center gap-2 mb-2">
+                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-yellow"></i>
+                    <span class="text-cpr-yellow uppercase text-xs tracking-widest font-bold">{{ $diag['title'] }}</span>
+                </div>
+                <p class="text-cpr-text-dim text-xs leading-relaxed">{{ $diag['detail'] }}</p>
+                <p class="text-cpr-text-main text-xs leading-relaxed mt-2"><strong>Fix:</strong> {{ $diag['hint'] }}</p>
+            </div>
+        @endif
+
         <!-- Session Status Banner -->
         <div x-data="{ sessionInfo: @js($sessionInfo ?? null), sessionLoading: {{ $sessionInfo ? 'false' : 'true' }}, loading: false, joinCode: '', joinMessage: '' }"
              x-init="
@@ -565,7 +580,11 @@
                 <p class="text-xs text-cpr-text-dim">
                     Once connected, pick the character you'll play and choose your interface theme.
                 </p>
-                @if(!$config->foundry_url && !config('services.foundry.base_url'))
+                {{-- Was `&& !config('services.foundry.base_url')`, which pointed at a
+                     retired relay whose default was a non-empty string, so this
+                     guard never once rendered: an account with no Foundry saved
+                     was shown the actor picker instead of being told to do Step 1. --}}
+                @if(!$config->foundry_url)
                     <div class="bg-cpr-red-dark/30 border border-cpr-red-dark text-cpr-red p-4 text-xs italic">
                         SYSTEM OFFLINE: Finish <strong>Step 1 · Connect to Foundry</strong> to enable Agent sync.
                     </div>

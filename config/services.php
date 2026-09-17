@@ -35,10 +35,6 @@ return [
         ],
     ],
 
-    'foundry' => [
-        'base_url' => env('BASE_URL', 'https://agent-relay.surrealdisco.co.uk'),
-    ],
-
     'turnstile' => [
         'key' => env('TURNSTILE_SITE_KEY'),
         'secret' => env('TURNSTILE_SECRET_KEY'),

@@ -4,6 +4,7 @@ import { useImageProxy } from './useImageProxy';
 import { useWebSocketSubscription } from './useWebSocketSubscription';
 import { isMyActor, isMyRequest } from '../utils/requests';
 import { useNetPool } from './useNetPool';
+import { classifyApiError } from './useFoundryDiagnostics';
 
 // Expose delta applier globally for WebSocket handler
 window.__applyDelta = null;
@@ -26,7 +27,7 @@ export function useCharacterData() {
     // Extract sub-composables
     const refreshIcons = useRefreshIcons();
     const { fetchBaseUrl, getImageUrl } = useImageProxy();
-    const { onMount, onUnmount, charData, loading, isWssConnected, error, agentLink, isGM } = useWebSocketSubscription();
+    const { onMount, onUnmount, charData, loading, isWssConnected, isFoundryLive, error, errorCode, agentLink, isGM } = useWebSocketSubscription();
 
     // Delta applier (bound to our reactive state)
     const deltaApplier = useDeltaApplier(charData, loading);
@@ -72,6 +73,11 @@ export function useCharacterData() {
      * Strategy: 1) Load from local DB instantly → 2) Background refresh from Foundry.
      */
     const fetchCharacterData = async (isInitial = false, forceFresh = false) => {
+        // Why the most recent request failed, as a DIAGNOSTICS key. Several
+        // steps here fail benignly on a fresh account, so the cause is carried
+        // rather than thrown, and only surfaces if we finish with nothing.
+        let lastFailure = null;
+
         try {
             if (!actorUuid) {
                 const getActors = await window.axios.post("/api/getactors");
@@ -110,7 +116,12 @@ export function useCharacterData() {
                         setTimeout(refreshIcons, 50);
                     }
                 } catch (dbErr) {
+                    // Expected on a fresh account: there is no cached sheet yet.
+                    // Keep *why* so that if the Foundry refresh also comes back
+                    // empty we can say which of the two it was, instead of
+                    // rendering nothing at all.
                     console.warn("Local DB fetch failed or empty:", dbErr);
+                    lastFailure = classifyApiError(dbErr);
                     if (isInitial) forceFresh = true;
                 }
             } else {
@@ -137,7 +148,16 @@ export function useCharacterData() {
                             }
                         } catch (e) {
                             console.error('[Agent] Fallback /actorsheet failed', e);
-                            loading.value = false;
+                            lastFailure = classifyApiError(e);
+                        }
+
+                        loading.value = false;
+
+                        // Nothing loaded and nothing raised: without this the
+                        // sheet renders no branch at all and the user gets a
+                        // blank dashboard with the answer only in the console.
+                        if (!charData.value && !error.value && !errorCode.value) {
+                            errorCode.value = lastFailure || 'no_character_data';
                         }
                     }
                 }, 4000);
@@ -145,8 +165,12 @@ export function useCharacterData() {
 
         } catch (err) {
             console.error("Fetch Error:", err);
+            lastFailure = classifyApiError(err);
             if (isInitial && !charData.value) {
-                error.value = err.response?.data?.error || err.message || "An error occurred.";
+                // "Request failed with status code 500" is what the user used to
+                // see here, which is true of a dead Reverb, a closed Foundry and
+                // an unconfigured account alike. Classify instead.
+                errorCode.value = lastFailure;
                 loading.value = false;
             }
         }
@@ -175,7 +199,9 @@ export function useCharacterData() {
         charData,
         loading,
         isWssConnected,
+        isFoundryLive,
         error,
+        errorCode,
         agentLink,
         isGM,
         rollMode,

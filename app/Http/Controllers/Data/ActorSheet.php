@@ -55,10 +55,16 @@ class ActorSheet extends FormRequest
         $isOffline = $request->has('actorData');
 
         if (empty($characterData)) {
+            // Not a malformed request: this account simply has no character yet,
+            // which is the normal state right up until Foundry sends one. The
+            // old body carried the prose "Can't Find Actor and no offline data
+            // available" (under a 'message' of "Data successfully submitted!",
+            // a copy-paste leftover), so the client had nothing to branch on and
+            // rendered an empty page.
             return response()->json([
                 'success' => false,
-                'message' => 'Data successfully submitted!',
-                'error' => "Can't Find Actor and no offline data available",
+                'error' => 'no_character_data',
+                'message' => 'No character data is cached for this account yet.',
             ], 400);
         }
 

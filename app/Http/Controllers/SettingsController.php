@@ -8,9 +8,11 @@ use App\Models\Config;
 use App\Models\Session;
 use App\Models\User;
 use App\Support\EventWaiter;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SettingsController extends Controller
@@ -26,8 +28,23 @@ class SettingsController extends Controller
         $config = $user->config ?? new Config;
         $actors = [];
 
-        // Fetch actors from Foundry if URL is configured
-        if ($config->foundry_url || config('services.foundry.base_url')) {
+        // Why this whole block is optional and wrapped: the actor list is a
+        // convenience, but this page is also the only place a user can fix a
+        // broken setup. Letting a dead Reverb throw out of here 500'd the one
+        // screen they needed, so the two failures that stop the list arriving
+        // are caught and reported instead of raised.
+        $connectionIssue = null;
+
+        // Only ask Foundry for actors when this user has actually told us where
+        // their Foundry is. The old condition also accepted a
+        // services.foundry.base_url that defaulted to the retired pre-Bridge
+        // relay and was set by no env file, so it was always true: a brand new
+        // account with nothing configured still dispatched a message nobody
+        // could answer and sat through the full five second wait before
+        // rendering. That config key is gone.
+        if (! $config->foundry_url) {
+            $connectionIssue = 'foundry_not_configured';
+        } else {
             $requestId = $this->createRequestId();
             $payload = [
                 'type' => 'GET_ACTORS',
@@ -37,12 +54,23 @@ class SettingsController extends Controller
                 'isGM' => (bool) $user->is_gm,
             ];
 
-            CyberpunkAgentChannel::dispatch($payload);
+            try {
+                CyberpunkAgentChannel::dispatch($payload);
 
-            // Wait for response using EventWaiter (non-blocking)
-            $foundryData = app(EventWaiter::class)->wait($requestId, 5.0);
-            if ($foundryData && ! empty($foundryData['actors'])) {
-                $actors = $foundryData['actors'];
+                // Wait for response using EventWaiter (non-blocking)
+                $foundryData = app(EventWaiter::class)->wait($requestId, 5.0);
+
+                if ($foundryData && ! empty($foundryData['actors'])) {
+                    $actors = $foundryData['actors'];
+                } else {
+                    // Reverb took the message but nothing answered: Foundry is
+                    // closed, or the Bridge module is not connected to it.
+                    $connectionIssue = 'foundry_no_response';
+                }
+            } catch (BroadcastException $e) {
+                // Could not even publish the message: Reverb is not running.
+                Log::warning('Settings page could not reach Reverb', ['message' => $e->getMessage()]);
+                $connectionIssue = 'realtime_unavailable';
             }
         }
 
@@ -75,6 +103,7 @@ class SettingsController extends Controller
             'config' => $config,
             'isFirstTime' => $isFirstTime,
             'sessionInfo' => $sessionInfo,
+            'connectionIssue' => $connectionIssue,
         ]);
     }
 

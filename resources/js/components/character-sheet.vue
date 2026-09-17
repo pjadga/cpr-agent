@@ -22,15 +22,28 @@
             </div>
         </div>
 
-        <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-cpr-black">
+        <!-- Only when there is no sheet to show. This branch and the sheet below
+             are separate v-ifs, so without the charData guard a failure arriving
+             after a successful load would paint a full-screen error panel on top
+             of a perfectly good sheet. A failed roll should not blank your
+             character. -->
+        <div v-else-if="(error || errorCode) && !charData" class="flex h-screen items-center justify-center p-4 bg-cpr-black">
             <div class="w-full max-w-md">
                 <div class="border-2 border-cpr-red bg-cpr-red-dark/10 p-6 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
                     <div class="flex items-center gap-4 mb-4 border-b border-cpr-red pb-4">
                         <i v-icon data-lucide="alert-octagon" class="w-8 h-8 text-cpr-red"></i>
-                        <h2 class="text-cpr-red font-black text-2xl uppercase tracking-tighter">Uplink Failed</h2>
+                        <h2 class="text-cpr-red font-black text-2xl uppercase tracking-tighter">{{ errorTitle }}</h2>
                     </div>
-                    <div class="text-cpr-text-main font-mono text-sm leading-relaxed mb-6">
-                        {{ error }}
+                    <!-- What went wrong, then what to do about it. The old panel
+                         printed the raw axios message, which named the symptom
+                         ("status code 500") and never the cause. -->
+                    <div class="text-cpr-text-main text-sm leading-relaxed mb-4">
+                        {{ errorDetail }}
+                    </div>
+                    <div v-if="errorHint"
+                         class="text-cpr-text-dim text-xs leading-relaxed mb-6 border-l-2 border-cpr-yellow pl-3">
+                        <span class="text-cpr-yellow font-bold uppercase tracking-widest">Fix:</span>
+                        {{ errorHint }}
                     </div>
                     <div class="flex gap-4">
                         <button @click="reloadPage"
@@ -79,7 +92,7 @@
                         <h2 class="text-cpr-yellow font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
                         </h2>
-                        <div v-if="!isWssConnected"
+                        <div v-if="!isLive"
                              class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
                             Offline Mode - Agent Synced via Local Cache
                         </div>
@@ -152,7 +165,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 v-if="!isWssConnected"
+                            <h1 v-if="!isLive"
                                 class="text-[0.8rem] font-normal uppercase truncate leading-none text-cpr-yellow">
                                 <span
                                     class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
@@ -479,6 +492,7 @@ import {useRollModifiers} from '../composables/useRollModifiers';
 import {useResources} from '../composables/useResources';
 import {useNetrunner} from '../composables/useNetrunner';
 import {useNetPool} from '../composables/useNetPool';
+import {diagnostic} from '../composables/useFoundryDiagnostics';
 import {useCyberware} from '../composables/useCyberware';
 import CyberwareInstallModal from './character-sheet/CyberwareInstallModal.vue';
 import {useEchoListener} from '../utils/listener';
@@ -516,7 +530,9 @@ export default {
             charData,
             loading,
             isWssConnected,
+            isFoundryLive,
             error: dataError,
+            errorCode,
             agentLink: localAgentLink,
             isGM,
             getImageUrl,
@@ -556,7 +572,22 @@ export default {
         const showCombatPanel = ref(false);
         const showEurobucksModal = ref(false);
         const popupMessage = ref('');
+        // "Live" means the sheet is showing what Foundry currently thinks, which
+        // needs both a socket AND something answering on it. isWssConnected
+        // alone only says Reverb accepted the connection: with Reverb up and
+        // Foundry closed it reads true while the sheet serves cached data, so
+        // the OFFLINE badge silently stopped appearing in exactly the situation
+        // it exists to flag.
+        const isLive = computed(() => isWssConnected.value && isFoundryLive.value);
+
         const error = computed(() => dataError.value);
+
+        // A classified failure gets a title, an explanation and a fix; free-text
+        // `error` (set by paths that already carry their own prose) keeps the
+        // old presentation so nothing regresses to a blank panel.
+        const errorTitle = computed(() => (errorCode.value ? diagnostic(errorCode.value).title : 'Uplink Failed'));
+        const errorDetail = computed(() => (errorCode.value ? diagnostic(errorCode.value).detail : dataError.value));
+        const errorHint = computed(() => (errorCode.value ? diagnostic(errorCode.value).hint : null));
 
         // --- INITIAL DATA LOAD ---
         fetchNetPool();
@@ -1151,6 +1182,10 @@ export default {
             charData,
             loading,
             error,
+            errorCode,
+            errorTitle,
+            errorDetail,
+            errorHint,
             activeTab,
             stats,
             luck,
@@ -1216,6 +1251,8 @@ export default {
             goToSettings,
             refreshSheet,
             isWssConnected,
+            isFoundryLive,
+            isLive,
             reloadPage,
             netPoolData,
 

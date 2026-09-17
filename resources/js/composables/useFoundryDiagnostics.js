@@ -125,6 +125,54 @@ export const DIAGNOSTICS = {
         hint: 'If Foundry runs on the GM\'s local network, you must be on that same network. If it is hosted, confirm the address is correct and online with your GM.',
     },
 
+    // --- The Agent's own stack (server-supplied codes) ---
+    // Three things have to be up before a sheet can load: the web app, the
+    // realtime server, and Foundry with the Bridge module connected. When one
+    // is missing the raw failure is indistinguishable -- all three used to
+    // arrive as "Request failed with status code 500" -- so the server names
+    // which one it was and these explain it.
+    realtime_unavailable: {
+        title: 'Live updates are offline',
+        detail: 'The Agent could not reach its own realtime server (Reverb), so nothing can be sent to or received from Foundry.',
+        hint: 'If you host the Agent yourself, Reverb has to be running alongside it: start it with `php artisan agent:serve` (or `ddev agent-serve`) and leave it running. If your GM hosts it, tell them the Agent is up but its realtime server is not.',
+    },
+    foundry_not_configured: {
+        title: 'No Foundry address saved yet',
+        detail: 'This account has no Foundry connection set up, so there is nothing to load a character from.',
+        hint: 'Open Agent Config and set your Foundry URL, or scan the QR code your GM gives you.',
+    },
+    foundry_no_response: {
+        title: 'Foundry did not answer',
+        detail: 'The message reached the realtime server, but nothing in Foundry replied.',
+        hint: "Ask your GM to open their Foundry world and check the Cyberpunk Red Agent Bridge module shows \"Bridge: Online\". If it is offline, they need to re-paste their setup code.",
+    },
+    agent_error: {
+        title: 'The Agent server hit an error',
+        detail: 'The request reached the Agent but it failed while handling it.',
+        hint: 'Reload and try again. If it keeps happening, the server log (storage/logs/laravel.log) will name the cause.',
+    },
+    rate_limited: {
+        title: 'Too many requests',
+        detail: 'The Agent is throttling requests from this device.',
+        hint: 'Wait a few seconds and try again.',
+    },
+
+    no_character_data: {
+        title: 'No character loaded yet',
+        detail: 'The Agent has never received a character for this account, so there is nothing to show.',
+        hint: 'Open Agent Config and check your Foundry connection, then pick your character. If your GM runs the game, ask them to open Foundry with the Bridge module connected and assign you a character.',
+    },
+    request_rejected: {
+        title: 'The Agent turned that request down',
+        detail: 'The request reached the Agent but it would not accept it.',
+        hint: 'Reload the page. If it keeps happening, check Agent Config is still pointing at the right Foundry.',
+    },
+    no_character_assigned: {
+        title: 'No character assigned to you',
+        detail: 'Foundry answered, but your Foundry user does not own a character sheet.',
+        hint: 'Ask your GM to assign you one in the Agent Character Assignment menu, then reload.',
+    },
+
     // --- GM round-trip ---
     no_gm_confirmation: {
         title: 'Linked, but the GM\'s Foundry did not confirm',
@@ -139,6 +187,43 @@ export function diagnostic(code) {
         detail: 'An unexpected error occurred.',
         hint: 'Reload the page and try again.',
     };
+}
+
+/**
+ * Map a failed axios/fetch call to a diagnostic code.
+ *
+ * Prefers the server's own code: every endpoint that can fail for a nameable
+ * reason returns `{ error: '<code>' }`, which is far better information than
+ * the status alone. Falls back to the status, and finally to a network-level
+ * guess, so the sheet never has to show a bare "Request failed with status
+ * code 500" again.
+ *
+ * @param {object} err  an axios error
+ * @returns {string} a DIAGNOSTICS key
+ */
+export function classifyApiError(err) {
+    const status = err?.response?.status;
+    const code = err?.response?.data?.error;
+
+    // The server said what went wrong, and we have wording for it.
+    if (code && DIAGNOSTICS[code]) return code;
+
+    // No response at all: the request never landed.
+    if (!err?.response) return 'agent_unreachable';
+
+    switch (status) {
+        case 401:
+        case 419:
+            return 'not_authenticated';
+        case 409:
+            return 'foundry_not_configured';
+        case 429:
+            return 'rate_limited';
+        case 503:
+            return 'realtime_unavailable';
+        default:
+            return status >= 500 ? 'agent_error' : 'request_rejected';
+    }
 }
 
 /**
