@@ -1,3 +1,8 @@
+---
+title: Setup Guide
+order: 2
+---
+
 # CPR Agent Guide
 
 This guide provides detailed instructions on how to set up, self-host, and connect the CPR Agent with Foundry VTT.
@@ -9,7 +14,7 @@ This guide provides detailed instructions on how to set up, self-host, and conne
 Whilst below is fairly comprehensive, it is a very involved process, especially when dealing with WSL2 and the like. 
 **Thanks to capt_garris** from the CPR Discord, they've done a fantastic write-up on getting the Agent self-hosted using Laravel's Herd app. It takes SO much of the faff out of self-hosting!
 
-> [Check it out here](https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/Agent%20Herd%20Guide.md?ref_type=heads)
+> [Check it out here](/wiki/setup-herd)
 
 ## Table of Contents
 
@@ -75,11 +80,11 @@ The CPR Agent is a companion app designed to bridge the gap between players and 
 
 ## Quick Connect: QR Pairing
 
-The manual "generate an API key, copy the Channel ID, assign each character by hand" flow works, but it's fiddly — especially when you've got a table full of players squinting at their phones. QR Pairing shortcuts the whole thing: players scan a code and their Agent configures itself and links to Foundry automatically.
+The manual "generate an API key, copy the Channel ID, assign each character by hand" flow works, but it's fiddly ,  especially when you've got a table full of players squinting at their phones. QR Pairing shortcuts the whole thing: players scan a code and their Agent configures itself and links to Foundry automatically.
 
 There are **two different codes** in play, and it's worth not mixing them up. One is for you (the GM) to set up your Bridge; the other is for each player to link their Agent.
 
-### Code #1 — The Foundry Setup Code (GM → Bridge)
+### Code #1 ,  The Foundry Setup Code (GM → Bridge)
 
 This one configures the **Bridge module itself**, so you don't have to type six settings into Foundry by hand.
 
@@ -88,41 +93,41 @@ This one configures the **Bridge module itself**, so you don't have to type six 
 3. In Foundry, open the **Agent Bridge → Quick Setup** menu and paste it in.
 4. The Bridge unpacks your Agent URL, Channel ID, API Key and Reverb settings in one shot.
 
-Under the hood this is just a base64-encoded bundle of `agentUrl`, `channelId`, `apiKey`, `reverbKey` and `reverbPort`. Because it carries your **secret API key**, it is **GM-only** — never hand this one to a player.
+Under the hood this is just a base64-encoded bundle of `agentUrl`, `channelId`, `apiKey`, `reverbKey` and `reverbPort`. Because it carries your **secret API key**, it is **GM-only** ,  never hand this one to a player.
 
-### Code #2 — The Pairing QR (Foundry → Player's Agent)
+### Code #2 ,  The Pairing QR (Foundry → Player's Agent)
 
 Once your Bridge is online, each player links their Agent by scanning a per-player QR code:
 
 1. As the GM, open **Agent Bridge → Manage Characters** in Foundry and hit the **QR button** next to the player you want to link.
 2. The player opens the Agent, goes to **Settings → Join a Session**, and taps **Scan to Link Foundry**.
-3. They point their camera at the QR. *(No camera? A copyable "link code" appears under the scan button — paste that instead.)*
-4. That's it. Their Agent picks up the Channel ID and Foundry URL, and Foundry is told which character belongs to them — no manual assignment needed.
+3. They point their camera at the QR. *(No camera? A copyable "link code" appears under the scan button ,  paste that instead.)*
+4. That's it. Their Agent picks up the Channel ID and Foundry URL, and Foundry is told which character belongs to them ,  no manual assignment needed.
 
 ### What actually happens (the handshake)
 
 For the technically curious, here's the round-trip behind that one scan:
 
-1. **Register** — When you display the QR, your Bridge mints a one-time random **nonce** and registers it with the Agent server (`POST /api/pairing/register`, authenticated with your GM API key). The server stores the nonce against your session, the target Foundry user, and the Foundry URL, stamped with a **5-minute expiry**. The QR itself only encodes `{ v: 1, nonce, agentUrl }` — no secrets travel in the image.
-2. **Claim** — The player's Agent reads the nonce and calls `POST /api/pairing/claim`. The server confirms the code is real, unclaimed and unexpired, then configures the player: sets their **Channel ID**, generates an **Agent Link** if they don't have one yet, and fills in the Foundry URL from the pairing.
-3. **Auto-link** — The server broadcasts a `PAIR_AGENT` event on your session channel (`cpr-agent.{channel_id}`). Your Bridge hears it and records which Agent Link maps to which Foundry user — this is exactly the step you'd otherwise do by hand in *Manage Characters*.
-4. **Confirm** — The player's Agent then runs a quick reachability check against Foundry and waits a few seconds for your Bridge to fire back a `PAIR_CONFIRMED`. That's what lets it show a "Linked!" rather than a guess.
+1. **Register** ,  When you display the QR, your Bridge mints a one-time random **nonce** and registers it with the Agent server (`POST /api/pairing/register`, authenticated with your GM API key). The server stores the nonce against your session, the target Foundry user, and the Foundry URL, stamped with a **5-minute expiry**. The QR itself only encodes `{ v: 1, nonce, agentUrl }` ,  no secrets travel in the image.
+2. **Claim** ,  The player's Agent reads the nonce and calls `POST /api/pairing/claim`. The server confirms the code is real, unclaimed and unexpired, then configures the player: sets their **Channel ID**, generates an **Agent Link** if they don't have one yet, and fills in the Foundry URL from the pairing.
+3. **Auto-link** ,  The server broadcasts a `PAIR_AGENT` event on your session channel (`cpr-agent.{channel_id}`). Your Bridge hears it and records which Agent Link maps to which Foundry user ,  this is exactly the step you'd otherwise do by hand in *Manage Characters*.
+4. **Confirm** ,  The player's Agent then runs a quick reachability check against Foundry and waits a few seconds for your Bridge to fire back a `PAIR_CONFIRMED`. That's what lets it show a "Linked!" rather than a guess.
 
 ### Safety rails
 
-- **One-time use** — each code can be claimed once. The same player re-scanning is fine (it's idempotent); anyone else gets a polite "already used".
-- **Short-lived** — codes expire after 5 minutes. If one goes stale, just generate a fresh one.
-- **GM-owned only** — a GM can only register pairings for a session they actually own.
-- **Server-matched** — if a player scans a QR meant for a *different* Agent server than the one they're logged in to, the Agent spots it and refuses before claiming.
+- **One-time use** ,  each code can be claimed once. The same player re-scanning is fine (it's idempotent); anyone else gets a polite "already used".
+- **Short-lived** ,  codes expire after 5 minutes. If one goes stale, just generate a fresh one.
+- **GM-owned only** ,  a GM can only register pairings for a session they actually own.
+- **Server-matched** ,  if a player scans a QR meant for a *different* Agent server than the one they're logged in to, the Agent spots it and refuses before claiming.
 
 ### When the QR won't cooperate
 
 The scanner tries to give you a plain-language reason and a fix. The usual suspects:
 
-- **Camera blocked (insecure connection)** — browsers only allow camera access over HTTPS. Load the Agent via its `https://` address (or `localhost`), not a bare `http://` IP.
-- **Code expired / already used** — ask the GM for a fresh QR.
-- **QR is for a different Agent** — log in to the Agent address your GM actually uses, then scan again.
-- **Linked, but can't reach Foundry** — you *are* paired, and stats/rolls will still sync over the websocket. This warning only affects direct loading of character images, which needs Foundry to be reachable from your device (same local network, or a public/HTTPS address). See [Troubleshooting](#troubleshooting).
+- **Camera blocked (insecure connection)** ,  browsers only allow camera access over HTTPS. Load the Agent via its `https://` address (or `localhost`), not a bare `http://` IP.
+- **Code expired / already used** ,  ask the GM for a fresh QR.
+- **QR is for a different Agent** ,  log in to the Agent address your GM actually uses, then scan again.
+- **Linked, but can't reach Foundry** ,  you *are* paired, and stats/rolls will still sync over the websocket. This warning only affects direct loading of character images, which needs Foundry to be reachable from your device (same local network, or a public/HTTPS address). See [Troubleshooting](#troubleshooting).
 
 ---
 

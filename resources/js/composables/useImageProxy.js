@@ -13,7 +13,7 @@ export function useImageProxy() {
         // In the Foundry embed there is no authenticated session and
         // /api/getbaseurl is short-circuited to {} by the postMessage adapter.
         // The image base is the parent (Foundry) origin, which initEmbed()
-        // seeds into cpr_base_url — read that instead of calling the server.
+        // seeds into cpr_base_url ,  read that instead of calling the server.
         if (window.__CPR_EMBED) {
             baseUrl.value = localStorage.getItem('cpr_base_url') || baseUrl.value;
             return;

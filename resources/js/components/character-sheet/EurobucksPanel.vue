@@ -121,7 +121,7 @@ function formatAmount(t) {
                                 {{ formatAmount(t) }}
                             </span>
                             <span class="text-[10px] text-cpr-text-dim truncate flex-1 text-right">{{
-                                    (Array.isArray(t) ? t[1] : t.reason) || '—'
+                                    (Array.isArray(t) ? t[1] : t.reason) || ', '
                                 }}</span>
                         </li>
                     </ul>

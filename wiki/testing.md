@@ -1,3 +1,8 @@
+---
+title: Testing
+order: 7
+---
+
 # Testing Documentation
 
 This document describes the comprehensive testing suite for the Cyberpunk Agent application.

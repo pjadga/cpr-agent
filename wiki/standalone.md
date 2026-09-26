@@ -1,6 +1,11 @@
-# Standalone Self-Hosting — FrankenPHP Tutorial & Build Catalog
+---
+title: "Self-Hosting: Standalone (FrankenPHP)"
+order: 4
+---
 
-CPR Agent can run as a self-hosted app with **zero external services** — no
+# Standalone Self-Hosting ,  FrankenPHP Tutorial & Build Catalog
+
+CPR Agent can run as a self-hosted app with **zero external services** ,  no
 Docker knowledge, no PHP install, no npm, no Redis, no MariaDB. This document
 is the full tutorial plus a catalog of the build process: every decision,
 every failure, and every fix from the 2026-07-05 prototype session, so the
@@ -30,11 +35,11 @@ reverse-proxies the Pusher-protocol WebSocket path (`/app/*`) to the internal
 Reverb process. Players connect to the same host and port they loaded the
 page from, so there are no mixed-content problems, no second TLS cert, and
 no extra firewall rule. This is the answer to "doesn't the Reverb port throw
-a spanner in self-hosting?" — the port simply doesn't exist externally.
+a spanner in self-hosting?" ,  the port simply doesn't exist externally.
 
 **Runtime WebSocket config, not build-time.** Historically the frontend read
 `VITE_REVERB_*` from `import.meta.env`, baked into the JS bundle when Vite
-built it — meaning every self-hoster would have needed Node + a full asset
+built it ,  meaning every self-hoster would have needed Node + a full asset
 rebuild to point the app at their own domain. Now
 `resources/views/partials/reverb-config.blade.php` injects
 `window.reverbConfig` (key/host/port/scheme from Laravel config) into every
@@ -46,7 +51,7 @@ window.reverbConfig  →  import.meta.env.VITE_REVERB_*  →  window.location
 ```
 
 The final fallback derives host, port, and scheme from the page's own origin
-— which is exactly correct whenever Reverb is same-origin proxied. Net
+,  which is exactly correct whenever Reverb is same-origin proxied. Net
 effect: **one prebuilt asset bundle works on any host.** ddev and existing
 `.env` files keep working unchanged because the same `VITE_REVERB_*` names
 feed the middle of the chain.
@@ -61,14 +66,14 @@ feed the middle of the chain.
 | Queue     | `database`          | `SyncCharacterDataToDb` etc. still async   |
 | WebSocket | Reverb (child proc) | Proxied same-origin                        |
 
-Redis and MariaDB remain available for bigger installs — they're config, not
+Redis and MariaDB remain available for bigger installs ,  they're config, not
 code.
 
 ---
 
 ## 2. Two distribution modes
 
-### Mode A — FrankenPHP binary + repo checkout
+### Mode A ,  FrankenPHP binary + repo checkout
 
 For people comfortable with `git clone`. One downloaded binary provides PHP
 and the web server; the app runs from the checkout.
@@ -79,7 +84,7 @@ curl -L -o standalone/bin/frankenphp \
   https://github.com/php/frankenphp/releases/latest/download/frankenphp-linux-x86_64
 chmod +x standalone/bin/frankenphp
 
-# 2. Configure .env.standalone — set APP_KEY, REVERB_APP_KEY/SECRET and an
+# 2. Configure .env.standalone ,  set APP_KEY, REVERB_APP_KEY/SECRET and an
 #    absolute DB_DATABASE path. It loads automatically because APP_ENV=standalone.
 
 # 3. Build assets once (any machine with node): npm run build
@@ -95,10 +100,10 @@ APP_ENV=standalone ./standalone/bin/frankenphp run --config standalone/Caddyfile
 
 App on `http://localhost:8000`; WebSockets ride `/app/*` on the same origin.
 
-### Mode B — one sealed binary (the app *inside* the executable)
+### Mode B ,  one sealed binary (the app *inside* the executable)
 
-For people who should never see a git checkout. The entire application —
-PHP runtime, Caddy, app code, vendor, prebuilt assets, a default `.env` —
+For people who should never see a git checkout. The entire application , 
+PHP runtime, Caddy, app code, vendor, prebuilt assets, a default `.env` , 
 is compiled into a single ~136MB executable.
 
 **Build it** (needs Docker + ~10GB free disk; produces `cpr-agent`):
@@ -115,7 +120,7 @@ docker cp cpr-tmp:/go/src/app/dist/frankenphp-linux-x86_64 cpr-agent
 docker rm cpr-tmp
 ```
 
-**Run it** — from a directory that is *not* a Laravel checkout (see gotcha
+**Run it** ,  from a directory that is *not* a Laravel checkout (see gotcha
 G8 below):
 
 ```bash
@@ -135,27 +140,27 @@ touch $DB_DATABASE
 ```
 
 The binary carries `standalone/.env.embed` as its default config; **real
-environment variables always override it** — that's how one binary serves
+environment variables always override it** ,  that's how one binary serves
 every install without a rebuild.
 
 ### Sharing with players
 
-- **LAN**: `http://<gm-ip>:8000` — plain-http origin means plain `ws://`,
+- **LAN**: `http://<gm-ip>:8000` ,  plain-http origin means plain `ws://`,
   which browsers allow (mixed-content rules only bite on `https://` pages).
 - **Tailscale Funnel / Cloudflare Tunnel**: point the tunnel at port 8000.
   Both proxy WebSockets; players get a real `https://` URL and the GM
   forwards no ports.
 - **Public domain**: change the Caddyfile site address from `:8000` to the
-  domain — Caddy provisions Let's Encrypt TLS automatically, and the
+  domain ,  Caddy provisions Let's Encrypt TLS automatically, and the
   `window.location` fallback means the frontend needs zero reconfiguration.
 
 ---
 
-## 3. The process catalog — how we got here
+## 3. The process catalog ,  how we got here
 
 Context: we were planning self-hosting options. Docker Compose is the
 primary path for the Foundry-hosting crowd; NativePHP was considered and
-rejected (CPR Agent is a multi-client hub — GM + players + the Bridge — while
+rejected (CPR Agent is a multi-client hub ,  GM + players + the Bridge ,  while
 NativePHP desktop deliberately builds single-user localhost apps); FrankenPHP
 was chosen as the "easy mode" because its embedded Caddy gives auto-TLS and
 WebSocket proxying in the same artifact as the PHP runtime.
@@ -169,7 +174,7 @@ WebSocket proxying in the same artifact as the PHP runtime.
 | `PDO::MYSQL_ATTR_SSL_CA` → `Pdo\Mysql::ATTR_SSL_CA` | `config/database.php` | PHP 8.5 (FrankenPHP ships 8.5) deprecated the old constant and printed warnings above every page; the class exists since 8.4 so ddev is unaffected |
 
 All suites stayed green throughout: 167 PHP tests, 64 JS tests, Pint clean.
-(Note: `composer test` exits 1 on a clean tree despite all tests passing —
+(Note: `composer test` exits 1 on a clean tree despite all tests passing , 
 pre-existing quirk, still unexplained.)
 
 ### The nine build attempts (Mode B)
@@ -178,11 +183,11 @@ Every failure below is now permanently encoded in
 `standalone/static-build.Dockerfile` or the runbook.
 
 1. **`composer: command not found` (exit 127).** The official FrankenPHP
-   docs recipe runs `composer install` inside `static-builder-gnu` — but that
+   docs recipe runs `composer install` inside `static-builder-gnu` ,  but that
    image ships *neither composer nor php*. Fix: multi-stage build with a
    `composer:2` deps stage. Bonus lesson: the failure originally reported
    exit 0 because the build output was piped through `tail`, which swallowed
-   the exit code — log to a file and append the status instead.
+   the exit code ,  log to a file and append the status instead.
 2. **`ld: final link failed: No space left on device.`** Disk was 100% full
    (1.1GB free of 229GB). Docker builder-cache pruning reclaimed almost
    nothing real; actual cleanup was needed. The static build wants ~10GB
@@ -190,16 +195,16 @@ Every failure below is now permanently encoded in
 3. **`undefined reference to ldap_*` / `ber_*`.** The builder's *prebuilt*
    `libcurl.a` was compiled with OpenLDAP support, but spc doesn't put
    openldap in the link set. First workaround attempt: `PHP_EXTENSION_LIBS=openldap`.
-4. **`Library [openldap] not exist!`** — wrong name; spc has no lib by that
+4. **`Library [openldap] not exist!`** ,  wrong name; spc has no lib by that
    name. Second attempt: add `ldap` as a PHP *extension* so its lib rides in.
 5. **`undefined reference to libssh2_* / ZSTD_*`.** The ldap symbols
    resolved, but libcurl also wants libssh2 and zstd. Third attempt:
    `PHP_EXTENSION_LIBS=libssh2,zstd`.
-6. **GitHub 403 rate limit** downloading the new lib sources — anonymous API
+6. **GitHub 403 rate limit** downloading the new lib sources ,  anonymous API
    quota burned by the repeated builds. Fix: pass `gh auth token` as a
    BuildKit secret (`--secret id=github-token,env=GITHUB_TOKEN`) so it never
    lands in image layers.
-7. **`undefined reference to ngtcp2_* / nghttp2_* / nghttp3_*`** — libs that
+7. **`undefined reference to ngtcp2_* / nghttp2_* / nghttp3_*`** ,  libs that
    linked fine in attempt 3! Adding libs was *shifting* spc's resolution set,
    not extending it. Conclusion: upstream dependency-resolution bug around
    the prebuilt curl; stop playing whack-a-mole. **Fix: drop `ext-curl`
@@ -208,7 +213,7 @@ Every failure below is now permanently encoded in
    doesn't require it. Build succeeded.
 8. **`Call to undefined function mb_split()`** at first boot. spc's mbstring
    builds with `--disable-mbregex` unless... (attempt: `PHP_EXTENSION_LIBS=onig`
-   — built and linked `libonig.a` but PHP still configured `--disable-mbregex`).
+   ,  built and linked `libonig.a` but PHP still configured `--disable-mbregex`).
 9. **`mbregex` is a separate spc extension.** Adding it to `PHP_EXTENSIONS`
    (it pulls onig itself) fixed it: `mb_split()`/`mb_ereg()` present, Laravel
    boots, migrations run. Done. (`phar` was added at the same time so
@@ -216,9 +221,9 @@ Every failure below is now permanently encoded in
 
 ### Runtime gotchas (Mode B)
 
-- **G8 — artisan resolution.** `./cpr-agent php-cli artisan …` resolves
+- **G8 ,  artisan resolution.** `./cpr-agent php-cli artisan …` resolves
   `artisan` from the current directory *first*. Run it inside a Laravel
-  checkout and you boot the checkout — complete with its `.env` (we watched
+  checkout and you boot the checkout ,  complete with its `.env` (we watched
   it try to connect to ddev's `mariadb` on host `db`). Always run from a
   clean directory; the embedded app's files then resolve from the binary's
   extraction dir under `/tmp/frankenphp_<hash>/`.
@@ -230,21 +235,21 @@ Every failure below is now permanently encoded in
   `APP_KEY`, Reverb credentials, and `DB_DATABASE` empty; the launcher
   environment supplies them (env vars beat `.env` in Laravel).
 - **Local port collisions.** Reverb uses 8085 in these configs because ddev
-  holds 8080 on the dev box. Any free localhost port works — it's internal.
+  holds 8080 on the dev box. Any free localhost port works ,  it's internal.
 
 ### Verification (what "works" means here)
 
 All checks ran against the sealed binary on completely fresh state
 (`~/.cpr-agent-proto`), not just the checkout:
 
-1. Page render — headless-Firefox screenshot of the served login page.
-2. Runtime config — served HTML contains `window.reverbConfig` with only the
+1. Page render ,  headless-Firefox screenshot of the served login page.
+2. Runtime config ,  served HTML contains `window.reverbConfig` with only the
    key (host/port/scheme correctly absent → client derives from origin).
-3. Transport — a Bun WebSocket client performed the real Pusher-protocol
+3. Transport ,  a Bun WebSocket client performed the real Pusher-protocol
    handshake against `ws://localhost:8000/app/<key>` (through the Caddy
    proxy) and received `pusher:connection_established`; the socket_id was
    cross-checked in Reverb's debug log.
-4. Full pipe — `Broadcast::on('embed-test')->as('EmbedTest')->sendNow()`
+4. Full pipe ,  `Broadcast::on('embed-test')->as('EmbedTest')->sendNow()`
    fired from the embedded Laravel runtime arrived at the subscribed client:
    `{"msg":"single binary, night city"}`. The queued path (database driver +
    `queue:work`) was verified the same way in Mode A, including a job that
@@ -253,11 +258,11 @@ All checks ran against the sealed binary on completely fresh state
 ### Not done yet (productization backlog)
 
 - `agent:serve` artisan command supervising reverb + queue as child
-  processes — turns three commands into one, and makes a menubar/NativePHP
+  processes ,  turns three commands into one, and makes a menubar/NativePHP
   *launcher* shell trivial later.
 - CI to build and publish per-release binaries (Linux first; macOS/Windows
   need their own FrankenPHP builds).
 - Docker Compose stack as the parallel "I already run Foundry in Docker"
-  path — shares every code change with this work.
+  path ,  shares every code change with this work.
 - First-run experience: auto-generate keys on first boot instead of asking
   users to run `openssl`.

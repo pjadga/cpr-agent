@@ -1,0 +1,247 @@
+/* Wiki prose. Deliberately plainer than the rest of the app: documentation is
+   read in long sittings, so this trades the Foundry journal styling (drop caps,
+   small-caps, heavy rules) for measure, contrast and spacing. Colours still come
+   from the theme vars, so light themes keep working. */
+
+.wiki-shell {
+    --wiki-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+        "Helvetica Neue", Arial, sans-serif;
+    --wiki-mono: "Hack", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --wiki-rule: var(--cpr-border-muted, #404040);
+
+    font-family: var(--wiki-body);
+}
+
+/* The app-wide scrollbar is yellow on black, which shouts over a page meant for
+   reading. Scoped to the wiki so the rest of the app keeps its styling. */
+html:has(.wiki-shell) {
+    scrollbar-color: var(--cpr-border-muted) transparent;
+}
+
+html:has(.wiki-shell) ::-webkit-scrollbar-thumb,
+.wiki-shell ::-webkit-scrollbar-thumb {
+    background: var(--cpr-border-muted);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+html:has(.wiki-shell) ::-webkit-scrollbar-track,
+.wiki-shell ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.wiki-prose {
+    font-family: var(--wiki-body);
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--cpr-text-bright);
+
+    /* body sets user-select:none app-wide for the native feel; docs need
+       selectable text so commands and keys can be copied. */
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+}
+
+.wiki-prose > :first-child {
+    margin-top: 0;
+}
+
+.wiki-prose p,
+.wiki-prose ul,
+.wiki-prose ol,
+.wiki-prose blockquote,
+.wiki-prose pre,
+.wiki-prose table {
+    margin: 0 0 1.15em;
+}
+
+/* Headings: the app forces the display face on h1/h2 with !important, so these
+   need matching weight plus the extra class specificity to win. */
+.wiki-prose h1,
+.wiki-prose h2,
+.wiki-prose h3,
+.wiki-prose h4,
+.wiki-prose h5,
+.wiki-prose h6 {
+    font-family: var(--wiki-body) !important;
+    font-weight: 650 !important;
+    font-variant: normal;
+    line-height: 1.3;
+    color: var(--cpr-text-bright);
+    letter-spacing: -0.01em;
+    /* clear the sticky mobile bar when jumping to an in-page anchor */
+    scroll-margin-top: 5rem;
+}
+
+.wiki-prose h1 {
+    font-size: 1.875rem;
+    margin: 0 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--wiki-rule);
+}
+
+.wiki-prose h2 {
+    font-size: 1.4rem;
+    margin: 2.25rem 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid var(--cpr-border-dark);
+}
+
+.wiki-prose h3 {
+    font-size: 1.15rem;
+    margin: 1.9rem 0 0.6rem;
+}
+
+.wiki-prose h4,
+.wiki-prose h5,
+.wiki-prose h6 {
+    font-size: 1rem;
+    margin: 1.6rem 0 0.5rem;
+    color: var(--cpr-text-main);
+}
+
+.wiki-prose a {
+    color: var(--cpr-teal);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, var(--cpr-teal) 45%, transparent);
+}
+
+.wiki-prose a:hover {
+    text-decoration-color: currentColor;
+}
+
+.wiki-prose strong {
+    color: var(--cpr-text-bright);
+    font-weight: 650;
+}
+
+.wiki-prose ul,
+.wiki-prose ol {
+    padding-left: 1.4rem;
+}
+
+.wiki-prose ul {
+    list-style: disc;
+}
+
+.wiki-prose ol {
+    list-style: decimal;
+}
+
+.wiki-prose li {
+    margin: 0.3em 0;
+}
+
+.wiki-prose li::marker {
+    color: var(--cpr-text-dim);
+}
+
+.wiki-prose li > ul,
+.wiki-prose li > ol {
+    margin: 0.3em 0;
+}
+
+.wiki-prose code {
+    font-family: var(--wiki-mono);
+    font-size: 0.875em;
+    background: var(--cpr-black);
+    border: 1px solid var(--cpr-border-dark);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+    word-break: break-word;
+}
+
+.wiki-prose pre {
+    background: var(--cpr-black);
+    border: 1px solid var(--cpr-border);
+    border-left: 2px solid var(--cpr-teal-dark);
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+}
+
+.wiki-prose pre code {
+    background: none;
+    border: 0;
+    padding: 0;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    word-break: normal;
+}
+
+.wiki-prose blockquote {
+    border-left: 2px solid var(--wiki-rule);
+    padding: 0.15rem 0 0.15rem 1rem;
+    color: var(--cpr-text-main);
+}
+
+.wiki-prose blockquote > :last-child {
+    margin-bottom: 0;
+}
+
+.wiki-prose hr {
+    border: 0;
+    border-top: 1px solid var(--cpr-border-dark);
+    margin: 2.25rem 0;
+}
+
+.wiki-prose img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--cpr-border);
+}
+
+/* display:block lets wide tables scroll on their own instead of forcing the
+   page sideways. Internal table layout still applies to the rows. */
+.wiki-prose table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+}
+
+.wiki-prose th,
+.wiki-prose td {
+    border: 1px solid var(--cpr-border-dark);
+    padding: 0.55rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+}
+
+.wiki-prose th {
+    background: var(--cpr-black);
+    color: var(--cpr-text-bright);
+    font-weight: 650;
+}
+
+.wiki-prose tbody tr:nth-child(even) {
+    background: var(--cpr-black-soft);
+}
+
+/* Several docs use headerless two-column tables (`| | |`) as layout grids;
+   an empty header bar on those is just noise. */
+.wiki-prose thead:has(th:empty):not(:has(th:not(:empty))) {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .wiki-prose {
+        font-size: 0.9375rem;
+        line-height: 1.65;
+    }
+
+    .wiki-prose h1 {
+        font-size: 1.5rem;
+    }
+
+    .wiki-prose h2 {
+        font-size: 1.25rem;
+    }
+
+    .wiki-prose h3 {
+        font-size: 1.0625rem;
+    }
+}

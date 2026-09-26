@@ -79,7 +79,7 @@
                             </label>
                         </div>
                         <p class="text-[10px] text-cpr-text-dim mt-1 uppercase">
-                            Not sure? Pick Player — you can change this later in Settings.
+                            Not sure? Pick Player ,  you can change this later in Settings.
                         </p>
                         <x-input-error :messages="$errors->get('role')" class="mt-2"/>
                     </div>

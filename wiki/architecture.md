@@ -1,4 +1,9 @@
-### Foundry Module — Bullet Point Release Notes (Rough Write‑Up)
+---
+title: Architecture
+order: 5
+---
+
+### Foundry Module ,  Bullet Point Release Notes (Rough Write‑Up)
 
 - Purpose: Displays character data from Foundry using a secure web-socket connection. Allows the user to interact with Foundry instance through callbacks.
 - Real‑time sheet sync: Applies selective “delta” updates to the Agent’s cached character sheet without requiring full refreshes. Deltas can add/update/delete nested values and item entries.
@@ -84,7 +89,7 @@ All routes below require an authenticated session and a configured profile. See 
     - Request: `{ actorUuid: string, actorData?: object }`
         - If `actorData` provided, it will be saved as the authoritative mirror.
         - If only `actorUuid` provided, the current mirror is returned.
-    - Response: `{ data: object, requestId?: string }` — `data` reflects the sheet mirror under `data.*` keys.
+    - Response: `{ data: object, requestId?: string }` ,  `data` reflects the sheet mirror under `data.*` keys.
 
 - POST `/getactor`
     - Purpose: Pull the live actor document from Foundry (via REST), typically for first-time hydration or force-refresh.
@@ -100,27 +105,27 @@ All routes below require an authenticated session and a configured profile. See 
 
 Common behavior: These routes translate a user action into a Foundry REST API call. The resulting data (roll totals, crit flags, modifiers, item effects) is returned via the webhook and broadcast. Some endpoints may also return an immediate 200 with an acknowledgment while the final result arrives asynchronously.
 
-- POST `/statrollrequest` — request a stat roll
-- POST `/skillrollrequest` — request a skill roll
-- POST `/rolerollrequest` — request a role ability roll
-- POST `/attackroll` — weapon attack roll
-- POST `/damageroll` — damage roll after a hit
-- POST `/initiativeroll` — initiative roll
-- POST `/getrollmodifiers` — fetch and/or prompt roll modifiers in Foundry
-- POST `/make-roll` — generic expression roll; GET `/get-rolls` to list recent rolls
+- POST `/statrollrequest` ,  request a stat roll
+- POST `/skillrollrequest` ,  request a skill roll
+- POST `/rolerollrequest` ,  request a role ability roll
+- POST `/attackroll` ,  weapon attack roll
+- POST `/damageroll` ,  damage roll after a hit
+- POST `/initiativeroll` ,  initiative roll
+- POST `/getrollmodifiers` ,  fetch and/or prompt roll modifiers in Foundry
+- POST `/make-roll` ,  generic expression roll; GET `/get-rolls` to list recent rolls
 
 Request bodies vary by action (stat/skill identifiers, context like item IDs/targets, or free-form expressions). Results will be posted back to `/api/foundry/callback` and broadcast.
 
 
 #### Token and Inventory/Program Endpoints
 
-- POST `/getvisibletokens` — query currently visible tokens (may be async with cache handoff via `requestId`).
-- POST `/listvisibletokens` — list candidate tokens (broader set than “visible only”).
-- POST `/targettokens` — set token targets.
-- POST `/movetoken` — move a token to a new position.
-- POST `/reloadweapon` — reload current weapon.
-- POST `/item-equip` — equip/unequip item.
-- POST `/installprogram`, `/uninstallprogram`, `/toggleprogramrez`, `/programroll` — Netrunning program management and rolls.
+- POST `/getvisibletokens` ,  query currently visible tokens (may be async with cache handoff via `requestId`).
+- POST `/listvisibletokens` ,  list candidate tokens (broader set than “visible only”).
+- POST `/targettokens` ,  set token targets.
+- POST `/movetoken` ,  move a token to a new position.
+- POST `/reloadweapon` ,  reload current weapon.
+- POST `/item-equip` ,  equip/unequip item.
+- POST `/installprogram`, `/uninstallprogram`, `/toggleprogramrez`, `/programroll` ,  Netrunning program management and rolls.
 
 These typically accept identifiers (token IDs, item IDs, program IDs) and context fields. Success/failure and resulting game state are propagated via the webhook and deltas.
 

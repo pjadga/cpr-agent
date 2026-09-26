@@ -146,7 +146,7 @@ class Session extends Model
     /**
      * Pull the GM's saved Foundry settings onto the session so joining players
      * auto-configure. Called automatically on session create and whenever the GM
-     * saves their connection settings — no manual "sync" step required.
+     * saves their connection settings ,  no manual "sync" step required.
      *
      * No-op until the GM has a Foundry URL, so an empty session is never written.
      */

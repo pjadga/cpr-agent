@@ -340,7 +340,7 @@ export default {
         };
 
         // `system.isInstalled` is a derived getter that does not survive every
-        // serialisation path — one cached sheet had it missing on all 14 items,
+        // serialisation path ,  one cached sheet had it missing on all 14 items,
         // which made installed mods offer an Install button. Derive it instead.
         const cyberwareInstalled = computed(
             () => isCyberwareInstalled(props.item, props.allItems || [])
@@ -379,7 +379,7 @@ export default {
             const actions = [
                 {id: 'info', icon: 'info', label: 'Info', handler: toggle},
             ];
-            // Equip is meaningless on the Control page — those weapons are already
+            // Equip is meaningless on the Control page ,  those weapons are already
             // equipped, and "Equip" doesn't ready them for combat. Select does.
             const isControlWeapon = isWeaponItem.value && props.activeTab === 'control';
             if (!isControlWeapon) {
@@ -428,7 +428,7 @@ export default {
             !!props.item.system?.isWeapon || props.item.type === 'weapon' || props.category === 'weapon'
         );
 
-        // True for ranged weapons that draw from a magazine — drives the radial
+        // True for ranged weapons that draw from a magazine ,  drives the radial
         // "Reload" petal (melee/unarmed and mag-less weapons are excluded).
         const usesAmmo = computed(() => {
             const sys = props.item.system;

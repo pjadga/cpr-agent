@@ -4,7 +4,7 @@
 }
 
 # For the embedded (single-binary) build: php_server serves the app baked
-# into the binary — no root directive needed. Reverb runs as a child process
+# into the binary ,  no root directive needed. Reverb runs as a child process
 # on 127.0.0.1:8085 and players ride the same origin via /app/*.
 :8000 {
 	encode zstd gzip

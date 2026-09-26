@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\WikiController;
 use App\Models\Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,11 @@ Route::get('/how-to-use', function () {
 })->name('how-to-use');
 
 Route::view('/design-brief', 'design-brief');
+
+// Read-only docs, rendered from wiki/*.md via spatie/sheets. Deliberately
+// public ,  no auth wall on documentation.
+Route::get('/wiki', [WikiController::class, 'index'])->name('wiki.index');
+Route::get('/wiki/{slug}', [WikiController::class, 'show'])->name('wiki.show');
 
 // In-Foundry embed. Auth-less and stateless: the page renders the Vue app in
 // embedded mode, fed entirely via postMessage from the Bridge module (no
@@ -101,7 +107,7 @@ Route::middleware('auth')->post('/settings/api-token', function (Request $reques
     $config->save();
 
     // Generating a key necessarily invalidates the previous one, including the
-    // copy already pasted into the Foundry Bridge — which then fails every call
+    // copy already pasted into the Foundry Bridge ,  which then fails every call
     // with a 401 ("Failed to mint pairing", "Bridge Offline") for no reason the
     // GM can see. Say so out loud instead of leaving them to work it out.
     return back()

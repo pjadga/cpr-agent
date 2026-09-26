@@ -42,12 +42,12 @@ Currently functioning but actively being worked on.
 
 Full documentation lives in the **[wiki](wiki/)**.
 
-* **[Herd Setup Guide](wiki/setup-herd.md)** — self-host your own Agent on Windows or macOS. Start here.
-* **[Guide](wiki/guide.md)** — QR pairing, data pools, the delta system, settings reference and the Bridge deep dive.
-* **WIP** **[Standalone](wiki/standalone.md)** — run it as a single binary with no dependencies.
+* **[Herd Setup Guide](wiki/setup-herd.md)** ,  self-host your own Agent on Windows or macOS. Start here.
+* **[Guide](wiki/guide.md)** ,  QR pairing, data pools, the delta system, settings reference and the Bridge deep dive.
+* **WIP** **[Standalone](wiki/standalone.md)** ,  run it as a single binary with no dependencies.
 * **[Architecture](wiki/architecture.md)** · **[API Endpoints](wiki/api-endpoints.md)** · **[Testing](wiki/testing.md)**
 
-Not hosting anything? Use the [hosted Agent](https://agent.surrealdisco.co.uk) — you only need to share your Foundry instance.
+Not hosting anything? Use the [hosted Agent](https://agent.surrealdisco.co.uk) ,  you only need to share your Foundry instance.
 
 ## Technical Foundation
 

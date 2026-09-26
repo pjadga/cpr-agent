@@ -6,7 +6,7 @@
           content="viewport-fit=cover, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     {{-- No csrf-token meta: the embed route runs without StartSession (see
          routes/web.php), so csrf_token() has no session to read. Embed is
-         stateless — all writes go over postMessage, not CSRF-guarded POSTs. --}}
+         stateless ,  all writes go over postMessage, not CSRF-guarded POSTs. --}}
     @cspMetaTag
 
     <title>Agent</title>

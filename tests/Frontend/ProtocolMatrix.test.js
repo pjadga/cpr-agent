@@ -74,7 +74,7 @@ describe('resolveReverbEndpoint', () => {
 
     it('keeps a non-standard page port', () => {
         // `php artisan serve` on :8000 with Reverb proxied on the same
-        // listener — the WebSocket is on 8000 too, not on 80.
+        // listener ,  the WebSocket is on 8000 too, not on 80.
         const endpoint = resolveReverbEndpoint({
             location: stubPage({protocol: 'http:', hostname: '192.168.1.50', port: '8000'}),
         });
@@ -170,7 +170,7 @@ describe('useImageProxy.getImageUrl', () => {
 
     it('proxies an http Foundry image on an https page (topology C)', () => {
         // The browser would block this outright, and the only visible symptom
-        // is missing token art while character data keeps syncing — it reads as
+        // is missing token art while character data keeps syncing ,  it reads as
         // a cosmetic glitch rather than the scheme mismatch it is.
         const {getImageUrl} = proxyFor('https:', 'http://192.168.1.60:30000');
 
@@ -237,7 +237,7 @@ describe('useImageProxy.getImageUrl', () => {
 
     it('proxies an absolute http URL on an https page', () => {
         // The proxy will refuse this server-side unless it is the user's own
-        // Foundry host — see ProtocolMatrixTest — but the client is right to
+        // Foundry host ,  see ProtocolMatrixTest ,  but the client is right to
         // route it there rather than emit a URL the browser will block.
         const {getImageUrl} = proxyFor('https:', 'https://foundry.example.com');
 

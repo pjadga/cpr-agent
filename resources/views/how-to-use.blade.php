@@ -11,7 +11,7 @@
                     Night City.</p>
             </div>
 
-            {{-- Ko-fi support button — top of the page, under the title. Colour matches the
+            {{-- Ko-fi support button ,  top of the page, under the title. Colour matches the
                  dark panel. Shown on the How to Use page for every instance. --}}
             <div class="mb-8 flex flex-col items-center gap-2 text-center">
                 <div class="flex justify-center">
@@ -53,15 +53,15 @@
                     much better error handling on the Agent side so any troubleshooting should be easier. With that said:</p>
                     <p class="mb-3">There are <strong>two QR codes</strong>, GM (for setup) and Player (for connection):</p>
                     <ul class="list-disc list-inside space-y-3 ml-4">
-                        <li><strong>Foundry Setup Code (GM only)</strong> — In <strong>Settings</strong>, enter your
-                            Foundry URL and generate an API Key — saving creates your session automatically. Hit
+                        <li><strong>Foundry Setup Code (GM only)</strong> ,  In <strong>Settings</strong>, enter your
+                            Foundry URL and generate an API Key ,  saving creates your session automatically. Hit
                             <strong>Get Foundry Setup Code</strong> and type the short code (e.g.
                             <code class="text-cpr-teal">KX7M-4PWD</code>) into <strong>Agent Bridge → Quick
-                                Setup</strong> in Foundry — it works even when the Agent is on your phone. (A full
+                                Setup</strong> in Foundry ,  it works even when the Agent is on your phone. (A full
                             copy-paste code is also available for same-device setup.) Setup codes fetch your secret
                             API key, so never share one with players.
                         </li>
-                        <li><strong>Pairing QR (per player)</strong> — Once your Bridge is online, open <strong>Agent
+                        <li><strong>Pairing QR (per player)</strong> ,  Once your Bridge is online, open <strong>Agent
                                 Bridge → Manage Characters</strong> and hit the <strong>QR button</strong> next to a
                             player. They open <strong>Settings → Join a Session</strong>, tap <strong>Scan to Link
                                 Foundry</strong>, and point their camera at the code. Their Agent picks up the Channel
@@ -69,7 +69,7 @@
                         </li>
                     </ul>
                     <p class="text-cpr-text-muted text-sm mt-4">No camera? A copyable link code appears under the scan
-                        button — paste that instead. Codes are one-time use and expire after 5 minutes. Camera access
+                        button ,  paste that instead. Codes are one-time use and expire after 5 minutes. Camera access
                         needs an <code class="text-cpr-red">https://</code> (or <code
                             class="text-cpr-red">localhost</code>) connection.</p>
                     <p class="mt-4">Prefer to do it by hand? The manual steps below still work as a fallback.</p>
@@ -81,14 +81,14 @@
                         (or switch role in Settings → Account Control) to unlock the GM flow.</p>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
                         <li>As the Game Master, navigate to the <strong>Settings</strong> page.</li>
-                        <li>Enter your <strong>Foundry URL</strong>, generate an <strong>API Key</strong>, and save —
+                        <li>Enter your <strong>Foundry URL</strong>, generate an <strong>API Key</strong>, and save ,
                             your game session (and Channel ID) is created automatically.
                         </li>
-                        <li>Use the <strong>Foundry Setup Code</strong> (above) to configure the Bridge in one step —
+                        <li>Use the <strong>Foundry Setup Code</strong> (above) to configure the Bridge in one step ,
                             or manually paste the Channel ID and API Key into <strong>Configure Settings</strong> ->
                             <strong>Agent Bridge</strong> in Foundry.
                         </li>
-                        <li>Share your <strong>session code</strong> with your players — or skip codes entirely and
+                        <li>Share your <strong>session code</strong> with your players ,  or skip codes entirely and
                             hand them pairing QRs from <strong>Agent Bridge → Manage Characters</strong>.
                         </li>
                     </ol>
@@ -131,7 +131,7 @@
             </div>
 
             <div class="mt-12 border-t border-cpr-red/30 pt-6 text-center text-cpr-text-muted">
-                <p>Want the full walkthrough — self-hosting, sharing over Tailscale, the QR handshake internals and
+                <p>Want the full walkthrough ,  self-hosting, sharing over Tailscale, the QR handshake internals and
                     troubleshooting? Read the
                     <a href="https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/wiki/" target="_blank"
                        class="text-cpr-red hover:text-cpr-red underline">complete documentation</a>.
@@ -141,7 +141,7 @@
             <div class="mt-10 border-t border-cpr-border/40 pt-6 text-center text-cpr-text-dim text-xs">
                 <h2 class="text-sm font-bold text-cpr-text-muted uppercase tracking-widest mb-3">Credits</h2>
                 <p>
-                    Heading font <strong class="text-cpr-text-muted">"Cyberpnuk2"</strong> by junkohanhero —
+                    Heading font <strong class="text-cpr-text-muted">"Cyberpnuk2"</strong> by junkohanhero ,
                     <a href="https://www.dafont.com/junkohanhero.d1293" target="_blank"
                        class="text-cpr-red hover:text-cpr-red underline">dafont.com/junkohanhero.d1293</a>.
                 </p>

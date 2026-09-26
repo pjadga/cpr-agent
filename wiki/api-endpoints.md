@@ -1,3 +1,8 @@
+---
+title: API Endpoints
+order: 6
+---
+
 ### Possible API Endpoints
 
 

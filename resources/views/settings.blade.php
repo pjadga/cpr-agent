@@ -113,7 +113,7 @@
                             @if($sessionInfo['foundry_configured'] ?? false)
                                 <span class="text-cpr-teal">✓ Auto-configured from GM session</span>
                             @else
-                                <span class="text-cpr-yellow">⚠ GM has not synced Foundry config yet — manual setup may be needed</span>
+                                <span class="text-cpr-yellow">⚠ GM has not synced Foundry config yet ,  manual setup may be needed</span>
                             @endif
                         </p>
                     </div>
@@ -134,7 +134,7 @@
                 <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Join a Session</h3>
 
                 <!-- Primary: scan the GM's QR (or paste the link code) to auto-configure and link.
-                     Isolated Vue mount — this Alpine page has no global #app root. Rendered once
+                     Isolated Vue mount ,  this Alpine page has no global #app root. Rendered once
                      per page: players get it here, GMs get it in their link block below. -->
                 @unless(auth()->user()->is_gm)
                     <div id="qr-link-app">
@@ -189,7 +189,7 @@
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
                 <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Create a Session</h3>
                 <p class="text-xs text-cpr-text-dim mb-4">
-                    A session is created automatically when you save your Foundry connection below —
+                    A session is created automatically when you save your Foundry connection below ,
                     or create one now. Players join using the session code.
                 </p>
                 <button @click="
@@ -235,7 +235,7 @@
                 </summary>
                 <div class="p-4 border-t border-cpr-border">
                     <p class="text-xs text-cpr-text-dim mb-4">
-                        In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong> —
+                        In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong> ,
                         as the GM you get your own QR immediately. Scan it here (phone) or paste the
                         link code (desktop). Optional if the Bridge already shows your account as linked.
                     </p>
@@ -254,11 +254,11 @@
                 </h3>
                 <p class="text-xs text-cpr-text-dim">
                     @if(auth()->user()->is_gm)
-                        Enter your Foundry URL and generate an API key — saving creates your game session
+                        Enter your Foundry URL and generate an API key ,  saving creates your game session
                         automatically. Then use the <strong class="text-cpr-teal">Setup Code</strong> below in
                         Foundry → Agent Bridge → Quick Setup, and share the session code with your players.
                     @else
-                        Scan your GM's QR (or paste their link code) up top to auto-fill all of this —
+                        Scan your GM's QR (or paste their link code) up top to auto-fill all of this ,
                         or join with a session code.
                     @endif
                 </p>
@@ -379,7 +379,7 @@
                                     class="absolute left-full ml-2 w-64 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
                                     The shared broadcast channel.
                                     @if(auth()->user()->is_gm)
-                                        Derived from your session automatically — share it with your players.
+                                        Derived from your session automatically ,  share it with your players.
                                     @else
                                         Auto-filled when you link or join a session above.
                                     @endif
@@ -400,7 +400,7 @@
 
                         @if(auth()->user()->is_gm)
                             <!-- One-paste Foundry setup for the Bridge's Quick Setup menu. Emits a
-                                 short one-time code (typeable across devices — phone Agent, desktop
+                                 short one-time code (typeable across devices ,  phone Agent, desktop
                                  Foundry) plus the full base64 blob as a same-device fallback. -->
                             <div class="mt-3" x-data="{ setupCode: '', shortCode: '', loading: false, copied: false, error: '' }">
                                 <button type="button"
@@ -446,7 +446,7 @@
                                               @focus="$el.select()"
                                               class="cyber-input-field mt-2 w-full font-mono text-[10px] break-all select-all"></textarea>
                                     <p class="text-cpr-yellow text-[10px] mt-1">
-                                        ⚠ Contains your API key — share only with your own Foundry world.
+                                        ⚠ Contains your API key ,  share only with your own Foundry world.
                                     </p>
                                 </details>
                             </div>
@@ -479,7 +479,7 @@
                                     Foundry → Agent Bridge → Quick Setup. That configures the whole Foundry side.
                                     Share your session code with players.
                                 @else
-                                    Your Channel ID fills in automatically when you link or join a session —
+                                    Your Channel ID fills in automatically when you link or join a session ,
                                     only change it if your GM tells you to.
                                 @endif
                             </p>
@@ -507,12 +507,12 @@
                     </button>
                 </form>
 
-                <!-- Players auto-configure from these settings on join — synced automatically
+                <!-- Players auto-configure from these settings on join ,  synced automatically
                      on session create and whenever you save. Shown until a Foundry URL exists. -->
                 <div x-show="sessionInfo && sessionInfo.type === 'gm' && !sessionInfo.foundry_configured"
                      class="mt-6 pt-6 border-t border-cpr-border">
                     <p class="text-xs text-cpr-yellow">
-                        ⚠ Set your <strong>Foundry URL</strong> above and save — your players will then
+                        ⚠ Set your <strong>Foundry URL</strong> above and save ,  your players will then
                         auto-configure when they join. No extra step needed.
                     </p>
                 </div>
@@ -540,9 +540,9 @@
                     <p class="text-cpr-text mb-4 leading-relaxed text-sm">
                         @if(auth()->user()->is_gm)
                             Enter your Foundry URL and generate an API key. Saving your connection also
-                            creates your game session automatically — no separate step.
+                            creates your game session automatically ,  no separate step.
                         @else
-                            You don't need to type any of this — ask your GM for a QR code or link code and
+                            You don't need to type any of this ,  ask your GM for a QR code or link code and
                             use <strong>Scan to Link</strong> up top. Everything configures itself.
                         @endif
                     </p>
@@ -652,7 +652,7 @@
                                         Once your GM assigns you a character, select and save it here.
                                     @endif
                                     @if($sessionInfo && $sessionInfo['foundry_configured'])
-                                        Your session is auto-configured — just pick your character!
+                                        Your session is auto-configured ,  just pick your character!
                                     @endif
                                 </p>
                                 <div
@@ -897,7 +897,7 @@
                         </button>
                     </form>
 
-                    <!-- Declared role — drives the whole onboarding flow. Foundry
+                    <!-- Declared role ,  drives the whole onboarding flow. Foundry
                          verifies it once the Bridge connects. -->
                     <form method="post" action="{{ route('settings.role') }}" class="pt-4 border-t border-cpr-border/50">
                         @csrf

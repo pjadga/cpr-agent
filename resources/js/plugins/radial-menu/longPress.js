@@ -14,7 +14,7 @@ import {tapHoldDisabled} from '../../utils/uiPreferences';
  *
  * The current binding value is stashed on the element and refreshed in
  * `updated()`, so a changed action list (reactive edit, or HMR swapping the
- * component) takes effect without a full remount — the hold reads the live
+ * component) takes effect without a full remount ,  the hold reads the live
  * value at trigger time rather than a stale mount-time snapshot.
  */
 const DEFAULT_DELAY = 350;
@@ -48,7 +48,7 @@ export const longPress = {
         };
 
         const onDown = (e) => {
-            // "Disable Tap and Hold" UI setting — read live so it needs no remount.
+            // "Disable Tap and Hold" UI setting ,  read live so it needs no remount.
             if (tapHoldDisabled()) return;
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             startX = e.clientX;
