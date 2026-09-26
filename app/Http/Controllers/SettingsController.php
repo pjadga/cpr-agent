@@ -148,7 +148,7 @@ class SettingsController extends Controller
      * Switch the user's declared role (GM <-> Player).
      *
      * Declared at registration, changeable here. Guard: a GM who still owns an
-     * active session must terminate it before demoting ,  otherwise the session
+     * active session must terminate it before demoting, otherwise the session
      * would be orphaned with no one able to manage it.
      */
     public function updateRole(Request $request)
@@ -172,19 +172,19 @@ class SettingsController extends Controller
 
         return redirect()->route('settings')->with(
             'success',
-            $wantsGm ? 'Role updated ,  you are now a GM.' : 'Role updated ,  you are now a Player.'
+            $wantsGm ? 'Role updated, you are now a GM.' : 'Role updated, you are now a Player.'
         );
     }
 
     /**
      * Emit a one-paste "Foundry Setup Code" for the GM.
      *
-     * Bundles everything the Agent Bridge module needs to connect ,  Agent URL,
-     * Channel ID, the GM's API key, and the Reverb app key ,  as a base64-encoded
+     * Bundles everything the Agent Bridge module needs to connect, Agent URL,
+     * Channel ID, the GM's API key, and the Reverb app key, as a base64-encoded
      * JSON blob the GM pastes into the Bridge's Quick Setup menu. The Bridge
      * derives Reverb host/port/SSL from the Agent URL, so only the key is sent.
      *
-     * The Channel ID is the user's own `channel_id` ,  the same value shown in the
+     * The Channel ID is the user's own `channel_id`, the same value shown in the
      * Channel ID field and used by the live broadcast channel (cpr-agent.{channel_id}).
      * It must match what the browser subscribes to, or channel auth rejects it.
      *
@@ -209,13 +209,13 @@ class SettingsController extends Controller
         // The address players actually load, straight from APP_URL. This used
         // to be assembled from the *WebSocket* scheme and APP_DOMAIN, so a
         // plain-HTTP self-host that (correctly) left VITE_REVERB_SCHEME unset
-        // got handed https://<domain> ,  a URL its Bridge could never reach, and
+        // got handed https://<domain>, a URL its Bridge could never reach, and
         // one that made every player's QR scan fail as "wrong server".
         $appUrl = rtrim((string) config('app.url'), '/');
 
         // GMs always have a session by the time they get here (auto-created on
         // connection save), but ensure it so the code never carries a personal
-        // channel_id that matches no session ,  that used to 404 pairing.
+        // channel_id that matches no session, that used to 404 pairing.
         $session = Session::ensureActiveFor($user);
 
         $payload = [

@@ -1,405 +1,291 @@
 ---
-title: Setup Guide
-order: 2
+title: 'Dev Env Setup: DDEV'
+order: 4
 ---
 
-# CPR Agent Guide
+# Dev Env Setup: DDEV
 
-This is the big one: setting up the Agent, hosting it yourself, and getting it talking to Foundry VTT.
+This covers getting a local DDEV environment set up, hosting the Agent yourself, and getting it talking to Foundry VTT.
 
+> **Just want to play?** Use the [hosted Agent](https://agent.surrealdisco.co.uk). It's free, and the only thing you need to share is your Foundry. Head to [Getting Started](/wiki/getting-started).
+>
+> **Self-hosting on Windows or macOS?** Head to the [Herd guide](/wiki/setup-herd) instead. Huge thanks to **capt_garris** from the CPR Discord for writing it. It takes SO much of the faff out of self-hosting, and no Docker or WSL2 required.
+>
+> **On Linux, or already a DDEV person?** Stick around.
 
+Once the Agent's up and running, [Getting Started](/wiki/getting-started) covers accounts, QR pairing and linking your players.
 
-> [!IMPORTANT]
-> WINDOWS (and OSX) USERS - 
-Whilst below is fairly comprehensive, it is a very involved process, especially when dealing with WSL2 and the like. 
-**Thanks to capt_garris** from the CPR Discord, they've done a fantastic write-up on getting the Agent self-hosted using Laravel's Herd app. It takes SO much of the faff out of self-hosting!
+## Contents
 
-> [Check it out here](/wiki/setup-herd)
-
-## Table of Contents
-
-1. [Getting Started](#getting-started)
-2. [Quick Connect: QR Pairing](#quick-connect-qr-pairing)
-3. [Self-Hosting Guide](#self-hosting-guide)
-4. [Connecting Foundry VTT](#connecting-foundry-vtt)
-5. [Data Pools](#data-pools)
-6. [Sharing is Caring](#sharing-is-caring)
-   - [Sharing Via Tailscale](#sharing-via-tailscale)
-7. [Settings Reference](#settings-reference)
-8. [Technical Deep Dive: The Bridge](#technical-deep-dive-the-bridge)
-9. [The Delta System](#the-delta-system)
-10. [Troubleshooting](#troubleshooting)
+1. [Self-Hosting with DDEV](#self-hosting-with-ddev)
+2. [Connecting Foundry VTT](#connecting-foundry-vtt)
+3. [Sharing is Caring](#sharing-is-caring)
+4. [Settings Reference](#settings-reference)
+5. [Technical Deep Dive: The Bridge](#technical-deep-dive-the-bridge)
+6. [The Delta System](#the-delta-system)
 
 ---
 
-## Getting Started
+## Self-Hosting with DDEV
 
-The CPR Agent is a companion app that sits between your players and your Foundry VTT game. Players get their stats, gear and rolls on their phone or tablet, and everything they do lands back in Foundry.
+If you'd rather run your own Agent, this is how I do it on Linux. On Windows or macOS, the [Herd guide](/wiki/setup-herd) is a much smoother ride.
 
-### 1. Preparation & Installation
+**The good news:** it used to be a right faff, with Reverb (the WebSocket server) sat on its own port and a pile of Bridge settings to match. That's gone. Reverb now rides the Agent's own address, so there's **one URL, one port**, and nothing Reverb-related to fill in anywhere.
 
-- **Foundry VTT Module**: You must have the [Cyberpunk Red Core module](https://foundryvtt.com/packages/cyberpunk-red-core) installed in Foundry VTT.
-- **Agent Bridge Module**: Install the **Cyberpunk Red Agent Bridge** module in Foundry VTT.
-  - Manifest URL: `https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge/-/raw/main/module.json`
-- **Agent Account**: Sign up and log in to the Agent app (either the [official hosted version](https://agent.surrealdisco.co.uk/) or your own self-hosted instance).
-
-### 2. GM Setup
-
-> **The quick way:** See [Quick Connect: QR Pairing](#quick-connect-qr-pairing). The manual steps below are the fallback for when there's no camera or you'd rather do it by hand. The same goes for the Player Setup step below. And Character Assignment. Just check the QR bit.
-
-1. In the Agent app, go to the **Settings** page.
-2. Generate an **API Key** and copy it.
-3. Copy your **Channel ID**.
-4. In Foundry VTT, go to `Configure Settings` -> `Agent Bridge`.
-5. Paste the **Channel ID** and **API Key**.
-6. Share the **Channel ID** with your players.
-
-### 3. Player Setup
-
-1. Log in to the Agent app and go to **Settings**.
-2. Generate your own **API Key** and copy it.
-3. Paste the **Channel ID** provided by your GM and click **Commit Sync**.
-4. In Foundry VTT, go to `Configure Settings` -> `Agent Bridge` and enter your individual **API Key**.
-
-### 4. Character Assignment
-
-1. As the GM, open the **Agent Character Assignment** menu in Foundry (found in the Agent Bridge module).
-2. Assign a playable character to each player who has linked their API key.
-3. Once assigned, the player's **Agent Link** will appear.
-   - *Note*: Players must be online in Foundry for the link to appear. If it doesn't show up immediately, ask the player to refresh.
-4. Players are now synced! Stats and rolls will flow in real-time. Once synced, only the GM's instance of Foundry is required to be open for this to work.
-
-### 5. Extras
-
-* Save the page to your Homescreen if using a mobile or tablet. It will remove the address bar and it will have more of an 'app' feel.
-* On Safari, Hit the 3 dots in the bottom right -> Share -> Scroll Down -> Add to Home Screen.
-* From Google: "
-  To the right of the address bar, tap More More and then Add to home screen and then Create shortcut."
-
----
-
-## Quick Connect: QR Pairing
-
-The manual way (generate an API key, copy the Channel ID, assign each character by hand) works, but it's fiddly. Especially with a table full of players squinting at their phones. QR Pairing skips all of it: players scan a code, and their Agent sets itself up and links to Foundry on its own.
-
-There are **two different codes** here, and it's worth not mixing them up. One is for you (the GM) to set up your Bridge. The other is for each player to link their Agent.
-
-### Code #1: The Foundry Setup Code (GM → Bridge)
-
-This one sets up the **Bridge module itself**, so you're not typing six settings into Foundry by hand.
-
-1. In the Agent, enter your **Foundry URL**, generate an **API Key**, and create a session (all at the top of **Settings**).
-2. Click **Copy Foundry Setup Code**.
-3. In Foundry, open the **Agent Bridge → Quick Setup** menu and paste it in.
-4. The Bridge unpacks your Agent URL, Channel ID, API Key and Reverb settings in one go.
-
-Under the hood it's just a base64-encoded bundle of `agentUrl`, `channelId`, `apiKey`, `reverbKey` and `reverbPort`. It carries your **secret API key**, so it's **GM-only**. Never hand this one to a player.
-
-### Code #2: The Pairing QR (Foundry → Player's Agent)
-
-Once your Bridge is online, each player links their Agent by scanning their own QR code:
-
-1. As the GM, open **Agent Bridge → Manage Characters** in Foundry and hit the **QR button** next to the player you want to link.
-2. The player opens the Agent, goes to **Settings → Join a Session**, and taps **Scan to Link Foundry**.
-3. They point their camera at the QR. *(No camera? A copyable "link code" shows up under the scan button. Paste that instead.)*
-4. That's it. Their Agent picks up the Channel ID and Foundry URL, and Foundry gets told which character is theirs. No manual assignment needed.
-
-### What actually happens (the handshake)
-
-For the nerds (hi), here's the round-trip behind that one scan:
-
-1. **Register.** When you show the QR, your Bridge mints a one-time random **nonce** and registers it with the Agent server (`POST /api/pairing/register`, authenticated with your GM API key). The server stores the nonce against your session, the target Foundry user and the Foundry URL, with a **5-minute expiry**. The QR itself only holds `{ v: 1, nonce, agentUrl }`, so no secrets travel in the image.
-2. **Claim.** The player's Agent reads the nonce and calls `POST /api/pairing/claim`. The server checks the code is real, unclaimed and in date, then sets the player up: their **Channel ID**, an **Agent Link** if they don't have one yet, and the Foundry URL from the pairing.
-3. **Auto-link.** The server broadcasts a `PAIR_AGENT` event on your session channel (`cpr-agent.{channel_id}`). Your Bridge hears it and records which Agent Link belongs to which Foundry user. That's exactly the step you'd otherwise be doing by hand in *Manage Characters*.
-4. **Confirm.** The player's Agent does a quick reachability check against Foundry and waits a few seconds for your Bridge to send back a `PAIR_CONFIRMED`. That's how it can say "Linked!" and actually mean it.
-
-### Safety rails
-
-- **One-time use.** Each code can be claimed once. The same player re-scanning is fine (it's idempotent); anyone else gets a polite "already used".
-- **Short-lived.** Codes expire after 5 minutes. If one goes stale, just make a fresh one.
-- **GM-owned only.** A GM can only register pairings for a session they actually own.
-- **Server-matched.** If a player scans a QR meant for a *different* Agent server than the one they're logged in to, the Agent spots it and refuses before claiming.
-
-### When the QR won't play ball
-
-The scanner tries to tell you what went wrong in plain English, and how to fix it. The usual suspects:
-
-- **Camera blocked (insecure connection).** Browsers only allow the camera over HTTPS. Load the Agent from its `https://` address (or `localhost`), not a bare `http://` IP.
-- **Code expired / already used.** Ask the GM for a fresh QR.
-- **QR is for a different Agent.** Log in to the Agent address your GM actually uses, then scan again.
-- **Linked, but can't reach Foundry.** You *are* paired, and stats and rolls will still sync over the websocket. This warning only affects loading character images directly, which needs Foundry to be reachable from your device (same local network, or a public/HTTPS address). See [Troubleshooting](#troubleshooting).
-
----
-
-## Data Pools
-
-I always liked the 'classifieds' vibe of 2077's terminals, and whilst the Red is fairly unconnected (and rightfully so), there is still local area networks called CitiNets thankls to Ziggurat (hmu if I've misunderstood the lore :D ).
-
-To imitate this, I've leveraged Foundry's Journal system and added a new type of Journal page. This creates a dynamic row form that gives you freedom to upload PDFs and RichText as 'pages' of a Data Pool. You can set the Icons for each 'link', and these will be displayed in a similar fashion to the 2077 terminal 'net' page on the agent.
-
-The CitiNet icon won't appear in the Agent until you've setup a Data Pool Journal. If it refuses to appear, give the Agent a refresh.
-
-## Self-Hosting Guide
-
-If you prefer to host your own instance of the CPR Agent, follow these steps.
-
-### Prerequisites
+### What you need
 
 - [Docker](https://www.docker.com/)
-- [DDEV](https://ddev.readthedocs.io/) (Recommended for easy setup)
+- [DDEV](https://ddev.readthedocs.io/)
 
-### Installation Steps
+### Installation
 
-1. **Clone the repository**:
+**1. Grab the code**
 
-   ```bash
-   git clone https://gitlab.com/surrealtech/cyberpunk-red-agent
-   cd cyberpunk-red-agent
-   ```
-2. **Start DDEV**:
+```bash
+git clone https://gitlab.com/surrealtech/cyberpunk-red-agent
+cd cyberpunk-red-agent
+```
 
-   ```bash
-   ddev start
-   ```
-3. **Environment Configuration**:
+> **On Windows with WSL?** Unzipping into WSL can leave `Zone.Identifier` files everywhere, which cause all sorts of errors. Clear them out with:
+>
+> ```bash
+> find . -name "*:Zone.Identifier" -type f -delete
+> ```
 
-   Note: If installing on Windows, unzipping into WSL may cause many errors due to .Zone.Identifiers added to files. Please run this command to fix:
+**2. Set up your environment file**
 
-   ```bash find . -name "*:Zone.Identifier" -type f -delete ```
+```bash
+cp .env.ddev .env
+```
 
-   Rename `.env.template` to `.env`. Key variables include:
+The template is ready to go as it is. The Agent lives at `https://cyberpunk.ddev.site`, and you don't need to touch anything Reverb-related.
 
-- `APP_URL`: Your local or public URL. For simplicity, leave it as cyberpunk.ddev.site
-- `REVERB_HOST`: The hostname for the websocket server. Generally the same as above.
-- `REVERB_PORT`: Typically 8080 for local development.
+**3. Start DDEV and install the dependencies**
 
-4. **Install Dependencies**:
+```bash
+ddev start
+ddev composer install
+ddev npm install
+```
 
-   ```bash
-   ddev composer install
-   ddev npm install
-   ```
-5. **Setup Database & Assets**:
-> **SUPER IMPORTANT NOTE ABOUT UPDATING**: If you are updating your current installation, just use 'migrate' and not 'migrate:fresh'. It will wipe the logins/database with fresh.
-   ```bash
-   ddev artisan migrate:fresh
-   ddev npm run build
-   ```
-6. **Turn on Reverb**
+**4. Run the installer**
 
-   This is a requisite for running the app. Reverb works through port 8080 for http (ws) or 8081 (wss) for https,
-   so when creating sharing tunnels later this will need to be taken into account.
+```bash
+ddev artisan agent:install
+```
 
-   ```bash
-   ddev artisan reverb:start
-   ```
+This generates your app key and any missing secrets, sets up storage and runs the migrations. It only fills in what's missing, so it's safe to run again.
 
-At this point, the Agent should be locally available and run without any severe Laravel/PHP errors (fingers crossed).
-For sharing locally, please see the Sharing is Caring section below.
+**5. Build the front end**
 
-**Note** The DDEV setup I have created uses Redis as the caching system instead of the database. This makes it incredibly
-responsive. During DDEV startup, check 'ddev describe' to list the containers, and check that redis exists.
-If it doesn't:
+```bash
+ddev npm run build
+```
+
+**6. Start the background processes**
+
+```bash
+ddev agent-serve
+```
+
+This runs Reverb and the queue worker together, and restarts them if they fall over. **Leave it running.** Without it the Agent will look fine, but nothing will update live and character changes won't get saved.
+
+Open [https://cyberpunk.ddev.site](https://cyberpunk.ddev.site) and you should be looking at the login screen. Fingers crossed.
+
+### A note on Redis
+
+The DDEV setup uses Redis for caching instead of the database, which makes it incredibly responsive. Run `ddev describe` and check there's a `redis` container in the list. If there isn't:
 
 ```bash
 ddev add-on get ddev/ddev-redis
-ddev restart 
+ddev restart
 ```
+
+### Updating
+
+```bash
+git pull
+ddev composer install
+ddev npm install
+ddev artisan migrate
+ddev npm run build
+```
+
+Then restart `ddev agent-serve`.
+
+> **SUPER IMPORTANT:** when updating, use `migrate`, **never** `migrate:fresh`. Fresh wipes the whole database, logins and all.
 
 ---
 
 ## Connecting Foundry VTT
 
-### Foundry Agent Bridge setup
+The Bridge module needs to know where your Agent is. That's genuinely it now.
 
-The "Bridge" module in Foundry needs to know how to talk to your Agent.
+**The quick way:** use the [Foundry Setup Code](/wiki/getting-started#quick-connect-qr-pairing). It fills everything in for you.
 
-If both Foundry and the Agent are running on the same machine then the Bridge (Foundry module) settings:
+**By hand,** in **Configure Settings → Agent Bridge**:
 
-- **Agent URL**: `https://cyberpunk.ddev.site` (if you've not changed the .env file - find it at APP_URL in the .env).
-  If you run ```bash ddev describe``` in the Agent directory, you can see the forwarding DDEV is doing in the back. Useful for troubleshooting ports.
-  For the local (not shared) instance, it will be the APP_URL in the .env file.
-  For the shared instance (your players either locally or online) it will be the NGROK or CF tunnel url.
-- **Reverb Port**: `8080` (default for self-hosting, however if using Tailscale - 8081).
-- **Reverb Use SSL**: Off, unless using Tailscale.
-- **Reverb App Key**: `my-app-key` in the .env file, or whatever you changed it to. If using the Live agent it should be ```itdsiqtx8cpskowawl1p```
-- **API Key**: Your API key, generated within your Agent.
-- **Channel ID**: Your Channel ID, also found within your Agent.
+| Setting | What goes in it |
+|---|---|
+| **Agent URL** | Your Agent's address, exactly. `https://cyberpunk.ddev.site` for a local DDEV install, your `APP_URL` for anything else, or `https://agent.surrealdisco.co.uk` for the hosted one. |
+| **API Key** | Generated on the Agent's Settings page. |
+| **Channel ID** | From the Agent's Settings page. |
+| **Reverb App Key** | `REVERB_APP_KEY` from your `.env` (`my-app-key` unless you changed it). On the hosted Agent, leave the default. |
+| **WebSocket Port (override)** | Leave at `0`. |
+| **WebSocket Host (override)** | Leave blank. |
+| **WebSocket security** | Leave on **Auto**. |
 
-If you are using my [hosted Agent service](https://agent.surrealdisco.co.uk) and you are sharing your Foundry instance online, then the defaults in the CPR Agent Bridge module should work (aside from the API Key and Channel ID). If you hit trouble, check the Debug mode in the module settings and check the Dev console for some hints. Otherwise come and let me know on the Discord :)
+Those last three stay on their defaults because the Bridge works everything out from the Agent URL. An `https://` Agent URL means a secure WebSocket, an `http://` one means a plain one, and both go to the same address.
 
-**NOTE: I've found that when I've entered these, Foundry usually needs a refresh OR a restart.**
+Foundry usually wants a refresh after saving. You should see **"Cyberpunk Bridge: Online"**.
+
+> **Heads up:** generating a new API key kills the old one. If you regenerate it in the Agent, paste the new one into Foundry too, or the Bridge will throw 401s and show as offline.
+
+---
 
 ## Sharing is Caring
 
-Originally I was using (and suggesting) NGROK to share Foundry and connect with local Agent installations. However, after the technical choice to use Reverb and rely on other ports, this has become a REALLY unreliable and painful way of sharing (for free). Using **Cloudflared Tunnels** is a much better alternative to sharing. The simplest way to use Agent is via my hosted version, it's free, and only relies on you sharing your local Foundry instance.
+Getting your players in from outside your house. There are a few ways to do it.
 
-There's a few decent ways - I have my instance on an Unraid server, tunneled out behind SWAG (or an Nginx Proxy Manager), through Cloudflare to a domain I own. It works amazing, but it's complex and way out of scope for this. If you want to learn more, search for IBRACORP on youtube.
+The easiest by miles is the [hosted Agent](https://agent.surrealdisco.co.uk). It's free, and you only need to share your Foundry.
 
-Another more friendly way is Tailscale. I find this to be easier to use instead of messing around with Port Forwarding and Firewalls. Check [this](https://foundryvtt.wiki/en/setup/hosting/tailscale) tutorial out. By the end you should have an idea on how to share your Foundry instance over a Tailscale Funnel.
+Me? I run mine on an Unraid server, behind SWAG (or Nginx Proxy Manager), through Cloudflare to a domain I own. It works brilliantly, but it's complex and way out of scope here. If you fancy that rabbit hole, look up IBRACORP on YouTube.
 
-Whilst writing this part, I had been looking for 'easier' ways to suggest sharing, and came across a [DDEV add-on](https://ddev.com/blog/tailscale-router-ddev-addon/) for Tailscale. I have since updated the DDEV install to use said add-on, and whilst useful for a quick share, I found it cumbersome to allow for specific ports. So, for this section, I am going to assume Tailscale is installed on the operating system you are hosting Foundry on.
+The friendlier option is **Tailscale**. No port forwarding, no firewall fiddling. Follow [this tutorial](https://foundryvtt.wiki/en/setup/hosting/tailscale) to put Foundry on a Tailscale Funnel. You'll end up with a Magic URL like `https://foundry.random-words.ts.net`.
 
-### Sharing Via Tailscale
+### With the hosted Agent
 
-#### And using the live Agent (agent.surrealdisco.co.uk)
+1. Put your Tailscale Foundry URL (`https://foundry.random-words.ts.net`) in the Agent's **Foundry URL** setting.
+2. Set up the Bridge with the [Foundry Setup Code](/wiki/getting-started#quick-connect-qr-pairing).
+3. Give your players the Tailscale Foundry URL, and have them make an account on the hosted Agent.
+4. Link them with [QR Pairing](/wiki/getting-started#quick-connect-qr-pairing), or do it by hand (API keys, Channel ID and character assignment, as in [Getting Started](/wiki/getting-started#first-time-setup)).
 
-Lets say you've followed the Foundry tutorial linked above to generate a Funnel & a Tailscale Magic Url. It will look something like ```https://foundry.random-words.ts.net```. If you are using the Live Agent, this would be the URL you would enter into the **Foundry Url** config input. Remember to make sure the CPR Agent Module settings reflect that you are now using TLS, so let the module work it out and keep the **Reverb Port**, **Host** and **enable** the **SSL checkbox**.
+### With your own DDEV Agent
 
-At this point, providing all the settings are correct (including API Key and Channel ID), the Live Agent & your Tailscale Funnel will be able to talk to each other, you can:
+If you're like me and need control over every digital aspect of your life, read on. Because Reverb rides the Agent's own address, this is **one extra Funnel**, not two.
 
-* Share your Foundry TS url with players
-* Have them make an account on the Live Agent, get their API keys and input your Channel ID.
-* Have them log on to Foundry via the TS Funnel URL and link their accounts within the Bridge module settings.
-* You can assign their characters in your Module settings.
-* Have them trigger the Sync in the Live Agent in Config, and their character should appear. Have them save it, and you should be good to go.
+1. Get the Agent running locally first ([Self-Hosting with DDEV](#self-hosting-with-ddev)). Get Foundry on its Funnel too, and check you can open it from the Magic URL.
+2. DDEV only answers to hostnames it knows about, so tell it about yours. In `.ddev/config.yaml`:
 
-#### Using a Local Agent
-
-If you're like me and require control over every digital aspect of your life, then read on. We'll be leveraging DDEV's portmapping + Tailscale's very annoying port limit.
-
-1. Follow the Installation Steps above. Once you've got a local instance running on a browser you can access, read on.
-2. Follow the tutorial for creating a Tailscale Funnel for your Foundry Instance (above). Once you can access that from the Magic URL, continue.
-3. Run `ddev describe`. We need the port numbers that are mapped to `web:80` and `web:8080` (they tend to be above 32000). Remember those.
-4. We will now be setting up two more Funnels, one for each port:
-   ```bash
-   tailscale funnel --bg --https 10000 http://127.0.0.1:80 
-   tailscale funnel --bg --https 8443 http://127.0.0.1:8080
+   ```yaml
+   additional_fqdns:
+     - foundry.random-words.ts.net
    ```
 
-***(Note: Replace 80 and 8080 with the actual port numbers from `ddev describe`)***
+   Then `ddev restart`.
+3. Open the Funnel for the Agent:
 
-5. This adds ports 10000 and 8443 to your Magic URL for your computer. If you go to ```https://foundry.random-words.ts.net:10000``` you should end up on your agent! Remember to make sure Reverb is still running.
-6. In Foundry, in the CPR Bridge settings:
-   **Agent URL:** ```https://foundry.random-words.ts.net:10000```
-   **Reverb Port:** 8443
-7. Press save. A Bridge Online message should pop up, and that is connected!
-8. Go to your Agent to test everything out. Sharing the ```https://foundry.random-words.ts.net:10000``` will give your players the Agent app.
+   ```bash
+   tailscale funnel --bg --https 8443 http://127.0.0.1:80
+   ```
 
-#### Good Luck
+4. Point the Agent at its new address. In `.env`:
 
-Setting this up locally is fairly complex, if you've got this far and you're sat infront of a shared Foundry & Agent, congrats choom! Kick back with some skop & kopi kadal.
+   ```
+   APP_URL="https://foundry.random-words.ts.net:8443"
+   ```
 
-If not, well, I hope you can debug! The dev console on browsers in your best friend. After checking the 'shit list' off:
+   Then `ddev artisan config:clear` and restart `ddev agent-serve`.
+5. In Foundry, set the Bridge's **Agent URL** to `https://foundry.random-words.ts.net:8443` (or just paste a fresh Setup Code). Leave the WebSocket settings on their defaults.
+6. Save, refresh, and you should get **Cyberpunk Bridge: Online**.
+7. Share `https://foundry.random-words.ts.net:8443` with your players. That's their Agent.
 
-* Refresh/hard refresh the page
-* Re-save the character in config
-* Flush/wipe all session data and cookies from browser (related to the Agent).
+> **The one rule:** the address your players type is the address in `APP_URL`, and the same address in the Bridge's Agent URL. If those three don't match, logins bounce and QR codes complain.
 
-If not, hit f12 when in the browser and see if there's any red errors kicking around. Ones to look out for would be 500 errors, cant connect, 404 errors, lost connection etc. If you see those chances are that the Agent and Foundry are not talking to each other, usually due to a port or URL misconfiguration (or my inability to write good documentation).
+**Quick and dirty alternative:** `ddev share --provider=cloudflared` gives you a temporary public URL with no setup. Set `APP_URL` to whatever it hands you (then `ddev artisan config:clear`), and use it as the Agent URL. The URL changes every time, so it's handy for testing, not so much for a weekly game.
 
-If you're super stuck, come and say hi on the CPRed Discord, I'm in the Content Share section.
+### Good luck, choom
+
+Setting this up locally is fairly involved. If you've made it this far and you're sat in front of a shared Foundry and Agent, congrats! Kick back with some skop and kopi kadal.
+
+If not, work through the usual suspects first:
+
+- Refresh, or hard refresh (Ctrl+Shift+R).
+- Re-save the character in Settings.
+- Clear the site data and cookies for the Agent in your browser.
+
+Still broken? Hit F12 and look for anything red in the console. 500s, 404s, "can't connect" or "lost connection" usually mean the Agent and Foundry aren't talking, and that's nearly always a URL mismatch (or my inability to write good documentation). Then check [Troubleshooting](/wiki/getting-started#troubleshooting).
+
+If you're super stuck, come and say hi on the CPRed Discord. I'm in the Content Share section.
+
+---
 
 ## Settings Reference
 
-### Agent App Settings
+### Agent settings
 
-- **Foundry URL**: The base address of your Foundry VTT instance.
-  - *Why*: The Agent uses it to pull images (tokens, items) from your Foundry server.
-  - *Tip*: Do NOT put `/game` on the end. It should look like `http://localhost:30000` or `https://foundry.example.com`.
-- **API Key**: A unique token, generated by Laravel Sanctum.
-  - *Why*: It's how your Agent proves who it is to the backend.
-  - *Note*: You have to click 'Generate' in settings to make one.
-- **Channel ID**: A unique ID for your game session.
-  - *Why*: It puts the GM and the players on the same channel.
-  - *Usage*: The GM generates it, and players must "Commit Sync" with the same ID.
+| Setting | What it's for |
+|---|---|
+| **Foundry URL** | The base address of your Foundry. The Agent uses it to pull in images (tokens, items, portraits). Do **not** put `/game` on the end. It should look like `http://localhost:30000` or `https://foundry.example.com`. |
+| **API Key** | A token generated by Laravel Sanctum. It's how your Bridge proves who it is to the Agent. Hit **Generate** in Settings to make one. |
+| **Channel ID** | The ID for your game session. It puts the GM and players on the same channel. The GM's is created when they save their Foundry connection; players get it from the GM or a QR scan. |
 
-### Foundry Bridge Settings
+### Foundry Bridge settings
 
-- **Controller URL**: Where the Agent app is hosted.
-- **API Key**: Your own API key from the Agent app.
-- **Channel ID**: The GM's Channel ID.
-- **Reverb Port**: The port the websocket server listens on.
-  - Default for the official Agent: `443` (TLS) or `80` (non-TLS).
-  - Default for self-hosting (DDEV): `8081` (HTTPS) or `8080` (HTTP).
-- **Reverb Use SSL**: Turn on (`wss`) if your Agent sits behind HTTPS. Turn off (`ws`) for plain HTTP.
-- **Host Override**: Force the hostname for the websocket connection.
-  - *Example*: If you're using NGROK for Reverb, put the NGROK hostname here (e.g. `random.ngrok-free.app`).
-- **Debug Mode**: Turns on chatty logging in the Foundry console (F12). Your first stop when the connection's playing up.
+| Setting | What it's for |
+|---|---|
+| **Quick Setup** | Paste or type a Foundry Setup Code and it fills in everything below. |
+| **Manage Characters** | Assign characters to players, and show pairing QRs. |
+| **Agent URL** | Where your Agent lives. Must match the address players use. |
+| **API Key** | Your own API key from the Agent. Each player enters their own. |
+| **Channel ID** | The GM's Channel ID. |
+| **Reverb App Key** | Your Agent's `REVERB_APP_KEY`. Leave the default on the hosted Agent. |
+| **WebSocket Host (override)** | Leave blank. Only for an Agent that serves its WebSocket from a different hostname. |
+| **WebSocket Port (override)** | Leave at `0`. Only for an Agent that publishes Reverb on its own port. |
+| **WebSocket security** | Leave on **Auto**, which matches the Agent URL. Only override if you've got a proxy that changes the scheme and live updates fail while everything else works. |
+| **Debug Mode** | Chatty logging in the Foundry console (F12). Your first stop when the connection's playing up. |
 
 ---
 
 ## Technical Deep Dive: The Bridge
 
-The Bridge module is where all the Foundry side of things happens. It sits between Foundry and the Laravel-based Agent and passes everything back and forth.
-You can grab it from the [repository](https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge) or from the Foundry package manager.
+The Bridge module is where all the Foundry side of things happens. It sits between Foundry and the Laravel-based Agent and passes everything back and forth. Grab it from the [repository](https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge) or the Foundry package manager.
 
-### How it Works
+### How it works
 
-1. **Connection**: It spins up a `Laravel Echo` instance using `Pusher` (via the Reverb broadcaster).
-2. **Authentication**: It sends the **API Key** (Sanctum Token) in the headers to authenticate with the Agent's API.
-3. **Subscriptions**:
-   - The Bridge joins a private channel: `cpr-agent.{channelId}`.
-   - It listens for events from the Agent (every event is named in capitalised SNAKE_CASE).
-4. **Synchronisation**:
-   - When a player does something in Foundry, the Bridge catches it and sends the data to the Agent.
-   - When the Agent sends a command (e.g. "Roll Initiative"), the Bridge runs it in Foundry.
-5. **Data Flow**:
-   - **Foundry -> Agent**: Standard API calls (POST/PATCH) to update character data.
-   - **Agent -> Foundry**: WebSockets (Reverb) for real-time triggers and updates.
+1. **Connection.** It spins up a `Laravel Echo` instance using the Reverb broadcaster. The WebSocket goes to the Agent URL's own host and port, on the `/app/` path.
+2. **Authentication.** It sends your **API Key** (a Sanctum token) in the headers to authenticate with the Agent's API.
+3. **Subscriptions.** It joins the private channel `cpr-agent.{channelId}` and listens for events from the Agent. Every event is named in capitalised SNAKE_CASE.
+4. **Synchronisation.** When something happens in Foundry, the Bridge catches it and sends it to the Agent. When the Agent sends a command (e.g. "Roll Initiative"), the Bridge runs it in Foundry.
+5. **Data flow.**
+   - **Foundry → Agent:** standard API calls (POST/PATCH) to update character data.
+   - **Agent → Foundry:** WebSockets (Reverb) for real-time triggers and updates.
 
-### The `CyberpunkBridge` Class
+### The `CyberpunkBridge` class
 
-This class looks after:
+This looks after:
 
-- **Roll Interception**:
-  - The Bridge hooks into Foundry's roll mechanism.
-  - It grabs the roll data (formula, results, modifiers) and sends it to the Agent, so players see the "virtual dice" result.
-- **Actor Updates**:
-  - It watches Foundry Actors for changes (HP, Armor, Humanity, etc.).
-  - When something changes, it pushes the new stats to the Agent via the API.
-- **Initialisation**:
-  - It tries to connect automatically when Foundry starts.
-  - It checks `apiUrl`, `apiKey` and `channelId` are all set before it tries to open a WebSocket connection.
+- **Roll interception.** It hooks into Foundry's rolls, grabs the formula, results and modifiers, and sends them to the Agent so players see the "virtual dice".
+- **Actor updates.** It watches Foundry actors for changes (HP, armour, Humanity and so on) and pushes the new stats to the Agent.
+- **Start-up.** It connects automatically when Foundry starts, once the Agent URL, API key and Channel ID are all set.
 
-### Communication Protocol
+### Communication protocol
 
 The Bridge uses a mix of REST (for state changes) and WebSockets (for events).
 
-- **REST**: `POST /api/foundry/callback|update`. Used for bulk updates of character data.
-- **WebSockets**: the `cpr-agent.{channelId}` channel. Used for instant triggers like "Request Roll" or "Ping Location".
+- **REST:** `POST /api/foundry/callback` and `/api/foundry/update`, for bulk character data.
+- **WebSockets:** the `cpr-agent.{channelId}` channel, for instant triggers like "Request Roll" or "Ping Location".
 
 ---
 
 ## The Delta System
 
-Foundry character sheets are huge, and phones on patchy signal don't love huge. So the Agent has its own "Delta" sync for character data.
+Foundry character sheets are huge, and phones on patchy signal don't love huge. So the Agent has its own "delta" sync for character data.
 
-### How it Works
+### How it works
 
-Rather than sending the whole character JSON (which can run to several hundred kilobytes) every time one number changes, it sends a **Delta**: just the bit that changed.
+Rather than sending the whole character (which can run to several hundred kilobytes) every time one number changes, it sends a **delta**: just the bit that changed.
 
-- **Dot-Notation Paths**: Fields are targeted with dot-notation (e.g. `system.stats.emp.value`).
-- **Item Handling**: Individual items in a character's inventory get their own syntax:
-  - `data.items.ID`: Updates a specific item's properties.
-  - `data.items.+ID`: Adds a new item to the character sheet.
-- **Null Values**: Setting a path to `null` deletes that field or item.
+- **Dot-notation paths.** Fields are targeted like `system.stats.emp.value`.
+- **Items** get their own syntax:
+  - `items.ID` updates a specific item.
+  - `items.+ID` adds a new item to the sheet.
+- **Null values.** Setting a path to `null` deletes that field or item.
 
-### Why Bother? (Space & Speed)
+### Why bother?
 
-1. **Bandwidth**: Full Foundry character sheets are massive. A delta is usually less than 1% of the size of a full update, which is why the Agent stays snappy even on a rubbish mobile connection.
-2. **Server Load**: The Laravel backend merges deltas straight into the cached state in memory. No parsing and replacing a giant JSON blob because someone lost 2 HP.
-3. **Async Persistence**: Deltas hit a fast cache first, and the full state gets written to the database in the background. The UI updates near enough instantly, and nothing gets lost.
+1. **Bandwidth.** A delta is usually less than 1% of the size of a full update, which is why the Agent stays snappy even on a rubbish mobile connection.
+2. **Server load.** The backend merges deltas straight into the cached character. No parsing and replacing a giant JSON blob because someone lost 2 HP.
+3. **Saved in the background.** Deltas hit a fast cache first, and the queue worker writes the full character to the database behind the scenes. The UI updates near enough instantly, and nothing gets lost. (This is why the queue worker in `agent-serve` matters.)
 
----
-
-## Troubleshooting
-
-### Images not showing up in the Agent
-
-- **Foundry URL**: Check the Foundry URL in the Agent settings does NOT end in `/game`.
-- **CORS**: If Foundry is on `http` and the Agent is on `https`, most browsers will block the images. Put both on `https`.
-- **NGROK**: If you're on NGROK, the Agent sends special headers to get past the NGROK splash page. If images still won't load, check the browser console (F12) for CORS errors.
-
-### Connection "Offline" in Foundry
-
-- **API Key**: Make sure you've generated a valid API key in the Agent and pasted it into Foundry properly.
-- **Reverb Port**: If you're self-hosting, double-check the port (usually 8080 or 8081).
-- **SSL Mismatch**: If your Agent is on `https`, you MUST turn on "Reverb Use SSL" in Foundry.
-
-### Rolls not appearing in the Agent
-
-- **Bridge Subscription**: Have a look in the Foundry console. You should see `[Bridge] Subscription successful`. If you don't, check your `Channel ID`.
-- **Character Assignment**: Make sure the GM has assigned a character to you in the `Agent Character Assignment` menu.
-
----
+Stuck? Have a look at [Troubleshooting](/wiki/getting-started#troubleshooting) on the Getting Started page.

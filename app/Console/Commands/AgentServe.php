@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Process;
  * update is just "drop in the new build, run agent:serve".
  *
  * Deliberately built on the Process facade (symfony/process) rather than
- * pcntl fork, so the same command works on Windows ,  pcntl is POSIX-only.
+ * pcntl fork, so the same command works on Windows, pcntl is POSIX-only.
  *
  * The web server itself (FrankenPHP/Caddy) is a separate foreground process;
  * pass --with-web to also supervise it via the AGENT_WEB_COMMAND env var once
@@ -25,14 +25,14 @@ use Illuminate\Support\Facades\Process;
  * ORPHANED CHILDREN. A graceful exit stops every child (Symfony shells out to
  * `taskkill /F /T` on Windows, so the whole tree goes). A hard kill does not:
  * nothing ties a child's lifetime to this process, so force-killing the
- * supervisor ,  or, on Windows, closing the console window, which delivers
- * CTRL_CLOSE_EVENT that PHP cannot trap ,  leaves Reverb holding its port and
+ * supervisor, or, on Windows, closing the console window, which delivers
+ * CTRL_CLOSE_EVENT that PHP cannot trap, leaves Reverb holding its port and
  * the next launch fails to bind. Verified on Windows 2026-08-14.
  *
  * Two defences, because neither alone is enough:
  *  1. Ctrl-C/Ctrl-Break are trapped on Windows too (sapi_windows_set_ctrl_handler),
  *     not just on POSIX, so the common interactive quit takes the clean path.
- *  2. Startup reaps strays left by a previous run ,  matched on this install's
+ *  2. Startup reaps strays left by a previous run, matched on this install's
  *     own artisan path, so a second checkout on the same machine is untouched.
  *     This is what makes "close the window, double-click again" work.
  */
@@ -65,7 +65,7 @@ class AgentServe extends Command
         if (! $this->option('no-migrate')) {
             $this->components->info('Running migrations');
             if ($this->call('migrate', ['--force' => true]) !== 0) {
-                $this->error('Migrations failed ,  aborting start.');
+                $this->error('Migrations failed, aborting start.');
 
                 return self::FAILURE;
             }
@@ -80,7 +80,7 @@ class AgentServe extends Command
 
         // Windows has no pcntl, but the CLI SAPI can still trap Ctrl-C and
         // Ctrl-Break. Without this, Ctrl-C kills the supervisor outright and
-        // strands the children. (Window-close cannot be trapped ,  that case is
+        // strands the children. (Window-close cannot be trapped, that case is
         // covered by reapStrays() on the next launch.)
         if (function_exists('sapi_windows_set_ctrl_handler')) {
             sapi_windows_set_ctrl_handler(function () {
@@ -103,7 +103,7 @@ class AgentServe extends Command
         while (! $this->shouldStop) {
             foreach ($processes as $name => $cmd) {
                 if (! $running[$name]->running()) {
-                    $this->warn("[{$name}] exited ,  restarting");
+                    $this->warn("[{$name}] exited, restarting");
                     $running[$name] = $this->spawn($name, $cmd);
                 }
             }
@@ -135,7 +135,7 @@ class AgentServe extends Command
      * Matching is by command line, not by a recorded PID: on Windows the PID we
      * hold for a child can belong to an intermediate shell that has already
      * exited, and PIDs get recycled. A process is only killed when every
-     * argument of one of our child commands appears in its command line ,  that
+     * argument of one of our child commands appears in its command line, that
      * includes this install's absolute artisan path, so a second checkout, a
      * DDEV container, or an unrelated PHP process is never touched.
      *
@@ -155,7 +155,7 @@ class AgentServe extends Command
                     continue;
                 }
 
-                $this->warn("[{$name}] stray from a previous run (pid {$pid}) ,  killing");
+                $this->warn("[{$name}] stray from a previous run (pid {$pid}), killing");
                 $this->kill($pid);
                 $reaped++;
                 break;
@@ -343,8 +343,8 @@ class AgentServe extends Command
 
     /**
      * Base argv for invoking artisan. AGENT_PHP_ARGS injects any interpreter
-     * subcommand the runtime needs ,  e.g. "php-cli" under the FrankenPHP binary
-     * (`frankenphp php-cli artisan ...`) ,  without hard-coding the runtime.
+     * subcommand the runtime needs, e.g. "php-cli" under the FrankenPHP binary
+     * (`frankenphp php-cli artisan ...`), without hard-coding the runtime.
      *
      * @return array<int, string>
      */

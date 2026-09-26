@@ -13,7 +13,7 @@ window.axios.defaults.withCredentials = true;
 const {isWssConnected} = useCharacterData();
 
 if (isEmbed()) {
-    // Embedded in Foundry: no Reverb/WebSocket ,  data flows over postMessage
+    // Embedded in Foundry: no Reverb/WebSocket, data flows over postMessage
     // via the Bridge module. initEmbed() installs the mock Echo + axios adapter.
     window.__CPR_EMBED = true;
     window.Echo = initEmbed();

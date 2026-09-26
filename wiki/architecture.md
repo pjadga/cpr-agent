@@ -1,6 +1,6 @@
 ---
 title: Architecture
-order: 5
+order: 6
 ---
 
 ### The Foundry Module: Rough Release Notes

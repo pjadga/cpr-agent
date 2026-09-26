@@ -474,7 +474,7 @@
             </section>
 
             <footer class="pt-4 pb-10 text-center text-[10px] font-mono text-cpr-text-dim uppercase tracking-widest">
-                End of brief ,  tweak freely.
+                End of brief, tweak freely.
             </footer>
         </main>
     </div>

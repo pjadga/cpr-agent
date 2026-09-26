@@ -93,7 +93,7 @@ class FoundryController extends Controller
             // CYBERWARE_INSTALL_OPTIONS / CYBERWARE_INSTALLED / CYBERWARE_UNINSTALLED.
             // validate() returns only the keys listed here and that array is what
             // BroadcastHandler ships, so anything missing is silently dropped on
-            // the way to the app ,  the install modal opened with no targets and
+            // the way to the app, the install modal opened with no targets and
             // no humanity figures because of exactly that.
             'itemId' => 'nullable|string',
             'itemName' => 'nullable|string',
@@ -140,7 +140,7 @@ class FoundryController extends Controller
      */
     public function update(Request $request)
     {
-        // Legacy endpoint ,  delegates to handle() for now
+        // Legacy endpoint, delegates to handle() for now
         return $this->handle($request);
     }
 }

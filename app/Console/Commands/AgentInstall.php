@@ -31,7 +31,7 @@ class AgentInstall extends Command
 
     public function handle(): int
     {
-        $this->info('CPR Agent ,  first-run install');
+        $this->info('CPR Agent, first-run install');
 
         $envPath = $this->resolveEnvPath();
 
@@ -89,7 +89,7 @@ class AgentInstall extends Command
 
         if ($generated && ($this->option('show') || ! $envWritable)) {
             $this->newLine();
-            $this->line('<comment>Generated secrets ,  keep these safe:</comment>');
+            $this->line('<comment>Generated secrets, keep these safe:</comment>');
             foreach ($generated as $envKey => $value) {
                 $this->line("  {$envKey}={$value}");
             }

@@ -1,6 +1,6 @@
 @extends('layouts.cyberpunk')
 
-@section('title', $page->title.' ,  Wiki ,  '.config('app.name'))
+@section('title', $page->title.', Wiki, '.config('app.name'))
 
 @section('content')
     <div x-data="{ open: false }" @keydown.escape.window="open = false"

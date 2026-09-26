@@ -95,7 +95,7 @@ class ProtocolMatrixTest extends TestCase
      * Render /profile and return its CSP header.
      *
      * CSP is opt-in (`CSP_ENABLED`, default false), so the header only exists
-     * where someone has switched it on ,  the hosted instance. Turn it on here
+     * where someone has switched it on, the hosted instance. Turn it on here
      * rather than skip, or the policy goes untested everywhere.
      */
     private function cspFor(User $user): ?string
@@ -263,7 +263,7 @@ class ProtocolMatrixTest extends TestCase
     {
         // partials/reverb-config.blade.php array_filters nulls out, so
         // window.reverbConfig has no key at all rather than an explicit null.
-        // bootstrap.js uses ??, which treats both the same ,  but only if the
+        // bootstrap.js uses ??, which treats both the same, but only if the
         // filter is actually there.
         config(['broadcasting.connections.reverb.frontend' => [
             'key' => 'app-key-1',
@@ -303,7 +303,7 @@ class ProtocolMatrixTest extends TestCase
     {
         // The Bridge derives its WebSocket scheme, host and port from this one
         // string. It used to be rebuilt from the *Reverb* scheme plus
-        // APP_DOMAIN, so a plain-http self-host was handed https://<domain> ,
+        // APP_DOMAIN, so a plain-http self-host was handed https://<domain>,
         // an address its Bridge could never reach.
         config([
             'app.url' => $appUrl,
@@ -334,7 +334,7 @@ class ProtocolMatrixTest extends TestCase
     {
         // Omitted, not zero and not 443: the Bridge only overrides its derived
         // port `if (data.reverbPort)`, so a null keeps it deriving from the
-        // Agent URL ,  the right answer on http and https alike.
+        // Agent URL, the right answer on http and https alike.
         config(['app.url' => 'https://agent.example.com', 'vite.reverb.port' => null]);
 
         $gm = $this->userWithFoundry('http://192.168.1.60:30000', isGm: true);
@@ -644,7 +644,7 @@ class ProtocolMatrixTest extends TestCase
     public function a_bearer_token_does_not_authorise_someone_elses_channel(): void
     {
         // Channel isolation is the multi-user boundary, and it is credential
-        // based rather than transport based ,  so it holds identically on every
+        // based rather than transport based, so it holds identically on every
         // topology in this file.
         $gm = $this->userWithFoundry('http://192.168.1.60:30000', isGm: true);
         Session::ensureActiveFor($gm);
@@ -653,7 +653,7 @@ class ProtocolMatrixTest extends TestCase
         $otherSession = Session::ensureActiveFor($otherGm);
 
         // phpunit.xml forces BROADCAST_CONNECTION=null, and the null
-        // broadcaster's auth() is a no-op ,  it returns 200 without ever
+        // broadcaster's auth() is a no-op, it returns 200 without ever
         // consulting routes/channels.php. Point at a real broadcaster so the
         // channel callback actually runs; no network is involved in signing.
         $this->useRealBroadcaster();

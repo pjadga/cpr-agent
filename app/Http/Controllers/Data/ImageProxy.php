@@ -76,7 +76,7 @@ class ImageProxy extends Controller
      * browser refuses, so that is the only thing it will fetch.
      *
      * Without this the endpoint takes an arbitrary URL and has the server
-     * request it ,  loopback, RFC1918, cloud metadata, anything. It is behind
+     * request it, loopback, RFC1918, cloud metadata, anything. It is behind
      * auth, but registration is open on the hosted instance. Pinning to the
      * user's own configured host closes that while keeping LAN self-hosting
      * working, which a blanket private-range block would not: a self-hosted

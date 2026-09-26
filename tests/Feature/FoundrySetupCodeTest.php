@@ -38,7 +38,7 @@ class FoundrySetupCodeTest extends TestCase
         $payload = json_decode(base64_decode($response->json('code')), true);
         $this->assertSame('https://agent.example.com', $payload['agentUrl']);
 
-        // A session is ensured on the fly, and the code carries its channel ,
+        // A session is ensured on the fly, and the code carries its channel,
         // the same value the GM's live broadcast channel now uses. A personal
         // (non-session) channel_id here used to 404 pairing registration.
         $session = Session::where('gm_user_id', $gm->id)->first();

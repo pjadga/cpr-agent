@@ -15,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         // spatie/sheets (the /wiki renderer) only binds this if nothing already
-        // has ,  registering it here first lets us add GFM tables/strikethrough/
+        // has, registering it here first lets us add GFM tables/strikethrough/
         // autolinks, which the wiki markdown uses, on top of bare CommonMark.
         $this->app->singleton(CommonMarkConverter::class, function () {
             $converter = new CommonMarkConverter([

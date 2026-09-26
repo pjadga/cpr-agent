@@ -20,7 +20,7 @@ const RANGE = { s1: 5, s2: 10 }; // ± travel (px) at full deflection
 const FULL_TILT = 25;            // degrees of tilt that maps to full deflection
 
 // Smoothing time constants. quickTo re-eases toward each sensor reading, so the
-// shadow trails the phone by roughly half the duration ,  this is the "lag". The
+// shadow trails the phone by roughly half the duration, this is the "lag". The
 // front layer tracks tight (feels responsive); the back layer trails a touch, and
 // that timing gap is what reads as parallax depth rather than the two in lockstep.
 // Keep a little smoothing so raw sensor noise doesn't jitter through.
@@ -44,7 +44,7 @@ export function initTiltShadow(target = document.documentElement) {
     };
 
     // Each write sets a CSS var on <html>, which invalidates style for every
-    // element that reads it ,  so we don't want to write every frame. But snapping
+    // element that reads it, so we don't want to write every frame. But snapping
     // to WHOLE pixels made the shadow stair-step visibly on slow tilts. The middle
     // ground: quantise to a fraction of a pixel (STEP). Fine enough to read as
     // smooth, coarse enough that most frames still write nothing and skip the

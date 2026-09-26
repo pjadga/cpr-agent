@@ -1,12 +1,12 @@
-; php.ini for the Windows FrankenPHP build ,  copy this next to frankenphp.exe
+; php.ini for the Windows FrankenPHP build, copy this next to frankenphp.exe
 ; as "php.ini".
 ;
 ; WHY THIS FILE EXISTS
 ; The Windows release of FrankenPHP is not a static binary like the Linux one.
 ; It bundles the standard PHP-for-Windows distribution: the extensions live as
 ; separate DLLs in .\ext\, and the archive ships NO php.ini. With no ini,
-; the embedded PHP boots with only its built-ins ,  no mbstring, no pdo_sqlite,
-; no openssl ,  and Laravel dies on boot (mb_split() missing).
+; the embedded PHP boots with only its built-ins, no mbstring, no pdo_sqlite,
+; no openssl, and Laravel dies on boot (mb_split() missing).
 ;
 ; The exe directory is part of PHP's ini search path on Windows, so a php.ini
 ; placed beside frankenphp.exe is picked up by BOTH `php-cli` and the

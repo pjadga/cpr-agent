@@ -2,15 +2,14 @@
 title: "Self-Hosting: Laravel Herd"
 order: 3
 ---
-
 # Self-Hosting the CPR Agent with Laravel Herd
 
 *Written by **capt_garris** from the CPR Discord. Big thanks for your time, testing and helping me out.*
 
-This is the current recommended way to run your own Agent on Windows or macOS. It
-replaces the DDEV instructions in [`guide.md`](/wiki/guide), which needed Docker (and WSL2 on
-Windows) and published the WebSocket server on a second port, the cause of most
-setup problems people hit.
+This is the current recommended way to run your own Agent on Windows or macOS.
+The other route is [Dev Env Setup: DDEV](/wiki/guide), which needs Docker (and
+WSL2 on Windows). Once you're up and running, head to
+[Getting Started](/wiki/getting-started) to link your players.
 
 By the end you will have **one address** that serves the Agent to you and your
 players, with the WebSocket riding the same address. There is no second port, no
@@ -41,20 +40,21 @@ second certificate and no Reverb settings to fill in.
 
 ## 1. Decide how players will reach you
 
-Do this first. It decides one setting (`APP_URL`) that everything else is derived
+First step: It decides one setting (`APP_URL`) that everything else is derived
 from, and changing your mind later means redoing steps 5 and 7.
 
-| | Who can use it | Your `APP_URL` |
-|---|---|---|
-| **A: Just you** | You only, on this PC. Good for trying it out. | `https://cyberpunk-red-agent.test` |
-| **B: Same Wi-Fi** | Players' phones on your home network. | `http://192.168.1.50` (your PC's IP) |
-| **C: Over the internet** | Anyone, anywhere, via Tailscale. **Recommended for real games.** | `https://your-pc.tailnet-1234.ts.net:8443` |
+
+|                          | Who can use it                                                  | Your`APP_URL`                              |
+| ------------------------ | --------------------------------------------------------------- | ------------------------------------------ |
+| **A: Just you**          | You only, on this PC. Good for trying it out.                   | `https://cyberpunk-red-agent.test`         |
+| **B: Same Wi-Fi**        | Players' phones on your home network.                           | `http://192.168.1.50` (your PC's IP)       |
+| **C: Over the internet** | Anyone, anywhere, via Tailscale.**Recommended for real games.** | `https://your-pc.tailnet-1234.ts.net:8443` |
 
 **Why C is worth the extra ten minutes.** Browsers only allow camera access on a
 secure (HTTPS) connection, so on option B your players cannot scan the QR pairing
 code; they have to copy and paste a link code instead. HTTPS also means character
 portraits and token art load properly, and the in-Foundry Agent window works.
-Tailscale gives you a real certificate for free.
+Tailscale gives you a certificate for free and takes a lot of the headache out of sharing.
 
 > **The one rule:** whatever address *players* type is the address that goes in
 > `APP_URL`, and the same address goes in the Foundry Bridge module. A
@@ -66,11 +66,11 @@ Tailscale gives you a real certificate for free.
 
 ## 2. Install Herd and Node
 
-- **Laravel Herd**: <https://herd.laravel.com>. The free version is enough.
+- **Laravel Herd**: [https://herd.laravel.com](https://herd.laravel.com). The free version is enough.
   Install any dependencies it asks for.
-- **Node.js**: <https://nodejs.org/en/download>.
+- **Node.js**: [https://nodejs.org/en/download](https://nodejs.org/en/download).
 
-For option C, also install **Tailscale** (<https://tailscale.com/download>) and
+For option C, also install **Tailscale** ([https://tailscale.com/download](https://tailscale.com/download)) and
 enable HTTPS in your tailnet admin console under *DNS → HTTPS Certificates*.
 
 ---
@@ -241,7 +241,7 @@ that rule, since nothing listens there any more.
 
 ---
 
-## 9. Start the background processes
+## 9. Start the background processes (I Swear We Are So Close, Choom)
 
 ```bash
 php artisan agent:serve
@@ -275,15 +275,16 @@ key and Reverb key together.
 
 **By hand,** if you'd rather. In **Configure Settings → Agent Bridge**:
 
-| Setting | Value |
-|---|---|
-| **Agent URL** | Your `APP_URL`, exactly |
-| **API Key** | From the Agent's Settings page |
-| **Channel ID** | From the Agent's Settings page |
-| **Reverb App Key** | Your `REVERB_APP_KEY` from `.env` |
-| **Reverb Port** | Leave at `0` |
-| **Reverb Host** | Leave blank |
-| **Reverb Use SSL** | On for options A and C, **off** for option B |
+
+| Setting            | Value                                       |
+| ------------------ | ------------------------------------------- |
+| **Agent URL**      | Your`APP_URL`, exactly                      |
+| **API Key**        | From the Agent's Settings page              |
+| **Channel ID**     | From the Agent's Settings page              |
+| **Reverb App Key** | Your`REVERB_APP_KEY` from `.env`            |
+| **Reverb Port**    | Leave at`0`                                 |
+| **Reverb Host**    | Leave blank                                 |
+| **Reverb Use SSL** | On for options A and C,**off** for option B |
 
 Reverb Port and Host stay empty because Reverb is now on the same address as the
 Agent: the Bridge works it out from the Agent URL.
@@ -345,17 +346,18 @@ With this guide, you almost certainly don't.
 
 Open the browser console with **F12** and look at the red errors first.
 
-| What you see | What it means |
-|---|---|
-| Login bounces straight back to the login page | `APP_URL` doesn't match the address you're actually using. Fix it, then `php artisan config:clear`. |
-| Bridge says **Offline** | Agent URL wrong in the module, or `agent:serve` isn't running. On option B, check *Reverb Use SSL* is **off**. |
-| **HTTP 401** in the Foundry console | The API key in Foundry is stale. Copy the current one from the Agent's Settings page. |
-| Sheet stuck loading forever | The WebSocket never connected. Check the console for `[Agent] WebSocket subscription established.` If it's missing, re-check step 7. |
-| Player scan says **"QR is for a different Agent"** | The Bridge's Agent URL doesn't match the address the player has open, usually a `.test` address. See step 5. |
-| Portraits and token art are blank | Your Foundry is on `http` while the Agent is on `https`. Put Foundry behind HTTPS too (option C does this). |
-| Control tab does nothing | Usually after the GM changed scenes. The player should refresh the Agent, or re-save in settings. |
-| Changes vanish after a while | The queue worker isn't running. See step 9. |
-| **404** on `/app/...` in the console | The `location /app/` block from step 7 isn't in effect. Check you edited the right file and restarted Herd. |
+
+| What you see                                      | What it means                                                                                                                       |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Login bounces straight back to the login page     | `APP_URL` doesn't match the address you're actually using. Fix it, then `php artisan config:clear`.                                 |
+| Bridge says**Offline**                            | Agent URL wrong in the module, or`agent:serve` isn't running. On option B, check *Reverb Use SSL* is **off**.                       |
+| **HTTP 401** in the Foundry console               | The API key in Foundry is stale. Copy the current one from the Agent's Settings page.                                               |
+| Sheet stuck loading forever                       | The WebSocket never connected. Check the console for`[Agent] WebSocket subscription established.` If it's missing, re-check step 7. |
+| Player scan says**"QR is for a different Agent"** | The Bridge's Agent URL doesn't match the address the player has open, usually a`.test` address. See step 5.                         |
+| Portraits and token art are blank                 | Your Foundry is on`http` while the Agent is on `https`. Put Foundry behind HTTPS too (option C does this).                          |
+| Control tab does nothing                          | Usually after the GM changed scenes. The player should refresh the Agent, or re-save in settings.                                   |
+| Changes vanish after a while                      | The queue worker isn't running. See step 9.                                                                                         |
+| **404** on `/app/...` in the console              | The`location /app/` block from step 7 isn't in effect. Check you edited the right file and restarted Herd.                          |
 
 Still stuck? Turn on **Debug Mode** in the Bridge module settings for verbose
 Foundry logging, and come and say hi on the CPRed Discord in the Content Share
@@ -401,12 +403,13 @@ curl -skI https://cyberpunk.ddev.site/login | grep -i set-cookie  # `secure`
 
 Worth knowing what each topology exercises:
 
-| | http | https |
-|---|---|---|
-| Secure cookie derivation | not Secure | Secure |
-| QR camera scanning | blocked by the browser | works |
-| Cross-scheme image proxying | n/a | exercised |
-| In-Foundry Agent window | blocked if Foundry is https | works |
+
+|                             | http                        | https     |
+| --------------------------- | --------------------------- | --------- |
+| Secure cookie derivation    | not Secure                  | Secure    |
+| QR camera scanning          | blocked by the browser      | works     |
+| Cross-scheme image proxying | n/a                         | exercised |
+| In-Foundry Agent window     | blocked if Foundry is https | works     |
 
 Verify the WebSocket is genuinely same-origin. This should return `101` with
 `X-Powered-By: Laravel Reverb`, and is the single best check that the setup in

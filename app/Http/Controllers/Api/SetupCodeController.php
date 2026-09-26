@@ -13,7 +13,7 @@ class SetupCodeController extends Controller
      *
      * Public but throttled: the code is a one-time, short-TTL bearer for the
      * GM's Bridge configuration (including their API key). Cache::pull makes
-     * redemption single-use ,  a second request gets a 404.
+     * redemption single-use, a second request gets a 404.
      */
     public function redeem(string $code): JsonResponse
     {

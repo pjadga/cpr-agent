@@ -766,7 +766,7 @@ export default {
                         if (typeof payload.dv !== 'undefined') {
                             const dvText = typeof payload.dv === 'number' ? payload.dv : String(payload.dv);
                             const outcome = payload.outcome || '';
-                            details = `DV ${dvText} ,  ${outcome}`.trim();
+                            details = `DV ${dvText}, ${outcome}`.trim();
                         }
                     }
                     window.emitter.emit('show-roll-result', {
@@ -974,7 +974,7 @@ export default {
             return groups;
         });
 
-        // Owned but not installed ,  the shelf you install from. Kept apart from
+        // Owned but not installed, the shelf you install from. Kept apart from
         // the body locations so a spare arm never reads as a fitted one.
         const uninstalledCyberware = computed(() => {
             const items = charData.value?.data?.items || [];
@@ -1141,7 +1141,7 @@ export default {
 
         // --- WATCHERS ---
         watch(activeTab, (newTab) => {
-            // Always land the new tab at the top ,  the page scrolls at window
+            // Always land the new tab at the top, the page scrolls at window
             // level, so without this a mid-scroll position carries across tabs.
             window.scrollTo({top: 0, left: 0});
             if (newTab === 'control') {

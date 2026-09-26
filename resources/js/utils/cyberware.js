@@ -85,7 +85,7 @@ export function freeSlotsOf(item, items = []) {
  * Whether an item is currently installed.
  *
  * `system.isInstalled` is a derived getter in CPR, so it survives a fresh
- * ACTOR_DATA push but is absent entirely from some cached sheets ,  one real
+ * ACTOR_DATA push but is absent entirely from some cached sheets, one real
  * actor had it missing on all 14 items, which made every installed mod render
  * an Install button. Containment in a parent's list is the only ground truth
  * available, with the getter as a fallback for foundationals, which install

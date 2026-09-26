@@ -1,6 +1,6 @@
 ---
 title: "Self-Hosting: Standalone (FrankenPHP)"
-order: 4
+order: 5
 ---
 
 # Standalone Self-Hosting: FrankenPHP Tutorial & Build Log

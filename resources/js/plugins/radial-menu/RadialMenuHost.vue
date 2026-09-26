@@ -169,7 +169,7 @@ export default {
         const onBackdropDown = () => { /* swallow to keep pointer capture sane */ };
 
         // The finger that opened the menu is still owned by the source row, whose
-        // touch-action allows vertical panning ,  so without this the browser scrolls
+        // touch-action allows vertical panning, so without this the browser scrolls
         // the page and fires pointercancel, killing the angle tracking. While the
         // menu is open we cancel the scroll so the drag keeps flowing to onWindowMove.
         const preventScroll = (e) => { if (radialState.open) e.preventDefault(); };
@@ -236,7 +236,7 @@ export default {
     z-index: 2;
 }
 
-/* Non-highlighted petals stay at full brightness ,  the yellow highlight already
+/* Non-highlighted petals stay at full brightness, the yellow highlight already
    carries the selection; dimming the rest only hurt readability. */
 .radial-petal--dim {
     /* intentionally empty */

@@ -37,7 +37,7 @@ Route::get('/how-to-use', function () {
 Route::view('/design-brief', 'design-brief');
 
 // Read-only docs, rendered from wiki/*.md via spatie/sheets. Deliberately
-// public ,  no auth wall on documentation.
+// public, no auth wall on documentation.
 Route::get('/wiki', [WikiController::class, 'index'])->name('wiki.index');
 Route::get('/wiki/{slug}', [WikiController::class, 'show'])->name('wiki.show');
 
@@ -107,7 +107,7 @@ Route::middleware('auth')->post('/settings/api-token', function (Request $reques
     $config->save();
 
     // Generating a key necessarily invalidates the previous one, including the
-    // copy already pasted into the Foundry Bridge ,  which then fails every call
+    // copy already pasted into the Foundry Bridge, which then fails every call
     // with a 401 ("Failed to mint pairing", "Bridge Offline") for no reason the
     // GM can see. Say so out loud instead of leaving them to work it out.
     return back()

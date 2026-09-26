@@ -54,7 +54,7 @@ class AgentInstallTest extends TestCase
         // Set every secret the command looks at. Don't rely on ambient config:
         // phpunit.xml only pins APP_KEY, so the Reverb keys are blank on any
         // checkout without a real .env (fresh clone, CI, the standalone build),
-        // and the command would correctly generate them ,  failing this test for
+        // and the command would correctly generate them, failing this test for
         // the wrong reason.
         config(['app.key' => 'base64:'.base64_encode(str_repeat('k', 32))]);
         config(['reverb.apps.apps.0.key' => str_repeat('a', 32)]);

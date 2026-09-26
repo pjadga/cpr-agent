@@ -40,7 +40,7 @@
                     </a>
                 </div>
 
-                {{-- Ko-fi support button ,  inside the box, below "How to Use". Only on the
+                {{-- Ko-fi support button, inside the box, below "How to Use". Only on the
                      official hosted instance; self-hosted / local instances hide it here
                      (it stays on the How to Use page). Colour matches the dark panel. --}}
                 @if (request()->getHost() === 'agent.surrealdisco.co.uk')

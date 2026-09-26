@@ -178,7 +178,7 @@ export function createEmbedTransport({ nonce, parentOrigin }) {
         const ok = (data) => ({ data, status: 200, statusText: 'OK', headers: {}, config, request: {} });
 
         if (!entry) {
-            // Unknown endpoint in embed mode ,  degrade to an empty success.
+            // Unknown endpoint in embed mode, degrade to an empty success.
             return ok({});
         }
         if (entry.empty) {

@@ -3,10 +3,10 @@
 //
 // A stand-in for laravel-echo used when the Agent runs embedded inside
 // Foundry (see resources/js/embed/transport.js). In embedded mode there
-// is no Reverb/WebSocket ,  Foundry data arrives as postMessage envelopes
+// is no Reverb/WebSocket, Foundry data arrives as postMessage envelopes
 // from the Bridge module. This shim implements the tiny slice of the Echo
-// API the app actually uses ,  `.private(ch).listen('.FoundryResponse', cb)`
-// (and `.channel(...)`) ,  so every existing listener keeps working
+// API the app actually uses, `.private(ch).listen('.FoundryResponse', cb)`
+// (and `.channel(...)`), so every existing listener keeps working
 // unchanged; we just feed the callbacks from postMessage instead of a
 // socket.
 // ==================================================================

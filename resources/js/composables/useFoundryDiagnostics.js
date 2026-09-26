@@ -117,7 +117,7 @@ export const DIAGNOSTICS = {
     foundry_timeout: {
         title: "Can't reach Foundry: timed out",
         detail: 'Foundry did not respond in time.',
-        hint: 'If the GM hosts Foundry locally, make sure you are on the same network (or they expose it publicly). If hosted, it may be down ,  ask your GM.',
+        hint: 'If the GM hosts Foundry locally, make sure you are on the same network (or they expose it publicly). If hosted, it may be down, ask your GM.',
     },
     foundry_unreachable: {
         title: "Can't reach Foundry",
