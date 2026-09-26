@@ -157,9 +157,26 @@ class ActorSheet extends FormRequest
                 'fireModes' => $sys['fireModes'] ?? [],
 
                 // Cyberware Specifics
+                //
+                // This list is a whitelist: a field absent here never reaches
+                // the sheet, however complete the stored actor is. The cyberware
+                // UI needs the CPR body-location type to group by, the
+                // foundational/core flags to tell a body location from the
+                // cyberware in it, and size to count slots against.
                 'installLocation' => $sys['installLocation'] ?? '',
                 'installedItems' => $sys['installedItems'] ?? [], // Keeps slot data
+                'type' => $sys['type'] ?? '',
+                // Long-standing alias for the same value. Kept so anything
+                // still reading the old name does not break.
                 'cyberwareType' => $sys['type'] ?? '',
+                'isFoundational' => $sys['isFoundational'] ?? false,
+                'core' => $sys['core'] ?? false,
+                // Derived getters in CPR: present when the actor was serialised
+                // with them, absent otherwise, so null is a real third state
+                // meaning "unknown" rather than "not installed".
+                'isInstalled' => $sys['isInstalled'] ?? null,
+                'size' => $sys['size'] ?? null,
+                'humanityLoss' => $sys['humanityLoss'] ?? null,
                 'class' => $sys['class'] ?? '',
                 'isRezzed' => $sys['isRezzed'] ?? false,
                 'def' => $sys['def'] ?? 0,

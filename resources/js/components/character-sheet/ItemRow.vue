@@ -83,10 +83,10 @@
                             <!--                                </span>-->
                             <!--                            </div>-->
 
-                            <div v-if="category === 'cyberware'" class="flex items-center gap-1">
+                            <div v-if="category === 'cyberware' && cyberwareSlots" class="flex items-center gap-1">
                                 <i v-icon data-lucide="cpu" class="w-3 h-3 text-cpr-teal"></i>
                                 <span class="text-[10px] font-numbers text-cpr-teal">
-                                {{ item.system.installedItems.usedSlots }} / {{ item.system.installedItems.slots }}
+                                {{ cyberwareSlots.used }} / {{ cyberwareSlots.total }}
                             </span>
                             </div>
 
@@ -131,16 +131,18 @@
                 </button>
             </div>
 
+            <!-- Core items are the body locations themselves. They are the top
+                 parent and cannot be removed, so they carry no action. -->
             <div
-                v-if="category === 'cyberware' && isPlayer"
+                v-if="category === 'cyberware' && isPlayer && !isCoreCyberware"
                 class="flex items-center gap-1 shrink-0 relative mr-1">
                 <button
-                    @click.stop="item.system?.isInstalled ? uninstallCyberware() : installCyberware()"
+                    @click.stop="cyberwareInstalled ? uninstallCyberware() : installCyberware()"
                     class="p-2 transition-colors flex items-start relative z-10"
-                    :class="item.system?.isInstalled ? 'text-cpr-teal hover:text-cpr-yellow' : 'text-cpr-text-dim hover:text-cpr-yellow'"
-                    :title="item.system?.isInstalled ? 'Uninstall' : 'Install'"
+                    :class="cyberwareInstalled ? 'text-cpr-teal hover:text-cpr-yellow' : 'text-cpr-text-dim hover:text-cpr-yellow'"
+                    :title="cyberwareInstalled ? 'Uninstall' : 'Install'"
                 >
-                    <i v-icon :data-lucide="item.system?.isInstalled ? 'unplug' : 'plug'" class="w-5 h-5 pointer-events-none"></i>
+                    <i v-icon :data-lucide="cyberwareInstalled ? 'unplug' : 'plug'" class="w-5 h-5 pointer-events-none"></i>
                 </button>
             </div>
 
@@ -315,6 +317,7 @@ import {computed, ref} from 'vue';
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 import {findItemInList, formatCategoryName} from '../../utils/helpers';
+import {isCyberwareInstalled, isTopParent, totalSlotsOf, usedSlotsOf} from '../../utils/cyberware';
 import {longPress} from '../../plugins/radial-menu';
 import BasicItemFrame from './frames/BasicItemFrame.vue';
 import WeaponItemFrame from './frames/WeaponItemFrame.vue';
@@ -336,6 +339,19 @@ export default {
             expanded.value = !expanded.value;
         };
 
+        // `system.isInstalled` is a derived getter that does not survive every
+        // serialisation path — one cached sheet had it missing on all 14 items,
+        // which made installed mods offer an Install button. Derive it instead.
+        const cyberwareInstalled = computed(
+            () => isCyberwareInstalled(props.item, props.allItems || [])
+        );
+        const isCoreCyberware = computed(() => isTopParent(props.item));
+        const cyberwareSlots = computed(() => {
+            const total = totalSlotsOf(props.item);
+            if (!total) return null;
+            return {total, used: usedSlotsOf(props.item, props.allItems || [])};
+        });
+
         // Cyberware install/uninstall, routed over window.emitter (same path as the
         // radial actions) so it reaches character-sheet without prop-drilling.
         const installCyberware = () => window.emitter?.emit('cyberware-install', props.item);
@@ -351,7 +367,8 @@ export default {
             // window.emitter so it reaches character-sheet without prop-drilling.
             if (props.category === 'cyberware') {
                 const cw = [{id: 'info', icon: 'info', label: 'Info', handler: toggle}];
-                if (props.item.system?.isInstalled) {
+                if (isCoreCyberware.value) return cw;
+                if (cyberwareInstalled.value) {
                     cw.push({id: 'uninstall', icon: 'unplug', label: 'Uninstall', handler: () => window.emitter?.emit('cyberware-uninstall', props.item)});
                 } else {
                     cw.push({id: 'install', icon: 'plug', label: 'Install', handler: () => window.emitter?.emit('cyberware-install', props.item)});
@@ -608,6 +625,9 @@ export default {
             itemActions,
             installCyberware,
             uninstallCyberware,
+            cyberwareInstalled,
+            isCoreCyberware,
+            cyberwareSlots,
             formatType,
             findItem,
             ammoName,

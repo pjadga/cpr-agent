@@ -8,12 +8,16 @@ const installLoading = ref(false);
 // The CYBERWARE_INSTALL_OPTIONS payload:
 // { itemId, itemName, isFoundational, canInstall, reason, targets:[{id,name}], humanityLoss:{roll,static} }
 const installOptions = ref(null);
+// Uninstall is a confirm step rather than a request/response round trip: there
+// is nothing to ask Foundry, only the player to confirm before the mod comes out.
+const showUninstallModal = ref(false);
+const uninstallTarget = ref(null);
 
 /**
  * Cyberware install / uninstall. Mirrors CPR's dialog flow, driven from the app:
  *   requestInstall(item)  -> PREPARE_CYBERWARE_INSTALL, options return via echo
  *   confirmInstall(...)   -> INSTALL_CYBERWARE (installItems + humanity loss)
- *   uninstall(item, fId)  -> UNINSTALL_CYBERWARE
+ *   requestUninstall(item) -> confirm, then UNINSTALL_CYBERWARE
  * The sheet updates via SHEET_DELTA; the humanity roll posts a CPR chat card.
  *
  * Call once (in character-sheet) so the echo listener registers a single time.
@@ -47,17 +51,46 @@ export function useCyberware() {
         }
     };
 
-    const uninstall = async (item, foundationalId = null) => {
+    // Open the confirm. The parent is resolved here rather than at the row so
+    // the Bridge gets the foundational it needs to detach from.
+    const requestUninstall = (item, items = []) => {
         if (!item?._id) return;
+        uninstallTarget.value = {
+            item,
+            foundationalId: findParentId(item._id, items),
+        };
+        showUninstallModal.value = true;
+    };
+
+    const confirmUninstall = async () => {
+        const target = uninstallTarget.value;
+        if (!target) return;
+        showUninstallModal.value = false;
         try {
-            await window.axios.post('/api/uninstall-cyberware', {itemId: item._id, foundationalId});
+            await window.axios.post('/api/uninstall-cyberware', {
+                itemId: target.item._id,
+                foundationalId: target.foundationalId,
+            });
         } catch (e) {
             console.error('Error uninstalling cyberware', e);
         }
+        uninstallTarget.value = null;
+    };
+
+    const closeUninstallModal = () => {
+        showUninstallModal.value = false;
+        uninstallTarget.value = null;
     };
 
     const closeInstallModal = () => {
         showInstallModal.value = false;
+    };
+
+    const findParentId = (childId, items) => {
+        const parent = (items || []).find(
+            (i) => (i.system?.installedItems?.list || []).includes(childId)
+        );
+        return parent?._id || null;
     };
 
     const handleFoundryResponse = (e) => {
@@ -77,7 +110,11 @@ export function useCyberware() {
         installOptions,
         requestInstall,
         confirmInstall,
-        uninstall,
         closeInstallModal,
+        showUninstallModal,
+        uninstallTarget,
+        requestUninstall,
+        confirmUninstall,
+        closeUninstallModal,
     };
 }

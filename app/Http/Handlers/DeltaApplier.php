@@ -128,7 +128,7 @@ class DeltaApplier
                 }
             }
 
-            // Not found — append
+            // Not found ,  append
             $array['items'][] = $value;
         }
     }

@@ -9,6 +9,9 @@
         <dice-history></dice-history>
         <cyberware-install-modal :show="showCyberwareModal" :options="cyberwareOptions"
                                  @close="closeCyberwareModal" @confirm="confirmCyberwareInstall"></cyberware-install-modal>
+        <cyberware-uninstall-modal :show="showCyberwareUninstallModal" :target="cyberwareUninstallTarget"
+                                   @close="closeCyberwareUninstallModal"
+                                   @confirm="confirmCyberwareUninstall"></cyberware-uninstall-modal>
 
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
@@ -266,10 +269,13 @@
                         :active-tab="activeTab"
                         :collapsed-categories="collapsedCategories"
                         :grouped-cyberware="groupedCyberware"
+                        :uninstalled-cyberware="uninstalledCyberware"
+                        :cyberware-show-all="cyberwareShowAll"
                         :grouped-gear="groupedGear"
                         :char-data="charData"
                         :refresh-all="refreshAll"
                         @toggle-category="toggleCategory"
+                        @toggle-cyberware-show-all="toggleCyberwareShowAll"
                         @item-click="handleItemClick"
                         @equip-click="openEquipModal"
                         @consume-click="openConsumeModal"
@@ -494,7 +500,9 @@ import {useNetrunner} from '../composables/useNetrunner';
 import {useNetPool} from '../composables/useNetPool';
 import {diagnostic} from '../composables/useFoundryDiagnostics';
 import {useCyberware} from '../composables/useCyberware';
+import {CYBERWARE_TYPE_ORDER, cyberwareTypeLabel, isCyberwareInstalled} from '../utils/cyberware';
 import CyberwareInstallModal from './character-sheet/CyberwareInstallModal.vue';
+import CyberwareUninstallModal from './character-sheet/CyberwareUninstallModal.vue';
 import {useEchoListener} from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
@@ -519,6 +527,7 @@ export default {
         DiceHistory,
         RollResultPopup,
         CyberwareInstallModal,
+        CyberwareUninstallModal,
         TopBorderFrame,
         BottomBorderFrame,
         MobileBackgroundFrame
@@ -556,11 +565,16 @@ export default {
             installOptions: cyberwareOptions,
             requestInstall: requestCyberwareInstall,
             confirmInstall: confirmCyberwareInstall,
-            uninstall: uninstallCyberware,
-            closeInstallModal: closeCyberwareModal
+            closeInstallModal: closeCyberwareModal,
+            showUninstallModal: showCyberwareUninstallModal,
+            uninstallTarget: cyberwareUninstallTarget,
+            requestUninstall: requestCyberwareUninstall,
+            confirmUninstall: confirmCyberwareUninstall,
+            closeUninstallModal: closeCyberwareUninstallModal
         } = useCyberware();
         window.emitter?.on('cyberware-install', (item) => requestCyberwareInstall(item));
-        window.emitter?.on('cyberware-uninstall', (item) => uninstallCyberware(item));
+        window.emitter?.on('cyberware-uninstall', (item) =>
+            requestCyberwareUninstall(item, charData.value?.data?.items || []));
 
         const activeTab = ref('stats');
         const showPopup = ref(false);
@@ -925,20 +939,52 @@ export default {
             return ids;
         });
 
-        const groupedCyberware = computed(() => {
-            if (!charData.value) return {};
-            const cyberware = charData.value.data.items.filter(i =>
-                ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal', 'cyberdeck'].includes(i.type) &&
-                !installedIds.value.has(i._id)
+        // Cyberware grouped by body location. Only installed, non-nested items
+        // become rows: the category heading is the top parent (CPR has a real
+        // container item for External/Internal/Fashionware but none for
+        // Cybereye/Cyberarm/Neuralware, so the heading has to stand in), and
+        // deeper nesting is rendered by CyberwareNode from installedItems.list.
+        //
+        // This grouped on `system.cyberwareType` and fell through a
+        // `|| 'Cyberdeck'` fallback for everything. The value is the CPR body
+        // location (cyberEye, cyberArm, ...); ActorSheet::cleanItem passes it
+        // under both names, and item-level `type` is only ever 'cyberware'.
+        const topLevelCyberware = computed(() => {
+            if (!charData.value) return [];
+            return charData.value.data.items.filter(
+                i => i.type === 'cyberware' && !installedIds.value.has(i._id)
             );
+        });
+
+        const groupedCyberware = computed(() => {
+            const items = charData.value?.data?.items || [];
+            const installed = topLevelCyberware.value.filter(cw => isCyberwareInstalled(cw, items));
+
             const groups = {};
-            cyberware.forEach(cw => {
-                const type = cw.system.cyberwareType || 'Cyberdeck';
-                if (!groups[type]) groups[type] = [];
-                groups[type].push(cw);
+            CYBERWARE_TYPE_ORDER.forEach(type => {
+                const inType = installed.filter(cw => cw.system?.type === type);
+                // "Show all" keeps every body location on screen, including the
+                // ones holding nothing, so the sheet doubles as a map of what
+                // could still be filled.
+                if (inType.length || cyberwareShowAll.value) groups[cyberwareTypeLabel(type)] = inType;
             });
+            const known = new Set(CYBERWARE_TYPE_ORDER);
+            const rest = installed.filter(cw => !known.has(cw.system?.type));
+            if (rest.length) groups[cyberwareTypeLabel(null)] = rest;
             return groups;
         });
+
+        // Owned but not installed — the shelf you install from. Kept apart from
+        // the body locations so a spare arm never reads as a fitted one.
+        const uninstalledCyberware = computed(() => {
+            const items = charData.value?.data?.items || [];
+            return topLevelCyberware.value.filter(cw => !isCyberwareInstalled(cw, items));
+        });
+
+        const cyberwareShowAll = ref(false);
+        const toggleCyberwareShowAll = () => {
+            cyberwareShowAll.value = !cyberwareShowAll.value;
+        };
 
         const groupedInjuries = computed(() => {
             if (!charData.value) return {head: [], body: []};
@@ -1193,6 +1239,9 @@ export default {
             roleItem,
             groupedSkills,
             groupedCyberware,
+            uninstalledCyberware,
+            cyberwareShowAll,
+            toggleCyberwareShowAll,
             groupedGear,
             groupedInjuries,
             groupedEquipped,
@@ -1261,6 +1310,10 @@ export default {
             cyberwareOptions,
             confirmCyberwareInstall,
             closeCyberwareModal,
+            showCyberwareUninstallModal,
+            cyberwareUninstallTarget,
+            confirmCyberwareUninstall,
+            closeCyberwareUninstallModal,
 
             // Combat
             mockEnemies,

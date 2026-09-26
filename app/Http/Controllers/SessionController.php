@@ -21,7 +21,7 @@ class SessionController extends Controller
         }
 
         // Channel unification, self-heal and Foundry-config sync all live in
-        // ensureActiveFor — shared with the auto-create on connection save.
+        // ensureActiveFor ,  shared with the auto-create on connection save.
         $session = Session::ensureActiveFor($user);
 
         return response()->json([

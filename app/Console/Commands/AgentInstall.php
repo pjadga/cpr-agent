@@ -31,7 +31,7 @@ class AgentInstall extends Command
 
     public function handle(): int
     {
-        $this->info('CPR Agent — first-run install');
+        $this->info('CPR Agent ,  first-run install');
 
         $envPath = $this->resolveEnvPath();
 
@@ -56,7 +56,7 @@ class AgentInstall extends Command
 
         $generated = [];
 
-        // APP_KEY — 32 random bytes, base64, matching Laravel's own key format.
+        // APP_KEY, 32 random bytes, base64, matching Laravel's own key format.
         if ($this->option('force') || blank(config('app.key'))) {
             $key = 'base64:'.base64_encode(random_bytes(32));
             config(['app.key' => $key]);
@@ -66,7 +66,7 @@ class AgentInstall extends Command
             $this->components->twoColumnDetail('APP_KEY', '<fg=gray>already set</>');
         }
 
-        // Reverb credentials — unique per install so one GM's tokens are not
+        // Reverb credentials, unique per install so one GM's tokens are not
         // valid against another's server.
         foreach (['REVERB_APP_KEY' => 'reverb.apps.apps.0.key', 'REVERB_APP_SECRET' => 'reverb.apps.apps.0.secret'] as $envKey => $configPath) {
             if ($this->option('force') || blank(config($configPath))) {
@@ -89,7 +89,7 @@ class AgentInstall extends Command
 
         if ($generated && ($this->option('show') || ! $envWritable)) {
             $this->newLine();
-            $this->line('<comment>Generated secrets — keep these safe:</comment>');
+            $this->line('<comment>Generated secrets ,  keep these safe:</comment>');
             foreach ($generated as $envKey => $value) {
                 $this->line("  {$envKey}={$value}");
             }
@@ -112,7 +112,7 @@ class AgentInstall extends Command
             }
         }
 
-        // Storage skeleton — honours LARAVEL_STORAGE_PATH, so this also seeds
+        // Storage skeleton, honours LARAVEL_STORAGE_PATH, so this also seeds
         // the persistent storage dir for the single-binary build.
         foreach (['framework/cache/data', 'framework/sessions', 'framework/views', 'app', 'logs'] as $dir) {
             $path = storage_path($dir);
