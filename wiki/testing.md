@@ -3,26 +3,26 @@ title: Testing
 order: 7
 ---
 
-# Testing Documentation
+# Testing
 
-This document describes the comprehensive testing suite for the Cyberpunk Agent application.
+This is what's in the test suite, and how to run it. It's for working on the Agent itself. If you're just self-hosting, you can happily skip this whole page.
 
 ## Overview
 
-The testing suite is organized into several categories:
-- **Backend Tests**: Tests for Foundry VTT callback API integration
-- **Frontend Tests**: Tests for authentication, API connections, and Laravel framework features
-- **Unit Tests**: Tests for individual components and helper methods
-- **Integration Tests**: End-to-end workflow tests
+The tests are split into four groups:
+- **Backend Tests**: The Foundry VTT callback API
+- **Frontend Tests**: Logins, API connections, and the Laravel framework bits
+- **Unit Tests**: Individual components and helper methods
+- **Integration Tests**: Whole workflows, start to finish
 
 ## Test Suites
 
 ### Backend Suite (`tests/Feature/Api/`)
 
-Tests all Foundry VTT integration points and callback handling.
+Everything where the Agent and Foundry VTT talk to each other, and how callbacks get handled.
 
 #### FoundryCallbackTest.php
-Comprehensive tests for the `/api/foundry/callback` endpoint covering:
+The `/api/foundry/callback` endpoint. Covers:
 - Authentication requirements
 - Character linking (player and GM-initiated)
 - Actor data updates (full and delta)
@@ -33,7 +33,7 @@ Comprehensive tests for the `/api/foundry/callback` endpoint covering:
 - Request validation
 
 **Key Test Cases:**
-- `it_requires_authentication()` - Ensures API is protected
+- `it_requires_authentication()` - API is locked down
 - `it_handles_link_player_character_request()` - Player character linking
 - `it_handles_gm_link_player_character_request()` - GM-initiated linking
 - `it_handles_actor_data_update()` - Full character sheet sync
@@ -46,7 +46,7 @@ Comprehensive tests for the `/api/foundry/callback` endpoint covering:
 - `it_broadcasts_with_channel_id()` - Channel-based broadcasting
 
 #### FoundryIntegrationTest.php
-End-to-end workflow tests simulating real Foundry VTT scenarios:
+Plays out real Foundry VTT scenarios from start to finish:
 - Complete character linking workflow
 - Combat sequences (initiative, attack, damage, ammo tracking)
 - Netrunning workflows (program installation, rezzing, attacks)
@@ -67,10 +67,10 @@ End-to-end workflow tests simulating real Foundry VTT scenarios:
 
 ### Frontend Suite (`tests/Feature/Frontend/`)
 
-Tests for frontend authentication and API connectivity.
+Logging in, and the frontend talking to the backend.
 
 #### AuthenticationFlowTest.php
-Laravel Breeze authentication tests:
+The Laravel Breeze auth flows:
 - Registration and login flows
 - Password management
 - Profile updates
@@ -88,7 +88,7 @@ Laravel Breeze authentication tests:
 - `user_can_update_password()` - Password changes
 
 #### ApiConnectionTest.php
-Frontend-to-backend API communication tests:
+The frontend talking to the backend API:
 - Sanctum token authentication
 - API endpoint accessibility
 - Error handling and validation
@@ -107,7 +107,7 @@ Frontend-to-backend API communication tests:
 
 ### Broadcasting Tests (`tests/Feature/BroadcastingTest.php`)
 
-Tests for Laravel Reverb/Broadcasting integration:
+Laravel Reverb and broadcasting:
 - Event dispatching
 - Channel routing
 - Authentication
@@ -123,7 +123,7 @@ Tests for Laravel Reverb/Broadcasting integration:
 ### Unit Tests (`tests/Unit/`)
 
 #### FoundryCallbackHelperTest.php
-Tests for the `arraySetDot()` helper method:
+The `arraySetDot()` helper, which does all the delta heavy lifting:
 - Dot notation path parsing
 - Nested updates
 - Item array operations (add, update, delete)
@@ -139,7 +139,7 @@ Tests for the `arraySetDot()` helper method:
 - `it_prevents_duplicate_items_when_adding()` - Duplicate prevention
 
 #### UserModelTest.php
-Tests for the User model:
+The User model:
 - Agent link generation
 - Channel ID generation
 - Character data storage
@@ -208,20 +208,17 @@ php artisan test --parallel
 
 ## Test Database
 
-Tests use an in-memory SQLite database configured in `phpunit.xml`:
+Tests run against an in-memory SQLite database, set in `phpunit.xml`:
 ```xml
 <env name="DB_CONNECTION" value="sqlite"/>
 <env name="DB_DATABASE" value=":memory:"/>
 ```
 
-This ensures:
-- Fast test execution
-- No pollution of development database
-- Clean state for each test run
+So the tests are quick, they never touch your dev database, and every run starts from clean.
 
 ## Continuous Integration
 
-The test suite is designed to run in CI/CD pipelines. Example GitHub Actions workflow:
+The suite runs fine in a CI/CD pipeline. Here's an example GitHub Actions workflow:
 
 ```yaml
 name: Tests
@@ -243,7 +240,7 @@ jobs:
         run: php artisan test
 ```
 
-## Test Coverage Goals
+## What I'm Aiming For
 
 - **Backend API**: 100% coverage of Foundry callback types
 - **Frontend Auth**: All Laravel Breeze flows
@@ -252,20 +249,22 @@ jobs:
 
 ## Writing New Tests
 
+If you're adding tests, here's the rough pattern.
+
 ### Backend Tests
-When adding new Foundry callback types:
+New Foundry callback type?
 1. Add test to `FoundryCallbackTest.php` for the specific callback
 2. Add integration test to `FoundryIntegrationTest.php` for the workflow
-3. Ensure event broadcasting is tested
+3. Make sure the event broadcasting is tested too
 
 ### Frontend Tests
-When adding new frontend features:
+New frontend feature?
 1. Add authentication tests if auth-related
 2. Add API connection tests if calling backend
 3. Test both success and error cases
 
 ### Unit Tests
-When adding helper methods or model methods:
+New helper or model method?
 1. Test all code paths
 2. Test edge cases (null, empty, invalid data)
 3. Test data type handling
@@ -308,20 +307,20 @@ $this->actingAs($user)->get('/dashboard')->assertStatus(200);
 ## Troubleshooting
 
 ### Tests Failing Due to Database
-- Ensure migrations are up to date
+- Make sure your migrations are up to date
 - Check `phpunit.xml` database configuration
 - Clear cache: `php artisan config:clear`
 
 ### Event Broadcasting Tests Failing
-- Ensure `Event::fake()` is called before triggering events
+- Make sure `Event::fake()` is called *before* you trigger the event
 - Check event class imports
 
 ### Authentication Tests Failing
 - Verify Laravel Breeze is installed
 - Check routes are registered
-- Ensure middleware is configured
+- Check the middleware is configured
 
-## Additional Resources
+## Further Reading
 
 - [Laravel Testing Documentation](https://laravel.com/docs/testing)
 - [PHPUnit Documentation](https://phpunit.de/documentation.html)

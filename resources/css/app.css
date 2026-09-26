@@ -2,6 +2,7 @@
 @import "./themes.css";
 @import "./components/foundry-content.css";
 @import "./components/wiki.css";
+@import "./components/settings.css";
 
 @theme {
     --font-sans: var(--cpr-font-sans, 'Hack', monospace);

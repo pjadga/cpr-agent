@@ -3,32 +3,36 @@ title: Architecture
 order: 5
 ---
 
-### Foundry Module ,  Bullet Point Release Notes (Rough Write‑Up)
+### The Foundry Module: Rough Release Notes
 
-- Purpose: Displays character data from Foundry using a secure web-socket connection. Allows the user to interact with Foundry instance through callbacks.
-- Real‑time sheet sync: Applies selective “delta” updates to the Agent’s cached character sheet without requiring full refreshes. Deltas can add/update/delete nested values and item entries.
-- Webhook callback: Foundry posts results and sheet changes to the Agent’s `/api/foundry/callback`, which are then broadcast to the frontend over a private channel (`cpr-agent.{{channel_id}}` → `FoundryResponse`).
-- Actor bootstrap: On first load, the Agent will try to resolve the user’s controlled Actor and persist a clean mirror of actor data server‑side to reduce round‑trips.
-- Rolls orchestration: Provides endpoints to initiate stat/skill/role/attack/damage/initiative rolls, forward them to Foundry, and deliver results (including modifiers, crit flags, and totals) back to the Agent.
-- Token controls: Exposes endpoints for visibility, targeting, movement, and weapon reload. 
-- Image routing: Supports proxying images from Foundry (including Ngrok URLs) to the Agent for reliable display outside the Foundry host.
-- Config integration: Stores per‑user `foundry_url` and an API token to address/authorize the correct Foundry instance and world.
-- Fault tolerance: Time‑boxed response collection using request IDs and cache; if Foundry is slow to respond, the Agent returns a structured timeout message.
-- Security: All Foundry callback and broadcast auth routes are protected by Sanctum; frontend listens on a private broadcast channel which is specific to the GM and their group.
+These started life as my bullet-point release notes, so they're rough. They're still the quickest way to see what the thing actually does.
+
+- **What it's for:** Shows your character data from Foundry over a secure websocket connection, and lets you poke your Foundry game back through callbacks.
+- **Real-time sheet sync:** Applies small "delta" updates to the Agent's cached character sheet, so nothing needs a full refresh. Deltas can add, update or delete nested values and item entries.
+- **Webhook callback:** Foundry posts results and sheet changes to the Agent's `/api/foundry/callback`, which then get broadcast to the frontend over a private channel (`cpr-agent.{{channel_id}}` → `FoundryResponse`).
+- **Actor bootstrap:** On first load, the Agent tries to work out which Actor you control, and keeps a clean copy of that actor's data server-side to save on round-trips.
+- **Rolls:** Endpoints to kick off stat/skill/role/attack/damage/initiative rolls, pass them to Foundry, and bring the results (modifiers, crit flags, totals) back to the Agent.
+- **Token controls:** Endpoints for visibility, targeting, movement and weapon reload.
+- **Image routing:** Proxies images from Foundry (Ngrok URLs included) so they still show up when you're not on the Foundry host.
+- **Config:** Stores a `foundry_url` and API token per user, so it's always talking to the right Foundry instance and world.
+- **Fault tolerance:** Waits for responses against request IDs and the cache, but only for so long. If Foundry's slow, the Agent sends back a proper timeout message instead of hanging.
+- **Security:** Every Foundry callback and broadcast auth route is behind Sanctum, and the frontend listens on a private channel that belongs to the GM and their group.
 
 #### Overview and Architecture
 
-- Components:
-    - Agent Backend (Laravel): Provides the HTTP API consumed by the frontend and mediates all requests and callbacks with Foundry.
-    - Foundry VTT + CPR Agent Bridge: Executes calls from the Agent within Foundry, sends callbacks containing requested data or results to the Agent.
-    - Agent Frontend (Vue): Renders character sheet, sends actions (rolls, updates), and applies realtime deltas via broadcast events.
-- Communication patterns:
+There are three moving parts:
+
+- **Agent Backend (Laravel):** The HTTP API the frontend talks to. Every request to Foundry, and every callback from it, goes through here.
+- **Foundry VTT + the CPR Agent Bridge:** Runs the Agent's calls inside Foundry, and sends back callbacks with the data or results that were asked for.
+- **Agent Frontend (Vue):** Draws the character sheet, sends actions (rolls, updates), and applies real-time deltas as broadcast events come in.
+
+And four ways they talk to each other:
     1) Agent → Foundry: The Agent calls CPRAB endpoints using the configured API key, foundry_url and channel_id.
     2) Foundry → Agent (webhook): Foundry posts results/updates to `/api/foundry/callback` with a `type`, optional `requestId`, and optional `delta`.
     3) Agent → Frontend (broadcast): The Agent emits a `FoundryResponse` event on private channel `cpr-agent.{{channel_id}}`; the Vue app consumes it and applies deltas immediately.
     4) Agent Frontend → Agent Backend (poll/refresh): For first-load or when a targeted refresh is requested, the frontend calls `/actorsheet` (and, if needed, `/getactor`) to hydrate/rehydrate the local mirror.
 
-Key files for reference:
+If you want to go digging, start with these:
 - Webhook handler: `app/Http/Controllers/Api/FoundryController.php`
 - Broadcast event: `app/Events/FoundryResponse.php`
 - Frontend Listener (Axios): `resources/js/composables/listener.js`
@@ -37,20 +41,20 @@ Key files for reference:
 
 #### Authentication and Configuration
 
-- Auth: All relevant API routes use Laravel Sanctum. The frontend must hold an authenticated web session or a valid bearer token.
-- Configuration:
+- **Auth:** Every API route that matters uses Laravel Sanctum. The frontend needs either a logged-in web session or a valid bearer token.
+- **Configuration:**
     - `foundry_url`: Base URL to the Foundry instance (stored per user in `configs`).
     - API Token: Generated in the Agent (`/settings/api-token`) and shared with the CPRAB Module per user.
-    - Channel ID: Generated for each user, however only one is needed for a group. Channel IDs can be shared between the group.
-    - Agent ID: Unique identifier to each user - this is a unique identifier that allows the CPRAB to correctly communicate back to the correct user.
+    - Channel ID: Every user gets one, but a group only needs one between them. Share it round the table.
+    - Agent ID: Unique to each user. It's how the CPRAB knows which user to talk back to.
 
 
 #### Webhook: Foundry → Agent
 
 - Method/Path: `POST /api/foundry/callback`
 - Auth: Sanctum (Bearer token or authenticated session)
-- Purpose: Unified callback for Foundry to push roll results, actor data snapshots, token lists, and partial sheet updates (deltas).
-- Body fields (subset; see code for full list):
+- Purpose: The one callback Foundry uses for everything: roll results, actor snapshots, token lists and partial sheet updates (deltas).
+- Body fields (not the full list, the code has the rest):
     - `requestId` (string, optional): Correlates async request/response.
     - `type` (string, required): Message kind. Examples: `SHEET_DELTA`, `CONFIRMATION`, `ACTORS_DATA`, `VISIBLE_TOKENS`, roll result types.
     - `action` (string, optional): Contextual action name (e.g., which roll).
@@ -67,7 +71,7 @@ Key files for reference:
     - `delta` (object, optional): Map of dot-paths to values representing partial sheet updates. See Delta section below.
     - `tab` (string, optional): UI hint for which sheet tab changed.
 
-- Behavior on receipt:
+- What happens when one lands:
     1) Validate shape and persist in cache if a `requestId` is present (short-lived handoff for polling consumers).
     2) If `type === SHEET_DELTA` and a user is authenticated, apply the delta to the server-side cached mirror (`user->character_data`) using dot-path mutation, including item add/update/delete semantics.
     3) Broadcast the validated payload via `FoundryResponse` on private channel `cpr-agent` to the frontend.
@@ -79,7 +83,7 @@ Key files for reference:
 
 #### Core Frontend Data Endpoints (Agent Frontend → Agent Backend)
 
-All routes below require an authenticated session and a configured profile. See `routes/web.php` for middleware guards.
+Everything below needs a logged-in session and a configured profile. The middleware guards are in `routes/web.php`.
 
 - GET `/getbaseurl`
     - Returns the configured `foundry_url` (string). Used by the frontend to compose image URLs.
@@ -89,7 +93,7 @@ All routes below require an authenticated session and a configured profile. See 
     - Request: `{ actorUuid: string, actorData?: object }`
         - If `actorData` provided, it will be saved as the authoritative mirror.
         - If only `actorUuid` provided, the current mirror is returned.
-    - Response: `{ data: object, requestId?: string }` ,  `data` reflects the sheet mirror under `data.*` keys.
+    - Response: `{ data: object, requestId?: string }`. `data` is the sheet mirror under `data.*` keys.
 
 - POST `/getactor`
     - Purpose: Pull the live actor document from Foundry (via REST), typically for first-time hydration or force-refresh.
@@ -103,36 +107,36 @@ All routes below require an authenticated session and a configured profile. See 
 
 #### Roll and Mechanics Endpoints
 
-Common behavior: These routes translate a user action into a Foundry REST API call. The resulting data (roll totals, crit flags, modifiers, item effects) is returned via the webhook and broadcast. Some endpoints may also return an immediate 200 with an acknowledgment while the final result arrives asynchronously.
+These all work the same way: turn something the player did into a Foundry REST API call. Whatever comes out of it (roll totals, crit flags, modifiers, item effects) comes back through the webhook and gets broadcast. Some of them also send an instant 200 to say "got it" while the real result turns up later.
 
-- POST `/statrollrequest` ,  request a stat roll
-- POST `/skillrollrequest` ,  request a skill roll
-- POST `/rolerollrequest` ,  request a role ability roll
-- POST `/attackroll` ,  weapon attack roll
-- POST `/damageroll` ,  damage roll after a hit
-- POST `/initiativeroll` ,  initiative roll
-- POST `/getrollmodifiers` ,  fetch and/or prompt roll modifiers in Foundry
-- POST `/make-roll` ,  generic expression roll; GET `/get-rolls` to list recent rolls
+- POST `/statrollrequest`: request a stat roll
+- POST `/skillrollrequest`: request a skill roll
+- POST `/rolerollrequest`: request a role ability roll
+- POST `/attackroll`: weapon attack roll
+- POST `/damageroll`: damage roll after a hit
+- POST `/initiativeroll`: initiative roll
+- POST `/getrollmodifiers`: fetch and/or prompt roll modifiers in Foundry
+- POST `/make-roll`: generic expression roll; GET `/get-rolls` to list recent rolls
 
-Request bodies vary by action (stat/skill identifiers, context like item IDs/targets, or free-form expressions). Results will be posted back to `/api/foundry/callback` and broadcast.
+What goes in the request depends on the action (stat/skill IDs, context like item IDs or targets, or a free-form expression). Results get posted back to `/api/foundry/callback` and broadcast.
 
 
 #### Token and Inventory/Program Endpoints
 
-- POST `/getvisibletokens` ,  query currently visible tokens (may be async with cache handoff via `requestId`).
-- POST `/listvisibletokens` ,  list candidate tokens (broader set than “visible only”).
-- POST `/targettokens` ,  set token targets.
-- POST `/movetoken` ,  move a token to a new position.
-- POST `/reloadweapon` ,  reload current weapon.
-- POST `/item-equip` ,  equip/unequip item.
-- POST `/installprogram`, `/uninstallprogram`, `/toggleprogramrez`, `/programroll` ,  Netrunning program management and rolls.
+- POST `/getvisibletokens`: query currently visible tokens (may be async with cache handoff via `requestId`).
+- POST `/listvisibletokens`: list candidate tokens (broader set than “visible only”).
+- POST `/targettokens`: set token targets.
+- POST `/movetoken`: move a token to a new position.
+- POST `/reloadweapon`: reload current weapon.
+- POST `/item-equip`: equip/unequip item.
+- POST `/installprogram`, `/uninstallprogram`, `/toggleprogramrez`, `/programroll`: Netrunning program management and rolls.
 
-These typically accept identifiers (token IDs, item IDs, program IDs) and context fields. Success/failure and resulting game state are propagated via the webhook and deltas.
+These mostly take IDs (token, item, program) plus some context. Whether it worked, and what changed in the game, comes back through the webhook and deltas.
 
 
 #### Delta Mechanism (Selective Sheet Updates)
 
-Deltas model partial updates as a map of dot-paths to values. They are applied on both server and client mirrors to avoid pulling an entire actor document.
+A delta is a partial update: a map of dot-paths to values. It gets applied to both the server and client copies, so nobody has to pull the whole actor document again.
 
 - Shape:
 ```json
@@ -149,25 +153,25 @@ Deltas model partial updates as a map of dot-paths to values. They are applied o
 }
 ```
 
-- Server-side application (highlights):
+- On the server (the important bits):
     - Paths are applied to `user->character_data` using a dot-walk.
     - Special item rules in `arraySetDot`:
         - `items.+ID`: append or replace entire item with `_id = ID`; creates `items` array if missing.
         - `items.ID`: add/replace entire item object, or delete when value is `null`.
         - `items.ID.some.deep.path`: deep-merge/update within an existing item; ignored if the item does not exist.
 
-- Client-side application (highlights in `applyDelta`):
+- On the client (the important bits of `applyDelta`):
     - Incoming Foundry-style paths are mapped under the local mirror root:
         - If a path starts with `system` or `items`, it is remapped to `data.system` or `data.items` respectively.
         - If a path already starts with `data.`, it is used as-is.
-    - Special item rules mirror the server’s logic:
+    - Items follow the same rules as the server:
         - `data.items.+ID` appends/replaces the entire item object.
         - `data.items.ID` adds/replaces the full item or deletes on `null`.
         - `data.items.ID.field...` deep-updates in place.
     - After applying, the composable triggers a reactive refresh and re-renders Lucide icons.
 
 - Targeted refresh (`refreshSheet`):
-    - For a focused pull, the frontend can ask the backend for the latest mirror via `/actorsheet` and request only the changed sub-paths; the result is converted into a synthetic delta and applied locally.
+    - When the frontend only needs a bit of the sheet, it asks the backend for the latest mirror via `/actorsheet`, just for the changed sub-paths. The result gets turned into a synthetic delta and applied locally.
 
 
 #### Typical Transaction Flows
@@ -202,8 +206,8 @@ Deltas model partial updates as a map of dot-paths to values. They are applied o
 
 #### Errors and Timeouts
 
-- Callback not received in time:
-    - Backend returns a consistent timeout JSON with `message: "Foundry VTT did not respond in time."` (see token/actors controllers), while still honoring any late callback when it arrives.
+- Foundry never called back:
+    - The backend sends a standard timeout JSON with `message: "Foundry VTT did not respond in time."` (see the token/actors controllers), and still deals with the callback properly if it turns up late.
 - Validation errors on webhook: `422 Unprocessable Entity` with details.
 - Auth failures: `401 Unauthorized`.
 
@@ -211,26 +215,26 @@ Deltas model partial updates as a map of dot-paths to values. They are applied o
 #### Image Proxying
 
 - GET `/proxy-image?url=<encoded>`
-- Proxies images from Foundry (including Ngrok) to ensure they render for the Agent frontend even when cross-origin or privately hosted.
+- Proxies images from Foundry (Ngrok included) so they still show up in the Agent when they're cross-origin or privately hosted.
 
 
 #### Notes on Data Shapes
 
 - Frontend mirror stores actor data under `data.*` to mirror Foundry’s `system.*` and `items` trees.
-- When constructing targeted refreshes, the frontend converts requested Foundry paths like `system.*` or `items.*` to `data.system.*` or `data.items.*` for local storage, but keeps the original external path keys in emitted deltas for clarity.
+- For targeted refreshes, the frontend stores Foundry paths like `system.*` or `items.*` locally as `data.system.*` or `data.items.*`, but keeps the original Foundry-style keys in the deltas it sends out, so they still make sense.
 
 
 #### Security Considerations
 
-- All critical endpoints require authentication via Sanctum.
+- Anything that matters needs Sanctum authentication.
 - Broadcast authorization uses `Broadcast::routes` with both `web` and `auth:sanctum,web` to allow session- or token-based subscriptions to the private channel.
-- Request IDs should be treated as opaque correlators; do not trust them for authorization.
+- Request IDs are just labels for matching responses to requests. Don't ever use them for authorisation.
 
 
 #### Versioning and Compatibility
 
-- The Agent expects the ThreeHats API module installed/enabled in Foundry and configured with the Agent’s relay/callback URL and matching API key.
-- Path conventions for deltas follow Foundry’s `system.*` and `items` schema; custom systems or schema changes must maintain dot-path consistency for best results.
+- The Agent expects the ThreeHats API module to be installed and switched on in Foundry, pointed at the Agent's relay/callback URL, with the matching API key.
+- Delta paths follow Foundry's `system.*` and `items` schema. If you're on a custom system or the schema changes, keep the dot-paths consistent or things will get weird.
 
 
 #### Minimal Examples

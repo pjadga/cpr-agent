@@ -4,7 +4,7 @@
     <form action="{{ route('token.create') }}" method="POST" id="token-create-form" class="hidden">
         @csrf
     </form>
-    <div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
+    <div class="settings-page max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
         <div class="flex justify-between flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
             <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
                 Settings
@@ -78,7 +78,7 @@
                  class="bg-cpr-teal-dark/20 border-2 border-cpr-teal p-6 rounded-lg shadow-[0_0_20px_rgba(0,255,159,0.1)]">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h3 class="text-cpr-teal font-bold uppercase tracking-widest text-sm mb-1">Active Session</h3>
+                        <h3 class="settings-subheading">Active Session</h3>
                         <p class="text-2xl font-mono font-black text-white tracking-wider">{{ $sessionInfo['code'] ?? '---' }}</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
                             {{ $sessionInfo['player_count'] ?? 0 }} player(s) connected
@@ -107,7 +107,7 @@
                  class="bg-cpr-teal-dark/20 border-2 border-cpr-teal p-6 rounded-lg shadow-[0_0_20px_rgba(0,255,159,0.1)]">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h3 class="text-cpr-teal font-bold uppercase tracking-widest text-sm mb-1">Connected to Session</h3>
+                        <h3 class="settings-subheading">Connected to Session</h3>
                         <p class="text-2xl font-mono font-black text-white tracking-wider">{{ $sessionInfo['code'] ?? '---' }}</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
                             @if($sessionInfo['foundry_configured'] ?? false)
@@ -131,7 +131,7 @@
             <!-- No Session (Player) - Join Flow -->
             <div x-show="!sessionLoading && !sessionInfo && {{ auth()->user()->is_gm ? 'false' : 'true' }}"
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
-                <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Join a Session</h3>
+                <h3 class="settings-subheading">Join a Session</h3>
 
                 <!-- Primary: scan the GM's QR (or paste the link code) to auto-configure and link.
                      Isolated Vue mount ,  this Alpine page has no global #app root. Rendered once
@@ -187,7 +187,7 @@
             <!-- No Session (GM) - Create Flow -->
             <div x-show="!sessionLoading && !sessionInfo && {{ auth()->user()->is_gm ? 'true' : 'false' }}"
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
-                <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Create a Session</h3>
+                <h3 class="settings-subheading">Create a Session</h3>
                 <p class="text-xs text-cpr-text-dim mb-4">
                     A session is created automatically when you save your Foundry connection below ,
                     or create one now. Players join using the session code.
@@ -223,7 +223,7 @@
                  "Link my Agent" mints their own QR instantly (no round-trip). -->
             <details class="mb-8 group border border-cpr-border rounded-lg overflow-hidden bg-cpr-black-deep/40">
                 <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-cpr-teal/10 transition-colors list-none">
-                    <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm">
+                    <h3 class="settings-subheading">
                         <i class="fas fa-qrcode mr-2"></i>Link this Agent to your Foundry user
                     </h3>
                     <div class="transition-transform duration-300 group-open:rotate-180">
@@ -249,7 +249,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <!-- Global App Configuration -->
             <div class="space-y-6 relative">
-                <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">
+                <h3 class="settings-heading">
                     <span class="text-cpr-teal">Step 1</span> · Connect to Foundry
                 </h3>
                 <p class="text-xs text-cpr-text-dim">
@@ -462,7 +462,7 @@
                                 class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
                             <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
-                                <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                                <h2 class="settings-heading">
                                     System Initialization <span
                                         class="text-xs font-mono ml-2 opacity-50">[STEP 02]</span>
                                 </h2>
@@ -527,7 +527,7 @@
                         class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
                     <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
-                        <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                        <h2 class="settings-heading">
                             System Initialization <span class="text-xs font-mono ml-2 opacity-50">[STEP 01]</span>
                         </h2>
                         <div class="flex gap-1">
@@ -563,7 +563,7 @@
             <!-- User Profile Synchronization -->
             <div class="space-y-6">
                 <div class="flex justify-between items-center border-b border-cpr-yellow/30 pb-2">
-                    <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest">
+                    <h3 class="settings-heading">
                         <span class="text-cpr-teal">Step 2</span> · Your Agent
                     </h3>
                     <div class="flex gap-2">
@@ -633,7 +633,7 @@
                                     class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
                                 <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
-                                    <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                                    <h2 class="settings-heading">
                                         System Initialization <span
                                             class="text-xs font-mono ml-2 opacity-50">[STEP 03]</span>
                                     </h2>
@@ -717,8 +717,8 @@
         </div>
 
         <!-- UI Settings (client-side preferences, stored in localStorage) -->
-        <div class="mt-12 pt-8 border-t-2 border-cpr-border">
-            <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
+        <div class="settings-section">
+            <h3 class="settings-heading">
                 Interface Settings
             </h3>
 
@@ -858,8 +858,8 @@
         </div>
 
         <!-- Account Management -->
-        <div class="mt-12 pt-8 border-t-2 border-cpr-border">
-            <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
+        <div class="settings-section">
+            <h3 class="settings-heading">
                 Account Control & Security
             </h3>
 
@@ -971,7 +971,7 @@
             </div>
 
             <!-- Danger Zone -->
-            <div class="mt-12 pt-8 border-t border-cpr-red-dark/30">
+            <div class="settings-section">
                 <div
                     class="flex flex-col md:flex-row items-center justify-between gap-6 bg-cpr-red-dark/10 p-6 border border-cpr-red-dark/20">
                     <div>
@@ -992,12 +992,19 @@
         </div>
 
         <!-- Help -->
-        <div class="mt-12 pt-8 border-t-2 border-cpr-border text-center">
-            <a href="{{ route('how-to-use') }}"
-               class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
-                <i data-lucide="help-circle" class="w-4 h-4"></i>
-                How to Use
-            </a>
+        <div class="settings-section text-center">
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="{{ route('how-to-use') }}"
+                   class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    How to Use
+                </a>
+                <a href="{{ route('wiki.index') }}"
+                   class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    Documentation
+                </a>
+            </div>
         </div>
     </div>
 
@@ -1007,7 +1014,7 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-2xl font-bold text-cpr-red uppercase tracking-tighter">
+            <h2 class="text-2xl font-bold text-cpr-red uppercase tracking-tighter keep-accent">
                 Confirm Account Termination
             </h2>
 

@@ -29,10 +29,14 @@
                     @endauth
                 </div>
 
-                <div class="mt-8">
+                <div class="mt-8 flex justify-center gap-6">
                     <a href="{{ route('how-to-use') }}"
                        class="text-cpr-text-muted hover:text-cpr-red uppercase tracking-widest text-sm transition-colors">
                         How to Use
+                    </a>
+                    <a href="{{ route('wiki.index') }}"
+                       class="text-cpr-text-muted hover:text-cpr-red uppercase tracking-widest text-sm transition-colors">
+                        Documentation
                     </a>
                 </div>
 

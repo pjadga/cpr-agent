@@ -133,9 +133,18 @@
             <div class="mt-12 border-t border-cpr-red/30 pt-6 text-center text-cpr-text-muted">
                 <p>Want the full walkthrough ,  self-hosting, sharing over Tailscale, the QR handshake internals and
                     troubleshooting? Read the
-                    <a href="https://gitlab.com/surrealtech/cyberpunk-red-agent/-/blob/main/wiki/" target="_blank"
+                    {{-- The wiki renders in-app from wiki/*.md, so this no longer
+                         sends people out to the raw markdown on GitLab. --}}
+                    <a href="{{ route('wiki.index') }}"
                        class="text-cpr-red hover:text-cpr-red underline">complete documentation</a>.
                 </p>
+                <div class="mt-6 flex justify-center">
+                    <a href="{{ route('wiki.index') }}"
+                       class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        Documentation
+                    </a>
+                </div>
             </div>
 
             <div class="mt-10 border-t border-cpr-border/40 pt-6 text-center text-cpr-text-dim text-xs">

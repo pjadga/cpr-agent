@@ -5,7 +5,7 @@ order: 2
 
 # CPR Agent Guide
 
-This guide provides detailed instructions on how to set up, self-host, and connect the CPR Agent with Foundry VTT.
+This is the big one: setting up the Agent, hosting it yourself, and getting it talking to Foundry VTT.
 
 
 
@@ -34,7 +34,7 @@ Whilst below is fairly comprehensive, it is a very involved process, especially 
 
 ## Getting Started
 
-The CPR Agent is a companion app designed to bridge the gap between players and a Foundry VTT session. It allows players to view stats, manage gear, and perform rolls directly from their mobile devices or tablets.
+The CPR Agent is a companion app that sits between your players and your Foundry VTT game. Players get their stats, gear and rolls on their phone or tablet, and everything they do lands back in Foundry.
 
 ### 1. Preparation & Installation
 
@@ -80,54 +80,54 @@ The CPR Agent is a companion app designed to bridge the gap between players and 
 
 ## Quick Connect: QR Pairing
 
-The manual "generate an API key, copy the Channel ID, assign each character by hand" flow works, but it's fiddly ,  especially when you've got a table full of players squinting at their phones. QR Pairing shortcuts the whole thing: players scan a code and their Agent configures itself and links to Foundry automatically.
+The manual way (generate an API key, copy the Channel ID, assign each character by hand) works, but it's fiddly. Especially with a table full of players squinting at their phones. QR Pairing skips all of it: players scan a code, and their Agent sets itself up and links to Foundry on its own.
 
-There are **two different codes** in play, and it's worth not mixing them up. One is for you (the GM) to set up your Bridge; the other is for each player to link their Agent.
+There are **two different codes** here, and it's worth not mixing them up. One is for you (the GM) to set up your Bridge. The other is for each player to link their Agent.
 
-### Code #1 ,  The Foundry Setup Code (GM → Bridge)
+### Code #1: The Foundry Setup Code (GM → Bridge)
 
-This one configures the **Bridge module itself**, so you don't have to type six settings into Foundry by hand.
+This one sets up the **Bridge module itself**, so you're not typing six settings into Foundry by hand.
 
 1. In the Agent, enter your **Foundry URL**, generate an **API Key**, and create a session (all at the top of **Settings**).
 2. Click **Copy Foundry Setup Code**.
 3. In Foundry, open the **Agent Bridge → Quick Setup** menu and paste it in.
-4. The Bridge unpacks your Agent URL, Channel ID, API Key and Reverb settings in one shot.
+4. The Bridge unpacks your Agent URL, Channel ID, API Key and Reverb settings in one go.
 
-Under the hood this is just a base64-encoded bundle of `agentUrl`, `channelId`, `apiKey`, `reverbKey` and `reverbPort`. Because it carries your **secret API key**, it is **GM-only** ,  never hand this one to a player.
+Under the hood it's just a base64-encoded bundle of `agentUrl`, `channelId`, `apiKey`, `reverbKey` and `reverbPort`. It carries your **secret API key**, so it's **GM-only**. Never hand this one to a player.
 
-### Code #2 ,  The Pairing QR (Foundry → Player's Agent)
+### Code #2: The Pairing QR (Foundry → Player's Agent)
 
-Once your Bridge is online, each player links their Agent by scanning a per-player QR code:
+Once your Bridge is online, each player links their Agent by scanning their own QR code:
 
 1. As the GM, open **Agent Bridge → Manage Characters** in Foundry and hit the **QR button** next to the player you want to link.
 2. The player opens the Agent, goes to **Settings → Join a Session**, and taps **Scan to Link Foundry**.
-3. They point their camera at the QR. *(No camera? A copyable "link code" appears under the scan button ,  paste that instead.)*
-4. That's it. Their Agent picks up the Channel ID and Foundry URL, and Foundry is told which character belongs to them ,  no manual assignment needed.
+3. They point their camera at the QR. *(No camera? A copyable "link code" shows up under the scan button. Paste that instead.)*
+4. That's it. Their Agent picks up the Channel ID and Foundry URL, and Foundry gets told which character is theirs. No manual assignment needed.
 
 ### What actually happens (the handshake)
 
-For the technically curious, here's the round-trip behind that one scan:
+For the nerds (hi), here's the round-trip behind that one scan:
 
-1. **Register** ,  When you display the QR, your Bridge mints a one-time random **nonce** and registers it with the Agent server (`POST /api/pairing/register`, authenticated with your GM API key). The server stores the nonce against your session, the target Foundry user, and the Foundry URL, stamped with a **5-minute expiry**. The QR itself only encodes `{ v: 1, nonce, agentUrl }` ,  no secrets travel in the image.
-2. **Claim** ,  The player's Agent reads the nonce and calls `POST /api/pairing/claim`. The server confirms the code is real, unclaimed and unexpired, then configures the player: sets their **Channel ID**, generates an **Agent Link** if they don't have one yet, and fills in the Foundry URL from the pairing.
-3. **Auto-link** ,  The server broadcasts a `PAIR_AGENT` event on your session channel (`cpr-agent.{channel_id}`). Your Bridge hears it and records which Agent Link maps to which Foundry user ,  this is exactly the step you'd otherwise do by hand in *Manage Characters*.
-4. **Confirm** ,  The player's Agent then runs a quick reachability check against Foundry and waits a few seconds for your Bridge to fire back a `PAIR_CONFIRMED`. That's what lets it show a "Linked!" rather than a guess.
+1. **Register.** When you show the QR, your Bridge mints a one-time random **nonce** and registers it with the Agent server (`POST /api/pairing/register`, authenticated with your GM API key). The server stores the nonce against your session, the target Foundry user and the Foundry URL, with a **5-minute expiry**. The QR itself only holds `{ v: 1, nonce, agentUrl }`, so no secrets travel in the image.
+2. **Claim.** The player's Agent reads the nonce and calls `POST /api/pairing/claim`. The server checks the code is real, unclaimed and in date, then sets the player up: their **Channel ID**, an **Agent Link** if they don't have one yet, and the Foundry URL from the pairing.
+3. **Auto-link.** The server broadcasts a `PAIR_AGENT` event on your session channel (`cpr-agent.{channel_id}`). Your Bridge hears it and records which Agent Link belongs to which Foundry user. That's exactly the step you'd otherwise be doing by hand in *Manage Characters*.
+4. **Confirm.** The player's Agent does a quick reachability check against Foundry and waits a few seconds for your Bridge to send back a `PAIR_CONFIRMED`. That's how it can say "Linked!" and actually mean it.
 
 ### Safety rails
 
-- **One-time use** ,  each code can be claimed once. The same player re-scanning is fine (it's idempotent); anyone else gets a polite "already used".
-- **Short-lived** ,  codes expire after 5 minutes. If one goes stale, just generate a fresh one.
-- **GM-owned only** ,  a GM can only register pairings for a session they actually own.
-- **Server-matched** ,  if a player scans a QR meant for a *different* Agent server than the one they're logged in to, the Agent spots it and refuses before claiming.
+- **One-time use.** Each code can be claimed once. The same player re-scanning is fine (it's idempotent); anyone else gets a polite "already used".
+- **Short-lived.** Codes expire after 5 minutes. If one goes stale, just make a fresh one.
+- **GM-owned only.** A GM can only register pairings for a session they actually own.
+- **Server-matched.** If a player scans a QR meant for a *different* Agent server than the one they're logged in to, the Agent spots it and refuses before claiming.
 
-### When the QR won't cooperate
+### When the QR won't play ball
 
-The scanner tries to give you a plain-language reason and a fix. The usual suspects:
+The scanner tries to tell you what went wrong in plain English, and how to fix it. The usual suspects:
 
-- **Camera blocked (insecure connection)** ,  browsers only allow camera access over HTTPS. Load the Agent via its `https://` address (or `localhost`), not a bare `http://` IP.
-- **Code expired / already used** ,  ask the GM for a fresh QR.
-- **QR is for a different Agent** ,  log in to the Agent address your GM actually uses, then scan again.
-- **Linked, but can't reach Foundry** ,  you *are* paired, and stats/rolls will still sync over the websocket. This warning only affects direct loading of character images, which needs Foundry to be reachable from your device (same local network, or a public/HTTPS address). See [Troubleshooting](#troubleshooting).
+- **Camera blocked (insecure connection).** Browsers only allow the camera over HTTPS. Load the Agent from its `https://` address (or `localhost`), not a bare `http://` IP.
+- **Code expired / already used.** Ask the GM for a fresh QR.
+- **QR is for a different Agent.** Log in to the Agent address your GM actually uses, then scan again.
+- **Linked, but can't reach Foundry.** You *are* paired, and stats and rolls will still sync over the websocket. This warning only affects loading character images directly, which needs Foundry to be reachable from your device (same local network, or a public/HTTPS address). See [Troubleshooting](#troubleshooting).
 
 ---
 
@@ -294,92 +294,92 @@ If you're super stuck, come and say hi on the CPRed Discord, I'm in the Content 
 
 ### Agent App Settings
 
-- **Foundry URL**: The base URL of your Foundry VTT instance.
-  - *Why*: This allows the Agent to fetch images (tokens, items) from your Foundry server.
-  - *Tip*: Do NOT include `/game` at the end. It should look like `http://localhost:30000` or `https://foundry.example.com`.
-- **API Key**: A unique token generated via Laravel Sanctum.
-  - *Why*: It authenticates your Agent interface with the backend.
-  - *Note*: You must click 'Generate' in the settings to create one.
-- **Channel ID**: A unique identifier for your game session.
-  - *Why*: This groups the GM and players into the same communication channel.
-  - *Usage*: The GM generates it, and players must "Commit Sync" using the same ID.
+- **Foundry URL**: The base address of your Foundry VTT instance.
+  - *Why*: The Agent uses it to pull images (tokens, items) from your Foundry server.
+  - *Tip*: Do NOT put `/game` on the end. It should look like `http://localhost:30000` or `https://foundry.example.com`.
+- **API Key**: A unique token, generated by Laravel Sanctum.
+  - *Why*: It's how your Agent proves who it is to the backend.
+  - *Note*: You have to click 'Generate' in settings to make one.
+- **Channel ID**: A unique ID for your game session.
+  - *Why*: It puts the GM and the players on the same channel.
+  - *Usage*: The GM generates it, and players must "Commit Sync" with the same ID.
 
 ### Foundry Bridge Settings
 
-- **Controller URL**: The URL where the Agent app is hosted.
-- **API Key**: Your personal API key from the Agent app.
+- **Controller URL**: Where the Agent app is hosted.
+- **API Key**: Your own API key from the Agent app.
 - **Channel ID**: The GM's Channel ID.
-- **Reverb Port**: The port used by the websocket server.
-  - Default for official Agent: `443` (TLS) or `80` (Non-TLS).
+- **Reverb Port**: The port the websocket server listens on.
+  - Default for the official Agent: `443` (TLS) or `80` (non-TLS).
   - Default for self-hosting (DDEV): `8081` (HTTPS) or `8080` (HTTP).
-- **Reverb Use SSL**: Enable (`wss`) if your Agent is hosted behind HTTPS. Disable (`ws`) for plain HTTP.
-- **Host Override**: Explicitly set the hostname for the websocket connection.
-  - *Example*: If using NGROK for Reverb, put the NGROK hostname here (e.g., `random.ngrok-free.app`).
-- **Debug Mode**: Enables verbose logging in the Foundry console (F12). Use this to troubleshoot connection issues.
+- **Reverb Use SSL**: Turn on (`wss`) if your Agent sits behind HTTPS. Turn off (`ws`) for plain HTTP.
+- **Host Override**: Force the hostname for the websocket connection.
+  - *Example*: If you're using NGROK for Reverb, put the NGROK hostname here (e.g. `random.ngrok-free.app`).
+- **Debug Mode**: Turns on chatty logging in the Foundry console (F12). Your first stop when the connection's playing up.
 
 ---
 
 ## Technical Deep Dive: The Bridge
 
-The Bridge module is the heart of the Foundry VTT integration. It acts as a bridge between the Foundry environment and the Laravel-based Agent.
-It can be found at this [repository](https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge) or on the Foundry package manager.
+The Bridge module is where all the Foundry side of things happens. It sits between Foundry and the Laravel-based Agent and passes everything back and forth.
+You can grab it from the [repository](https://gitlab.com/surrealtech/Cyberpunk-Red-Agent-Bridge) or from the Foundry package manager.
 
 ### How it Works
 
-1. **Connection**: It initializes a `Laravel Echo` instance using `Pusher` (via the Reverb broadcaster).
-2. **Authentication**: It uses the **API Key** (Sanctum Token) in the headers to authenticate with the Agent's API.
+1. **Connection**: It spins up a `Laravel Echo` instance using `Pusher` (via the Reverb broadcaster).
+2. **Authentication**: It sends the **API Key** (Sanctum Token) in the headers to authenticate with the Agent's API.
 3. **Subscriptions**:
    - The Bridge joins a private channel: `cpr-agent.{channelId}`.
-   - It listens for events sent by the Agent (all events are labelled in capitalised SNAKE_CASE).
-4. **Synchronization**:
-   - When a player performs an action in Foundry, the Bridge intercepts it and sends data to the Agent.
-   - When the Agent sends a command (e.g., "Roll Initiative"), the Bridge executes it in Foundry.
+   - It listens for events from the Agent (every event is named in capitalised SNAKE_CASE).
+4. **Synchronisation**:
+   - When a player does something in Foundry, the Bridge catches it and sends the data to the Agent.
+   - When the Agent sends a command (e.g. "Roll Initiative"), the Bridge runs it in Foundry.
 5. **Data Flow**:
-   - **Foundry -> Agent**: Uses standard API calls (POST/PATCH) to update character data.
-   - **Agent -> Foundry**: Uses WebSockets (Reverb) for real-time triggers and updates.
+   - **Foundry -> Agent**: Standard API calls (POST/PATCH) to update character data.
+   - **Agent -> Foundry**: WebSockets (Reverb) for real-time triggers and updates.
 
 ### The `CyberpunkBridge` Class
 
-The class manages:
+This class looks after:
 
 - **Roll Interception**:
   - The Bridge hooks into Foundry's roll mechanism.
-  - It captures the roll data (formula, results, modifiers) and sends it to the Agent so players can see the "virtual dice" result.
+  - It grabs the roll data (formula, results, modifiers) and sends it to the Agent, so players see the "virtual dice" result.
 - **Actor Updates**:
-  - It watches for changes in Foundry Actors (HP, Armor, Humanity, etc.).
-  - When a change is detected, it pushes the updated stats to the Agent via the API.
-- **Initialization**:
-  - Automatically attempts to connect on Foundry startup.
-  - It checks if `apiUrl`, `apiKey`, and `channelId` are set before trying to establish a WebSocket connection.
+  - It watches Foundry Actors for changes (HP, Armor, Humanity, etc.).
+  - When something changes, it pushes the new stats to the Agent via the API.
+- **Initialisation**:
+  - It tries to connect automatically when Foundry starts.
+  - It checks `apiUrl`, `apiKey` and `channelId` are all set before it tries to open a WebSocket connection.
 
 ### Communication Protocol
 
-The Bridge uses a combination of REST API (for state changes) and WebSockets (for events).
+The Bridge uses a mix of REST (for state changes) and WebSockets (for events).
 
-- **REST**: `POST /api/foundry/callback|update` - Used for bulk updates of character data.
-- **WebSockets**: `cpr-agent.{channelId}` channel - Used for instantaneous triggers like "Request Roll" or "Ping Location".
+- **REST**: `POST /api/foundry/callback|update`. Used for bulk updates of character data.
+- **WebSockets**: the `cpr-agent.{channelId}` channel. Used for instant triggers like "Request Roll" or "Ping Location".
 
 ---
 
 ## The Delta System
 
-To ensure a smooth experience and minimize data usage, the Agent uses a custom "Delta" synchronization system for character data.
+Foundry character sheets are huge, and phones on patchy signal don't love huge. So the Agent has its own "Delta" sync for character data.
 
 ### How it Works
 
-Instead of sending the entire character JSON (which can be several hundred kilobytes) every time a value changes, the system sends a **Delta**.
+Rather than sending the whole character JSON (which can run to several hundred kilobytes) every time one number changes, it sends a **Delta**: just the bit that changed.
 
-- **Dot-Notation Paths**: The system uses dot-notation to target specific fields (e.g., `system.stats.emp.value`).
-- **Item Handling**: It can target individual items within the character's inventory using a special syntax:
+- **Dot-Notation Paths**: Fields are targeted with dot-notation (e.g. `system.stats.emp.value`).
+- **Item Handling**: Individual items in a character's inventory get their own syntax:
   - `data.items.ID`: Updates a specific item's properties.
-  - `data.items.+ID`: Appends a new item to the character sheet.
+  - `data.items.+ID`: Adds a new item to the character sheet.
 - **Null Values**: Setting a path to `null` deletes that field or item.
 
-### Why it Matters (Space & Speed)
+### Why Bother? (Space & Speed)
 
-1. **Bandwidth Savings**: Full character sheets in Foundry VTT are massive. Delta updates are typically less than 1% of the size of a full update. This makes the Agent extremely responsive even on slower mobile connections.
-2. **Server Performance**: The Laravel backend merges these deltas into the cached state in memory instantly. This avoids the overhead of parsing and replacing massive JSON blobs for minor changes.
-3. **Async Persistence**: Deltas are applied to a high-speed cache first, and the full state is synced to the database asynchronously. This ensures that UI updates are near-instantaneous while still maintaining data integrity.
+1. **Bandwidth**: Full Foundry character sheets are massive. A delta is usually less than 1% of the size of a full update, which is why the Agent stays snappy even on a rubbish mobile connection.
+2. **Server Load**: The Laravel backend merges deltas straight into the cached state in memory. No parsing and replacing a giant JSON blob because someone lost 2 HP.
+3. **Async Persistence**: Deltas hit a fast cache first, and the full state gets written to the database in the background. The UI updates near enough instantly, and nothing gets lost.
 
 ---
 
@@ -387,19 +387,19 @@ Instead of sending the entire character JSON (which can be several hundred kilob
 
 ### Images not showing up in the Agent
 
-- **Foundry URL**: Ensure the Foundry URL in the Agent settings does NOT end in `/game`.
-- **CORS Issues**: If your Foundry is on `http` and the Agent is on `https`, most browsers will block image loading. Ensure both use `https`.
-- **NGROK**: If using NGROK, the Agent includes special headers to bypass the NGROK splash page. If images still fail, check the browser console (F12) for CORS errors.
+- **Foundry URL**: Check the Foundry URL in the Agent settings does NOT end in `/game`.
+- **CORS**: If Foundry is on `http` and the Agent is on `https`, most browsers will block the images. Put both on `https`.
+- **NGROK**: If you're on NGROK, the Agent sends special headers to get past the NGROK splash page. If images still won't load, check the browser console (F12) for CORS errors.
 
 ### Connection "Offline" in Foundry
 
-- **API Key**: Ensure you have generated a valid API key in the Agent app and pasted it correctly into Foundry settings.
-- **Reverb Port**: If self-hosting, ensure you are using the correct port (typically 8080 or 8081).
-- **SSL Mismatch**: If your Agent uses `https`, you MUST enable "Reverb Use SSL" in Foundry.
+- **API Key**: Make sure you've generated a valid API key in the Agent and pasted it into Foundry properly.
+- **Reverb Port**: If you're self-hosting, double-check the port (usually 8080 or 8081).
+- **SSL Mismatch**: If your Agent is on `https`, you MUST turn on "Reverb Use SSL" in Foundry.
 
 ### Rolls not appearing in the Agent
 
-- **Bridge Subscription**: Check the Foundry console. You should see `[Bridge] Subscription successful`. If not, check your `Channel ID`.
-- **Character Assignment**: Ensure the GM has assigned a character to your user in the `Agent Character Assignment` menu.
+- **Bridge Subscription**: Have a look in the Foundry console. You should see `[Bridge] Subscription successful`. If you don't, check your `Channel ID`.
+- **Character Assignment**: Make sure the GM has assigned a character to you in the `Agent Character Assignment` menu.
 
 ---

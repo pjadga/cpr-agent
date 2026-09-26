@@ -1,0 +1,109 @@
+/* Settings page.
+ *
+ * Settings is a reading-and-typing surface, not a HUD. The rest of the app
+ * earns its saturated teal/yellow/red by being glanceable at a table mid-game;
+ * here the same palette put full-strength #00f0ff and #fcee0a headings against
+ * near-black every few lines, which fights the form fields for attention and
+ * makes long labels hard to scan.
+ *
+ * So inside .settings-page the accents are held back to their dark variants or
+ * to plain text tones, and the vertical rhythm is fixed to one scale instead of
+ * the mix of mt-8/mt-12/pt-8 the page had grown. Structural colour (borders,
+ * backgrounds) is untouched, and destructive actions keep full-strength red
+ * because that one does need to shout.
+ */
+
+.settings-page {
+    --settings-gap: 2.5rem;
+}
+
+/* One rhythm for every top-level block, replacing the ad-hoc mt-12 pt-8 pairs. */
+.settings-page .settings-section {
+    margin-top: var(--settings-gap);
+    padding-top: 2rem;
+    border-top: 1px solid var(--cpr-border);
+}
+
+.settings-page .settings-section:first-child {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+/* Section heading: was text-2xl in full yellow. Same size, quieter colour. */
+.settings-page .settings-heading {
+    color: var(--cpr-text-bright);
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--cpr-border);
+}
+
+/* Sub-heading inside a section. Was an inconsistent mix of teal and yellow. */
+.settings-page .settings-subheading {
+    color: var(--cpr-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
+}
+
+/* Cards holding a form or a block of fields. */
+.settings-page .settings-card {
+    background-color: var(--cpr-black-deep);
+    border: 1px solid var(--cpr-border);
+    padding: 1.5rem;
+}
+
+/* Dull the accents that are decorative rather than informative. Anything the
+   page marks as destructive or as a live status keeps its own colour. */
+.settings-page h2:not(.keep-accent),
+.settings-page h3:not(.keep-accent) {
+    text-shadow: none;
+}
+
+/* Field and toggle labels were reading as neon signs rather than as labels.
+   Enough teal survives to keep the page recognisably part of the app. */
+.settings-page .text-cpr-teal:not(.keep-accent) {
+    color: color-mix(in srgb, var(--cpr-teal-dark) 55%, var(--cpr-text-bright));
+}
+
+.settings-page .text-cpr-yellow:not(.keep-accent) {
+    color: var(--cpr-text-muted);
+}
+
+/* Borders carry the structure, so they can sit back further than the text. */
+.settings-page .border-cpr-teal:not(.keep-accent) {
+    border-color: color-mix(in srgb, var(--cpr-teal-dark) 45%, transparent);
+}
+
+.settings-page .border-cpr-yellow:not(.keep-accent) {
+    border-color: var(--cpr-border);
+}
+
+/* Body copy wants a touch more room than the HUD's tight line height. */
+.settings-page p,
+.settings-page label,
+.settings-page li {
+    line-height: 1.6;
+}
+
+.settings-page .cyber-input-field,
+.settings-page .cyber-textarea-field,
+.settings-page .cyber-select-field {
+    margin-top: 0.375rem;
+}
+
+/* Primary actions stay obvious but stop glowing: three full-strength teal bars
+   down one column pulled the eye away from the fields they belong to. */
+.settings-page .bg-cpr-teal:not(.keep-accent) {
+    background-color: var(--cpr-teal-dark);
+}
+
+.settings-page .bg-cpr-teal:not(.keep-accent):hover {
+    background-color: var(--cpr-teal);
+}
