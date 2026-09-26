@@ -50,11 +50,11 @@ from, and changing your mind later means redoing steps 5 and 7.
 | **B: Same Wi-Fi**        | Players' phones on your home network.                           | `http://192.168.1.50` (your PC's IP)       |
 | **C: Over the internet** | Anyone, anywhere, via Tailscale.**Recommended for real games.** | `https://your-pc.tailnet-1234.ts.net:8443` |
 
-**Why C is worth the extra ten minutes.** Browsers only allow camera access on a
-secure (HTTPS) connection, so on option B your players cannot scan the QR pairing
+**HTTPS** Browsers only allow camera access on a
+secure (HTTPS) connection, so on option B your **external** players cannot scan the QR pairing
 code; they have to copy and paste a link code instead. HTTPS also means character
 portraits and token art load properly, and the in-Foundry Agent window works.
-Tailscale gives you a certificate for free and takes a lot of the headache out of sharing.
+Tailscale gives you a certificate for free and takes a lot of the headache out of sharing, but is not required for this to work.
 
 > **The one rule:** whatever address *players* type is the address that goes in
 > `APP_URL`, and the same address goes in the Foundry Bridge module. A
