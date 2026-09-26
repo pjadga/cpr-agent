@@ -50,7 +50,7 @@
                     </div>
 
                     <!-- Captcha -->
-                    @if(!app()->environment('local'))
+                    @if(config('services.turnstile.enabled'))
                         <div class="mt-4 flex flex-col items-center">
                             <x-turnstile/>
                             <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2"/>
@@ -86,7 +86,7 @@
                         How to Use
                     </a>
                 </div>
-                {{-- Ko-fi support button — inside the box, below "How to Use". Only on the
+                {{-- Ko-fi support button, inside the box, below "How to Use". Only on the
      official hosted instance; self-hosted / local instances hide it here
      (it stays on the How to Use page). Colour matches the dark panel. --}}
                 @if (request()->getHost() === 'agent.surrealdisco.co.uk')

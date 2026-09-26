@@ -8,9 +8,11 @@ use App\Models\Config;
 use App\Models\Session;
 use App\Models\User;
 use App\Support\EventWaiter;
+use Illuminate\Broadcasting\BroadcastException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SettingsController extends Controller
@@ -26,8 +28,23 @@ class SettingsController extends Controller
         $config = $user->config ?? new Config;
         $actors = [];
 
-        // Fetch actors from Foundry if URL is configured
-        if ($config->foundry_url || config('services.foundry.base_url')) {
+        // Why this whole block is optional and wrapped: the actor list is a
+        // convenience, but this page is also the only place a user can fix a
+        // broken setup. Letting a dead Reverb throw out of here 500'd the one
+        // screen they needed, so the two failures that stop the list arriving
+        // are caught and reported instead of raised.
+        $connectionIssue = null;
+
+        // Only ask Foundry for actors when this user has actually told us where
+        // their Foundry is. The old condition also accepted a
+        // services.foundry.base_url that defaulted to the retired pre-Bridge
+        // relay and was set by no env file, so it was always true: a brand new
+        // account with nothing configured still dispatched a message nobody
+        // could answer and sat through the full five second wait before
+        // rendering. That config key is gone.
+        if (! $config->foundry_url) {
+            $connectionIssue = 'foundry_not_configured';
+        } else {
             $requestId = $this->createRequestId();
             $payload = [
                 'type' => 'GET_ACTORS',
@@ -37,12 +54,23 @@ class SettingsController extends Controller
                 'isGM' => (bool) $user->is_gm,
             ];
 
-            CyberpunkAgentChannel::dispatch($payload);
+            try {
+                CyberpunkAgentChannel::dispatch($payload);
 
-            // Wait for response using EventWaiter (non-blocking)
-            $foundryData = app(EventWaiter::class)->wait($requestId, 5.0);
-            if ($foundryData && ! empty($foundryData['actors'])) {
-                $actors = $foundryData['actors'];
+                // Wait for response using EventWaiter (non-blocking)
+                $foundryData = app(EventWaiter::class)->wait($requestId, 5.0);
+
+                if ($foundryData && ! empty($foundryData['actors'])) {
+                    $actors = $foundryData['actors'];
+                } else {
+                    // Reverb took the message but nothing answered: Foundry is
+                    // closed, or the Bridge module is not connected to it.
+                    $connectionIssue = 'foundry_no_response';
+                }
+            } catch (BroadcastException $e) {
+                // Could not even publish the message: Reverb is not running.
+                Log::warning('Settings page could not reach Reverb', ['message' => $e->getMessage()]);
+                $connectionIssue = 'realtime_unavailable';
             }
         }
 
@@ -75,6 +103,7 @@ class SettingsController extends Controller
             'config' => $config,
             'isFirstTime' => $isFirstTime,
             'sessionInfo' => $sessionInfo,
+            'connectionIssue' => $connectionIssue,
         ]);
     }
 
@@ -119,7 +148,7 @@ class SettingsController extends Controller
      * Switch the user's declared role (GM <-> Player).
      *
      * Declared at registration, changeable here. Guard: a GM who still owns an
-     * active session must terminate it before demoting — otherwise the session
+     * active session must terminate it before demoting, otherwise the session
      * would be orphaned with no one able to manage it.
      */
     public function updateRole(Request $request)
@@ -143,19 +172,19 @@ class SettingsController extends Controller
 
         return redirect()->route('settings')->with(
             'success',
-            $wantsGm ? 'Role updated — you are now a GM.' : 'Role updated — you are now a Player.'
+            $wantsGm ? 'Role updated, you are now a GM.' : 'Role updated, you are now a Player.'
         );
     }
 
     /**
      * Emit a one-paste "Foundry Setup Code" for the GM.
      *
-     * Bundles everything the Agent Bridge module needs to connect — Agent URL,
-     * Channel ID, the GM's API key, and the Reverb app key — as a base64-encoded
+     * Bundles everything the Agent Bridge module needs to connect, Agent URL,
+     * Channel ID, the GM's API key, and the Reverb app key, as a base64-encoded
      * JSON blob the GM pastes into the Bridge's Quick Setup menu. The Bridge
      * derives Reverb host/port/SSL from the Agent URL, so only the key is sent.
      *
-     * The Channel ID is the user's own `channel_id` — the same value shown in the
+     * The Channel ID is the user's own `channel_id`, the same value shown in the
      * Channel ID field and used by the live broadcast channel (cpr-agent.{channel_id}).
      * It must match what the browser subscribes to, or channel auth rejects it.
      *
@@ -177,15 +206,16 @@ class SettingsController extends Controller
             ], 422);
         }
 
-        $appUrl = sprintf(
-            '%s://%s',
-            config('vite.reverb.scheme') === 'https' ? 'https' : 'http',
-            config('app.domain')
-        );
+        // The address players actually load, straight from APP_URL. This used
+        // to be assembled from the *WebSocket* scheme and APP_DOMAIN, so a
+        // plain-HTTP self-host that (correctly) left VITE_REVERB_SCHEME unset
+        // got handed https://<domain>, a URL its Bridge could never reach, and
+        // one that made every player's QR scan fail as "wrong server".
+        $appUrl = rtrim((string) config('app.url'), '/');
 
         // GMs always have a session by the time they get here (auto-created on
         // connection save), but ensure it so the code never carries a personal
-        // channel_id that matches no session — that used to 404 pairing.
+        // channel_id that matches no session, that used to 404 pairing.
         $session = Session::ensureActiveFor($user);
 
         $payload = [
@@ -194,7 +224,10 @@ class SettingsController extends Controller
             'channelId' => $session->code,
             'apiKey' => $config->api_key,
             'reverbKey' => config('broadcasting.connections.reverb.key'),
-            'reverbPort' => config('vite.reverb.port'),
+            // Only sent when Reverb genuinely lives on another port. Omitted on
+            // a single-origin install so the Bridge keeps its own default and
+            // derives the port from the Agent URL.
+            'reverbPort' => config('vite.reverb.port') ?: null,
         ];
 
         // Short one-time code for cross-device setup (e.g. Agent on a phone,

@@ -40,7 +40,7 @@ class LinkPlayerHandler
     {
         $user->default_actor_id = $actorId;
 
-        // Foundry's isGM verifies the declared role — but never auto-demote a
+        // Foundry's isGM verifies the declared role, but never auto-demote a
         // user who owns an active session (e.g. a GM testing from a player
         // login would otherwise lose access to their own session management).
         if ($isGm || ! $user->ownsActiveSession()) {

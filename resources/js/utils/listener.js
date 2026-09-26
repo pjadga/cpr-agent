@@ -11,7 +11,13 @@ const sharedListeners = new Map();
  */
 export function useEchoListener(handler, channel = null, event = '.FoundryResponse') {
     const channel_id = window.AgentConfig?.channel_id;
-    const effectiveChannel = channel || (channel_id ? `cpr-agent.${channel_id}` : null);
+    // In the Foundry embed there is no Reverb channel_id: window.Echo is the
+    // MockEcho fed by postMessage and it ignores the channel name. We still must
+    // register on *some* channel or onMounted short-circuits and this listener
+    // never hears ROLL_MODIFIERS_DATA / NET_POOL_DATA / DICE_ROLL_EVENT. Use the
+    // same synthetic name as useWebSocketSubscription so the guards below pass.
+    const effectiveChannel = channel
+        || (channel_id ? `cpr-agent.${channel_id}` : (window.__CPR_EMBED ? 'cpr-agent.embed' : null));
 
     const wrappedHandler = (e) => {
         const payload = e.payload || e;

@@ -12,7 +12,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
     @cspMetaTag
 
-    <title>{{ config('app.name', 'Cyberpunk Interface') }}</title>
+    <title>@yield('title', config('app.name', 'Cyberpunk Interface'))</title>
 
     <!-- Fonts -->
     <link rel="preload" as="font" type="font/ttf" href="{{ Vite::asset('resources/fonts/Cybrpnuk2.ttf') }}" crossorigin>
@@ -20,6 +20,7 @@
     <link href="https://fonts.cdnfonts.com/css/repetition-scrolling" rel="stylesheet">
 
     <!-- Scripts -->
+    @include('partials.reverb-config')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://unpkg.com/lucide@latest" @cspNonce></script>
     <script @cspNonce>

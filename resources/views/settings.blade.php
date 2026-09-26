@@ -4,7 +4,7 @@
     <form action="{{ route('token.create') }}" method="POST" id="token-create-form" class="hidden">
         @csrf
     </form>
-    <div class="max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
+    <div class="settings-page max-w-4xl mx-auto p-8" x-data="{ onboardingStep: @js($isFirstTime ? 1 : 0), sessionInfo: @js($sessionInfo ?? null) }">
         <div class="flex justify-between flex-wrap items-center mb-8 border-b-2 border-cpr-border pb-4">
             <h2 class="text-4xl font-bold text-cpr-red uppercase tracking-tighter">
                 Settings
@@ -38,6 +38,21 @@
             </div>
         @endif
 
+        {{-- Why one of the three pieces (Reverb, Foundry URL, Bridge) is missing.
+             This page still loads when they are, which is the point: it is where
+             you come to fix them. --}}
+        @if(\App\Support\ConnectionDiagnostics::has($connectionIssue ?? null))
+            @php($diag = \App\Support\ConnectionDiagnostics::get($connectionIssue))
+            <div class="bg-cpr-yellow-dark/20 border border-cpr-yellow p-4 mb-8">
+                <div class="flex items-center gap-2 mb-2">
+                    <i v-icon data-lucide="alert-triangle" class="w-4 h-4 text-cpr-yellow"></i>
+                    <span class="text-cpr-yellow uppercase text-xs tracking-widest font-bold">{{ $diag['title'] }}</span>
+                </div>
+                <p class="text-cpr-text-dim text-xs leading-relaxed">{{ $diag['detail'] }}</p>
+                <p class="text-cpr-text-main text-xs leading-relaxed mt-2"><strong>Fix:</strong> {{ $diag['hint'] }}</p>
+            </div>
+        @endif
+
         <!-- Session Status Banner -->
         <div x-data="{ sessionInfo: @js($sessionInfo ?? null), sessionLoading: {{ $sessionInfo ? 'false' : 'true' }}, loading: false, joinCode: '', joinMessage: '' }"
              x-init="
@@ -63,7 +78,7 @@
                  class="bg-cpr-teal-dark/20 border-2 border-cpr-teal p-6 rounded-lg shadow-[0_0_20px_rgba(0,255,159,0.1)]">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h3 class="text-cpr-teal font-bold uppercase tracking-widest text-sm mb-1">Active Session</h3>
+                        <h3 class="settings-subheading">Active Session</h3>
                         <p class="text-2xl font-mono font-black text-white tracking-wider">{{ $sessionInfo['code'] ?? '---' }}</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
                             {{ $sessionInfo['player_count'] ?? 0 }} player(s) connected
@@ -92,13 +107,13 @@
                  class="bg-cpr-teal-dark/20 border-2 border-cpr-teal p-6 rounded-lg shadow-[0_0_20px_rgba(0,255,159,0.1)]">
                 <div class="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                        <h3 class="text-cpr-teal font-bold uppercase tracking-widest text-sm mb-1">Connected to Session</h3>
+                        <h3 class="settings-subheading">Connected to Session</h3>
                         <p class="text-2xl font-mono font-black text-white tracking-wider">{{ $sessionInfo['code'] ?? '---' }}</p>
                         <p class="text-xs text-cpr-text-dim mt-1">
                             @if($sessionInfo['foundry_configured'] ?? false)
                                 <span class="text-cpr-teal">✓ Auto-configured from GM session</span>
                             @else
-                                <span class="text-cpr-yellow">⚠ GM has not synced Foundry config yet — manual setup may be needed</span>
+                                <span class="text-cpr-yellow">⚠ GM has not synced Foundry config yet, manual setup may be needed</span>
                             @endif
                         </p>
                     </div>
@@ -116,10 +131,10 @@
             <!-- No Session (Player) - Join Flow -->
             <div x-show="!sessionLoading && !sessionInfo && {{ auth()->user()->is_gm ? 'false' : 'true' }}"
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
-                <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Join a Session</h3>
+                <h3 class="settings-subheading">Join a Session</h3>
 
                 <!-- Primary: scan the GM's QR (or paste the link code) to auto-configure and link.
-                     Isolated Vue mount — this Alpine page has no global #app root. Rendered once
+                     Isolated Vue mount, this Alpine page has no global #app root. Rendered once
                      per page: players get it here, GMs get it in their link block below. -->
                 @unless(auth()->user()->is_gm)
                     <div id="qr-link-app">
@@ -172,9 +187,9 @@
             <!-- No Session (GM) - Create Flow -->
             <div x-show="!sessionLoading && !sessionInfo && {{ auth()->user()->is_gm ? 'true' : 'false' }}"
                  class="bg-cpr-black-deep border-2 border-cpr-border p-6 rounded-lg">
-                <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm mb-4">Create a Session</h3>
+                <h3 class="settings-subheading">Create a Session</h3>
                 <p class="text-xs text-cpr-text-dim mb-4">
-                    A session is created automatically when you save your Foundry connection below —
+                    A session is created automatically when you save your Foundry connection below,
                     or create one now. Players join using the session code.
                 </p>
                 <button @click="
@@ -208,7 +223,7 @@
                  "Link my Agent" mints their own QR instantly (no round-trip). -->
             <details class="mb-8 group border border-cpr-border rounded-lg overflow-hidden bg-cpr-black-deep/40">
                 <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-cpr-teal/10 transition-colors list-none">
-                    <h3 class="text-cpr-yellow font-bold uppercase tracking-widest text-sm">
+                    <h3 class="settings-subheading">
                         <i class="fas fa-qrcode mr-2"></i>Link this Agent to your Foundry user
                     </h3>
                     <div class="transition-transform duration-300 group-open:rotate-180">
@@ -220,7 +235,7 @@
                 </summary>
                 <div class="p-4 border-t border-cpr-border">
                     <p class="text-xs text-cpr-text-dim mb-4">
-                        In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong> —
+                        In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong>,
                         as the GM you get your own QR immediately. Scan it here (phone) or paste the
                         link code (desktop). Optional if the Bridge already shows your account as linked.
                     </p>
@@ -234,16 +249,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <!-- Global App Configuration -->
             <div class="space-y-6 relative">
-                <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest border-b border-cpr-yellow/30 pb-2">
+                <h3 class="settings-heading">
                     <span class="text-cpr-teal">Step 1</span> · Connect to Foundry
                 </h3>
                 <p class="text-xs text-cpr-text-dim">
                     @if(auth()->user()->is_gm)
-                        Enter your Foundry URL and generate an API key — saving creates your game session
+                        Enter your Foundry URL and generate an API key, saving creates your game session
                         automatically. Then use the <strong class="text-cpr-teal">Setup Code</strong> below in
                         Foundry → Agent Bridge → Quick Setup, and share the session code with your players.
                     @else
-                        Scan your GM's QR (or paste their link code) up top to auto-fill all of this —
+                        Scan your GM's QR (or paste their link code) up top to auto-fill all of this,
                         or join with a session code.
                     @endif
                 </p>
@@ -325,9 +340,25 @@
                                         </div>
                                     @endif
 
+                                    @if (session('flash_token_replaced'))
+                                        <div class="border border-amber-500 bg-amber-950/60 p-4 mb-4 rounded">
+                                            <p class="text-xs text-amber-200 uppercase tracking-tight font-bold mb-1">
+                                                Your old key no longer works
+                                            </p>
+                                            <p class="text-xs text-amber-100/90">
+                                                Paste the key above into <span class="font-mono">Configure Settings →
+                                                Agent Bridge → API Key</span> in Foundry. Until you do, the Bridge will
+                                                report 401 errors and show as offline.
+                                            </p>
+                                        </div>
+                                    @endif
+
                                     <button type="submit" form="token-create-form"
+                                            @if ($config->api_key)
+                                                onclick="return confirm('This replaces your current API key. The key already saved in your Foundry Bridge module will stop working until you paste the new one in. Continue?')"
+                                            @endif
                                             class="cyber-button bg-cpr-teal-dark border-cpr-teal text-black w-full uppercase font-bold py-2">
-                                        Generate New Connection Key
+                                        {{ $config->api_key ? 'Replace Connection Key' : 'Generate Connection Key' }}
                                     </button>
 
                                     @if ($config->api_key)
@@ -348,7 +379,7 @@
                                     class="absolute left-full ml-2 w-64 p-2 bg-cpr-black-deep border border-cpr-teal text-[10px] text-cpr-text-main uppercase tracking-tighter hidden group-hover:block z-50 shadow-2xl">
                                     The shared broadcast channel.
                                     @if(auth()->user()->is_gm)
-                                        Derived from your session automatically — share it with your players.
+                                        Derived from your session automatically, share it with your players.
                                     @else
                                         Auto-filled when you link or join a session above.
                                     @endif
@@ -369,7 +400,7 @@
 
                         @if(auth()->user()->is_gm)
                             <!-- One-paste Foundry setup for the Bridge's Quick Setup menu. Emits a
-                                 short one-time code (typeable across devices — phone Agent, desktop
+                                 short one-time code (typeable across devices, phone Agent, desktop
                                  Foundry) plus the full base64 blob as a same-device fallback. -->
                             <div class="mt-3" x-data="{ setupCode: '', shortCode: '', loading: false, copied: false, error: '' }">
                                 <button type="button"
@@ -385,7 +416,7 @@
                                                 })
                                                 .catch(e => { error = e.message; })
                                                 .finally(() => loading = false)
-                                        "
+                                        "p
                                         class="cyber-button bg-cpr-black-elevated border-cpr-teal text-cpr-teal px-3 py-1.5 uppercase text-[10px] font-bold w-full">
                                     <i data-lucide="clipboard-copy" class="w-3 h-3 inline -mt-0.5"></i>
                                     <span x-show="!loading && !shortCode">Get Foundry Setup Code</span>
@@ -415,7 +446,7 @@
                                               @focus="$el.select()"
                                               class="cyber-input-field mt-2 w-full font-mono text-[10px] break-all select-all"></textarea>
                                     <p class="text-cpr-yellow text-[10px] mt-1">
-                                        ⚠ Contains your API key — share only with your own Foundry world.
+                                        ⚠ Contains your API key, share only with your own Foundry world.
                                     </p>
                                 </details>
                             </div>
@@ -431,7 +462,7 @@
                                 class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
                             <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
-                                <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                                <h2 class="settings-heading">
                                     System Initialization <span
                                         class="text-xs font-mono ml-2 opacity-50">[STEP 02]</span>
                                 </h2>
@@ -448,7 +479,7 @@
                                     Foundry → Agent Bridge → Quick Setup. That configures the whole Foundry side.
                                     Share your session code with players.
                                 @else
-                                    Your Channel ID fills in automatically when you link or join a session —
+                                    Your Channel ID fills in automatically when you link or join a session,
                                     only change it if your GM tells you to.
                                 @endif
                             </p>
@@ -476,12 +507,12 @@
                     </button>
                 </form>
 
-                <!-- Players auto-configure from these settings on join — synced automatically
+                <!-- Players auto-configure from these settings on join, synced automatically
                      on session create and whenever you save. Shown until a Foundry URL exists. -->
                 <div x-show="sessionInfo && sessionInfo.type === 'gm' && !sessionInfo.foundry_configured"
                      class="mt-6 pt-6 border-t border-cpr-border">
                     <p class="text-xs text-cpr-yellow">
-                        ⚠ Set your <strong>Foundry URL</strong> above and save — your players will then
+                        ⚠ Set your <strong>Foundry URL</strong> above and save, your players will then
                         auto-configure when they join. No extra step needed.
                     </p>
                 </div>
@@ -496,7 +527,7 @@
                         class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
                     <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
-                        <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                        <h2 class="settings-heading">
                             System Initialization <span class="text-xs font-mono ml-2 opacity-50">[STEP 01]</span>
                         </h2>
                         <div class="flex gap-1">
@@ -509,9 +540,9 @@
                     <p class="text-cpr-text mb-4 leading-relaxed text-sm">
                         @if(auth()->user()->is_gm)
                             Enter your Foundry URL and generate an API key. Saving your connection also
-                            creates your game session automatically — no separate step.
+                            creates your game session automatically, no separate step.
                         @else
-                            You don't need to type any of this — ask your GM for a QR code or link code and
+                            You don't need to type any of this, ask your GM for a QR code or link code and
                             use <strong>Scan to Link</strong> up top. Everything configures itself.
                         @endif
                     </p>
@@ -532,7 +563,7 @@
             <!-- User Profile Synchronization -->
             <div class="space-y-6">
                 <div class="flex justify-between items-center border-b border-cpr-yellow/30 pb-2">
-                    <h3 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest">
+                    <h3 class="settings-heading">
                         <span class="text-cpr-teal">Step 2</span> · Your Agent
                     </h3>
                     <div class="flex gap-2">
@@ -549,7 +580,11 @@
                 <p class="text-xs text-cpr-text-dim">
                     Once connected, pick the character you'll play and choose your interface theme.
                 </p>
-                @if(!$config->foundry_url && !config('services.foundry.base_url'))
+                {{-- Was `&& !config('services.foundry.base_url')`, which pointed at a
+                     retired relay whose default was a non-empty string, so this
+                     guard never once rendered: an account with no Foundry saved
+                     was shown the actor picker instead of being told to do Step 1. --}}
+                @if(!$config->foundry_url)
                     <div class="bg-cpr-red-dark/30 border border-cpr-red-dark text-cpr-red p-4 text-xs italic">
                         SYSTEM OFFLINE: Finish <strong>Step 1 · Connect to Foundry</strong> to enable Agent sync.
                     </div>
@@ -598,7 +633,7 @@
                                     class="absolute -top-3 left-8 w-6 h-6 bg-cpr-black border-l-2 border-t-2 border-cpr-teal transform rotate-45"></div>
 
                                 <div class="flex items-center justify-between border-b border-cpr-teal/30 mb-4 pb-2">
-                                    <h2 class="text-xl font-bold text-cpr-teal uppercase tracking-tighter">
+                                    <h2 class="settings-heading">
                                         System Initialization <span
                                             class="text-xs font-mono ml-2 opacity-50">[STEP 03]</span>
                                     </h2>
@@ -617,7 +652,7 @@
                                         Once your GM assigns you a character, select and save it here.
                                     @endif
                                     @if($sessionInfo && $sessionInfo['foundry_configured'])
-                                        Your session is auto-configured — just pick your character!
+                                        Your session is auto-configured, just pick your character!
                                     @endif
                                 </p>
                                 <div
@@ -682,8 +717,8 @@
         </div>
 
         <!-- UI Settings (client-side preferences, stored in localStorage) -->
-        <div class="mt-12 pt-8 border-t-2 border-cpr-border">
-            <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
+        <div class="settings-section">
+            <h3 class="settings-heading">
                 Interface Settings
             </h3>
 
@@ -823,8 +858,8 @@
         </div>
 
         <!-- Account Management -->
-        <div class="mt-12 pt-8 border-t-2 border-cpr-border">
-            <h3 class="text-2xl font-bold text-cpr-yellow uppercase tracking-tighter mb-8">
+        <div class="settings-section">
+            <h3 class="settings-heading">
                 Account Control & Security
             </h3>
 
@@ -862,7 +897,7 @@
                         </button>
                     </form>
 
-                    <!-- Declared role — drives the whole onboarding flow. Foundry
+                    <!-- Declared role, drives the whole onboarding flow. Foundry
                          verifies it once the Bridge connects. -->
                     <form method="post" action="{{ route('settings.role') }}" class="pt-4 border-t border-cpr-border/50">
                         @csrf
@@ -936,7 +971,7 @@
             </div>
 
             <!-- Danger Zone -->
-            <div class="mt-12 pt-8 border-t border-cpr-red-dark/30">
+            <div class="settings-section">
                 <div
                     class="flex flex-col md:flex-row items-center justify-between gap-6 bg-cpr-red-dark/10 p-6 border border-cpr-red-dark/20">
                     <div>
@@ -957,12 +992,19 @@
         </div>
 
         <!-- Help -->
-        <div class="mt-12 pt-8 border-t-2 border-cpr-border text-center">
-            <a href="{{ route('how-to-use') }}"
-               class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
-                <i data-lucide="help-circle" class="w-4 h-4"></i>
-                How to Use
-            </a>
+        <div class="settings-section text-center">
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="{{ route('how-to-use') }}"
+                   class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    How to Use
+                </a>
+                <a href="{{ route('wiki.index') }}"
+                   class="cyber-button bg-cpr-black-elevated border-cpr-border text-sm px-8 py-3 uppercase font-bold inline-flex items-center gap-2">
+                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                    Documentation
+                </a>
+            </div>
         </div>
     </div>
 
@@ -972,7 +1014,7 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-2xl font-bold text-cpr-red uppercase tracking-tighter">
+            <h2 class="text-2xl font-bold text-cpr-red uppercase tracking-tighter keep-accent">
                 Confirm Account Termination
             </h2>
 

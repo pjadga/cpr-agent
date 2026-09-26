@@ -35,13 +35,13 @@ return [
         ],
     ],
 
-    'foundry' => [
-        'base_url' => env('BASE_URL', 'https://agent-relay.surrealdisco.co.uk'),
-    ],
-
     'turnstile' => [
         'key' => env('TURNSTILE_SITE_KEY'),
         'secret' => env('TURNSTILE_SECRET_KEY'),
+        // Turnstile is active only when BOTH keys are configured. Self-hosted
+        // installs leave them blank, which disables the captcha entirely (no
+        // external Cloudflare dependency) rather than locking users out.
+        'enabled' => filled(env('TURNSTILE_SITE_KEY')) && filled(env('TURNSTILE_SECRET_KEY')),
     ],
 
 ];

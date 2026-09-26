@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.standalone
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -15,6 +16,8 @@
 /node_modules
 /public/build
 /public/hot
+/standalone/bin/
+/standalone/database.sqlite
 /public/storage
 /storage/*.key
 /storage/pail
@@ -35,3 +38,7 @@ package-lock.json
 CHANGELOG.md
 
 scripts/build-frames.py
+
+/dist
+
+EMBED_README.md

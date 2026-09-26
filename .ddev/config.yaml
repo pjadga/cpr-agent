@@ -18,11 +18,11 @@ web_extra_exposed_ports:
       container_port: 5173
       http_port: 5172
       https_port: 5173
-    - name: reverb
-      container_port: 8080
-      host_port: 8080
-      http_port: 8080
-      https_port: 8081
+# Reverb is deliberately NOT exposed here. It binds 127.0.0.1:8085 inside the
+# web container and is reached through /app/ on the site's own origin (see
+# .ddev/nginx/reverb-app.conf), which is how a Herd/production install works.
+# Publishing it on a second port is what made every self-host guide need a
+# Reverb host, port and SSL toggle in the Foundry Bridge.
 # Key features of DDEV's config.yaml:
 
 # name: <projectname> # Name of the project, automatically provides

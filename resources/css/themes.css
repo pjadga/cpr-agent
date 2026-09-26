@@ -1,5 +1,5 @@
 :root {
-    /* DEFAULT THEME (Night Mode) — core colours ported from the item frame SVGs */
+    /* DEFAULT THEME (Night Mode), core colours ported from the item frame SVGs */
     --cpr-red: #e60012;
     --cpr-red-dark: #ad000e; /* derived from --cpr-red, not in the SVGs */
     --cpr-yellow: #fcee0a;

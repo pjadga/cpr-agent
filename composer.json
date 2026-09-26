@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.10.1",
         "ryangjchandler/laravel-cloudflare-turnstile": "^3.0",
         "spatie/laravel-csp": "^3.21",
+        "spatie/sheets": "^1.12",
         "tedivm/jshrink": "~1.0"
     },
     "require-dev": {

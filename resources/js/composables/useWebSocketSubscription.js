@@ -4,8 +4,19 @@ import { isMyRequest } from '../utils/requests';
 // Shared state for character data (module-level singleton)
 export const charData = shallowRef(null);
 export const loading = ref(true);
+// The socket to *Reverb*. Says nothing about whether Foundry is on the other
+// end of it: with Reverb running and Foundry closed this is happily true while
+// the sheet shows month-old cached data.
 export const isWssConnected = ref(false);
+// Whether Foundry itself has actually spoken to us this session. Only a payload
+// that originated in Foundry sets this, so it stays false while the sheet is
+// being served from the local database cache.
+export const isFoundryLive = ref(false);
 export const error = ref(null);
+// A DIAGNOSTICS key (see useFoundryDiagnostics) naming *why* the sheet could
+// not load. Preferred over `error`, which holds free prose: a code carries a
+// title, an explanation and a fix, where a string carries only itself.
+export const errorCode = ref(null);
 export const agentLink = ref((localStorage.getItem('cpr_agent_link') || '').replace(/\/$/, ''));
 export const isGM = ref(localStorage.getItem('cpr_is_gm') === 'true');
 
@@ -26,7 +37,11 @@ export function useWebSocketSubscription() {
         if (!window.Echo) return;
 
         const channel_id = window.AgentConfig?.channel_id;
-        const channelName = channel_id ? `cpr-agent.${channel_id}` : null;
+        // In the Foundry embed there is no Reverb channel: window.Echo is the
+        // MockEcho fed by postMessage, and it ignores the channel name.
+        const channelName = channel_id
+            ? `cpr-agent.${channel_id}`
+            : (window.__CPR_EMBED ? 'cpr-agent.embed' : null);
 
         if (!channelName) {
             console.warn('[Agent] No channel_id configured. Live updates disabled.');
@@ -47,6 +62,15 @@ export function useWebSocketSubscription() {
                 // Handle ACTOR_DATA events
                 if (payload.type === 'ACTOR_DATA' && payload.actor) {
                     handleActorData(payload);
+                }
+                // The Bridge answers with actor === false when the Foundry user
+                // has no character assigned. Degrade honestly instead of spinning
+                // on the loading screen forever.
+                else if (payload.type === 'ACTOR_DATA' && payload.actor === false) {
+                    loading.value = false;
+                    if (!charData.value) {
+                        errorCode.value = 'no_character_assigned';
+                    }
                 }
                 // Handle SHEET_DELTA events
                 else if (payload.type === 'SHEET_DELTA' && payload.delta) {
@@ -86,11 +110,18 @@ export function useWebSocketSubscription() {
 
         charData.value = {
             ...charData.value,
+            // Mirror the hosted /api/actorsheet shape: a top-level `type` drives
+            // isPlayer (charData.type === 'character'). Without it, embed rows
+            // render the locked/mook variant
+            type: payload.actor.type,
             data: payload.actor,
             uuid: payloadActorId,
             requestId: payload.requestId
         };
         loading.value = false;
+        error.value = null; // clear any prior "no character" / timeout state now that real data arrived
+        errorCode.value = null;
+        isFoundryLive.value = true; // this payload came from Foundry, so it is live
     };
 
     /**
@@ -108,6 +139,10 @@ export function useWebSocketSubscription() {
             actorUuid = payloadActorId;
             localStorage.setItem('cpr_actor_uuid', actorUuid);
         }
+
+        // A delta only exists because something changed in Foundry, so the
+        // connection is demonstrably live.
+        isFoundryLive.value = true;
 
         // Delegate to the delta applier (imported by caller)
         if (window.__applyDelta) {
@@ -146,7 +181,9 @@ export function useWebSocketSubscription() {
         charData,
         loading,
         isWssConnected,
+        isFoundryLive,
         error,
+        errorCode,
         agentLink,
         isGM,
     };

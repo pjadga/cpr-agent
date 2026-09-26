@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "./themes.css";
 @import "./components/foundry-content.css";
+@import "./components/wiki.css";
+@import "./components/settings.css";
 
 @theme {
     --font-sans: var(--cpr-font-sans, 'Hack', monospace);
@@ -41,7 +43,7 @@
     --border-cpr-width: var(--cpr-border-width, 1px);
 }
 
-/* Display font for headings — "Cyberpnuk2" by junkohanhero (dafont.com/junkohanhero.d1293),
+/* Display font for headings, "Cyberpnuk2" by junkohanhero (dafont.com/junkohanhero.d1293),
    bundled locally in resources/fonts. Vite resolves the relative url at build. */
 @font-face {
     font-family: 'Cyberpnuk2';
@@ -51,7 +53,7 @@
     font-display: swap;
 }
 
-/* All H1/H2 use the display font. Broad on purpose (per request — tweak later).
+/* All H1/H2 use the display font. Broad on purpose (per request, tweak later).
    font-synthesis:none stops the browser faux-bolding this single-weight face
    (it renders far too intense under font-bold); real fonts with a bold face
    are unaffected, so fallbacks still bold normally. */
@@ -60,7 +62,7 @@ h2 {
     /* !important so the display font wins regardless of theme font vars or any
        utility/inherited font-family on a given page. font-weight:normal both keeps
        the display font from reading too intense (it ships a single 400 face) and
-       makes the requested weight match that face exactly — a 900 (font-black)
+       makes the requested weight match that face exactly, a 900 (font-black)
        request against a 400-only font is a fragile match that can drop to fallback. */
     font-family: 'Cyberpnuk2', var(--font-sans, 'Hack'), monospace !important;
     font-weight: normal !important;
@@ -78,7 +80,7 @@ body {
     -webkit-touch-callout: none;
 }
 
-/* touch-action does NOT inherit — set it on every element so double-tap zoom
+/* touch-action does NOT inherit, set it on every element so double-tap zoom
    (and the legacy 300ms tap delay) is disabled UI-wide. `manipulation` still
    allows scrolling/panning and pinch, just kills double-tap + non-standard gestures. */
 *,

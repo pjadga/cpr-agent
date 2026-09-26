@@ -29,9 +29,14 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="relative flex flex-col items-center justify-center px-5 min-w-[92px]"
-                             :style="{ '--frame-border': 'var(--cpr-yellow-dark)' }">
+                        <div class="relative flex flex-col items-center justify-center px-5 min-w-[92px] transition-transform"
+                             :class="selectedWeapon ? 'cursor-pointer active:scale-95' : ''"
+                             :style="{ '--frame-border': 'var(--cpr-yellow-dark)' }"
+                             :title="selectedWeapon ? 'Tap for the full range DV table' : ''"
+                             @click="selectedWeapon && (showDvTable = true)">
                             <med-stat-frame/>
+                            <i v-if="selectedWeapon" v-icon data-lucide="table"
+                               class="absolute top-1 right-1 z-10 w-3 h-3 text-cpr-yellow-dark/70"></i>
                             <div class="relative z-10 text-[10px] text-cpr-text-dim uppercase font-bold mb-1">Target DV</div>
                             <div v-if="dvLoading" class="relative z-10 text-cpr-yellow-dark animate-pulse font-mono font-bold">
                                 CALC...
@@ -110,6 +115,9 @@
                 </div>
 
             </div>
+
+            <dv-table-modal :show="showDvTable" :weapon="selectedWeapon" :target-distance="targetDistance"
+                            @close="showDvTable = false"></dv-table-modal>
         </div>
     </transition>
 </template>
@@ -118,16 +126,20 @@
 import {vIcon} from '../../directives/icon';
 import MedStatFrame from './frames/MedStatFrame.vue';
 import SimpleStatFrame from './frames/SimpleStatFrame.vue';
+import DvTableModal from './DvTableModal.vue';
 
 export default {
     name: 'CombatPanel',
-    components: {MedStatFrame, SimpleStatFrame},
+    components: {MedStatFrame, SimpleStatFrame, DvTableModal},
     props: [
         'show', 'selectedWeapon', 'availableFireModes', 'fireMode',
-        'dvLoading', 'dvError', 'dvInfo', 'reloadRequired'
+        'dvLoading', 'dvError', 'dvInfo', 'reloadRequired', 'targetDistance'
     ],
     directives: {icon: vIcon},
-    emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'move', 'update:fireMode']
+    emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'move', 'update:fireMode'],
+    data() {
+        return {showDvTable: false};
+    }
 }
 </script>
 

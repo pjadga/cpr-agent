@@ -1,6 +1,18 @@
 <template>
     <div class="min-h-screen pb-[calc(6rem+env(safe-area-inset-bottom))] text-sans bg-none">
 
+        <!-- Roll overlays live at the root, OUTSIDE the charData gate: a player
+             observing someone else's roll needs the big modal / mini side popup
+             even if their own sheet has not loaded (e.g. a GM with no assigned
+             character). Both are driven purely by window.emitter. -->
+        <roll-result-popup></roll-result-popup>
+        <dice-history></dice-history>
+        <cyberware-install-modal :show="showCyberwareModal" :options="cyberwareOptions"
+                                 @close="closeCyberwareModal" @confirm="confirmCyberwareInstall"></cyberware-install-modal>
+        <cyberware-uninstall-modal :show="showCyberwareUninstallModal" :target="cyberwareUninstallTarget"
+                                   @close="closeCyberwareUninstallModal"
+                                   @confirm="confirmCyberwareUninstall"></cyberware-uninstall-modal>
+
         <div v-if="loading" class="flex h-screen w-screen items-center justify-center bg-cpr-black">
             <div class="flex flex-col items-center">
                 <div class="text-cpr-yellow font-mono animate-pulse text-xl">INITIALIZING AGENT...</div>
@@ -13,15 +25,28 @@
             </div>
         </div>
 
-        <div v-else-if="error" class="flex h-screen items-center justify-center p-4 bg-cpr-black">
+        <!-- Only when there is no sheet to show. This branch and the sheet below
+             are separate v-ifs, so without the charData guard a failure arriving
+             after a successful load would paint a full-screen error panel on top
+             of a perfectly good sheet. A failed roll should not blank your
+             character. -->
+        <div v-else-if="(error || errorCode) && !charData" class="flex h-screen items-center justify-center p-4 bg-cpr-black">
             <div class="w-full max-w-md">
                 <div class="border-2 border-cpr-red bg-cpr-red-dark/10 p-6 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
                     <div class="flex items-center gap-4 mb-4 border-b border-cpr-red pb-4">
                         <i v-icon data-lucide="alert-octagon" class="w-8 h-8 text-cpr-red"></i>
-                        <h2 class="text-cpr-red font-black text-2xl uppercase tracking-tighter">Uplink Failed</h2>
+                        <h2 class="text-cpr-red font-black text-2xl uppercase tracking-tighter">{{ errorTitle }}</h2>
                     </div>
-                    <div class="text-cpr-text-main font-mono text-sm leading-relaxed mb-6">
-                        {{ error }}
+                    <!-- What went wrong, then what to do about it. The old panel
+                         printed the raw axios message, which named the symptom
+                         ("status code 500") and never the cause. -->
+                    <div class="text-cpr-text-main text-sm leading-relaxed mb-4">
+                        {{ errorDetail }}
+                    </div>
+                    <div v-if="errorHint"
+                         class="text-cpr-text-dim text-xs leading-relaxed mb-6 border-l-2 border-cpr-yellow pl-3">
+                        <span class="text-cpr-yellow font-bold uppercase tracking-widest">Fix:</span>
+                        {{ errorHint }}
                     </div>
                     <div class="flex gap-4">
                         <button @click="reloadPage"
@@ -70,7 +95,7 @@
                         <h2 class="text-cpr-yellow font-bold uppercase tracking-widest text-lg">
                             {{ charData.data.name }}
                         </h2>
-                        <div v-if="!isWssConnected"
+                        <div v-if="!isLive"
                              class="text-cpr-red font-black text-xs mt-1 animate-pulse tracking-widest uppercase">
                             Offline Mode - Agent Synced via Local Cache
                         </div>
@@ -103,8 +128,6 @@
                 @save="commitResourceValue">
             </resource-modal>
 
-            <roll-result-popup></roll-result-popup>
-            <dice-history></dice-history>
             <radial-menu-host></radial-menu-host>
 
             <combat-panel
@@ -115,6 +138,7 @@
                 :dv-loading="dvLoading"
                 :dv-error="dvError"
                 :dv-info="dvInfo"
+                :target-distance="controlState.selectedTarget?.distanceM"
                 :reload-required="controlState.reloadRequired"
                 @close="showCombatPanel = false"
                 @roll-hit="rollHit"
@@ -144,7 +168,7 @@
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2">
-                            <h1 v-if="!isWssConnected"
+                            <h1 v-if="!isLive"
                                 class="text-[0.8rem] font-normal uppercase truncate leading-none text-cpr-yellow">
                                 <span
                                     class="px-2 py-0.5 bg-cpr-red text-black text-[10px] font-black uppercase tracking-tighter rounded-sm animate-pulse mr-2">
@@ -245,10 +269,13 @@
                         :active-tab="activeTab"
                         :collapsed-categories="collapsedCategories"
                         :grouped-cyberware="groupedCyberware"
+                        :uninstalled-cyberware="uninstalledCyberware"
+                        :cyberware-show-all="cyberwareShowAll"
                         :grouped-gear="groupedGear"
                         :char-data="charData"
                         :refresh-all="refreshAll"
                         @toggle-category="toggleCategory"
+                        @toggle-cyberware-show-all="toggleCyberwareShowAll"
                         @item-click="handleItemClick"
                         @equip-click="openEquipModal"
                         @consume-click="openConsumeModal"
@@ -310,7 +337,7 @@
                          @click="activeTab = 'control'"></nav-btn>
                 <nav-btn v-if="netPoolData.length > 0" icon="globe" label="CitiNet" :active="activeTab === 'net'"
                          @click="activeTab = 'net'"></nav-btn>
-                <nav-btn icon="settings" label="Config" :active="activeTab === 'profile'"
+                <nav-btn v-if="!isEmbed" icon="settings" label="Config" :active="activeTab === 'profile'"
                          @click="goToSettings"></nav-btn>
             </nav>
 
@@ -471,6 +498,11 @@ import {useRollModifiers} from '../composables/useRollModifiers';
 import {useResources} from '../composables/useResources';
 import {useNetrunner} from '../composables/useNetrunner';
 import {useNetPool} from '../composables/useNetPool';
+import {diagnostic} from '../composables/useFoundryDiagnostics';
+import {useCyberware} from '../composables/useCyberware';
+import {CYBERWARE_TYPE_ORDER, cyberwareTypeLabel, isCyberwareInstalled} from '../utils/cyberware';
+import CyberwareInstallModal from './character-sheet/CyberwareInstallModal.vue';
+import CyberwareUninstallModal from './character-sheet/CyberwareUninstallModal.vue';
 import {useEchoListener} from '../utils/listener';
 
 // --- DIRECTIVES & UTILS ---
@@ -494,6 +526,8 @@ export default {
         EurobucksPanel,
         DiceHistory,
         RollResultPopup,
+        CyberwareInstallModal,
+        CyberwareUninstallModal,
         TopBorderFrame,
         BottomBorderFrame,
         MobileBackgroundFrame
@@ -505,7 +539,9 @@ export default {
             charData,
             loading,
             isWssConnected,
+            isFoundryLive,
             error: dataError,
+            errorCode,
             agentLink: localAgentLink,
             isGM,
             getImageUrl,
@@ -522,6 +558,24 @@ export default {
             handleNetPoolData
         } = useNetPool();
 
+        // Cyberware install/uninstall. Triggered from the ItemRow radial menu over
+        // window.emitter; the modal (rendered at root) shows targets + humanity option.
+        const {
+            showInstallModal: showCyberwareModal,
+            installOptions: cyberwareOptions,
+            requestInstall: requestCyberwareInstall,
+            confirmInstall: confirmCyberwareInstall,
+            closeInstallModal: closeCyberwareModal,
+            showUninstallModal: showCyberwareUninstallModal,
+            uninstallTarget: cyberwareUninstallTarget,
+            requestUninstall: requestCyberwareUninstall,
+            confirmUninstall: confirmCyberwareUninstall,
+            closeUninstallModal: closeCyberwareUninstallModal
+        } = useCyberware();
+        window.emitter?.on('cyberware-install', (item) => requestCyberwareInstall(item));
+        window.emitter?.on('cyberware-uninstall', (item) =>
+            requestCyberwareUninstall(item, charData.value?.data?.items || []));
+
         const activeTab = ref('stats');
         const showPopup = ref(false);
         const showEquipModal = ref(false);
@@ -532,10 +586,34 @@ export default {
         const showCombatPanel = ref(false);
         const showEurobucksModal = ref(false);
         const popupMessage = ref('');
+        // "Live" means the sheet is showing what Foundry currently thinks, which
+        // needs both a socket AND something answering on it. isWssConnected
+        // alone only says Reverb accepted the connection: with Reverb up and
+        // Foundry closed it reads true while the sheet serves cached data, so
+        // the OFFLINE badge silently stopped appearing in exactly the situation
+        // it exists to flag.
+        const isLive = computed(() => isWssConnected.value && isFoundryLive.value);
+
         const error = computed(() => dataError.value);
+
+        // A classified failure gets a title, an explanation and a fix; free-text
+        // `error` (set by paths that already carry their own prose) keeps the
+        // old presentation so nothing regresses to a blank panel.
+        const errorTitle = computed(() => (errorCode.value ? diagnostic(errorCode.value).title : 'Uplink Failed'));
+        const errorDetail = computed(() => (errorCode.value ? diagnostic(errorCode.value).detail : dataError.value));
+        const errorHint = computed(() => (errorCode.value ? diagnostic(errorCode.value).hint : null));
 
         // --- INITIAL DATA LOAD ---
         fetchNetPool();
+
+        //Fetch post app load
+        let netPoolFetched = false;
+        watch(charData, (val) => {
+            if (val && !netPoolFetched) {
+                netPoolFetched = true;
+                fetchNetPool();
+            }
+        }, {immediate: true});
 
         // --- UTILS & HELPERS ---
         const throwError = (message) => {
@@ -688,7 +766,7 @@ export default {
                         if (typeof payload.dv !== 'undefined') {
                             const dvText = typeof payload.dv === 'number' ? payload.dv : String(payload.dv);
                             const outcome = payload.outcome || '';
-                            details = `DV ${dvText} — ${outcome}`.trim();
+                            details = `DV ${dvText}, ${outcome}`.trim();
                         }
                     }
                     window.emitter.emit('show-roll-result', {
@@ -861,20 +939,52 @@ export default {
             return ids;
         });
 
-        const groupedCyberware = computed(() => {
-            if (!charData.value) return {};
-            const cyberware = charData.value.data.items.filter(i =>
-                ['cyberware', 'fashionware', 'cyberwareInternal', 'cyberwareExternal', 'cyberdeck'].includes(i.type) &&
-                !installedIds.value.has(i._id)
+        // Cyberware grouped by body location. Only installed, non-nested items
+        // become rows: the category heading is the top parent (CPR has a real
+        // container item for External/Internal/Fashionware but none for
+        // Cybereye/Cyberarm/Neuralware, so the heading has to stand in), and
+        // deeper nesting is rendered by CyberwareNode from installedItems.list.
+        //
+        // This grouped on `system.cyberwareType` and fell through a
+        // `|| 'Cyberdeck'` fallback for everything. The value is the CPR body
+        // location (cyberEye, cyberArm, ...); ActorSheet::cleanItem passes it
+        // under both names, and item-level `type` is only ever 'cyberware'.
+        const topLevelCyberware = computed(() => {
+            if (!charData.value) return [];
+            return charData.value.data.items.filter(
+                i => i.type === 'cyberware' && !installedIds.value.has(i._id)
             );
+        });
+
+        const groupedCyberware = computed(() => {
+            const items = charData.value?.data?.items || [];
+            const installed = topLevelCyberware.value.filter(cw => isCyberwareInstalled(cw, items));
+
             const groups = {};
-            cyberware.forEach(cw => {
-                const type = cw.system.cyberwareType || 'Cyberdeck';
-                if (!groups[type]) groups[type] = [];
-                groups[type].push(cw);
+            CYBERWARE_TYPE_ORDER.forEach(type => {
+                const inType = installed.filter(cw => cw.system?.type === type);
+                // "Show all" keeps every body location on screen, including the
+                // ones holding nothing, so the sheet doubles as a map of what
+                // could still be filled.
+                if (inType.length || cyberwareShowAll.value) groups[cyberwareTypeLabel(type)] = inType;
             });
+            const known = new Set(CYBERWARE_TYPE_ORDER);
+            const rest = installed.filter(cw => !known.has(cw.system?.type));
+            if (rest.length) groups[cyberwareTypeLabel(null)] = rest;
             return groups;
         });
+
+        // Owned but not installed, the shelf you install from. Kept apart from
+        // the body locations so a spare arm never reads as a fitted one.
+        const uninstalledCyberware = computed(() => {
+            const items = charData.value?.data?.items || [];
+            return topLevelCyberware.value.filter(cw => !isCyberwareInstalled(cw, items));
+        });
+
+        const cyberwareShowAll = ref(false);
+        const toggleCyberwareShowAll = () => {
+            cyberwareShowAll.value = !cyberwareShowAll.value;
+        };
 
         const groupedInjuries = computed(() => {
             if (!charData.value) return {head: [], body: []};
@@ -1031,7 +1141,7 @@ export default {
 
         // --- WATCHERS ---
         watch(activeTab, (newTab) => {
-            // Always land the new tab at the top — the page scrolls at window
+            // Always land the new tab at the top, the page scrolls at window
             // level, so without this a mid-scroll position carries across tabs.
             window.scrollTo({top: 0, left: 0});
             if (newTab === 'control') {
@@ -1109,11 +1219,19 @@ export default {
             refreshSheet();
         };
 
+        // Running inside the Foundry iframe
+        const isEmbed = window.__CPR_EMBED === true;
+
         return {
             // State
+            isEmbed,
             charData,
             loading,
             error,
+            errorCode,
+            errorTitle,
+            errorDetail,
+            errorHint,
             activeTab,
             stats,
             luck,
@@ -1121,6 +1239,9 @@ export default {
             roleItem,
             groupedSkills,
             groupedCyberware,
+            uninstalledCyberware,
+            cyberwareShowAll,
+            toggleCyberwareShowAll,
             groupedGear,
             groupedInjuries,
             groupedEquipped,
@@ -1179,8 +1300,20 @@ export default {
             goToSettings,
             refreshSheet,
             isWssConnected,
+            isFoundryLive,
+            isLive,
             reloadPage,
             netPoolData,
+
+            // Cyberware install
+            showCyberwareModal,
+            cyberwareOptions,
+            confirmCyberwareInstall,
+            closeCyberwareModal,
+            showCyberwareUninstallModal,
+            cyberwareUninstallTarget,
+            confirmCyberwareUninstall,
+            closeCyberwareUninstallModal,
 
             // Combat
             mockEnemies,

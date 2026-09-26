@@ -542,4 +542,44 @@ class FoundryCallbackTest extends TestCase
         $this->assertCount(2, $deck['system']['installedItems']['list']);
         $this->assertEquals(4, $deck['system']['installedItems']['usedSlots']);
     }
+
+    #[Test]
+    public function it_broadcasts_cyberware_install_options_without_stripping_fields()
+    {
+        Event::fake([FoundryResponse::class]);
+
+        // validatePayload() allowlists fields and the validated array is what
+        // gets broadcast, so a field missing from the rules is dropped in
+        // transit. That is what left the install modal with no targets and no
+        // humanity figures, rendering its "cannot be installed" branch instead.
+        $response = $this->withToken($this->token)
+            ->postJson('/api/foundry/callback', [
+                'type' => 'CYBERWARE_INSTALL_OPTIONS',
+                'requestId' => 'req-cyber-001',
+                'actorId' => 'abc123',
+                'itemId' => 'item-neuralware-1',
+                'itemName' => 'Neural Link',
+                'isFoundational' => true,
+                'canInstall' => true,
+                'reason' => null,
+                'targets' => [
+                    ['id' => 'foundational-1', 'name' => 'Cyberaudio Suite'],
+                ],
+                'humanityLoss' => ['roll' => '2d6', 'static' => 7],
+                'success' => true,
+            ]);
+
+        $response->assertStatus(200);
+
+        Event::assertDispatched(FoundryResponse::class, function ($event) {
+            return $event->payload['type'] === 'CYBERWARE_INSTALL_OPTIONS'
+                && $event->payload['itemId'] === 'item-neuralware-1'
+                && $event->payload['itemName'] === 'Neural Link'
+                && $event->payload['isFoundational'] === true
+                && $event->payload['canInstall'] === true
+                && $event->payload['targets'][0]['name'] === 'Cyberaudio Suite'
+                && $event->payload['humanityLoss']['roll'] === '2d6'
+                && $event->payload['humanityLoss']['static'] === 7;
+        });
+    }
 }

@@ -79,13 +79,13 @@
                             </label>
                         </div>
                         <p class="text-[10px] text-cpr-text-dim mt-1 uppercase">
-                            Not sure? Pick Player — you can change this later in Settings.
+                            Not sure? Pick Player, you can change this later in Settings.
                         </p>
                         <x-input-error :messages="$errors->get('role')" class="mt-2"/>
                     </div>
 
                     <!-- Captcha -->
-                    @if(!app()->environment('local'))
+                    @if(config('services.turnstile.enabled'))
                         <div class="mt-4 flex flex-col items-center">
                             <x-turnstile/>
                             <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2"/>

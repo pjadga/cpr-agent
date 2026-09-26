@@ -29,14 +29,18 @@
                     @endauth
                 </div>
 
-                <div class="mt-8">
+                <div class="mt-8 flex justify-center gap-6">
                     <a href="{{ route('how-to-use') }}"
                        class="text-cpr-text-muted hover:text-cpr-red uppercase tracking-widest text-sm transition-colors">
                         How to Use
                     </a>
+                    <a href="{{ route('wiki.index') }}"
+                       class="text-cpr-text-muted hover:text-cpr-red uppercase tracking-widest text-sm transition-colors">
+                        Documentation
+                    </a>
                 </div>
 
-                {{-- Ko-fi support button — inside the box, below "How to Use". Only on the
+                {{-- Ko-fi support button, inside the box, below "How to Use". Only on the
                      official hosted instance; self-hosted / local instances hide it here
                      (it stays on the How to Use page). Colour matches the dark panel. --}}
                 @if (request()->getHost() === 'agent.surrealdisco.co.uk')

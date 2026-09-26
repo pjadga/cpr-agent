@@ -2,7 +2,6 @@
 
 namespace App\Support\Csp;
 
-use App\Models\Config;
 use Spatie\Csp\Directive;
 use Spatie\Csp\Keyword;
 use Spatie\Csp\Preset;
@@ -11,7 +10,11 @@ class Policy implements Preset
 {
     public function configure(\Spatie\Csp\Policy $policy): void
     {
-        $foundryUrl = Config::first()?->foundry_url;
+        // The *current* user's Foundry. Config::first() returned whichever row
+        // happened to be first in the table, so on the hosted instance one
+        // arbitrary user's Foundry was allow-listed for everybody and every
+        // other GM's images were blocked.
+        $foundryUrl = auth()->user()?->config?->foundry_url;
 
         $policy
             ->add(Directive::SCRIPT, [
