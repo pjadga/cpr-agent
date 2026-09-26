@@ -210,7 +210,7 @@ use. Find the existing `listen` and `server_name` lines and change them to:
 
 ```nginx
 listen 0.0.0.0:80;
-server_name cyberpunk-red-agent.test 192.168.1.50 your-pc.tailnet-1234.ts.net;
+server_name cyberpunk-red-agent.test 192.168.1.50 your-pc.tailnet-1234.ts.net; (Remove/Change as applicable)
 ```
 
 Keep any lines Herd put there for the isolated PHP version or the certificate.
@@ -244,6 +244,12 @@ that rule, since nothing listens there any more.
 ---
 
 ## 9. Start the background processes (I Swear We Are So Close, Choom)
+
+```bash
+herd link YOUR_HOST_PC_IP
+```
+The 'link' command attaches your PC IP address to herd, allowing it to serve correctly to other computers. If they are hitting 404 errors, this is likely the culprit.
+
 
 ```bash
 php artisan agent:serve
