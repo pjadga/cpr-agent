@@ -110,11 +110,8 @@ regenerate secrets unless you pass `--force`.
 > **Updating an existing install?** Use `php artisan migrate`. Never
 > `migrate:fresh`, which wipes every account and character.
 
-> **Note on PHP & SQLite** In my testing, becuase I have various PHP versions installed, I hit an issue running php artisan agent:install - it suggested that Herd did not have the SQLite extension available (when it clearly does). This is caused by the terminal using a PHP version other than the one Herd is offering. I'm assuming if this is the case for you, you will know where the php.ini file is - you'll need to enable pdo_sqlite + sqlite3 extensions by removing the ; from the beginning of the line.  
+> **Note on PHP & SQLite** In my testing, becuase I have various PHP versions installed, I hit an issue running php artisan agent:install - it suggested that Herd did not have the SQLite extension available (when it clearly does). This is caused by the terminal using a PHP version other than the one Herd is offering. If you hit this, replace `php` with `herd php` in the commands.
 
-> Another fix is to run `where.exe php` then use the printout of the herd php as the pre-fix, for example: 
-
-> `& "C:\Users\{USER}\.config\herd\bin\php.bat" artisan agent:install`
 ---
 
 ## 5. Set your address
