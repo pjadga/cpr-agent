@@ -56,7 +56,7 @@ code; they have to copy and paste a link code instead. HTTPS also means characte
 portraits and token art load properly, and the in-Foundry Agent window works.
 Tailscale gives you a certificate for free and takes a lot of the headache out of sharing, but is not required for this to work.
 
-> **The one rule:** whatever address *players* type is the address that goes in
+> **Note on the URL:** whatever address *players* type is the address that goes in
 > `APP_URL`, and the same address goes in the Foundry Bridge module. A
 > `.test` address only exists on your own PC. If you give that to the Bridge
 > while players are remote, QR pairing and the in-Foundry Agent window will both
