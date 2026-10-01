@@ -438,6 +438,46 @@ class ProtocolMatrixTest extends TestCase
         $this->assertStringNotContainsString('someone-else.example.com', $csp);
     }
 
+    /**
+     * img-src as the /embed page gets it, framed by a Foundry at $referer.
+     */
+    private function embedImgSrc(?string $referer): string
+    {
+        config(['csp.enabled' => true]);
+        $headers = $referer ? ['Referer' => $referer] : [];
+        $csp = $this->get('/embed', $headers)->headers->get('Content-Security-Policy');
+        preg_match('/img-src[^;]*/', (string) $csp, $m);
+
+        return $m[0] ?? '';
+    }
+
+    #[Test]
+    public function the_embed_allows_images_from_the_foundry_that_frames_it(): void
+    {
+        // The embed is auth-less, so there is no user config to allow-list.
+        // Without the parent origin every item icon was blocked by img-src.
+        $imgSrc = $this->embedImgSrc('http://localhost:30000/game');
+
+        $this->assertStringContainsString('http://localhost:30000', $imgSrc);
+        $this->assertStringNotContainsString('/game', $imgSrc);
+    }
+
+    #[Test]
+    public function the_embed_ignores_a_missing_or_non_http_referer(): void
+    {
+        $this->assertStringNotContainsString('localhost', $this->embedImgSrc(null));
+        $this->assertStringNotContainsString('javascript', $this->embedImgSrc('javascript:alert(1)'));
+    }
+
+    #[Test]
+    public function only_the_embed_takes_its_image_origin_from_the_referer(): void
+    {
+        config(['csp.enabled' => true]);
+        $csp = $this->get('/login', ['Referer' => 'http://evil.example.com/'])->headers->get('Content-Security-Policy');
+
+        $this->assertStringNotContainsString('evil.example.com', (string) $csp);
+    }
+
     #[Test]
     public function a_user_with_no_foundry_configured_still_gets_a_usable_img_policy(): void
     {

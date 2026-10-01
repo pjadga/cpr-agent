@@ -201,6 +201,15 @@ describe('useImageProxy.getImageUrl', () => {
         expect(getImageUrl('/tokens/solo.png')).toBe('https://foundry.example.com/tokens/solo.png');
     });
 
+    it('loads a loopback http Foundry directly on an https page, not via the proxy', () => {
+        // Browsers allow http://localhost from https pages, and the server
+        // (inside DDEV/Docker) can't reach the host's localhost anyway.
+        for (const base of ['http://localhost:30000', 'http://127.0.0.1:30000', 'http://[::1]:30000']) {
+            const {getImageUrl} = proxyFor('https:', base);
+            expect(getImageUrl('/tokens/solo.png')).toBe(`${base}/tokens/solo.png`);
+        }
+    });
+
     it('proxies ngrok on every scheme, for the interstitial rather than for mixed content', () => {
         // ngrok answers a plain browser request with its warning page; the
         // proxy sends the skip header. That is scheme-independent.
