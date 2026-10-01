@@ -7,6 +7,9 @@ import {
     relevantBonusKeys,
     rollModRows,
     augmentRollMods,
+    modLabel,
+    effectList,
+    skillTotal,
 } from '@/utils/rollEffects';
 
 // Shapes copied from real cached actor JSON (users.character_data).
@@ -181,5 +184,65 @@ describe('augmentRollMods', () => {
 
     it('passes null through', () => {
         expect(augmentRollMods(null, actor([]), pistol)).toBeNull();
+    });
+});
+
+// Shapes from the live character (Smash, Black Lace, Dismembered Leg).
+const smash = {
+    _id: 'd2', name: 'Smash', type: 'drug', system: {usage: 'snorted'},
+    effects: [
+        effect('Smash Primary', [['bonuses.persuasion', 2], ['bonuses.acting', 2]]),
+        effect('Smash Addiction', [['bonuses.persuasion', -2]], {disabled: true}),
+    ],
+};
+const persuasion = {_id: 's1', name: 'Persuasion', type: 'skill', system: {stat: 'cool', level: 4}};
+const handgun = {_id: 's2', name: 'Handgun', type: 'skill', system: {stat: 'ref', level: 6}};
+
+describe('modLabel', () => {
+    it('names stats and bonuses for people', () => {
+        expect(modLabel('system.stats.move.value')).toBe('MOVE');
+        expect(modLabel('bonuses.allActionsHands')).toBe('Hand actions');
+        expect(modLabel('bonuses.humanPerception')).toBe('Human perception');
+    });
+});
+
+describe('skillTotal (#22)', () => {
+    it('adds a skill bonus from an active effect, not the disabled one', () => {
+        const total = skillTotal(actor([smash], {cool: {value: 5}}), persuasion);
+        expect(total).toEqual({base: 9, value: 11, mods: [{source: 'Smash', value: 2}]});
+    });
+
+    it('folds effect-adjusted stats and armour into REF skills', () => {
+        const blackLace = {
+            _id: 'd1', name: 'Black Lace', type: 'drug', system: {usage: 'snorted'},
+            effects: [effect('Black Lace Addiction', [['system.stats.ref.value', -2]])],
+        };
+        const total = skillTotal(actor([blackLace, armour('Flak (Body)', 4)]), handgun);
+        expect(total.base).toBe(12);
+        expect(total.value).toBe(6);
+        expect(total.mods).toEqual([{source: 'Black Lace', value: -2}, {source: 'Flak (Body)', value: -4}]);
+    });
+
+    it('is unchanged with no effects', () => {
+        expect(skillTotal(actor([]), handgun)).toEqual({base: 12, value: 12, mods: []});
+    });
+});
+
+describe('effectList (#22)', () => {
+    it('lists active effects first, inactive with a reason', () => {
+        const hat = {
+            _id: 'g1', name: 'Kevlar Hat', type: 'clothing', system: {usage: 'equipped', equipped: 'carried'},
+            effects: [effect('Style', [['bonuses.wardrobeAndStyle', 1]])],
+        };
+        const list = effectList(actor([smash, hat]));
+        expect(list.map((e) => [e.effect, e.active, e.reason])).toEqual([
+            ['Smash Primary', true, null],
+            ['Smash Addiction', false, 'off'],
+            ['Style', false, 'not equipped'],
+        ]);
+        expect(list[0].changes).toEqual([
+            {label: 'Persuasion', value: 2, situational: false},
+            {label: 'Acting', value: 2, situational: false},
+        ]);
     });
 });

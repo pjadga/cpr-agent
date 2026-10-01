@@ -227,6 +227,7 @@
                         :active-tab="activeTab"
                         :char-data="charData"
                         :stats="stats"
+                        :effects="activeEffects"
                         :luck="luck"
                         :emp="emp"
                         :grouped-equipped="groupedEquipped"
@@ -254,7 +255,7 @@
                         :expanded-skills="expandedSkills"
                         :grouped-skills="groupedSkills"
                         :collapsed-categories="collapsedCategories"
-                        :calculate-base="calculateBase"
+                        :skill-totals="skillTotals"
                         :skills-descriptions="skillsDescriptions"
                         @role-request="sendRoleRequest"
                         @role-ability-request="sendRoleAbilityRequest"
@@ -495,7 +496,7 @@ import MobileBackgroundFrame from "./character-sheet/frames/MobileBackgroundFram
 import {useCharacterData} from '../composables/useCharacterData';
 import {useCombat} from '../composables/useCombat';
 import {useRollModifiers} from '../composables/useRollModifiers';
-import {augmentRollMods, effectiveStats} from '../utils/rollEffects';
+import {augmentRollMods, effectiveStats, effectList, skillTotal} from '../utils/rollEffects';
 import {useResources} from '../composables/useResources';
 import {useNetrunner} from '../composables/useNetrunner';
 import {useNetPool} from '../composables/useNetPool';
@@ -922,11 +923,23 @@ export default {
 
         // Effect-adjusted (a Broken Leg shows as MOVE -4); each stat keeps its
         // base and the mods that moved it.
+        const allStats = computed(() => charData.value ? effectiveStats(charData.value.data) : {});
         const stats = computed(() => {
-            if (!charData.value) return {};
-            const {luck, emp, ...rest} = effectiveStats(charData.value.data);
+            const {luck, emp, ...rest} = allStats.value;
             return rest;
         });
+
+        // Skill totals as CPR would roll them, keyed by skill _id (#22).
+        const skillTotals = computed(() => {
+            if (!charData.value) return {};
+            const data = charData.value.data;
+            return Object.fromEntries(data.items
+                .filter(i => i.type === 'skill')
+                .map(skill => [skill._id, skillTotal(data, skill, allStats.value)]));
+        });
+
+        // Read-only list of every effect on the character, active first.
+        const activeEffects = computed(() => charData.value ? effectList(charData.value.data) : []);
 
         const luck = computed(() => charData.value?.data.system.stats.luck || {value: 0, max: 0});
         const emp = computed(() => charData.value?.data.system.stats.emp || {value: 0, max: 0});
@@ -1094,12 +1107,6 @@ export default {
 
         // --- HELPER FUNCTIONS ---
 
-        const calculateBase = (skill) => {
-            if (!charData.value) return 0;
-            const statVal = charData.value.data.system.stats[skill.system.stat]?.value || 0;
-            return skill.system.level + statVal;
-        };
-
         const findItem = (id) => findItemInList(id, charData.value?.data.items);
 
         const formatCategory = formatCategoryName;
@@ -1243,6 +1250,8 @@ export default {
             errorHint,
             activeTab,
             stats,
+            skillTotals,
+            activeEffects,
             luck,
             emp,
             roleItem,
@@ -1271,7 +1280,6 @@ export default {
             toggleProgramDetails,
 
             // UI Helpers
-            calculateBase,
             findItem,
             formatCategory,
             getImageUrl,

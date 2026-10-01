@@ -143,6 +143,46 @@
             </transition>
         </div>
 
+        <!-- Read-only: every effect on the character (utils/rollEffects.js effectList).
+             Toggling stays in Foundry; the Bridge pushes changes back live. -->
+        <div v-if="effects && effects.length">
+            <h3 @click="$emit('toggle-category', 'activeEffects')"
+                class="flex items-center justify-between mb-2 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red cursor-pointer hover:bg-cpr-teal-dark/30 transition-colors group">
+                <span class="text-cpr-yellow font-bold text-sm uppercase group-hover:text-cpr-teal transition-colors">Active Effects</span>
+                <div class="transition-transform duration-200"
+                     :class="{ 'rotate-180': collapsedCategories['activeEffects'] }">
+                    <i v-icon data-lucide="chevron-down"
+                       class="w-4 h-4 text-cpr-red group-hover:text-cpr-teal"></i>
+                </div>
+            </h3>
+            <div v-show="!collapsedCategories['activeEffects']" class="flex flex-col gap-2">
+                <!-- Plain grey row (EffectRowFrame): the skill-row outline without the
+                     value chip, with ends that stay put when a row wraps. -->
+                <div v-for="(eff, idx) in effects" :key="idx"
+                     class="relative flex items-stretch min-h-[3.25rem]"
+                     :style="{ '--frame-accent': 'var(--cpr-border)' }">
+                    <EffectRowFrame class="absolute inset-0 pointer-events-none select-none"/>
+                    <div class="relative z-10 flex-1 flex items-center p-2 pl-4 pr-4"
+                         :class="{ 'opacity-60': !eff.active }">
+                        <div class="flex flex-col min-w-0">
+                            <div class="flex items-baseline gap-2 flex-wrap">
+                                <span class="text-sm font-medium text-cpr-text-main">{{ eff.source }}</span>
+                                <span v-if="eff.effect && eff.effect !== eff.source"
+                                      class="text-[10px] text-cpr-text-dim">{{ eff.effect }}</span>
+                                <span v-if="!eff.active"
+                                      class="text-[10px] text-cpr-red font-black uppercase tracking-wider">({{ eff.reason || 'off' }})</span>
+                            </div>
+                            <div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
+                                <span v-for="(change, cIdx) in eff.changes" :key="cIdx"
+                                      :class="change.value < 0 ? 'text-cpr-red' : 'text-cpr-lime'"
+                                      class="text-[11px]">{{ formatChange(change) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div>
             <h3 class="flex items-center justify-between mb-4 mt-4 bg-cpr-black-deep py-1 px-2 border-l-2 border-cpr-red transition-colors group">
                 <span class="text-cpr-yellow font-bold text-sm uppercase">Currently Equipped</span>
@@ -196,15 +236,18 @@ import ItemRow from './ItemRow.vue';
 import {formatCategoryName} from '../../utils/helpers';
 import ArmourRow from "./ArmourRow.vue";
 import MedStatFrame from "./frames/MedStatFrame.vue";
+import EffectRowFrame from "./frames/EffectRowFrame.vue";
 
 export default {
     name: 'StatsTab',
-    props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll', 'groupedArmour'],
-    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow, ArmourRow, MedStatFrame},
+    props: ['activeTab', 'charData', 'stats', 'luck', 'emp', 'groupedEquipped', 'groupedInjuries', 'collapsedCategories', 'refreshAll', 'groupedArmour', 'effects'],
+    components: {ResourceCounter, SimpleStat, AdjustableStat, ItemRow, ArmourRow, MedStatFrame, EffectRowFrame},
     directives: {icon: vIcon},
     emits: ['open-resource', 'stat-request', 'update-stat', 'facedown', 'deathsave', 'item-click', 'equip-click', 'consume-click', 'toggle-category', 'open-eurobucks'],
     setup() {
-        return {formatCategory: formatCategoryName};
+        // One string per change so the label and value can't lose their space: "MOVE -6"
+        const formatChange = (c) => `${c.label} ${c.value > 0 ? '+' : ''}${c.value}${c.situational ? ' (situational)' : ''}`;
+        return {formatCategory: formatCategoryName, formatChange};
     }
 }
 </script>

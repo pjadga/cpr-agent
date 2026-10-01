@@ -224,3 +224,104 @@ export function augmentRollMods(result, actorData, weapon) {
         finalModifier: (Number(result.finalModifier) || 0) + total,
     };
 }
+
+const MOD_LABELS = {
+    allActions: 'All actions',
+    allActionsHands: 'Hand actions',
+    allActionsSpeech: 'Speech actions',
+    universalAttack: 'Attacks',
+    ranged: 'Ranged attacks',
+    melee: 'Melee attacks',
+    singleShot: 'Single shot',
+    perceptionSight: 'Perception (sight)',
+    perceptionHearing: 'Perception (hearing)',
+    hasPainSuppression: 'Pain suppression',
+};
+
+/**
+ * Human label for a change key: "system.stats.move.value" → "MOVE",
+ * "bonuses.allActionsHands" → "Hand actions", "bonuses.humanPerception" → "Human perception".
+ * Same table as modLabel in the Bridge's src/constants.js.
+ */
+export function modLabel(key) {
+    const stat = String(key).match(STAT_KEY);
+    if (stat) return stat[1].toUpperCase();
+    const bonus = String(key).replace(/^bonuses\./, '');
+    if (MOD_LABELS[bonus]) return MOD_LABELS[bonus];
+    const words = bonus.replace(/([A-Z])/g, ' $1').toLowerCase().trim();
+    return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+// Why an item's effects are switched off, in the player's terms.
+const SUPPRESSED_REASON = {
+    carried: 'not carried',
+    equipped: 'not equipped',
+    installed: 'not installed',
+    rezzed: 'not rezzed',
+};
+
+/**
+ * Every effect on the character, one entry per effect, for the read-only
+ * Active Effects list. Active ones first, then inactive with the reason.
+ */
+export function effectList(actorData) {
+    const entries = [];
+    const push = (effect, item) => {
+        const situational = effect.flags?.['cyberpunk-red-core']?.changes?.situational || [];
+        const suppressed = item ? areEffectsSuppressed(item) : false;
+        const changes = (effect.changes || [])
+            .map((change, index) => ({
+                label: modLabel(change.key),
+                value: Number(change.value),
+                situational: !!situational[index]?.isSituational && !situational[index]?.onByDefault,
+            }))
+            .filter((c) => !Number.isNaN(c.value));
+        if (!changes.length) return;
+        entries.push({
+            source: item?.name || 'Character',
+            itemType: item?.type || null,
+            effect: effect.name || '',
+            active: !effect.disabled && !suppressed,
+            reason: effect.disabled ? 'off' : (suppressed ? SUPPRESSED_REASON[item.system.usage] : null),
+            changes,
+        });
+    };
+    (actorData?.effects || []).forEach((effect) => push(effect, null));
+    (actorData?.items || []).forEach((item) => (item.effects || []).forEach((effect) => push(effect, item)));
+    return entries.sort((a, b) => Number(b.active) - Number(a.active));
+}
+
+/**
+ * A skill's total as CPR would roll it (cpr-skill.js), minus wound state and
+ * role mods: level + effect-adjusted stat + armour (REF/DEX/MOVE skills) +
+ * the skill's own bonuses + all-action bonuses. Situational bonuses that are
+ * off by default are left out, as CPR does.
+ *
+ * Pass `stats` from effectiveStats() to avoid recomputing it per skill.
+ * Returns { base, value, mods: [{source, value}] } where base = level + base stat.
+ */
+export function skillTotal(actorData, skill, stats = effectiveStats(actorData)) {
+    const statName = skill?.system?.stat;
+    const level = Number(skill?.system?.level) || 0;
+    const stat = stats[statName] || {base: 0, value: 0, mods: []};
+    const mods = stat.mods.map((m) => ({source: m.source, value: m.value}));
+
+    if (ARMOUR_PENALTY_STATS.includes(statName)) {
+        const armour = armourPenalty(actorData?.items);
+        if (armour) mods.push({source: armour.source, value: armour.value});
+    }
+
+    const slug = slugify(skill?.name || '');
+    const keys = [...ALL_ACTIONS_KEYS, slug, `${slug}Hearing`, `${slug}Sight`];
+    for (const mod of collectMods(actorData)) {
+        const bonus = String(mod.key).replace(/^bonuses\./, '');
+        if (bonus === mod.key || !keys.includes(bonus)) continue;
+        if (!mod.active || (mod.situational && !mod.onByDefault)) continue;
+        mods.push({source: mod.source, value: mod.value});
+    }
+
+    const base = level + stat.base;
+    // Stat mods are already inside stat.value, so only add the rest on top.
+    const extra = mods.slice(stat.mods.length).reduce((sum, m) => sum + m.value, 0);
+    return {base, value: level + stat.value + extra, mods};
+}
