@@ -345,7 +345,7 @@
                 :show="showRollPanel"
                 :loading="rollModsLoading"
                 :error="rollModsError"
-                :data="rollModsData"
+                :data="rollModsView"
                 :has-weapon="!!controlState.selectedWeapon"
                 @close="closeRollPanel"
                 @refresh="fetchRollModifiers"
@@ -495,6 +495,7 @@ import MobileBackgroundFrame from "./character-sheet/frames/MobileBackgroundFram
 import {useCharacterData} from '../composables/useCharacterData';
 import {useCombat} from '../composables/useCombat';
 import {useRollModifiers} from '../composables/useRollModifiers';
+import {augmentRollMods, effectiveStats} from '../utils/rollEffects';
 import {useResources} from '../composables/useResources';
 import {useNetrunner} from '../composables/useNetrunner';
 import {useNetPool} from '../composables/useNetPool';
@@ -828,6 +829,12 @@ export default {
             fetchRollModifiers
         } = useRollModifiers(controlState);
 
+        // The Bridge reports wounds and critical injuries; armour and item
+        // effects are added here from the cached actor (#30, #22).
+        const rollModsView = computed(() =>
+            augmentRollMods(rollModsData.value, charData.value?.data, controlState.value.selectedWeapon)
+        );
+
         const {
             activeCyberdeck,
             availablePrograms,
@@ -913,9 +920,11 @@ export default {
 
         // --- COMPUTED PROPERTIES ---
 
+        // Effect-adjusted (a Broken Leg shows as MOVE -4); each stat keeps its
+        // base and the mods that moved it.
         const stats = computed(() => {
             if (!charData.value) return {};
-            const {luck, emp, ...rest} = charData.value.data.system.stats;
+            const {luck, emp, ...rest} = effectiveStats(charData.value.data);
             return rest;
         });
 
@@ -1334,6 +1343,7 @@ export default {
             rollModsLoading,
             rollModsError,
             rollModsData,
+            rollModsView,
             openRollPanel,
             closeRollPanel,
             fetchRollModifiers,

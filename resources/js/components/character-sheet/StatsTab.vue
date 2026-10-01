@@ -32,14 +32,14 @@
             </template>
         </div>
         <div class="grid grid-cols-4 gap-2">
-            <simple-stat label="INT" :value="stats.int?.value" @click="$emit('stat-request', 'INT')"></simple-stat>
-            <simple-stat label="REF" :value="stats.ref?.value" @click="$emit('stat-request', 'REF')"></simple-stat>
-            <simple-stat label="DEX" :value="stats.dex?.value" @click="$emit('stat-request', 'DEX')"></simple-stat>
-            <simple-stat label="TECH" :value="stats.tech?.value" @click="$emit('stat-request', 'TECH')"></simple-stat>
-            <simple-stat label="COOL" :value="stats.cool?.value" @click="$emit('stat-request', 'COOL')"></simple-stat>
-            <simple-stat label="WILL" :value="stats.will?.value" @click="$emit('stat-request', 'WILL')"></simple-stat>
-            <simple-stat label="MOVE" :value="stats.move?.value" @click="$emit('stat-request', 'MOVE')"></simple-stat>
-            <simple-stat label="BODY" :value="stats.body?.value" @click="$emit('stat-request', 'BODY')"></simple-stat>
+            <simple-stat label="INT" :value="stats.int?.value" :base="stats.int?.base" @click="$emit('stat-request', 'INT')"></simple-stat>
+            <simple-stat label="REF" :value="stats.ref?.value" :base="stats.ref?.base" @click="$emit('stat-request', 'REF')"></simple-stat>
+            <simple-stat label="DEX" :value="stats.dex?.value" :base="stats.dex?.base" @click="$emit('stat-request', 'DEX')"></simple-stat>
+            <simple-stat label="TECH" :value="stats.tech?.value" :base="stats.tech?.base" @click="$emit('stat-request', 'TECH')"></simple-stat>
+            <simple-stat label="COOL" :value="stats.cool?.value" :base="stats.cool?.base" @click="$emit('stat-request', 'COOL')"></simple-stat>
+            <simple-stat label="WILL" :value="stats.will?.value" :base="stats.will?.base" @click="$emit('stat-request', 'WILL')"></simple-stat>
+            <simple-stat label="MOVE" :value="stats.move?.value" :base="stats.move?.base" @click="$emit('stat-request', 'MOVE')"></simple-stat>
+            <simple-stat label="BODY" :value="stats.body?.value" :base="stats.body?.base" @click="$emit('stat-request', 'BODY')"></simple-stat>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
