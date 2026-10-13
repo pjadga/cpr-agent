@@ -135,7 +135,7 @@
                     </div>
 
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
-                        <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1">Injuries & Effects</div>
+                        <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1">Injuries</div>
                         <div v-if="!data.injuries || data.injuries.length === 0"
                              class="text-[10px] text-cpr-text-dim italic">No injuries.
                         </div>
@@ -149,13 +149,47 @@
                                         class="text-[10px] font-numbers">{{ inj.penalty }}
                                     </div>
                                 </div>
+                                <!-- Bridge note: what the injury does when it isn't counted on this roll -->
+                                <div v-if="inj.note" class="text-[9px] text-cpr-text-dim">{{ inj.note }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Armour and item effects, computed Agent-side (utils/rollEffects.js).
+                         "Could apply" lists situational or switched-off effects that
+                         Foundry would not count on this roll as things stand. -->
+                    <div v-if="data.effects?.length || data.availableEffects?.length"
+                         class="bg-cpr-black-deep border border-cpr-border p-2">
+                        <div class="text-[9px] text-cpr-text-dim uppercase font-bold mb-1">Armour & Effects</div>
+                        <div v-if="data.effects?.length" class="space-y-1">
+                            <div v-for="(eff, idx) in data.effects" :key="'e' + idx"
+                                 class="border border-cpr-border p-1.5 bg-cpr-black/40">
+                                <div class="flex items-center justify-between gap-2">
+                                    <div class="text-[10px] font-bold text-cpr-yellow truncate">{{ eff.title }}</div>
+                                    <div
+                                        :class="{'text-cpr-red': eff.value < 0, 'text-cpr-lime': eff.value > 0, 'opacity-60': eff.included}"
+                                        class="text-[10px] font-numbers shrink-0">{{ eff.value > 0 ? '+' : '' }}{{ eff.value }}
+                                    </div>
+                                </div>
+                                <div v-if="eff.detail" class="text-[9px] text-cpr-text-dim">{{ eff.detail }}</div>
+                            </div>
+                        </div>
+                        <div v-if="data.availableEffects?.length" class="mt-2">
+                            <div class="text-[8px] text-cpr-text-dim uppercase font-bold mb-1">Could apply</div>
+                            <div v-for="(eff, idx) in data.availableEffects" :key="'a' + idx"
+                                 class="flex items-center justify-between gap-2 px-1.5 py-0.5 opacity-60">
+                                <div class="min-w-0">
+                                    <div class="text-[10px] text-cpr-text-main truncate">{{ eff.title }}</div>
+                                    <div v-if="eff.detail" class="text-[9px] text-cpr-text-dim">{{ eff.detail }}</div>
+                                </div>
+                                <div class="text-[10px] font-numbers text-cpr-text-main shrink-0">{{ eff.value > 0 ? '+' : '' }}{{ eff.value }}</div>
                             </div>
                         </div>
                     </div>
 
                     <div class="bg-cpr-black-deep border border-cpr-border p-2">
                         <div class="flex items-center justify-between">
-                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Total Penalty</div>
+                            <div class="text-[9px] text-cpr-text-dim uppercase font-bold">Total Mods</div>
                             <div
                                 :class="{'text-cpr-red': data.totalPenalty < 0, 'text-cpr-text-main': data.totalPenalty === 0, 'text-cpr-lime': data.totalPenalty > 0}"
                                 class="font-numbers font-bold text-xs">{{ data.totalPenalty }}

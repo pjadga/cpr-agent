@@ -1,5 +1,15 @@
 import { ref } from 'vue';
 
+/** localhost, 127.0.0.0/8 or [::1]: the browser's own machine. */
+const isLoopback = (url) => {
+    try {
+        const host = new URL(url).hostname;
+        return host === 'localhost' || host.endsWith('.localhost') || /^127\./.test(host) || host === '[::1]';
+    } catch {
+        return false;
+    }
+};
+
 /**
  * Composable for constructing image URLs and handling proxy logic.
  */
@@ -60,7 +70,14 @@ export function useImageProxy() {
         // reads as a cosmetic glitch rather than the scheme mismatch it is.
         // ngrok stays on the list regardless of scheme: its interstitial needs
         // the skip header the proxy sends.
-        const isCrossScheme = window.location.protocol === 'https:' && fullUrl.startsWith('http://');
+        //
+        // Loopback is the exception. Browsers treat http://localhost as a
+        // secure origin, so an https page loads it directly, while the server
+        // can't reach it at all: inside DDEV/Docker "localhost" is the
+        // container, not the machine Foundry runs on. Proxying it only ever
+        // produced cURL error 7 and blank icons.
+        const isCrossScheme = window.location.protocol === 'https:' && fullUrl.startsWith('http://')
+            && !isLoopback(fullUrl);
         if (isCrossScheme || fullUrl.includes('ngrok-free.dev') || fullUrl.includes('ngrok.dev')) {
             return `/api/proxy-image?url=${encodeURIComponent(fullUrl)}`;
         }

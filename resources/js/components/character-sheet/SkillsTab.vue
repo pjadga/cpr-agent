@@ -101,7 +101,7 @@
                 <div v-for="(skill, index) in group" :key="skill._id" class="flex flex-col">
                     <!-- Skill row -->
                     <div class="relative flex items-stretch min-h-[3.25rem] group"
-                         :style="{ '--frame-accent': 'var(--cpr-border)', '--frame-colour-change': 'var(--cpr-red)' }">
+                         :style="{ '--frame-accent': 'var(--cpr-border)', '--frame-colour-change': tileColour(skillTotals[skill._id]) }">
                         <SkillRowFrame class="absolute inset-0 pointer-events-none select-none"/>
                         <div
                             class="relative z-10 flex-1 flex justify-between items-center p-2 pl-4 cursor-pointer gap-3"
@@ -117,6 +117,11 @@
                                                 skill.system.stat
                                             }})</span>
                                     </div>
+                                    <!-- What's moving this skill: injuries, drugs, armour, cyberware -->
+                                    <span v-if="skillTotals[skill._id]?.mods.length"
+                                          class="text-[10px] text-cpr-text-dim">{{
+                                            formatMods(skillTotals[skill._id].mods)
+                                        }}</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -133,7 +138,7 @@
                                     }}</span></span>
                                 <div
                                     class="w-8 h-8 flex items-center justify-center mt-[2px] text-cpr-black font-bold font-black font-numbers text-m">
-                                    {{ calculateBase(skill) }}
+                                    {{ skillTotals[skill._id]?.value }}
                                 </div>
                             </div>
                         </div>
@@ -165,11 +170,19 @@ import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
 export default {
     name: 'SkillsTab',
     components: {RoleRowFrame, SkillRowFrame, DropdownInfoFrame},
-    props: ['activeTab', 'roleItem', 'expandedRoleItems', 'expandedSkills', 'groupedSkills', 'collapsedCategories', 'calculateBase', 'skillsDescriptions'],
+    props: ['activeTab', 'roleItem', 'expandedRoleItems', 'expandedSkills', 'groupedSkills', 'collapsedCategories', 'skillTotals', 'skillsDescriptions'],
     directives: {icon: vIcon},
     emits: ['role-request', 'role-ability-request', 'toggle-role', 'toggle-skill', 'toggle-category', 'skill-request'],
     setup() {
-        return {formatCategory: formatCategoryName};
+        // "Smash +2 · Flak (Body) -4"
+        const formatMods = (mods) => mods.map(m => `${m.source} ${m.value > 0 ? '+' : ''}${m.value}`).join(' · ');
+        // The total sits on the frame's colour-change tile (red by default), so
+        // recolour the tile when effects move the skill: lime up, yellow down.
+        const tileColour = (total) => {
+            if (!total || total.value === total.base) return 'var(--cpr-red)';
+            return total.value > total.base ? 'var(--cpr-lime)' : 'var(--cpr-yellow)';
+        };
+        return {formatCategory: formatCategoryName, formatMods, tileColour};
     }
 }
 </script>
