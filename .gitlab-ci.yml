@@ -70,7 +70,9 @@ npm:
 # Common before_script for all PHP tests
 .php-test-setup: &php-test-setup
   before_script:
-    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev curl
+    # procps provides `ps`, which agent:serve (and its stray-reaper test) shells out to;
+    # the slim php image does not ship it.
+    - apt-get update && apt-get install -y git unzip libzip-dev libpng-dev libsqlite3-dev curl procps
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     - apt-get install -y nodejs
     - docker-php-ext-install pdo_sqlite zip bcmath gd
