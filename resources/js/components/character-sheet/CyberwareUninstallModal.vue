@@ -3,7 +3,8 @@
         <div v-if="show"
              class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-md"
              @click.self="$emit('close')">
-            <div class="w-full max-w-sm bg-cpr-black border-2 border-cpr-red shadow-[0_0_40px_rgba(220,38,38,0.35)] flex flex-col">
+            <div class="relative isolate w-full max-w-sm p-4 flex flex-col" :style="{ '--frame-accent': 'var(--cpr-red)' }">
+                <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                 <div class="flex items-center justify-between p-3 border-b border-cpr-red-dark bg-cpr-black-deep/40 shrink-0">
                     <span class="text-[11px] font-black uppercase tracking-[0.2em] text-cpr-red">Uninstall Cyberware</span>
                     <button @click="$emit('close')" class="p-1 text-cpr-text-muted hover:text-cpr-yellow transition-colors">
@@ -41,8 +42,11 @@
 <script>
 import {vIcon} from '../../directives/icon';
 
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
+
 export default {
     name: 'CyberwareUninstallModal',
+    components: {DropdownInfoFrame},
     props: ['show', 'target'],
     directives: {icon: vIcon},
     emits: ['close', 'confirm'],

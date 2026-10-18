@@ -116,7 +116,7 @@
 
             </div>
 
-            <dv-table-modal :show="showDvTable" :weapon="selectedWeapon" :target-distance="targetDistance"
+            <dv-table-modal :show="showDvTable" :weapon="selectedWeapon" :target-distance="targetDistance" :live-table="dvTable"
                             @close="showDvTable = false"></dv-table-modal>
         </div>
     </transition>
@@ -133,7 +133,7 @@ export default {
     components: {MedStatFrame, SimpleStatFrame, DvTableModal},
     props: [
         'show', 'selectedWeapon', 'availableFireModes', 'fireMode',
-        'dvLoading', 'dvError', 'dvInfo', 'reloadRequired', 'targetDistance'
+        'dvLoading', 'dvError', 'dvInfo', 'dvTable', 'reloadRequired', 'targetDistance'
     ],
     directives: {icon: vIcon},
     emits: ['close', 'roll-hit', 'roll-damage', 'reload', 'move', 'update:fireMode'],

@@ -12,9 +12,12 @@ export default defineConfig({
         cors: {
             origin: /https?:\/\/([A-Za-z0-9\-\.]+)?(\.ddev\.site)(?::\d+)?$/,
         },
-        hmr: {
-            host: "localhost",
-        },
+        // Under DDEV the page is served from the DDEV hostname over https, so the HMR
+        // socket must be wss on that same host (wss://localhost has no matching cert).
+        // Outside DDEV leave Vite's defaults alone.
+        ...(process.env.DDEV_HOSTNAME && {
+            hmr: {protocol: 'wss', host: process.env.DDEV_HOSTNAME},
+        }),
     },
     plugins: [
         laravel({

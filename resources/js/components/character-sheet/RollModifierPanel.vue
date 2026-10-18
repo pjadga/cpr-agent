@@ -31,7 +31,8 @@
                     <div v-if="showResultPopup"
                          class="absolute inset-0 z-[70] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-sm">
                         <div
-                            class="bg-cpr-black border-2 border-cpr-red shadow-[0_0_50px_rgba(220,38,38,0.5)] p-4 text-center relative overflow-hidden group">
+                            class="relative isolate p-6 text-center overflow-hidden group" :style="{ '--frame-accent': 'var(--cpr-red)' }">
+                            <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                             <!-- Background Glitch Effect -->
                             <div class="absolute inset-0 bg-cpr-red/5 animate-pulse"></div>
                             <div
@@ -237,8 +238,11 @@ import {vIcon} from '../../directives/icon';
 import axios from 'axios';
 import {useCharacterData} from '../../composables/useCharacterData';
 
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
+
 export default {
     name: 'RollModifierPanel',
+    components: {DropdownInfoFrame},
     props: ['show', 'loading', 'error', 'data', 'hasWeapon'],
     directives: {icon: vIcon},
     emits: ['close', 'refresh', 'go-to-control'],

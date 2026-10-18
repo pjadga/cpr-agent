@@ -2,7 +2,8 @@
     <div v-if="visible"
          class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
          @click="close">
-        <div class="w-full max-w-sm bg-cpr-black-deep border-2" :class="borderColor" @click.stop>
+        <div class="relative isolate w-full max-w-sm p-4" :style="{ '--frame-accent': frameAccent }" @click.stop>
+            <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <div class="flex items-center justify-between px-4 py-2 border-b"
                  :class="headerBorderColor + ' ' + headerBgColor">
                 <span class="text-xs font-black uppercase tracking-[0.2em] text-cpr-yellow">{{ title }}</span>
@@ -101,8 +102,11 @@
 <script>
 import {vIcon} from '../directives/icon';
 
+import DropdownInfoFrame from './character-sheet/frames/DropdownInfoFrame.vue';
+
 export default {
     name: 'RollResultPopup',
+    components: {DropdownInfoFrame},
     directives: {icon: vIcon},
     data() {
         return {
@@ -136,6 +140,11 @@ export default {
         },
         skillValue() {
             return this.raw?.skillValue || 0;
+        },
+        frameAccent() {
+            if (this.isCriticalSuccess) return '#16a34a';
+            if (this.isCriticalFailure) return 'var(--cpr-red)';
+            return 'var(--cpr-yellow)';
         },
         borderColor() {
             if (this.isCriticalSuccess) return 'border-green-600 shadow-[0_0_20px_rgba(22,163,74,0.3)]';

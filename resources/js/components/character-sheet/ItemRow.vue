@@ -1,7 +1,6 @@
 <template>
     <div
         class="flex flex-col transition-colors relative group"
-        :class="{ 'z-20': showEquipPopup }"
         :style="{
             '--frame-accent': 'var(--cpr-border)',
             '--frame-colour-change': `var(--${categoryColor})`,

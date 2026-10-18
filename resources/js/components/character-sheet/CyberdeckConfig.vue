@@ -2,7 +2,8 @@
     <div v-if="activeCyberdeck"
          class="fixed inset-0 z-[130] flex items-center justify-center p-6 backdrop-blur-md bg-cpr-black/80 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]">
         <div
-            class="cpr-panel w-full max-w-2xl bg-cpr-black-deep border-2 border-cpr-teal shadow-[0_0_40px_rgba(20,184,166,0.2)] flex flex-col max-h-[85vh]">
+            class="relative isolate w-full max-w-2xl p-4 flex flex-col max-h-[85vh]" :style="{ '--frame-accent': 'var(--cpr-teal)' }">
+            <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <div class="bg-cpr-teal-dark p-3 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="text-sm font-black text-black tracking-tighter uppercase italic">Cyberdeck Configuration</span>
@@ -106,8 +107,11 @@
 import {vIcon} from '../../directives/icon';
 import {useCharacterData} from '../../composables/useCharacterData';
 
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
+
 export default {
     name: 'CyberdeckConfig',
+    components: {DropdownInfoFrame},
     props: ['activeCyberdeck', 'availablePrograms'],
     directives: {icon: vIcon},
     emits: ['close', 'install', 'uninstall'],

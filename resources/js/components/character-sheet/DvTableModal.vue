@@ -3,7 +3,8 @@
         <div v-if="show"
              class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-md"
              @click.self="$emit('close')">
-            <div class="w-full max-w-sm bg-cpr-black border-2 border-cpr-red shadow-[0_0_40px_rgba(220,38,38,0.35)] flex flex-col max-h-[85vh]">
+            <div class="relative isolate w-full max-w-sm p-4 flex flex-col max-h-[85vh]" :style="{ '--frame-accent': 'var(--cpr-red)' }">
+                <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                 <!-- Header -->
                 <div class="flex items-center justify-between p-3 border-b border-cpr-red-dark bg-cpr-black-deep/40 shrink-0">
                     <div class="flex items-center gap-2">
@@ -62,17 +63,33 @@
 import {vIcon} from '../../directives/icon';
 import {dvRowsForWeapon, activeBracketIndex} from '../../utils/dvTable';
 
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
+
 export default {
     name: 'DvTableModal',
-    props: ['show', 'weapon', 'targetDistance'],
+    components: {DropdownInfoFrame},
+    props: ['show', 'weapon', 'targetDistance', 'liveTable'],
     directives: {icon: vIcon},
     emits: ['close'],
     computed: {
         table() {
-            return dvRowsForWeapon(this.weapon);
+            const builtin = dvRowsForWeapon(this.weapon);
+            // Foundry's own table for this weapon wins: it reflects homebrew and re-pointed tables.
+            if (!this.liveTable?.rows?.length) return builtin;
+            return {
+                category: builtin.category,
+                melee: false,
+                rows: this.liveTable.rows.map(r => ({
+                    range: r.label,
+                    dv: r.dv,
+                    outOfRange: typeof r.dv === 'string' && r.dv !== 'VS',
+                })),
+            };
         },
         activeIndex() {
             if (this.table.melee) return -1;
+            // Foundry resolved the DV, so highlight the very band it used.
+            if (this.liveTable?.rows?.length) return this.liveTable.activeIndex;
             return activeBracketIndex(this.targetDistance);
         },
         weaponName() {

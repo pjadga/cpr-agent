@@ -1,4 +1,5 @@
 <script setup>
+import DropdownInfoFrame from './frames/DropdownInfoFrame.vue';
 import {computed, ref} from 'vue';
 import axios from 'axios';
 import {vIcon} from '../../directives/icon';
@@ -62,7 +63,8 @@ function formatAmount(t) {
 
 <template>
     <section class="eurobucks-panel" @click="$emit('updated')">
-        <div class="w-full max-w-xs bg-cpr-black-deep border border-cpr-border shadow-2xl" @click.stop>
+        <div class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-border)' }" @click.stop>
+            <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-border bg-cpr-black/40">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Eurobucks</span>
                 <button class="text-cpr-text-muted hover:text-cpr-yellow" @click="$emit('updated')">

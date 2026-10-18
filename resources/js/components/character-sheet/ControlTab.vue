@@ -1,7 +1,9 @@
 <template>
     <div v-if="activeTab === 'control'" key="control" class="space-y-6 w-full p-3">
 
-        <div v-if="hasNetspaceOptions" class="flex bg-cpr-black border border-cpr-border p-1 rounded-sm">
+        <div v-if="hasNetspaceOptions" class="relative isolate flex min-h-[3.25rem] items-stretch px-4 py-2"
+             :style="{ '--frame-accent': controlState.spaceMode === 'netspace' ? 'var(--cpr-teal)' : 'var(--cpr-red)' }">
+            <BasicRowFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <button @click="controlState.spaceMode = 'meatspace'"
                     class="flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-all"
                     :class="controlState.spaceMode === 'meatspace' ? 'bg-cpr-red text-black' : 'text-cpr-text-dim hover:text-cpr-text-main'">

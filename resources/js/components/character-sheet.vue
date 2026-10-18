@@ -138,6 +138,7 @@
                 :dv-loading="dvLoading"
                 :dv-error="dvError"
                 :dv-info="dvInfo"
+                :dv-table="dvTable"
                 :target-distance="controlState.selectedTarget?.distanceM"
                 :reload-required="controlState.reloadRequired"
                 @close="showCombatPanel = false"
@@ -358,8 +359,9 @@
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showPopup = false">
                 <div
-                    class="w-full max-w-xs bg-cpr-black-deep border border-cpr-red-dark shadow-[0_0_30px_rgba(220,38,38,0.2)]"
+                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-red)' }"
                     @click.stop>
+                    <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                     <div
                         class="flex items-center justify-between px-3 py-2 border-b border-cpr-red-dark/30 bg-cpr-red-dark/10">
                         <span
@@ -387,8 +389,9 @@
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showConsumeModal = false">
                 <div
-                    class="w-full max-w-xs bg-cpr-black-deep border border-cpr-yellow shadow-[0_0_30px_rgba(234,179,8,0.2)]"
+                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-yellow)' }"
                     @click.stop>
+                    <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                     <div
                         class="flex items-center justify-between px-3 py-2 border-b border-cpr-yellow-dark/30 bg-cpr-yellow-dark/10">
                         <span
@@ -427,8 +430,9 @@
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showEquipModal = false">
                 <div
-                    class="w-full max-w-xs bg-cpr-black-deep border border-cpr-teal shadow-[0_0_30px_rgba(20,184,166,0.2)]"
+                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-teal)' }"
                     @click.stop>
+                    <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                     <div
                         class="flex items-center justify-between px-3 py-2 border-b border-cpr-teal-dark/30 bg-cpr-teal-dark/10">
                         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-cpr-teal">Update Equipment State</span>
@@ -472,10 +476,11 @@
  * Handles character data fetching, stat updates, skills, gear, and combat controls.
  */
 
-import {computed, onMounted, ref, triggerRef, watch} from "vue";
+import {computed, onMounted, onUnmounted, ref, triggerRef, watch} from "vue";
 
 // --- COMPONENTS ---
 import NavBtn from './character-sheet/NavBtn.vue';
+import DropdownInfoFrame from './character-sheet/frames/DropdownInfoFrame.vue';
 import CyberdeckConfig from './character-sheet/CyberdeckConfig.vue';
 import CombatPanel from './character-sheet/CombatPanel.vue';
 import ControlTab from './character-sheet/ControlTab.vue';
@@ -515,6 +520,7 @@ import {isMyRequest} from '../utils/requests';
 export default {
     name: 'CharacterSheet',
     components: {
+        DropdownInfoFrame,
         CyberdeckConfig,
         NavBtn,
         CombatPanel,
@@ -807,6 +813,7 @@ export default {
         const {
             mockEnemies,
             dvInfo,
+            dvTable,
             dvLoading,
             dvError,
             debouncedFetchDV,
@@ -1213,6 +1220,13 @@ export default {
             await fetchRollModifiers();
         })
 
+        // Foundry doesn't push token movement, so poll while the Control tab is open
+        // (other players/enemies move on their own turns, not just ours).
+        const tokenPoll = setInterval(() => {
+            if (activeTab.value === 'control' && !document.hidden) getVisibleTokens();
+        }, 5000);
+        onUnmounted(() => clearInterval(tokenPoll));
+
         const refreshAll = () => {
             fetchCharacterData();
             if (activeTab.value === 'control') {
@@ -1341,6 +1355,7 @@ export default {
             reloadWeapon,
             availableFireModes,
             dvInfo,
+            dvTable,
             dvLoading,
             dvError,
             fetchDVForSelectedWeapon,
