@@ -52,6 +52,13 @@ export function useWebSocketSubscription() {
             .listen('.FoundryResponse', (e) => {
                 const payload = e.payload || e;
 
+                // Anything Foundry says on our channel proves the Bridge is up, even if
+                // it is for another agent or another actor, so mark live before filtering.
+                if (!isFoundryLive.value) {
+                    console.log(`[Agent] Foundry live (first message: ${payload.type})`);
+                }
+                isFoundryLive.value = true;
+
                 // Filter out requests from other agents (unless public event)
                 const isPublicEvent = ['DICE_ROLL_EVENT', 'ROLL_RESULT', 'ACTOR_DATA', 'SHEET_DELTA'].includes(payload.type);
                 if (!isPublicEvent && payload.requestId && !isMyRequest(payload.requestId)) {

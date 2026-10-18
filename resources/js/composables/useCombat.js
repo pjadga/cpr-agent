@@ -10,8 +10,14 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const {rollMode} = useCharacterData();
     const mockEnemies = ref([]);
     const dvInfo = ref(null);
+    // Live range table from Foundry ({ rows, activeIndex }); null falls back to the built-in tables.
+    const dvTable = ref(null);
     const dvLoading = ref(false);
     const dvError = ref(null);
+
+    const tableFrom = (result) => Array.isArray(result?.table)
+        ? {rows: result.table, activeIndex: result.activeIndex ?? -1}
+        : null;
 
     /**
      * Fetch Difficulty Value (DV) for the selected weapon and target
@@ -19,6 +25,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     const fetchDVForSelectedWeapon = async () => {
         dvError.value = null;
         dvInfo.value = null;
+        dvTable.value = null;
         if (!controlState.value.selectedWeapon || !controlState.value.selectedTarget) return;
 
         try {
@@ -30,6 +37,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
             if (response.data && response.data.success && response.data.data) {
                 dvInfo.value = response.data.data.dv;
+                dvTable.value = tableFrom(response.data.data);
                 dvLoading.value = false;
             }
         } catch (e) {
@@ -90,6 +98,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
 
         if (payload.type === 'DV_INFO_DATA') {
             dvInfo.value = payload.result?.dv;
+            dvTable.value = tableFrom(payload.result);
             dvLoading.value = false;
         } else if (payload.type === 'VISIBLE_TOKENS_DATA') {
             updateMockEnemies(payload.tokens || []);
@@ -225,6 +234,7 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
     return {
         mockEnemies,
         dvInfo,
+        dvTable,
         dvLoading,
         dvError,
         debouncedFetchDV,

@@ -582,4 +582,30 @@ class FoundryCallbackTest extends TestCase
                 && $event->payload['humanityLoss']['static'] === 7;
         });
     }
+
+    #[Test]
+    public function it_does_not_let_another_actors_data_overwrite_the_assigned_character()
+    {
+        $this->user->character_data = ['_id' => 'abc123', 'name' => 'Mine', 'system' => ['stats' => ['body' => ['value' => 5]]]];
+        $this->user->save();
+        Cache::forget("user_char_{$this->user->id}");
+
+        $this->withToken($this->token)->postJson('/api/foundry/callback', [
+            'type' => 'ACTOR_DATA',
+            'actor' => ['_id' => 'someone-else', 'name' => 'Other'],
+            'agentLink' => $this->user->agent_link,
+        ]);
+        $this->withToken($this->token)->postJson('/api/foundry/callback', [
+            'type' => 'SHEET_DELTA',
+            'actorId' => 'Actor.someone-else',
+            'delta' => ['system.stats.body.value' => 1],
+            'agentLink' => $this->user->agent_link,
+        ]);
+
+        $cached = Cache::get("user_char_{$this->user->id}");
+        $this->assertNull($cached, 'Neither payload should have touched the cache');
+        $this->user->refresh();
+        $this->assertSame('abc123', $this->user->character_data['_id']);
+        $this->assertSame(5, $this->user->character_data['system']['stats']['body']['value']);
+    }
 }

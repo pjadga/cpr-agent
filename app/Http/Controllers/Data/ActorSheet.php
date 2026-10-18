@@ -47,7 +47,8 @@ class ActorSheet extends FormRequest
         // Ensure we only return data for the assigned character if one is set
         if ($user->default_actor_id && ! empty($characterData)) {
             // Verify that the cached data matches the assigned character
-            if (($characterData['_id'] ?? '') !== $user->default_actor_id) {
+            $cachedId = preg_replace('/^Actor\./', '', (string) ($characterData['_id'] ?? ''));
+            if ($cachedId !== preg_replace('/^Actor\./', '', $user->default_actor_id)) {
                 $characterData = null;
             }
         }

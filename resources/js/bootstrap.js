@@ -76,15 +76,21 @@ if (window.Echo.connector.pusher) {
     });
 
     window.Echo.connector.pusher.connection.bind('disconnected', () => {
+        console.warn('[Agent] Reverb socket disconnected');
         isWssConnected.value = false;
     });
 
     window.Echo.connector.pusher.connection.bind('unavailable', () => {
+        console.warn('[Agent] Reverb socket unavailable');
         isWssConnected.value = false;
     });
 
     window.Echo.connector.pusher.connection.bind('failed', () => {
+        console.warn('[Agent] Reverb socket failed');
         isWssConnected.value = false;
     });
+
+    // The 'connected' event may already have fired before we bound to it.
+    if (window.Echo.connector.pusher.connection.state === 'connected') isWssConnected.value = true;
 }
 }

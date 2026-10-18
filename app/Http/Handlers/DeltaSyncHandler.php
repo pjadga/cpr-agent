@@ -22,6 +22,7 @@ class DeltaSyncHandler
         $current = Cache::get($cacheKey);
 
         // Fallback to DB if cache is empty
+        $user = null;
         if (! $current) {
             $user = \App\Models\User::find($userId);
             $current = $user?->character_data ?? [];
@@ -32,10 +33,32 @@ class DeltaSyncHandler
             $current = [];
         }
 
+        $normalise = fn ($id) => preg_replace('/^Actor\./', '', (string) $id);
+        $user = $user ?? \App\Models\User::find($userId);
+        $assignedId = $normalise($user?->default_actor_id);
+
         // Apply the incoming data/delta
         if ($type === 'ACTOR_DATA' && ! empty($payload['actor'])) {
+            // Never let another actor's sheet (a GM fetch, a stray GET_ACTOR) overwrite
+            // the assigned character's cache: the sheet would then fail the id check
+            // and the app would lose its actor id.
+            $incomingId = $normalise($payload['actor']['_id'] ?? '');
+            if ($assignedId !== '' && $incomingId !== '' && $incomingId !== $assignedId) {
+                Log::debug("Ignoring ACTOR_DATA for [{$incomingId}], user [{$userId}] is assigned [{$assignedId}]");
+
+                return;
+            }
             $current = $payload['actor'];
         } elseif ($type === 'SHEET_DELTA' && ! empty($payload['delta'])) {
+            // A delta patches an existing sheet. With no base it would create a
+            // fragment without an _id, and a delta for another actor corrupts this one.
+            $baseId = $normalise($current['_id'] ?? '');
+            $deltaId = $normalise($payload['actorId'] ?? $payload['uuid'] ?? '');
+            if (empty($current) || ($baseId !== '' && $deltaId !== '' && $deltaId !== $baseId)) {
+                Log::debug("Skipping SHEET_DELTA for user [{$userId}]: base [{$baseId}], delta [{$deltaId}]");
+
+                return;
+            }
             $applier = new \App\Http\Handlers\DeltaApplier();
             $applier->apply($current, $payload['delta']);
         }
