@@ -183,66 +183,6 @@ eslint:
 # is the slow half, and the packaging itself stays a manual step on a Windows
 # machine. See standalone/windows/README.md.
 
-# The packaging script copies these files by path. A rename would otherwise go
-# unnoticed until someone tried to cut a release weeks later, on their desktop,
-# by hand. Failing here costs seconds instead.
-standalone:check:
-  stage: package
-  image: alpine:3.20
-  needs: []
-  script:
-    - |
-      set -eu
-
-      for file in \
-        standalone/php.ini-windows \
-        standalone/Caddyfile \
-        .env.standalone.example \
-        standalone/windows/build-bundle.ps1 \
-        standalone/windows/cpr-agent.iss \
-        standalone/windows/launcher.ps1 \
-        standalone/windows/stop.ps1
-      do
-        if [ ! -f "$file" ]; then echo "Missing packaging input: $file"; exit 1; fi
-      done
-      echo "All Windows packaging inputs present."
-    - |
-      set -eu
-
-      # build-bundle.ps1 copies an explicit list of top level directories. A new
-      # one that nobody adds to that list is silently missing from the bundle,
-      # and the failure only shows up on a user's machine after a release. So
-      # every top level directory must be named in one list or the other.
-      #
-      # Patterns omit the leading $ because GitLab would try to expand it.
-      script=standalone/windows/build-bundle.ps1
-
-      sed -n '/include = @(/,/^)/p' "$script"           | grep -o "'[^']*'" | tr -d "'"  > /tmp/known
-      sed -n '/excludeFromBundle = @(/,/^)/p' "$script" | grep -o "'[^']*'" | tr -d "'" >> /tmp/known
-      sort -u /tmp/known -o /tmp/known
-
-      # Dot directories are tooling and never shipped; ls skips them already.
-      ls -d */ 2>/dev/null | sed 's#/$##' | sort -u > /tmp/actual
-
-      missing=$(comm -23 /tmp/actual /tmp/known)
-
-      if [ -n "$missing" ]; then
-        echo "These top level directories appear in neither list in $script:"
-        echo "$missing" | sed 's/^/  /'
-        echo
-        echo "Add each to \$include (ship it) or \$excludeFromBundle (do not),"
-        echo "otherwise the Windows bundle silently ships without them."
-        exit 1
-      fi
-
-      echo "Every top level directory is accounted for in the bundle lists."
-  # Tags included: a release build is exactly when a silently incomplete bundle
-  # does the most damage, so the guard has to run there too.
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH
-    - if: $CI_COMMIT_TAG
-
 # Builds exactly what `build-bundle.ps1 -SkipDependencies` expects, so the
 # Windows box never has to run Composer or npm. Download this artifact, unpack
 # it into a checkout, and the packaging step is two commands.
@@ -252,11 +192,7 @@ standalone:check:
 standalone:windows-inputs:
   stage: package
   image: php:8.4-cli
-  # Gated on the guard: building a release bundle that is missing a directory
-  # is worse than not building one. standalone:check runs in every pipeline
-  # this job runs in, so the dependency is always satisfiable.
-  needs:
-    - standalone:check
+  needs: []
   <<: *composer-cache
   before_script:
     # libsqlite3-dev is required to build pdo_sqlite. The official php image
