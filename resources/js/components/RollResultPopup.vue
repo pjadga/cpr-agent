@@ -2,7 +2,7 @@
     <div v-if="visible"
          class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
          @click="close">
-        <div class="relative isolate w-full max-w-sm p-4" :style="{ '--frame-accent': frameAccent }" @click.stop>
+        <div class="relative isolate w-full max-w-sm p-4" :style="{ '--frame-accent': frameAccent, '--frame-panel': 'var(--cpr-black-deep)' }" @click.stop>
             <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <div class="flex items-center justify-between px-4 py-2 border-b"
                  :class="headerBorderColor + ' ' + headerBgColor">

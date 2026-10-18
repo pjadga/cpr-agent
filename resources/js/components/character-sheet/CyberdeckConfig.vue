@@ -2,7 +2,7 @@
     <div v-if="activeCyberdeck"
          class="fixed inset-0 z-[130] flex items-center justify-center p-6 backdrop-blur-md bg-cpr-black/80 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]">
         <div
-            class="relative isolate w-full max-w-2xl p-4 flex flex-col max-h-[85vh]" :style="{ '--frame-accent': 'var(--cpr-teal)' }">
+            class="relative isolate w-full max-w-2xl p-4 flex flex-col max-h-[85vh]" :style="{ '--frame-accent': 'var(--cpr-teal)', '--frame-panel': 'var(--cpr-black-deep)' }">
             <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <div class="bg-cpr-teal-dark p-3 flex justify-between items-center shrink-0">
                 <div class="flex items-center gap-2">

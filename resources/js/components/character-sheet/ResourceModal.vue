@@ -2,7 +2,7 @@
     <div v-if="show"
          class="fixed inset-0 z-[120] flex items-center justify-center p-6 bg-cpr-black/70 p-[env(safe-area-inset-top)_env(safe-area-inset-right)_env(safe-area-inset-bottom)_env(safe-area-inset-left)]"
          @click="$emit('close')">
-        <div class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-border)' }" @click.stop>
+        <div class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-border)', '--frame-panel': 'var(--cpr-black-deep)' }" @click.stop>
             <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
             <div class="flex items-center justify-between px-3 py-2 border-b border-cpr-border bg-cpr-black/40">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-cpr-text-dim">Adjust {{

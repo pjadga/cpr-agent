@@ -359,7 +359,7 @@
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showPopup = false">
                 <div
-                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-red)' }"
+                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-red)', '--frame-panel': 'var(--cpr-black-deep)' }"
                     @click.stop>
                     <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                     <div
@@ -389,7 +389,7 @@
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showConsumeModal = false">
                 <div
-                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-yellow)' }"
+                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-yellow)', '--frame-panel': 'var(--cpr-black-deep)' }"
                     @click.stop>
                     <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                     <div
@@ -430,7 +430,7 @@
                  class="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-cpr-black/80 backdrop-blur-sm"
                  @click="showEquipModal = false">
                 <div
-                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-teal)' }"
+                    class="relative isolate w-full max-w-xs p-4" :style="{ '--frame-accent': 'var(--cpr-teal)', '--frame-panel': 'var(--cpr-black-deep)' }"
                     @click.stop>
                     <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                     <div

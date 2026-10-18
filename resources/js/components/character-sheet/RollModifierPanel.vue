@@ -31,7 +31,7 @@
                     <div v-if="showResultPopup"
                          class="absolute inset-0 z-[70] flex items-center justify-center p-4 bg-cpr-black/80 backdrop-blur-sm">
                         <div
-                            class="relative isolate p-6 text-center overflow-hidden group" :style="{ '--frame-accent': 'var(--cpr-red)' }">
+                            class="relative isolate p-6 text-center overflow-hidden group" :style="{ '--frame-accent': 'var(--cpr-red)', '--frame-panel': 'var(--cpr-black-deep)' }">
                             <DropdownInfoFrame class="absolute inset-0 -z-10 pointer-events-none select-none"/>
                             <!-- Background Glitch Effect -->
                             <div class="absolute inset-0 bg-cpr-red/5 animate-pulse"></div>
