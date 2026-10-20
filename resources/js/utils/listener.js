@@ -40,7 +40,11 @@ export function useEchoListener(handler, channel = null, event = '.FoundryRespon
         //
         // } else
 
-        if (['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type)) {
+        if (payload.type === 'REFRESH_SIGNAL') {
+            // Unsolicited, data-free broadcast (e.g. a Data Pool changed). No
+            // requestId or actorId to match on, and nothing private to gate.
+            isPublicEvent = true;
+        } else if (['DICE_ROLL_EVENT', 'ROLL_RESULT'].includes(payload.type)) {
             if (rollMode === 'publicroll') {
                 isPublicEvent = true;
             } else if (rollMode === 'gmroll') {

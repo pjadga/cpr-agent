@@ -761,6 +761,9 @@ export default {
 
             handleNetPoolData(payload);
 
+            // Foundry changed a Data Pool (row hidden, page shown/removed): re-fetch
+            if (payload.type === 'REFRESH_SIGNAL' && payload.target === 'NET_POOL_DATA') fetchNetPool();
+
             if (payload.type === 'DICE_ROLL_EVENT' || payload.type === 'ROLL_RESULT') {
                 const incomingLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '').toLowerCase();
                 const myLink = (localAgentLink.value || '').replace(/\/$/, '').toLowerCase();
