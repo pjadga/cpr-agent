@@ -22,8 +22,8 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
+            'method' => 'username',
+            'value' => $user->username,
             'cf-turnstile-response' => 'test-token',
         ]);
 
@@ -31,13 +31,13 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('dashboard', absolute: false));
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function test_users_can_not_authenticate_with_an_unknown_username(): void
     {
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'wrong-password',
+            'method' => 'username',
+            'value' => 'not-'.$user->username,
         ]);
 
         $this->assertGuest();

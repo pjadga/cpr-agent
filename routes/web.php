@@ -70,9 +70,9 @@ Route::middleware(['auth', 'app.configured'])->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Sign-in options live on the Access page; the gamemaster removes accounts on the Group page.
+    Route::get('/profile', fn () => redirect()->route('access.edit'))->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // Session management routes (unified onboarding)

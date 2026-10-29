@@ -160,6 +160,11 @@ class SettingsController extends Controller
         $user = Auth::user();
         $wantsGm = $validated['role'] === 'gm';
 
+        // Players don't promote themselves; the gamemaster account stays the GM.
+        if (! $user->is_gamemaster || ! $wantsGm) {
+            return redirect()->route('settings')->with('error', 'Roles are managed by the gamemaster account.');
+        }
+
         if (! $wantsGm && $user->is_gm && $user->ownsActiveSession()) {
             return redirect()->route('settings')->with(
                 'error',

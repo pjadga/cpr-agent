@@ -20,12 +20,6 @@
                             Initiate Link
                         </a>
 
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                               class="cyber-button bg-cpr-black-elevated border-cpr-border text-lg px-12 py-4 uppercase font-bold text-center">
-                                Register Bio-ID
-                            </a>
-                        @endif
                     @endauth
                 </div>
 

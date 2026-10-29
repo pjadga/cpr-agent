@@ -4,7 +4,7 @@
             Authentication Required</h3>
         <div class="flex justify-between items-center">
             <p class="text-[12px] text-cpr-yellow/80 uppercase italic">
-                Note: Your data is not used for any purpose other than logging in. No RABIDS here.
+                Unlock with your username, PIN or pattern. Your gamemaster gave you a username.
             </p>
         </div>
     </div>
@@ -19,67 +19,68 @@
                 <!-- Session Status -->
                 <x-auth-session-status class="mb-4" :status="session('status')"/>
 
-                <form id="login-form" method="POST" action="{{ route('login') }}" class="space-y-6">
-                    @csrf
-
-                    <!-- Email Address -->
-                    <div>
-                        <x-input-label for="email" :value="__('Email')" class="text-xs uppercase text-cpr-text-muted"/>
-                        <x-text-input id="email" class="cyber-input-field mt-1" type="email" name="email"
-                                      :value="old('email')" required autofocus autocomplete="username"/>
-                        <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+                <div x-data="{ method: @js(old('method', 'username')) }">
+                    <div class="grid grid-cols-3 gap-2 mb-6" role="tablist">
+                        @foreach (['username' => 'Username', 'pin' => 'PIN', 'pattern' => 'Pattern'] as $key => $label)
+                            <button type="button" role="tab" x-on:click="method = '{{ $key }}'"
+                                    x-bind:aria-selected="method === '{{ $key }}'"
+                                    x-bind:class="method === '{{ $key }}' ? 'border-cpr-teal text-cpr-teal bg-cpr-teal/10' : 'border-cpr-border text-cpr-text-dim'"
+                                    class="border rounded p-2 text-center uppercase text-xs tracking-widest transition-colors">
+                                {{ $label }}
+                            </button>
+                        @endforeach
                     </div>
 
-                    <!-- Password -->
-                    <div>
-                        <x-input-label for="password" :value="__('Password')"
-                                       class="text-xs uppercase text-cpr-text-muted"/>
-                        <x-text-input id="password" class="cyber-input-field mt-1"
-                                      type="password"
-                                      name="password"
-                                      required autocomplete="current-password"/>
-                        <x-input-error :messages="$errors->get('password')" class="mt-2"/>
-                    </div>
+                    <x-input-error :messages="$errors->get('value')" class="mb-4"/>
+                    <x-input-error :messages="$errors->get('method')" class="mb-4"/>
 
-                    <!-- Remember Me -->
-                    <div class="flex items-center">
-                        <input id="remember_me" type="checkbox"
-                               class="rounded bg-cpr-black-elevated border-cpr-border text-cpr-pink-dark focus:ring-cpr-pink"
-                               name="remember">
-                        <label for="remember_me" class="ms-2 text-sm text-cpr-text-muted italic">Stay connected</label>
-                    </div>
-
-                    <!-- Captcha -->
-                    @if(config('services.turnstile.enabled'))
-                        <div class="mt-4 flex flex-col items-center">
-                            <x-turnstile/>
-                            <x-input-error :messages="$errors->get('cf-turnstile-response')" class="mt-2"/>
+                    <form method="POST" action="{{ route('login') }}" class="space-y-6" x-show="method === 'username'">
+                        @csrf
+                        <input type="hidden" name="method" value="username">
+                        <div>
+                            <x-input-label for="username" :value="__('Username')" class="text-xs uppercase text-cpr-text-muted"/>
+                            <x-text-input id="username" class="cyber-input-field mt-1" type="password" name="value"
+                                          required autofocus autocomplete="off" autocapitalize="none" spellcheck="false"/>
+                            <p class="text-[10px] text-cpr-text-dim mt-1 uppercase">Your username signs you in on its own, so keep it to yourself.</p>
                         </div>
-                    @endif
+                        @include('auth.partials.login-footer')
+                    </form>
 
-                    <div class="mt-4 flex flex-col items-center">
-                        <button type="submit"
-                                class="cyber-button bg-cpr-red border-cpr-red w-full uppercase font-black text-lg py-3 mt-4">
-                            Initiate Link-up
-                        </button>
-                    </div>
+                    <form method="POST" action="{{ route('login') }}" class="space-y-6" x-show="method === 'pin'" x-cloak>
+                        @csrf
+                        <input type="hidden" name="method" value="pin">
+                        <div>
+                            <x-input-label for="pin" :value="__('PIN')" class="text-xs uppercase text-cpr-text-muted"/>
+                            <x-text-input id="pin" class="cyber-input-field mt-1 text-center tracking-[0.5em]" type="password" name="value"
+                                          inputmode="numeric" pattern="[0-9]*" maxlength="12" autocomplete="off" required/>
+                        </div>
+                        @include('auth.partials.login-footer')
+                    </form>
 
-                    <div class="flex flex-col gap-4">
-                        @if (Route::has('password.request'))
-                            <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-yellow uppercase transition-colors"
-                               href="{{ route('password.request') }}">
-                                {{ __('Forgot access code?') }}
-                            </a>
+                    <form method="POST" action="{{ route('login') }}" class="space-y-4" x-show="method === 'pattern'" x-cloak>
+                        @csrf
+                        <input type="hidden" name="method" value="pattern">
+                        <x-pattern-lock name="value" :submit="true"/>
+                        <div class="flex items-center justify-center">
+                            <input id="remember_pattern" type="checkbox" name="remember"
+                                   class="rounded bg-cpr-black-elevated border-cpr-border text-cpr-pink-dark focus:ring-cpr-pink">
+                            <label for="remember_pattern" class="ms-2 text-sm text-cpr-text-muted italic">Stay connected</label>
+                        </div>
+                        @if(config('services.turnstile.enabled'))
+                            <div class="flex flex-col items-center"><x-turnstile/></div>
                         @endif
+                    </form>
 
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}"
-                               class="cyber-button bg-cpr-black-elevated border-cpr-border text-lg px-12 py-4 uppercase font-bold text-center">
-                                Register Bio-ID
-                            </a>
-                        @endif
+                    <div class="flex flex-col gap-2 mt-6">
+                        <a class="text-xs text-center text-cpr-text-dim hover:text-cpr-yellow uppercase transition-colors"
+                           href="{{ route('recover') }}">
+                            {{ __('Forgot? Use your recovery email') }}
+                        </a>
+                        <p class="text-[10px] text-center text-cpr-text-dim uppercase">
+                            No recovery email? Your gamemaster can tell you your username.
+                        </p>
                     </div>
-                </form>
+                </div>
                 <div class="text-center mt-4">
                     <a href="{{ route('how-to-use') }}"
                        class="text-[12px] text-cpr-red hover:text-cpr-yellow uppercase font-bold transition-colors border-b border-cpr-red/300 pb-1">

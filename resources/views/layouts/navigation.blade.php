@@ -84,7 +84,7 @@
         <div class="pt-4 pb-1 border-t border-cpr-border">
             <div class="px-4">
                 <div class="font-medium text-base text-cpr-text-main">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-cpr-text-dim">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-sm text-cpr-text-dim">{{ Auth::user()->is_gamemaster ? 'Gamemaster' : 'Player' }}</div>
             </div>
 
             <div class="mt-3 space-y-1">

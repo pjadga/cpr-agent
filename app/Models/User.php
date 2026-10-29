@@ -3,11 +3,13 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\AccessCode;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -23,6 +25,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
+        'given_username',
         'email',
         'password',
         'default_actor_id',
@@ -31,6 +35,8 @@ class User extends Authenticatable
         'agent_link',
         'channel_id',
         'is_gm',
+        'is_gamemaster',
+        'access_reviewed_at',
     ];
 
     /**
@@ -41,6 +47,11 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        // Each signs the user in on its own, so none leaves the server.
+        'username',
+        'given_username',
+        'pin_hash',
+        'pattern_hash',
     ];
 
     /**
@@ -55,6 +66,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'character_data' => 'array',
             'is_gm' => 'boolean',
+            'is_gamemaster' => 'boolean',
+            'access_reviewed_at' => 'datetime',
         ];
     }
 
@@ -149,5 +162,69 @@ class User extends Authenticatable
     public function config(): HasOne
     {
         return $this->hasOne(Config::class);
+    }
+
+    /** The account that signs in with any one of: username (any case), PIN or pattern. */
+    public static function findByAccess(string $method, string $value): ?self
+    {
+        return match ($method) {
+            'username' => self::whereRaw('lower(username) = ?', [mb_strtolower(trim($value))])->first(),
+            'pin' => AccessCode::validPin($value) ? self::where('pin_hash', AccessCode::hash('pin', $value))->first() : null,
+            'pattern' => AccessCode::validPattern($value) ? self::where('pattern_hash', AccessCode::hash('pattern', $value))->first() : null,
+            default => null,
+        };
+    }
+
+    /** Whether another account already signs in with this username, PIN or pattern. */
+    public function accessTaken(string $method, string $value): bool
+    {
+        $other = self::findByAccess($method, $value);
+
+        return $other !== null && ! $other->is($this);
+    }
+
+    public function setPin(?string $pin): void
+    {
+        $this->pin_hash = $pin === null ? null : AccessCode::hash('pin', $pin);
+    }
+
+    public function setPattern(?string $pattern): void
+    {
+        $this->pattern_hash = $pattern === null ? null : AccessCode::hash('pattern', $pattern);
+    }
+
+    /** The account that always exists and manages the others. */
+    public static function gamemaster(): ?self
+    {
+        return self::where('is_gamemaster', true)->first();
+    }
+
+    /**
+     * A player the gamemaster adds: the demo character until Foundry sends a real one, and a place
+     * on the gamemaster's session, so they never type a session code.
+     */
+    public static function addPlayer(string $username): self
+    {
+        $demoData = File::exists(base_path('json.json'))
+            ? json_decode(File::get(base_path('json.json')), true)
+            : null;
+
+        $player = self::create([
+            'name' => $username,
+            'username' => $username,
+            'given_username' => $username,
+            'character_data' => $demoData,
+            'default_actor_id' => $demoData['_id'] ?? null,
+            'default_token_id' => $demoData['_id'] ?? null,
+        ]);
+
+        if ($gamemaster = self::gamemaster()) {
+            $session = Session::ensureActiveFor($gamemaster);
+            if ($player->channel_id !== $session->code) {
+                $session->joinPlayer($player);
+            }
+        }
+
+        return $player;
     }
 }

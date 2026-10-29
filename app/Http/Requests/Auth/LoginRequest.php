@@ -2,15 +2,18 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use RyanChandler\LaravelCloudflareTurnstile\Rules\Turnstile;
 
+/**
+ * Lock-screen sign-in: any one of a username, PIN or 3x3 pattern finds the account on its own.
+ */
 class LoginRequest extends FormRequest
 {
     /**
@@ -29,8 +32,8 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+            'method' => ['required', 'in:username,pin,pattern'],
+            'value' => ['required', 'string', 'max:255'],
         ];
 
         if (config('services.turnstile.enabled')) {
@@ -49,13 +52,18 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        $user = User::findByAccess((string) $this->string('method'), (string) $this->string('value'));
+
+        if (! $user) {
+            // Any account's PIN or pattern opens it, so attempts are limited per address, not per account.
+            RateLimiter::hit($this->throttleKey(), 300);
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'value' => __('That doesn\'t match any account.'),
             ]);
         }
+
+        Auth::login($user, $this->boolean('remember'));
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -76,7 +84,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'value' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -88,6 +96,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return 'login|'.$this->ip();
     }
 }

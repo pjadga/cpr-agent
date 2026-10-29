@@ -92,7 +92,7 @@ class ProtocolMatrixTest extends TestCase
     }
 
     /**
-     * Render /profile and return its CSP header.
+     * Render /access and return its CSP header.
      *
      * CSP is opt-in (`CSP_ENABLED`, default false), so the header only exists
      * where someone has switched it on, the hosted instance. Turn it on here
@@ -102,7 +102,7 @@ class ProtocolMatrixTest extends TestCase
     {
         config(['csp.enabled' => true]);
 
-        return $this->actingAs($user)->get('/profile')->headers->get('Content-Security-Policy');
+        return $this->actingAs($user)->get('/access')->headers->get('Content-Security-Policy');
     }
 
     private function useRealBroadcaster(): void
@@ -378,7 +378,7 @@ class ProtocolMatrixTest extends TestCase
 
         $response = $this->actingAs($gm)
             ->withHeaders(['X-Forwarded-Proto' => 'https'])
-            ->get('http://cyberpunk.test/profile');
+            ->get('http://cyberpunk.test/access');
 
         $response->assertOk();
         $this->assertTrue($response->baseRequest->isSecure());
@@ -389,7 +389,7 @@ class ProtocolMatrixTest extends TestCase
     {
         $gm = $this->userWithFoundry('http://192.168.1.60:30000');
 
-        $response = $this->actingAs($gm)->get('http://cyberpunk.test/profile');
+        $response = $this->actingAs($gm)->get('http://cyberpunk.test/access');
 
         $response->assertOk();
         $this->assertFalse($response->baseRequest->isSecure());

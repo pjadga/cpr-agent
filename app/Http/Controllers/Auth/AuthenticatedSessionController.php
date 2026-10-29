@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // First sign-in: offer to replace the given username and add a PIN, pattern and recovery email.
+        if (! $request->user()->access_reviewed_at) {
+            return redirect()->route('access.edit');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

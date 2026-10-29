@@ -106,9 +106,10 @@ class Session extends Model
             ->first();
 
         if (! $session) {
+            // The gamemaster's session is everyone's channel, so it doesn't expire.
             $session = self::create([
                 'gm_user_id' => $gm->id,
-                'expires_at' => now()->addDays(30),
+                'expires_at' => $gm->is_gamemaster ? null : now()->addDays(30),
             ]);
         }
 

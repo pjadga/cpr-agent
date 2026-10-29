@@ -3,7 +3,6 @@
 namespace Tests\Feature\Frontend;
 
 use App\Models\User;
-use Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -14,30 +13,6 @@ use Tests\TestCase;
 class AuthenticationFlowTest extends TestCase
 {
     use RefreshDatabase;
-
-    #[Test]
-    public function registration_screen_can_be_rendered()
-    {
-        $response = $this->get('/register');
-
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function new_users_can_register()
-    {
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'role' => 'player',
-            'cf-turnstile-response' => 'test-token',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect('/dashboard');
-    }
 
     #[Test]
     public function login_screen_can_be_rendered()
@@ -53,8 +28,8 @@ class AuthenticationFlowTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
+            'method' => 'username',
+            'value' => $user->username,
             'cf-turnstile-response' => 'test-token',
         ]);
 
@@ -68,8 +43,8 @@ class AuthenticationFlowTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'wrong-password',
+            'method' => 'username',
+            'value' => 'not-'.$user->username,
         ]);
 
         $this->assertGuest();
@@ -133,7 +108,6 @@ class AuthenticationFlowTest extends TestCase
 
         $response = $this->actingAs($user)->patch('/profile', [
             'name' => 'Updated Name',
-            'email' => 'updated@example.com',
         ]);
 
         $response->assertSessionHasNoErrors();
@@ -142,88 +116,6 @@ class AuthenticationFlowTest extends TestCase
         $user->refresh();
 
         $this->assertEquals('Updated Name', $user->name);
-        $this->assertEquals('updated@example.com', $user->email);
     }
 
-    #[Test]
-    public function user_can_delete_their_account()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->delete('/profile', [
-            'password' => 'password',
-        ]);
-
-        $response->assertSessionHasNoErrors();
-        $response->assertRedirect('/');
-
-        $this->assertGuest();
-        $this->assertNull($user->fresh());
-    }
-
-    #[Test]
-    public function password_confirmation_screen_can_be_rendered()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->get('/confirm-password');
-
-        $response->assertStatus(200);
-    }
-
-    #[Test]
-    public function password_can_be_confirmed()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'password',
-        ]);
-
-        $response->assertRedirect();
-        $response->assertSessionHasNoErrors();
-    }
-
-    #[Test]
-    public function password_is_not_confirmed_with_invalid_password()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->post('/confirm-password', [
-            'password' => 'wrong-password',
-        ]);
-
-        $response->assertSessionHasErrors();
-    }
-
-    #[Test]
-    public function user_can_update_password()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)->put('/password', [
-            'current_password' => 'password',
-            'password' => 'new-password',
-            'password_confirmation' => 'new-password',
-        ]);
-
-        $response->assertSessionHasNoErrors();
-
-        $this->assertTrue(Hash::check('new-password', $user->fresh()->password));
-    }
-
-    #[Test]
-    public function correct_password_must_be_provided_to_update_password()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->actingAs($user)
-            ->from('/profile')
-            ->delete('/profile', [
-                'password' => 'wrong-password',
-            ]);
-
-        $response->assertSessionHasErrorsIn('userDeletion', 'password');
-        $response->assertRedirect('/profile');
-    }
 }

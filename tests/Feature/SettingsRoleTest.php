@@ -14,25 +14,15 @@ class SettingsRoleTest extends TestCase
     use RefreshDatabase;
 
     #[Test]
-    public function player_can_promote_themselves_to_gm()
+    public function players_cannot_promote_themselves()
     {
+        // The gamemaster account manages accounts; nobody promotes themselves in Settings.
         $user = User::factory()->create(['is_gm' => false]);
 
         $this->actingAs($user)
             ->patch(route('settings.role'), ['role' => 'gm'])
-            ->assertRedirect(route('settings'));
-
-        $this->assertTrue($user->fresh()->is_gm);
-    }
-
-    #[Test]
-    public function gm_without_a_session_can_demote_to_player()
-    {
-        $user = User::factory()->create(['is_gm' => true]);
-
-        $this->actingAs($user)
-            ->patch(route('settings.role'), ['role' => 'player'])
-            ->assertRedirect(route('settings'));
+            ->assertRedirect(route('settings'))
+            ->assertSessionHas('error');
 
         $this->assertFalse($user->fresh()->is_gm);
     }
@@ -49,17 +39,6 @@ class SettingsRoleTest extends TestCase
             ->assertSessionHas('error');
 
         $this->assertTrue($gm->fresh()->is_gm);
-    }
-
-    #[Test]
-    public function gm_with_only_an_expired_session_can_demote()
-    {
-        $gm = User::factory()->create(['is_gm' => true]);
-        Session::create(['gm_user_id' => $gm->id, 'expires_at' => now()->subDay()]);
-
-        $this->actingAs($gm)->patch(route('settings.role'), ['role' => 'player']);
-
-        $this->assertFalse($gm->fresh()->is_gm);
     }
 
     #[Test]

@@ -77,8 +77,12 @@
 
                 <section>
                     <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">2. GM Setup</h2>
-                    <p class="mb-4 text-cpr-text-muted text-sm">Pick <strong>Game Master</strong> when you register
-                        (or switch role in Settings → Account Control) to unlock the GM flow.</p>
+                    <p class="mb-4 text-cpr-text-muted text-sm">There's no sign-up. The Agent always has a
+                        <strong>gamemaster</strong> account (first sign-in: username <strong>gamemaster</strong>),
+                        which adds each player on the <strong>Group</strong> page with a username. Anyone signs in
+                        with their username, PIN or pattern; on first sign-in they can replace the username and add
+                        a PIN, a pattern and a recovery email. Players added there join the gamemaster's session
+                        automatically.</p>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
                         <li>As the Game Master, navigate to the <strong>Settings</strong> page.</li>
                         <li>Enter your <strong>Foundry URL</strong>, generate an <strong>API Key</strong>, and save,
@@ -96,14 +100,12 @@
 
                 <section>
                     <h2 class="text-xl font-bold text-cpr-yellow uppercase tracking-widest mb-4">3. Player Setup</h2>
-                    <p class="mb-4">Players must link their accounts to the GM's session:</p>
+                    <p class="mb-4">Sign in with the username your gamemaster gave you; you're already in their
+                        session. Then link Foundry:</p>
                     <ol class="list-decimal list-inside space-y-2 ml-4">
                         <li>Log in to this Agent app and navigate to <strong>Settings</strong>.</li>
                         <li>Generate your own <strong>API Key</strong> and copy it. Enter this key into your Foundry
                             account settings provided by the GM (as below).
-                        </li>
-                        <li>Paste the <strong>Channel ID</strong> provided by your GM into the Channel ID field and
-                            click <strong>Commit Sync</strong>.
                         </li>
                         <li>Within Foundry VTT, go to <strong>Configure Settings</strong> -> <strong>Agent
                                 Bridge</strong> and enter your individual <strong>API Key</strong>.

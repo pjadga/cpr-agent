@@ -22,25 +22,9 @@ class TurnstileDisabledTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
+            'method' => 'username',
+            'value' => $user->username,
             // no cf-turnstile-response on purpose
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
-    }
-
-    public function test_registration_works_without_a_token_when_turnstile_disabled(): void
-    {
-        config(['services.turnstile.enabled' => false]);
-
-        $response = $this->post('/register', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-            'role' => 'player',
         ]);
 
         $this->assertAuthenticated();
@@ -62,8 +46,8 @@ class TurnstileDisabledTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
+            'method' => 'username',
+            'value' => $user->username,
             // no cf-turnstile-response: the 'required' rule must reject this
         ])->assertSessionHasErrors('cf-turnstile-response');
 

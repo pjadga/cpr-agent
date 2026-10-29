@@ -864,7 +864,6 @@
             </h3>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <!-- Profile Info -->
                 <div class="space-y-6">
                     <h4 class="text-lg font-bold text-cpr-text-muted uppercase tracking-widest border-b border-cpr-border pb-2">
                         Profile Data
@@ -882,111 +881,31 @@
                                            :messages="$errors->get('name')"/>
                         </div>
 
-                        <div>
-                            <x-input-label for="email" :value="__('Agent ID (Email)')"
-                                           class="text-xs uppercase text-cpr-teal"/>
-                            <x-text-input id="email" name="email" type="email" class="cyber-input-field mt-1 w-full"
-                                          :value="old('email', $user->email)" required autocomplete="username"/>
-                            <x-input-error class="mt-1 text-cpr-red text-[10px] uppercase"
-                                           :messages="$errors->get('email')"/>
-                        </div>
-
                         <button type="submit"
                                 class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark w-full uppercase font-bold py-2 hover:bg-cpr-teal text-black">
                             Update Profile
                         </button>
                     </form>
-
-                    <!-- Declared role, drives the whole onboarding flow. Foundry
-                         verifies it once the Bridge connects. -->
-                    <form method="post" action="{{ route('settings.role') }}" class="pt-4 border-t border-cpr-border/50">
-                        @csrf
-                        @method('patch')
-
-                        <x-input-label for="role" :value="__('Role')" class="text-xs uppercase text-cpr-teal"/>
-                        <div class="flex gap-2 items-stretch mt-1">
-                            <select id="role" name="role" class="cyber-select-field flex-1 text-base">
-                                <option value="player" {{ !$user->is_gm ? 'selected' : '' }} class="cyber-select-option">
-                                    Player
-                                </option>
-                                <option value="gm" {{ $user->is_gm ? 'selected' : '' }} class="cyber-select-option">
-                                    Game Master
-                                </option>
-                            </select>
-                            <button type="submit"
-                                    class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark px-6 uppercase font-bold text-xs hover:bg-cpr-teal text-black">
-                                Update Role
-                            </button>
-                        </div>
-                        <p class="text-[10px] text-cpr-text-dim mt-1 uppercase">
-                            Switching role changes your setup flow. GMs must terminate their active session
-                            before switching to Player.
-                        </p>
-                    </form>
                 </div>
 
-                <!-- Security/Password -->
                 <div class="space-y-6">
                     <h4 class="text-lg font-bold text-cpr-text-muted uppercase tracking-widest border-b border-cpr-border pb-2">
-                        Change Password
+                        Sign-in Options
                     </h4>
-                    <form method="post" action="{{ route('password.update') }}" class="space-y-4">
-                        @csrf
-                        @method('put')
-
-                        <div>
-                            <x-input-label for="update_password_current_password" :value="__('Current Password')"
-                                           class="text-xs uppercase text-cpr-teal"/>
-                            <x-text-input id="update_password_current_password" name="current_password" type="password"
-                                          class="cyber-input-field mt-1 w-full" autocomplete="current-password"/>
-                            <x-input-error :messages="$errors->updatePassword->get('current_password')"
-                                           class="mt-1 text-cpr-red text-[10px] uppercase"/>
-                        </div>
-
-                        <div>
-                            <x-input-label for="update_password_password" :value="__('New Password')"
-                                           class="text-xs uppercase text-cpr-teal"/>
-                            <x-text-input id="update_password_password" name="password" type="password"
-                                          class="cyber-input-field mt-1 w-full" autocomplete="new-password"/>
-                            <x-input-error :messages="$errors->updatePassword->get('password')"
-                                           class="mt-1 text-cpr-red text-[10px] uppercase"/>
-                        </div>
-
-                        <div>
-                            <x-input-label for="update_password_password_confirmation" :value="__('Confirm Password')"
-                                           class="text-xs uppercase text-cpr-teal"/>
-                            <x-text-input id="update_password_password_confirmation" name="password_confirmation"
-                                          type="password" class="cyber-input-field mt-1 w-full"
-                                          autocomplete="new-password"/>
-                            <x-input-error :messages="$errors->updatePassword->get('password_confirmation')"
-                                           class="mt-1 text-cpr-red text-[10px] uppercase"/>
-                        </div>
-
-                        <button type="submit"
-                                class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark w-full uppercase font-bold py-2 hover:bg-cpr-teal text-black">
-                            Update
-                        </button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Danger Zone -->
-            <div class="settings-section">
-                <div
-                    class="flex flex-col md:flex-row items-center justify-between gap-6 bg-cpr-red-dark/10 p-6 border border-cpr-red-dark/20">
-                    <div>
-                        <h4 class="text-lg font-bold text-cpr-red uppercase tracking-widest">Terminate Account</h4>
-                        <p class="text-xs text-cpr-red/60 uppercase mt-1">Warning: This action is permanent and will
-                            wipe all Agent sync data.</p>
-                    </div>
-
-                    <button
-                        x-data=""
-                        x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
-                        class="cyber-button bg-cpr-red-dark border-cpr-red-dark px-8 py-2 uppercase font-bold hover:bg-cpr-red whitespace-nowrap"
-                    >
-                        Delete Account
-                    </button>
+                    <p class="text-sm text-cpr-text-muted">
+                        Change your username, PIN, pattern or recovery email.
+                    </p>
+                    <a href="{{ route('access.edit') }}"
+                       class="cyber-button bg-cpr-teal-dark border-cpr-teal-dark w-full uppercase font-bold py-2 hover:bg-cpr-teal text-black text-center block">
+                        Access
+                    </a>
+                    @if($user->is_gamemaster)
+                        <p class="text-sm text-cpr-text-muted">Add players and manage their sign-in.</p>
+                        <a href="{{ route('group.index') }}"
+                           class="cyber-button bg-cpr-black-elevated border-cpr-border w-full uppercase font-bold py-2 text-center block">
+                            Group
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
@@ -1007,50 +926,6 @@
             </div>
         </div>
     </div>
-
-    <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}"
-              class="p-6 bg-cpr-black-deep border-2 border-cpr-red">
-            @csrf
-            @method('delete')
-
-            <h2 class="text-2xl font-bold text-cpr-red uppercase tracking-tighter keep-accent">
-                Confirm Account Termination
-            </h2>
-
-            <p class="mt-4 text-sm text-cpr-text-muted uppercase tracking-widest">
-                Once your account is deleted, all of its resources and data will be permanently deleted. Please enter
-                your password to confirm you would like to permanently delete your account.
-            </p>
-
-            <div class="mt-6">
-                <x-input-label for="password" value="{{ __('Password') }}" class="sr-only"/>
-
-                <x-text-input
-                    id="password"
-                    name="password"
-                    type="password"
-                    class="cyber-input-field mt-1 block w-3/4"
-                    placeholder="{{ __('Enter Encryption Key') }}"
-                />
-
-                <x-input-error :messages="$errors->userDeletion->get('password')"
-                               class="mt-2 text-cpr-red text-[10px] uppercase"/>
-            </div>
-
-            <div class="mt-6 flex justify-end gap-4">
-                <button type="button" x-on:click="$dispatch('close')"
-                        class="cyber-button bg-cpr-black-elevated border-cpr-border px-6 py-2 uppercase text-xs">
-                    Abort
-                </button>
-
-                <button type="submit"
-                        class="cyber-button bg-cpr-red-dark border-cpr-red-dark px-6 py-2 uppercase text-xs hover:bg-cpr-red">
-                    Terminate Account
-                </button>
-            </div>
-        </form>
-    </x-modal>
 
     <script @cspNonce>
         const actorSelection = document.getElementById('actor_selection');
