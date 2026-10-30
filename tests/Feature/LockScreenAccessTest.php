@@ -178,6 +178,7 @@ class LockScreenAccessTest extends TestCase
     public function test_the_gamemaster_adds_a_player_who_joins_their_session(): void
     {
         $gm = $this->gamemaster();
+        $gm->config()->create(['foundry_url' => 'https://foundry.example']);
 
         $this->actingAs($gm)->post('/group', ['username' => 'Roy'])->assertRedirect(route('group.index'));
         $this->actingAs($gm)->post('/group', ['username' => 'ROY'])->assertSessionHasErrors('username');
@@ -187,6 +188,8 @@ class LockScreenAccessTest extends TestCase
         $this->assertNull($session->expires_at);
         $this->assertSame($session->code, $roy->channel_id);
         $this->assertFalse($roy->is_gm);
+        // Like a player who joins with a code, they get the gamemaster's Foundry address.
+        $this->assertSame('https://foundry.example', $roy->config->foundry_url);
     }
 
     public function test_the_gamemaster_changes_anyones_username_pin_and_pattern(): void

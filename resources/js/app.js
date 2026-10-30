@@ -83,9 +83,11 @@ if (document.getElementById('app')) {
 }
 
 // The settings page is Alpine-land, so the QR/paste linker gets its own isolated
-// Vue root that can't clash with Alpine directives elsewhere on the page.
-if (document.getElementById('qr-link-app')) {
+// Vue root that can't clash with Alpine directives elsewhere on the page. Settings
+// has more than one slot (Join a Session, and linking for users already in one),
+// and only one is visible, so each gets its own root.
+for (const slot of document.querySelectorAll('.qr-link-app')) {
     const qrApp = createApp({});
     qrApp.component('qr-link-scanner', QrLinkScanner);
-    qrApp.mount('#qr-link-app');
+    qrApp.mount(slot);
 }

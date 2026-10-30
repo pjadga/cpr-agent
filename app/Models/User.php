@@ -223,6 +223,8 @@ class User extends Authenticatable
             if ($player->channel_id !== $session->code) {
                 $session->joinPlayer($player);
             }
+            // As joining with a code does, take the gamemaster's Foundry address.
+            $player->config()->create(['foundry_url' => $session->foundry_config['foundry_url'] ?? $gamemaster->config?->foundry_url]);
         }
 
         return $player;

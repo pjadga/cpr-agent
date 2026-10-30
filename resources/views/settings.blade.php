@@ -137,7 +137,7 @@
                      Isolated Vue mount, this Alpine page has no global #app root. Rendered once
                      per page: players get it here, GMs get it in their link block below. -->
                 @unless(auth()->user()->is_gm)
-                    <div id="qr-link-app">
+                    <div class="qr-link-app">
                         <qr-link-scanner agent-link="{{ auth()->user()->agent_link }}"></qr-link-scanner>
                     </div>
                 @endunless
@@ -218,9 +218,11 @@
             </div>
         </div>
 
-        @if(auth()->user()->is_gm)
+        @if(auth()->user()->is_gm || ! empty($sessionInfo))
             <!-- GM self-link: same scan/paste flow players get. In Foundry the GM's
-                 "Link my Agent" mints their own QR instantly (no round-trip). -->
+                 "Link my Agent" mints their own QR instantly (no round-trip). Players the
+                 gamemaster added are already in the session, so the Join a Session scanner
+                 above isn't shown to them; this one links their Foundry user. -->
             <details class="mb-8 group border border-cpr-border rounded-lg overflow-hidden bg-cpr-black-deep/40">
                 <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-cpr-teal/10 transition-colors list-none">
                     <h3 class="settings-subheading">
@@ -235,11 +237,17 @@
                 </summary>
                 <div class="p-4 border-t border-cpr-border">
                     <p class="text-xs text-cpr-text-dim mb-4">
-                        In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong>,
-                        as the GM you get your own QR immediately. Scan it here (phone) or paste the
-                        link code (desktop). Optional if the Bridge already shows your account as linked.
+                        @if(auth()->user()->is_gm)
+                            In Foundry, open <strong class="text-cpr-teal">Agent Bridge → Link my Agent</strong>,
+                            as the GM you get your own QR immediately. Scan it here (phone) or paste the
+                            link code (desktop). Optional if the Bridge already shows your account as linked.
+                        @else
+                            Your GM shows your QR from <strong class="text-cpr-teal">Agent Bridge → Manage
+                            Characters</strong> in Foundry. Scan it here (phone) or paste the link code
+                            (desktop), and your character is linked.
+                        @endif
                     </p>
-                    <div id="qr-link-app">
+                    <div class="qr-link-app">
                         <qr-link-scanner agent-link="{{ auth()->user()->agent_link }}"></qr-link-scanner>
                     </div>
                 </div>
