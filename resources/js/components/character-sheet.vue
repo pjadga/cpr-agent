@@ -797,8 +797,21 @@ export default {
                 }
             }
 
-            if (payload.type === 'CONFIRMATION') {
-                // Potential confirmation handling
+            // Cyberware moved in or out: the tree is built from the whole sheet, so reload
+            // it, as the Refresh button does, rather than wait for a refresh that may not come.
+            if (['CYBERWARE_INSTALLED', 'CYBERWARE_UNINSTALLED'].includes(payload.type)
+                && payload.success && payload.requestId && isMyRequest(payload.requestId)) {
+                refreshSheet({ force: true });
+            }
+
+            // Foundry refused one of my requests (game paused, not in combat, path
+            // blocked...): say why rather than leave the button doing nothing.
+            if (payload.type === 'CONFIRMATION' && payload.success === false && payload.message) {
+                const incomingLink = (payload.agentLink || payload.agent_link || '').replace(/\/$/, '').toLowerCase();
+                const myLink = (localAgentLink.value || '').replace(/\/$/, '').toLowerCase();
+                if ((payload.requestId && isMyRequest(payload.requestId)) || (myLink && incomingLink === myLink)) {
+                    throwError(payload.message);
+                }
             }
         };
 
@@ -954,10 +967,16 @@ export default {
         const luck = computed(() => charData.value?.data.system.stats.luck || {value: 0, max: 0});
         const emp = computed(() => charData.value?.data.system.stats.emp || {value: 0, max: 0});
 
+        // The character's active role. activeNetRole is the netrunning role's id, empty for
+        // anyone who isn't a Netrunner; activeRole is the active role's name.
         const roleItem = computed(() => {
             if (!charData.value) return null;
-            const id = charData.value.data.system.roleInfo.activeNetRole;
-            return charData.value.data.items.find(i => i._id === id);
+            const roleInfo = charData.value.data.system.roleInfo || {};
+            const roles = charData.value.data.items.filter(i => i.type === 'role');
+            return roles.find(i => i.name === roleInfo.activeRole)
+                || roles.find(i => i._id === roleInfo.activeNetRole)
+                || roles[0]
+                || null;
         });
 
         const installedIds = computed(() => {
@@ -1078,7 +1097,11 @@ export default {
                 const isToggledWeapon = i.system.isWeapon && i.system.usage === 'toggled';
                 const isProgram = i.type === 'program';
                 const isCyberdeck = i.type === 'cyberdeck';
-                return (isEquipped || isToggledWeapon || isProgram || isCyberdeck) && !installedIds.value.has(i._id);
+                // Items inside another (ammo in a gun, programs in a deck) aren't listed on
+                // their own, except cyberware weapons: Core installs Wolvers inside its
+                // Cyberarm, and that is the only way the player can use them.
+                const isNested = installedIds.value.has(i._id) && !(i.type === 'cyberware' && i.system.isWeapon);
+                return (isEquipped || isToggledWeapon || isProgram || isCyberdeck) && !isNested;
             });
 
             items.forEach(item => {
@@ -1196,6 +1219,11 @@ export default {
             // Refresh roll modifiers whether we have a weapon or not
             fetchRollModifiers();
         }, {deep: true});
+
+        // Autofire reads its own DV table, so a new fire mode needs a new DV.
+        watch(() => controlState.value.fireMode, () => {
+            if (controlState.value.selectedWeapon) debouncedFetchDV();
+        });
 
         watch(() => charData.value, (newData, oldData) => {
             if (newData && controlState.value.selectedWeapon) {

@@ -66,6 +66,12 @@ class ActorSheet extends FormRequest
                 'success' => false,
                 'error' => 'no_character_data',
                 'message' => 'No character data is cached for this account yet.',
+                // The character the GM assigned, so a page holding an older id
+                // (a reassignment, or another account in the same browser) asks
+                // Foundry for the right one.
+                'assignedActorId' => $user->default_actor_id
+                    ? preg_replace('/^Actor\./', '', $user->default_actor_id)
+                    : null,
             ], 400);
         }
 

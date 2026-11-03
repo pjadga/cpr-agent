@@ -19,6 +19,8 @@ class GetVisibleTokens extends FormRequest
         $validatedData = $request->validate([
             'selectedWeapon' => 'required|array|max:255',
             'selectedTarget' => 'nullable|array|max:255',
+            // Single, Aimed, Auto or Suppress: autofire has its own DV table.
+            'fireMode' => 'nullable|string|max:20',
         ]);
 
         $user = auth()->user();
@@ -42,6 +44,7 @@ class GetVisibleTokens extends FormRequest
             'actorId' => $actorId,
             'weaponId' => $weaponId,
             'targetTokenId' => $targetTokenId,
+            'fireMode' => $validatedData['fireMode'] ?? null,
             'requestId' => $requestId,
         ]);
 

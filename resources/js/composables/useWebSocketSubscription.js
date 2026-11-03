@@ -24,6 +24,16 @@ let actorUuid = (localStorage.getItem('cpr_actor_uuid') || '').replace(/^Actor\.
 let useCount = 0;
 
 /**
+ * Switch to another actor: this module filters live updates by it, so the
+ * page's fetches must change it here too, not only in localStorage.
+ */
+export function setActorUuid(id) {
+    actorUuid = String(id || '').replace(/^Actor\./, '') || null;
+    if (actorUuid) localStorage.setItem('cpr_actor_uuid', actorUuid);
+    else localStorage.removeItem('cpr_actor_uuid');
+}
+
+/**
  * Subscribe to WebSocket events on the private channel.
  * Handles ACTOR_DATA and SHEET_DELTA events, applying them to charData.
  */

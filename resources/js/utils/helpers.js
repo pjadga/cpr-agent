@@ -64,7 +64,8 @@ export function findItemInList(id, list) {
 export function formatCategoryName(cat) {
     if (!cat) return 'Other';
     if (cat === 'installedPrograms') return 'Installed Programs';
-    const result = cat.replace(/([A-Z])/g, ' $1').trim();
+    // Core spells this category key "rangedweaponSkills", so the split below can't see the word break.
+    const result = cat.replace(/^rangedweapon/, 'rangedWeapon').replace(/([A-Z])/g, ' $1').trim();
     return result.charAt(0).toUpperCase() + result.slice(1);
 }
 

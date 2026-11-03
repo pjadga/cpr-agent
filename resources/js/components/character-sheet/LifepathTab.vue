@@ -49,7 +49,7 @@
                     <div v-if="expanded[key]" class="relative mt-1"
                          :style="{ '--frame-accent': 'var(--cpr-border)' }">
                         <DropdownInfoFrame class="absolute inset-0 pointer-events-none select-none"/>
-                        <div class="relative z-10 px-4 py-3 text-[11px] text-cpr-text-main leading-relaxed">
+                        <div class="relative z-10 px-4 py-3 text-[11px] text-cpr-text-main leading-relaxed whitespace-pre-line">
                             {{ value || '---' }}
                         </div>
                     </div>
@@ -86,7 +86,12 @@ export default {
             localNotes.value = cleanNotes(newNotes);
         }, {immediate: true});
 
-        const lifepathData = computed(() => props.charData?.data?.system?.lifepath || {});
+        // Lifepath fields are rich text in Cyberpunk RED ("<p>North American</p>"): show
+        // their text, a line per paragraph, not the markup.
+        const lifepathText = (html) => cleanNotes(String(html ?? '').replace(/<\/(p|div|li|h\d)>|<br\s*\/?>/gi, '$&\n')).trim();
+        const lifepathData = computed(() => Object.fromEntries(
+            Object.entries(props.charData?.data?.system?.lifepath || {}).map(([key, value]) => [key, lifepathText(value)])
+        ));
 
         const formatLabel = (key) => {
             return key

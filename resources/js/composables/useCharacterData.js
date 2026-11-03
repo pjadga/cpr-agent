@@ -1,7 +1,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, triggerRef, watch } from 'vue';
 import { useRefreshIcons, useDeltaApplier } from './useDeltaApplier';
 import { useImageProxy } from './useImageProxy';
-import { useWebSocketSubscription } from './useWebSocketSubscription';
+import { useWebSocketSubscription, setActorUuid } from './useWebSocketSubscription';
 import { isMyActor, isMyRequest } from '../utils/requests';
 import { useNetPool } from './useNetPool';
 import { classifyApiError } from './useFoundryDiagnostics';
@@ -108,7 +108,7 @@ export function useCharacterData() {
                         if (dbActorUuid && dbActorUuid !== actorUuid) {
                             console.log(`UUID mismatch: Local (${actorUuid}) vs DB (${dbActorUuid}). Updating...`);
                             actorUuid = dbActorUuid;
-                            localStorage.setItem('cpr_actor_uuid', actorUuid);
+                            setActorUuid(actorUuid);
                         }
 
                         charData.value = dbResponse.data;
@@ -122,6 +122,14 @@ export function useCharacterData() {
                     // rendering nothing at all.
                     console.warn("Local DB fetch failed or empty:", dbErr);
                     lastFailure = classifyApiError(dbErr);
+                    // The server names the assigned character when it has no sheet for
+                    // it yet; an older id here would ask Foundry for the wrong actor.
+                    const assigned = dbErr?.response?.data?.assignedActorId;
+                    if (assigned && assigned !== actorUuid) {
+                        console.log(`Assigned actor changed: ${actorUuid} -> ${assigned}`);
+                        actorUuid = assigned;
+                        setActorUuid(actorUuid);
+                    }
                     if (isInitial) forceFresh = true;
                 }
             } else {

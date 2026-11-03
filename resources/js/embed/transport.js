@@ -56,7 +56,8 @@ export const ENDPOINT_MAP = {
     // weaponId (selectedWeapon._id) and targetTokenId (selectedTarget.id) before
     // dispatching GET_DV_INFO. Without this the Bridge sees weaponId undefined
     // ("Weapon ID undefined not found on actor"). DV_INFO_DATA returns via echo.
-    '/getvisibletokens':  { type: 'GET_DV_INFO', transform: (b) => ({ weaponId: b.selectedWeapon?._id ?? null, targetTokenId: b.selectedTarget?.id ?? null }) },
+    // fireMode picks the autofire DV table for Auto.
+    '/getvisibletokens':  { type: 'GET_DV_INFO', transform: (b) => ({ weaponId: b.selectedWeapon?._id ?? null, targetTokenId: b.selectedTarget?.id ?? null, fireMode: b.fireMode ?? null }) },
     '/listvisibletokens': { type: 'LIST_VISIBLE_TOKENS' }, // empty body; VISIBLE_TOKENS_DATA returns via echo (verified)
     '/getbaseurl':        { empty: true },                 // image-proxy base; images are a known embed gap
     '/get-rolls':         { empty: true },                 // dice history is server-stored; empty in embed

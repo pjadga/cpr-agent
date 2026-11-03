@@ -32,7 +32,8 @@ export function useCombat(controlState, charData, fetchCharacterData, throwError
             dvLoading.value = true;
             const response = await window.axios.post('/api/getvisibletokens', {
                 selectedWeapon: controlState.value.selectedWeapon,
-                selectedTarget: controlState.value.selectedTarget
+                selectedTarget: controlState.value.selectedTarget,
+                fireMode: controlState.value.fireMode
             });
 
             if (response.data && response.data.success && response.data.data) {
